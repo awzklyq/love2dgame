@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="804" height="1024" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+ <metadata>image/svg+xml
+  <rdf:RDF>
+   <cc:Work rdf:about="">
+    <dc:format>image/svg+xml</dc:format>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:title/>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <g>
+  <title>background</title>
+  <rect id="canvas_background" x="-1" y="-1" width="1662" height="802" fill="none"/>
+ </g>
+ <g>
+  <title>Layer 1</title>
+ </g>
+ <path d="m309.97 137.5 52.446-92.998 54.316 91.919z" fill="#e9afaf" asd="test"/>
+ <rect x="319.04" y="136.42" width="97.696" height="173.68" fill="#ff2a2a"/>
+ <rect x="372.69" y="250.87" width="4.8245" height="26.535" fill="#e9afaf"/>
+ <rect x="359.43" y="294.29" width="2.4122" height="10.855" fill="#e9afaf"/>
+</svg>

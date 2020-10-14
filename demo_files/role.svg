@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="210mm" height="297mm" version="1.1" viewBox="0 0 210 297" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+ <metadata>
+  <rdf:RDF>
+   <cc:Work rdf:about="">
+    <dc:format>image/svg+xml</dc:format>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:title/>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <g stroke-width=".26458">
+  <ellipse cx="115.66" cy="120.57" rx="62.744" ry="60.854" fill="#fea"/>
+  <ellipse cx="114.15" cy="117.93" rx="24.946" ry="21.167" fill="#808000"/>
+  <ellipse cx="114.15" cy="133.05" rx=".75595" ry="3.0238" fill="#808000"/>
+ </g>
+ <rect transform="rotate(40.148)" x="157.49" y="21.205" width="19.655" height="33.06" fill="#000080" stroke-width=".25421"/>
+ <rect x="121.74" y="109.84" width="41.455" height="20.584" ry="0" fill="#008000" stroke-width=".27142"/>
+ <rect x="163.19" y="115.54" width="15.214" height="14.889" fill="#a00" stroke-width=".21276"/>
+</svg>
