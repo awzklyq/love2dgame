@@ -15,7 +15,6 @@ _G.app.load(function()
     -- ground:setType('static') -- Types can be 'static', 'dynamic' or 'kinematic'. Defaults to 'dynamic'
     -- wall_left:setType('static')
     -- wall_right:setType('static')
-    print('ttttttttttttttttttttt')
 -- end)
 end)
 

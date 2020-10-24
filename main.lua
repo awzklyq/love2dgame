@@ -1,5 +1,6 @@
 --file
 _G.log = require "script/log"
+dofile('script/class.lua')
 dofile("script/ui/uihelper.lua")
 dofile('script/debug.lua')
 
@@ -34,6 +35,12 @@ dofile('script/groupmanager.lua')
 dofile('script/physics/world.lua')
 
 dofile('script/entity/entity.lua')
+
+_G.lovedebug.renderbox2d = true;   
+_G.lovedebug.renderobject = true;
+
+_G.lovedebug.showstat = false
+
 app.load(function()
 	_G.GroupManager.loadGroup("Login");
 end)

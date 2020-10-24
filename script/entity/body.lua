@@ -36,6 +36,15 @@ function Body:addBody(body)
     body.parent = self;
 end
 
+function Body:update(e)
+    for i, v in pairs(self.polygons) do
+        v:update(e)
+    end
+
+    for i, v in pairs(self.children) do
+        v:update(e)
+    end
+end
 
 function Body:draw()
     love.graphics.push();

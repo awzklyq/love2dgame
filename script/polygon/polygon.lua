@@ -20,6 +20,8 @@ function Polygon.new(x ,y)
 
     polygon.pos = Vector.new();
     polygon.transform =  Matrix.new();
+
+    --polygon.box2d
     return polygon;
 end
 
@@ -39,9 +41,10 @@ function Polygon:addRect(rect)
 end
 
 function Polygon:moveTo(x, y)
+    
+    self.transform:translate(x - self.pos.x, y - self.pos.y);
     self.pos.x = x;
     self.pos.y = y;
-    self.transform:translate(x, y);
 end
 
 function Polygon:move(x, y)
@@ -58,15 +61,38 @@ function Polygon:faceTo(x, y)
     self.transform:setXDirection( x - self.pos.x, y - self.pos.y);
 end
 
+function Polygon:update(e)
+    --同步物理信息
+    if self.phytype == "dynamic" and self.box2d then
+
+        local x, y = self.box2d:getWorldCenter( )
+        if self.oldbox2dshearx and self.oldbox2dsheary then
+            if math.abs(self.oldbox2dshearx - x) < 0.000001 and math.abs(self.oldbox2dsheary - y) < 0.000001 then
+                return;
+            end
+        end 
+
+        if not self.box2doffsetx or not self.box2doffsety then
+            local x1, y1 = self.box2d:getPosition()
+            self.box2doffsetx = x1 - x;
+            self.box2doffsety = y1 - y;
+        end
+
+        self.oldbox2dshearx = x;
+        self.oldbox2dsheary = y;
+        self:moveTo(x + self.box2doffsetx, y + self.box2doffsety);
+    end
+end
+
 function Polygon:draw()
     local r, g, b, a = love.graphics.getColor( );
     love.graphics.setColor(self.color.r, self.color.g, self.color.b, self.color.a );
     Render.RenderObject(self);
     love.graphics.setColor(r, g, b, a );
-    -- Matrix.reset()
-    if self.box2d then
-        self.box2d:draw();
-    end
+    -- -- Matrix.reset()
+    -- if self.box2d then
+    --     self.box2d:draw();
+    -- end
 end
 
 function Polygon:createSVG(file, entity)
@@ -93,7 +119,6 @@ function Polygon:createSVGRenderPaths(svgpaths, entity, rootbody)
     
     for i, v in pairs(svgpaths) do
         local svgpath = svgpaths[i];
-        local values = {}
         if svgpath.paths then
             svgpath.rendervertices = {}
             for j = 1, #svgpath.paths do
@@ -174,19 +199,45 @@ function Polygon:createSVGRenderPaths(svgpaths, entity, rootbody)
             end
 
             if not body then
-                print('ccccccccccc', not rootbody)
                 if not rootbody then --没有body的时候 创建rootbody
                     rootbody = Body.new("", 0);--name, order
                     entity.body = rootbody;
                     body = rootbody;
-                    print('bbbbbbbbbbbbbbbbb',entity, entity.body)
                 else
                     body = Body.new("", 0);--name, order
                     table.insert(rootbody.children, body);
                 end
             end
+
+            if v.paths and v["user_phytype"] then
+                if v.typename == 'rect' then
+                    polygon.box2d = Box2dObject:newPolygon(polygon.vertices);
+                    polygon.box2d:setType(v["user_phytype"] == "1" and 'static' or 'dynamic');
+                elseif v.typename == 'ellipse' then
+
+                    if #polygon.vertices <= 16 then
+                        polygon.box2d = Box2dObject:newPolygon(polygon.vertices);
+                    else
+                        local vertices = {}
+                        local count = #polygon.vertices / 2;
+                        local op =math.ceil(count / 16);
+
+                        
+                        for offset =1,#polygon.vertices ,op * 2 do 
+                            table.insert(vertices, polygon.vertices[offset] );
+                            table.insert(vertices, polygon.vertices[offset + 1] );
+                        end
+                        
+                        polygon.box2d = Box2dObject:newPolygon(vertices);
+                    end
+
+                    polygon.box2d:setType(v["user_phytype"] == "1" and 'static' or 'dynamic');
+                end
+            end 
             
             table.insert(body.polygons, polygon);
+
+            polygon.phytype = v["user_phytype"] == "1" and 'static' or 'dynamic';
         end
 
         

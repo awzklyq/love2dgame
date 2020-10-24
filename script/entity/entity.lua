@@ -1,7 +1,6 @@
-
-
-dofile('script/entity/body.lua')
 _G.Entity = {}
+dofile('script/entity/body.lua')
+dofile('script/entity/me.lua')
 
 function Entity.new()
     local entity = setmetatable({}, {__index = Entity});
@@ -31,6 +30,12 @@ end
 function Entity:faceTo(x, y)
     if self.body then
         self.body:setXDirection( x - self.pos.x, y - self.pos.y);
+    end
+end
+
+function Entity:update(e)
+    if self.body then
+        self.body:update();
     end
 end
 

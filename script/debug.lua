@@ -7,8 +7,3 @@ _G.lovedebug.logtab = function(tab)
         end
     end
 end
-
-_G.lovedebug.renderbox2d = true;   
-_G.lovedebug.renderobject = true;
-
-_G.lovedebug.showstat = false

@@ -476,9 +476,9 @@ function common.gen(svg, element, options, userpaths)
     --Load user define value
     if element.attributes then
         for i, v in pairs(element.attributes) do
-            if string.find(i, "user_" ) then
+            -- if string.find(i, "user_" ) or i == "name" then
                 upath[i] = v;
-            end
+            -- end
         end
     end
 

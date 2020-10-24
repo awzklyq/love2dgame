@@ -47,8 +47,8 @@ function love.keyreleased(key)
 end
 
 function love.wheelmoved(x, y)
-    if  _G.UIHelper.whellMove then
-        _G.UIHelper.whellMove(x, y)
+    if  _G.UIHelper.wheelMove then
+        _G.UIHelper.wheelMove(x, y)
     end
     _G.CameraManager.wheelmoved(x, y);
     _G.LightManager.wheelmoved(x, y);

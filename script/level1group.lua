@@ -8,8 +8,10 @@ end
 function Level1Group:init()
     self.levelres = Entity.new()
     self.level1 = Polygon.new(100, 100);
-    print('ttttttttttttt',self.levelres)
     self.level1:createSVG("levels/level1.svg", self.levelres);--method-draw-image.svg
+
+    self.me = Entity.new()
+    self.level1:createSVG("demo_files/me.svg", self.me);--method-draw-image.svg
     local button = self:createUI("Button")
     button:setPos(200, 200);
     button:setText("Game");
@@ -30,6 +32,20 @@ function Level1Group:release()
     self:clearUI();
 end
 
+function Level1Group:update(dt)
+    -- if self.level1 then
+    --     self.level1:draw(dt);
+    -- end
+
+    if self.levelres then
+        self.levelres:update();
+    end
+
+    if self.me then
+        self.me:update();
+    end
+end
+
 function Level1Group:draw(dt)
     -- if self.level1 then
     --     self.level1:draw(dt);
@@ -37,5 +53,9 @@ function Level1Group:draw(dt)
 
     if self.levelres then
         self.levelres:draw();
+    end
+
+    if self.me then
+        self.me:draw();
     end
 end

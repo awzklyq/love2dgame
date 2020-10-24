@@ -22,6 +22,14 @@ _G.GroupManager.releaseGroup = function(group)
     _G.GroupManager.groups[group] = nil;
 end
 
+app.update(function(dt)
+    for i, v in pairs(_G.GroupManager.groups) do
+        if v.update then
+            v:update(dt);
+        end
+    end
+end)
+
 app.render(function(dt)
     for i, v in pairs(_G.GroupManager.groups) do
         if v.draw then

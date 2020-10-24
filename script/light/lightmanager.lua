@@ -23,7 +23,7 @@ function _G.LightManager.update(dt)
     -- lw:setTranslation(100, 100, 1)
 end
 
-_G.LightManager.Need = true
+_G.LightManager.Need = false
 
 function _G.LightManager.draw(func)
     lw:draw(func);
