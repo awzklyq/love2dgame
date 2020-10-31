@@ -7,3 +7,5 @@ _G.lovedebug.logtab = function(tab)
         end
     end
 end
+
+_G.log = print

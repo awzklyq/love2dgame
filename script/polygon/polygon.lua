@@ -1,7 +1,7 @@
 _G.Polygon = {}
 
 function Polygon.new(x ,y)
-    local polygon = setmetatable({}, {__index = Polygon});
+    local polygon = setmetatable({}, Polygon);
     -- polygon.mode1 = 'fill';
 
     polygon.color = LColor.new(255,255,255,255)
@@ -18,7 +18,6 @@ function Polygon.new(x ,y)
 
     polygon.usesvgpaths = false;
 
-    polygon.des = Vector.new();
     polygon.transform =  Matrix.new();
 
     polygon.x1 = 0
@@ -30,8 +29,39 @@ function Polygon.new(x ,y)
     polygon.cx = 0;
     polygon.cy = 0;
 
+  
+
     --polygon.box2d
     return polygon;
+end
+
+Polygon.__index = function(tab, key)
+    local body = rawget(tab, "body")
+    if key == 'parent' and  body then
+        return  tab["body"]["parent"];
+    end
+
+    if body then
+        if key == 'parent' then
+            return  body["parent"];
+        elseif key == "name" then
+            return "Polygon_"..body[key]
+        elseif key == "needparentposition" then
+            return body[key]
+        elseif key == "needparentoffsetpos" then
+            return body[key]
+        end 
+    end
+
+    if Polygon[key] then
+        return Polygon[key];
+    end
+
+    return rawget(tab, key);
+end
+
+Polygon.__newindex = function(tab, key, value)
+    rawset(tab, key, value);
 end
 
 function Polygon:setColor(r, g, b, a)
@@ -49,27 +79,6 @@ function Polygon:addRect(rect)
     table.insert(self.rects, rect);
 end
 
-function Polygon:move(x, y)
-    self.transform:translate(x, y);
-
-    self.des.x = self.des.x + x
-    self.des.y = self.des.y + y
-end
-
-function Polygon:moveTo(x, y)
-    self.transform:translate(x - self.des.x, y - self.des.y);
-
-    self.des.x = x
-    self.des.y = y
-end
-
-function Polygon:scale(x, y)
-    self.transform:scale( x, y);
-end
-
-function Polygon:faceTo(x, y)
-    self.transform:setXDirection( x - self.des.x, y - self.des.y);
-end
 
 function Polygon:update(e)
     --同步物理信息
@@ -97,7 +106,7 @@ function Polygon:update(e)
         self.oldbox2dangle = angle;
         
 
-        self:moveTo(x, y);
+        self.transform:moveTo(x, y);
         self.transform:rotateLeft(angle - (self.oldbox2dangle or 0))
 
         -- self.transform:rotateLeft(0.2);
@@ -269,7 +278,14 @@ function Polygon:createSVGRenderPaths(svgpaths, entity, rootbody)
                 end
             end
 
-            body:addPolygon(polygon);
+            for m, n in pairs(v) do
+                if string.find(m, "user_") then
+                    body[string.gsub(m, "user_", "")] = n
+                    --print('ttttttttt', string.gsub(m, "user_", ""), m, n)
+                end
+            end
+
+            body:setPolygon(polygon);
 
             polygon.phytype = v["user_phytype"] == "1" and 'static' or 'dynamic';
         end

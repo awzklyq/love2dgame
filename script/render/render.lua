@@ -3,22 +3,37 @@ _G.Render = {};
 Render.CircleId = 1;
 Render.RectId = 2;
 
-Render.Box2dCircleId = 3;
-Render.Box2dRectId = 4;
+Render.PolygonId = 3;
 
-Render.PolygonId = 5;
+Render.EntityBodyId = 4;
 
-Render.EntityBodyId = 6;
+Render.LineId = 5;
 
-Render.LineId = 7;
+Render.CrossLineId = 6;
 
-Render.CrossLineId = 8;
+Render.getRenderIdName = function(id)
+    if Render.CircleId == id then
+        return "Circle"
+    elseif Render.RectId == id then
+        return "Rect"
+    elseif Render.PolygonId == id then
+        return "Polygon"
+    elseif Render.EntityBodyId == id then
+        return "EntityBody"
+    elseif Render.LineId == id then
+        return "Line"
+    elseif Render.CrossLineId == id then
+        return "CrossLine"
+    end
+
+    return "Null"
+end
 
 Render.RenderObject = function(obj)
     if not _G.lovedebug.renderobject then return end
     love.graphics.push();
 
-    if obj.transform then
+    if obj.transform and obj.renderid ~= Render.EntityBodyId then
         obj.transform:use(obj);
     end
     if _G.lovedebug.renderobject then
@@ -28,9 +43,8 @@ Render.RenderObject = function(obj)
             love.graphics.rectangle( obj.mode, obj.x, obj.y, obj.w, obj.h);
         elseif obj.renderid == Render.EntityBodyId then
            
-            for i, v in ipairs(obj.polygons) do
-                -- Render.RenderObject(v);
-                v:draw();
+            if obj.polygon then
+                obj.polygon:draw()
             end
 
             for i, v in ipairs(obj.children) do

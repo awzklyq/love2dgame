@@ -1,47 +1,93 @@
 _G.Matrix = {}
 
 function Matrix.new(lmat)
-    local mat = setmetatable({}, {__index = function(mytable, key, ...)
-        if Matrix[key] then
-            return Matrix[key];
-        end
-        
-        if mytable.transform and mytable.transform[key] then
-
-            if type(mytable.transform[key]) == 'function' then
-                mytable[key] = function(tab, ...)
-                    return mytable.transform[key](mytable.transform, ...);--todo..
-                end
-                return mytable[key];
-            end
-
-            return mytable.transform[key]
-        end
-
-        return nil;
-      end});
+    local mat = setmetatable({}, Matrix);
 
     mat.transform =  lmat or love.math.newTransform( );
 
     mat.parenttransform = love.math.newTransform( );
+
+    mat.des = Vector.new();
+    mat.offsetpos = Vector.new();
+    mat.angle = 0;
     return mat;
 end
 
--- function Matrix:translate(x, y)
---     self.transform:translate(x, y);
--- end
+Matrix.__index = function(tab, key, ...)
+    local value = rawget(tab, key);
+    if value then
+        return value;
+    end
 
--- function Matrix:scale(x, y)
---     self.transform:scale( x, y);
--- end
+    if Matrix[key] then
+        return Matrix[key];
+    end
+    
+    if tab["transform"] and tab["transform"][key] then
+        if type(tab["transform"][key]) == "function" then
+            tab[key] = function(tab, ...)
+                return tab["transform"][key](tab["transform"], ...);--todo..
+            end
+            return  tab[key]
+        end
+        return tab["transform"][key];
+    end
 
--- function Matrix:reset()
---     self.transform:reset();
--- end
+    return nil;
+end
 
--- function Matrix:rotate(angle)
---     self.transform:rotate(angle);
--- end
+Matrix.__newindex = function(tab, key, value)
+    rawset(tab, key, value);
+end
+
+function Matrix:move(x, y)
+    self.transform:translate(x, y);
+
+    self.des.x = self.des.x + x
+    self.des.y = self.des.y + y
+
+    self.offsetpos.x = self.offsetpos.x + x
+    self.offsetpos.y = self.offsetpos.y + y
+end
+
+function Matrix:moveTo(x, y)
+    self.transform:translate(x - self.des.x, y - self.des.y);
+
+    --TODO.
+    if self.des.x ~= 0 or self.des.y ~= 0 then
+    self.offsetpos.x = self.offsetpos.x + x - self.des.x
+    self.offsetpos.y = self.offsetpos.y + y - self.des.y
+    end
+
+    self.des.x = x
+    self.des.y = y
+end
+
+function Matrix:scale(x, y)
+    self.transform:scale( x, y);
+end
+
+function Matrix:faceTo(x, y)
+    self.transform:setXDirection( x - self.des.x, y - self.des.y);
+end
+
+function Matrix:rotateLeft(angle)
+    self.transform:rotateLeft(angle)
+    self.angle = self.angle + angle;
+end
+
+
+function Matrix:getPosition()
+    return self.des;
+end
+
+function Matrix:getOffsetPos()
+    return self.offsetpos;
+end
+
+function Matrix:getAngle()
+    return self.angle;
+end
 
 function Matrix:setXDirection( x, y )
     local dir = Vector.new( x, y );
@@ -92,24 +138,31 @@ end
 function Matrix:rotateLeft(angle)
     local mat = Matrix.new();
     mat:rotate(angle);
-    -- self.transform = self.transform:apply(mat.transform)
     self.transform = mat.transform:apply(self.transform)
 end
 
 --使用父矩阵
-function Matrix:applyParent(obj)
+function Matrix:applyParent(obj, needparentposition, needparentoffsetpos)
     if obj.parent and obj.parent.transform then
-        self:applyParent(obj.parent);
+        self:applyParent(obj.parent, needparentposition);
     end
-    -- self.parenttransform:setMatrix(self.parenttransform:apply(obj.transform.transform):getMatrix());
-    self.parenttransform = obj.transform.transform;
+
+    if needparentposition then
+        local pos = obj.transform:getPosition();
+        self.parenttransform:translate(pos.x, pos.y);
+    elseif needparentoffsetpos then
+        local pos = obj.transform:getOffsetPos();
+        self.parenttransform:translate(pos.x, pos.y);
+    end
+   
 end
 
 function Matrix:use(obj)
-    if obj and obj.parent then
-        -- self.parenttransform:reset();
-       
-        self.parenttransform = obj.parent.transform.transform;
+    if obj and (obj["needparentposition"] or obj["needparentoffsetpos"]) and obj.parent then
+
+        self.parenttransform:reset();
+        
+        self:applyParent(obj.parent,  obj["needparentposition"], obj["needparentoffsetpos"]);
         self.parenttransform = self.parenttransform:apply(self.transform);
         love.graphics.applyTransform(self.parenttransform)
         return;

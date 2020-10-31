@@ -1,10 +1,9 @@
 _G.Body = {}
 function Body.new(name, order)
-    local body = setmetatable({}, {__index = Body});
-    body.transform =  Matrix.new();
+    local body = setmetatable({}, Body);
     body.pos = Vector.new();
     body.children = {};
-    body.polygons = {};
+    body.polygon = nil;--TODO
     body.name = name or "";
     body.order = order or 0;
     
@@ -18,24 +17,39 @@ function Body.new(name, order)
     return body;
 end
 
+Body.__index = function(tab, key)
+    if key == 'transform' and tab["polygon"] then
+        return  tab["polygon"]["transform"];
+    end
+
+    if Body[key] then
+        return Body[key];
+    end
+
+    return rawget(tab, key);
+end
+
+Body.__newindex = function(tab, key, value)
+    if key == 'transform' and tab["polygon"] then
+        tab["polygon"]["transform"] = value;
+    end
+    rawset(tab, key, value);
+end
+
 function Body:moveTo(x, y)
-    self.pos.x = x;
-    self.pos.y = y;
-    self.transform:translate(x, y);
+   
 end
 
 function Body:move(x, y)
-    self.pos.x = self.pos.x + x;
-    self.pos.y = self.pos.y + y;
-    self.transform:translate(x, y);
+    
 end
 
 function Body:scale(x, y)
-    self.transform:scale( x, y);
+   
 end
 
 function Body:faceTo(x, y)
-    self.transform:setXDirection( x - self.pos.x, y - self.pos.y);
+    
 end
 
 function Body:addBody(body)
@@ -44,7 +58,7 @@ function Body:addBody(body)
     body.entity = self.entity;
 end
 
-function Body:addPolygon(polygon)
+function Body:setPolygon(polygon)
     polygon.body = self;
 
     self.x1 = polygon.vertices[1];
@@ -84,11 +98,11 @@ function Body:addPolygon(polygon)
     polygon.cx = cx;
     polygon.cy = cy;
 
-    polygon:moveTo(cx, cy);
+    polygon.transform:moveTo(cx, cy);
 
     polygon.crossline = CrossLine.new(0, 0, 20, 20, 5);
     polygon.crossline.transform = polygon.transform;
-    table.insert(self.polygons, polygon);
+    self.polygon = polygon;
 end
 
 function Body:findBodyByName(name)
@@ -122,8 +136,8 @@ function Body:setBodyParent()
 end
 
 function Body:update(e)
-    for i, v in pairs(self.polygons) do
-        v:update(e)
+    if self.polygon then
+        self.polygon:update(e)
     end
 
     for i, v in pairs(self.children) do
