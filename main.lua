@@ -36,7 +36,8 @@ dofile('script/groupmanager.lua')
 dofile('script/physics/world.lua')
 
 dofile('script/entity/entity.lua')
-
+dofile('script/entity/body.lua')
+dofile('script/entity/me.lua')
 _G.lovedebug.renderbox2d = true;   
 _G.lovedebug.renderobject = true;
 

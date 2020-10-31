@@ -1,8 +1,9 @@
 
 _G.__setParentClass = function(obj, parent)
-    for i, v in pairs(parent) do
+    for i, v in pairs(Entity) do
         if not obj[i] and type(parent[i]) == "function" then
             obj[i] = parent[i];
+            
         end
     end
 end

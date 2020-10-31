@@ -1,6 +1,4 @@
 _G.Entity = {}
-dofile('script/entity/body.lua')
-dofile('script/entity/me.lua')
 
 function Entity.new()
     local entity = setmetatable({}, {__index = Entity});

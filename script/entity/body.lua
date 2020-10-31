@@ -77,8 +77,12 @@ function Body:setPolygon(polygon)
     local cx = (self.x1 + self.x2) * 0.5
     local cy = (self.y1 + self.y2) * 0.5
 
-    -- local w = self.x2 - self.x1
-    -- local h = self.y2 - self.y1
+    self.w = self.x2 - self.x1
+    self.h = self.y2 - self.y1
+
+    if self.name == "pao" then
+        print('aaaaaa', self.h)
+    end
     local vertices = {}
     for i =1,#polygon.vertices ,2 do 
         table.insert(vertices, polygon.vertices[i] - cx );
@@ -90,10 +94,8 @@ function Body:setPolygon(polygon)
 
     polygon.vertices = vertices;
     polygon.x1 = self.x1;
-    polygon.y1 = self.y1;
 
     polygon.x2 = self.x2;
-    polygon.y2 = self.y2;
 
     polygon.cx = cx;
     polygon.cy = cy;

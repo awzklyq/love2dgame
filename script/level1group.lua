@@ -10,8 +10,11 @@ function Level1Group:init()
     self.level1 = Polygon.new(100, 100);
     self.level1:createSVG("levels/level1.svg", self.levelres);--method-draw-image.svg
 
-    self.me = Entity.new()
+    self.me = Me.new()
     self.level1:createSVG("demo_files/me.svg", self.me);--method-draw-image.svg
+
+    self.me:init();
+
     local button = self:createUI("Button")
     button:setPos(200, 200);
     button:setText("Game");
