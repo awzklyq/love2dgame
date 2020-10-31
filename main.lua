@@ -20,6 +20,7 @@ dofile('script/map/terrain/tiled.lua')
 
 dofile('script/polygon/rect.lua')
 dofile('script/polygon/circle.lua')
+dofile('script/polygon/line.lua')
 
 dofile('script/polygon/polygon.lua')
 

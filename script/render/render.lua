@@ -10,12 +10,16 @@ Render.PolygonId = 5;
 
 Render.EntityBodyId = 6;
 
+Render.LineId = 7;
+
+Render.CrossLineId = 8;
+
 Render.RenderObject = function(obj)
     if not _G.lovedebug.renderobject then return end
     love.graphics.push();
 
     if obj.transform then
-        obj.transform:use();
+        obj.transform:use(obj);
     end
     if _G.lovedebug.renderobject then
         if obj.renderid == Render.CircleId then
@@ -23,14 +27,17 @@ Render.RenderObject = function(obj)
         elseif obj.renderid == Render.RectId then
             love.graphics.rectangle( obj.mode, obj.x, obj.y, obj.w, obj.h);
         elseif obj.renderid == Render.EntityBodyId then
+           
             for i, v in ipairs(obj.polygons) do
-                Render.RenderObject(v);
+                -- Render.RenderObject(v);
+                v:draw();
             end
 
             for i, v in ipairs(obj.children) do
-                Render.RenderObject(v);
+                v:draw();
             end
         elseif obj.renderid == Render.PolygonId then
+            
             if #obj.circles > 0 then
                 for i= 1, #obj.circles do
                     Render.RenderObject(obj.circles[i])
@@ -64,6 +71,19 @@ Render.RenderObject = function(obj)
             if obj.usesvgpaths then
                 Render.RenderSVGPaths(obj.svgpaths);
             end
+        elseif obj.renderid == Render.LineId then
+            local lw = love.graphics.getLineWidth();
+            love.graphics.setLineWidth( obj.lw);
+            love.graphics.setColor(obj.color.r, obj.color.g, obj.color.b, obj.color.a);
+            love.graphics.line( obj.x1, obj.y1, obj.x2, obj.y2)
+            love.graphics.setLineWidth(lw);
+        elseif obj.renderid == Render.CrossLineId then
+            local lw = love.graphics.getLineWidth();
+            love.graphics.setLineWidth( obj.lw);
+            love.graphics.setColor(obj.color._r, obj.color._g, obj.color._b);
+            love.graphics.line( obj.x - 0.5 * obj.w, obj.y,  obj.x + 0.5 * obj.w, obj.y);
+            love.graphics.line( obj.x, obj.y - 0.5 * obj.h,  obj.x, obj.y + 0.5 * obj.h);
+            love.graphics.setLineWidth(lw);
         end
         love.graphics.pop();
     end

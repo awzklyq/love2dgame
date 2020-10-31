@@ -18,8 +18,17 @@ function Polygon.new(x ,y)
 
     polygon.usesvgpaths = false;
 
-    polygon.pos = Vector.new();
+    polygon.des = Vector.new();
     polygon.transform =  Matrix.new();
+
+    polygon.x1 = 0
+    polygon.y1 = 0;
+
+    polygon.x2 = 0;
+    polygon.y2 = 0;
+
+    polygon.cx = 0;
+    polygon.cy = 0;
 
     --polygon.box2d
     return polygon;
@@ -40,17 +49,18 @@ function Polygon:addRect(rect)
     table.insert(self.rects, rect);
 end
 
-function Polygon:moveTo(x, y)
-    
-    self.transform:translate(x - self.pos.x, y - self.pos.y);
-    self.pos.x = x;
-    self.pos.y = y;
+function Polygon:move(x, y)
+    self.transform:translate(x, y);
+
+    self.des.x = self.des.x + x
+    self.des.y = self.des.y + y
 end
 
-function Polygon:move(x, y)
-    self.pos.x = self.pos.x + x;
-    self.pos.y = self.pos.y + y;
-    self.transform:translate(x, y);
+function Polygon:moveTo(x, y)
+    self.transform:translate(x - self.des.x, y - self.des.y);
+
+    self.des.x = x
+    self.des.y = y
 end
 
 function Polygon:scale(x, y)
@@ -58,16 +68,17 @@ function Polygon:scale(x, y)
 end
 
 function Polygon:faceTo(x, y)
-    self.transform:setXDirection( x - self.pos.x, y - self.pos.y);
+    self.transform:setXDirection( x - self.des.x, y - self.des.y);
 end
 
 function Polygon:update(e)
     --同步物理信息
-    if self.phytype == "dynamic" and self.box2d then
+    if  self.phytype == "dynamic" and self.box2d then
 
         local x, y = self.box2d:getWorldCenter( )
-        if self.oldbox2dshearx and self.oldbox2dsheary then
-            if math.abs(self.oldbox2dshearx - x) < 0.000001 and math.abs(self.oldbox2dsheary - y) < 0.000001 then
+        local angle = self.box2d:getAngle( )
+        if self.oldbox2dx and self.oldbox2dy and self.oldbox2dangle then
+            if math.abs(self.oldbox2dx - x) < 0.000001 and math.abs(self.oldbox2dy - y) < 0.000001 and math.abs(self.oldbox2dangle - angle) < 0.000001 then
                 return;
             end
         end 
@@ -78,21 +89,34 @@ function Polygon:update(e)
             self.box2doffsety = y1 - y;
         end
 
-        self.oldbox2dshearx = x;
-        self.oldbox2dsheary = y;
-        self:moveTo(x + self.box2doffsetx, y + self.box2doffsety);
+        self.oldbox2dx = x;
+        self.oldbox2dy = y;
+        -- self.transform:reset();
+ 
+        -- self.transform:rotateLeft(angle - (self.oldbox2dangle or 0))
+        self.oldbox2dangle = angle;
+        
+
+        self:moveTo(x, y);
+        self.transform:rotateLeft(angle - (self.oldbox2dangle or 0))
+
+        -- self.transform:rotateLeft(0.2);
+        -- self.transform:rotate(0.2);
     end
 end
 
 function Polygon:draw()
-    local r, g, b, a = love.graphics.getColor( );
-    love.graphics.setColor(self.color.r, self.color.g, self.color.b, self.color.a );
+    -- local r, g, b, a = love.graphics.getColor( );
+    -- love.graphics.setColor(self.color.r, self.color.g, self.color.b, self.color.a );
     Render.RenderObject(self);
-    love.graphics.setColor(r, g, b, a );
+    -- love.graphics.setColor(r, g, b, a );
     -- -- Matrix.reset()
     -- if self.box2d then
     --     self.box2d:draw();
     -- end
+    if self.crossline then
+        self.crossline:draw();
+    end
 end
 
 function Polygon:createSVG(file, entity)
@@ -106,9 +130,9 @@ function Polygon:createSVG(file, entity)
         --     entity = Entity.new();
         -- end
         self:createSVGRenderPaths(self.svgpaths, entity, nil);
-        -- if needentity then
-        -- --todo..
-        -- end
+       if entity then
+        -- entity:setBodyParent();
+       end
     end
 
     return svg;
@@ -146,38 +170,44 @@ function Polygon:createSVGRenderPaths(svgpaths, entity, rootbody)
 
         local body;
         if entity and svgpath.rendervertices then--需要创建entity
-            local transform = Matrix.new();
-            if svgpath.rotate then
-                transform:translate(svgpath.rotate.x, svgpath.rotate.y);
-                transform:rotate(svgpath.rotate.a);
-                transform:translate(-svgpath.rotate.x, -svgpath.rotate.y);
-            end
-    
-            if svgpath.scale then
-                transform:scale(svgpath.scale.x, svgpath.scale.y)
-            end
+            local polygon = Polygon.new(0, 0);
     
             if svgpath.translate then
-                transform:translate(svgpath.translate.x, svgpath.translate.y)
+                polygon.transform:moveTo(svgpath.translate.x, svgpath.translate.y)
             end
+
+            if svgpath.scale then
+                polygon.transform:scale(svgpath.scale.x, svgpath.scale.y)
+            end
+
+            if svgpath.rotate then
+                polygon.transform:rotateLeft(svgpath.rotate.a);
+
+                -- polygon.transform:translate(svgpath.rotate.x, svgpath.rotate.y);
+                -- polygon.transform:rotate(svgpath.rotate.a);
+                -- polygon.transform:translate(-svgpath.rotate.x, -svgpath.rotate.y);
+            end
+
             
             if svgpath.matrix then
-                transform:applyTransform(svgpath.matrix);
+                polygon.transform:applyTransform(svgpath.matrix);
             end
     
             if svgpath.skewx then
-                transform:shear(svgpath.skewx, 0);
+                polygon.transform:shear(svgpath.skewx, 0);
             end
             if svgpath.skewy then
-                transform:shear(0, svgpath.skewy);
+                polygon.transform:shear(0, svgpath.skewy);
             end
 
-            local polygon = Polygon.new(0, 0);
+            
             local vertices = {}
             for n = 1,#svgpath.rendervertices,2 do
-                local localX, localY = transform:transformPoint( svgpath.rendervertices[n], svgpath.rendervertices[n+1] );
+                local localX, localY = polygon.transform:transformPoint( svgpath.rendervertices[n], svgpath.rendervertices[n+1] );
                 table.insert(polygon.vertices, localX);
                 table.insert(polygon.vertices, localY);
+                -- table.insert(polygon.vertices, svgpath.rendervertices[n]);
+                -- table.insert(polygon.vertices, svgpath.rendervertices[n+1]);
             end
             
             if svgpath.stroke_paint and svgpath.paths then
@@ -198,31 +228,20 @@ function Polygon:createSVGRenderPaths(svgpaths, entity, rootbody)
                 -- end
             end
 
-            if not body then
-                if not rootbody then --没有body的时候 创建rootbody
-                    rootbody = Body.new("", 0);--name, order
-                    entity.body = rootbody;
-                    body = rootbody;
-                else
-                    body = Body.new("", 0);--name, order
-                    table.insert(rootbody.children, body);
-                end
-            end
-
             if v.paths and v["user_phytype"] then
                 if v.typename == 'rect' then
+                    
                     polygon.box2d = Box2dObject:newPolygon(polygon.vertices);
                     polygon.box2d:setType(v["user_phytype"] == "1" and 'static' or 'dynamic');
                 elseif v.typename == 'ellipse' then
-
-                    if #polygon.vertices <= 16 then
+                    
+                    if #polygon.vertices <= 32 then
                         polygon.box2d = Box2dObject:newPolygon(polygon.vertices);
                     else
                         local vertices = {}
                         local count = #polygon.vertices / 2;
                         local op =math.ceil(count / 16);
 
-                        
                         for offset =1,#polygon.vertices ,op * 2 do 
                             table.insert(vertices, polygon.vertices[offset] );
                             table.insert(vertices, polygon.vertices[offset + 1] );
@@ -234,8 +253,23 @@ function Polygon:createSVGRenderPaths(svgpaths, entity, rootbody)
                     polygon.box2d:setType(v["user_phytype"] == "1" and 'static' or 'dynamic');
                 end
             end 
-            
-            table.insert(body.polygons, polygon);
+         
+            if not body then
+                if not rootbody then --没有body的时候 创建rootbody
+                    rootbody = Body.new(v["name"], 0);--name, order
+                    entity:setBody(rootbody);
+                    body = rootbody;
+                else
+                    body = Body.new(v["name"], 0);--name, order
+                    rootbody:addBody(body);
+                end
+
+                if v["parentname"] and v["parentname"]  ~= ""then
+                    body.parentname = v["parentname"];
+                end
+            end
+
+            body:addPolygon(polygon);
 
             polygon.phytype = v["user_phytype"] == "1" and 'static' or 'dynamic';
         end

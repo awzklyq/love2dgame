@@ -8,6 +8,10 @@ function Entity.new()
     return entity;
 end
 
+function Entity:setBody(body)
+    self.body = body;
+    self.body.entity = self;
+end
 
 function Entity:moveTo(x, y)
     if self.body then
@@ -36,6 +40,20 @@ end
 function Entity:update(e)
     if self.body then
         self.body:update();
+    end
+end
+
+function Entity:findBodyByName(name)
+    if self.body then
+        return self.body:findBodyByName(name);
+    end
+    return nil;
+end
+
+--TODO..
+function Entity:setBodyParent()
+    if self.body then
+        return self.body:setBodyParent();
     end
 end
 

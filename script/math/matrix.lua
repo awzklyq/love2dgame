@@ -22,6 +22,8 @@ function Matrix.new(lmat)
       end});
 
     mat.transform =  lmat or love.math.newTransform( );
+
+    mat.parenttransform = love.math.newTransform( );
     return mat;
 end
 
@@ -87,7 +89,31 @@ function Matrix:apply(mat)
     return Matrix.new(lovemat)
 end
 
-function Matrix:use()
+function Matrix:rotateLeft(angle)
+    local mat = Matrix.new();
+    mat:rotate(angle);
+    -- self.transform = self.transform:apply(mat.transform)
+    self.transform = mat.transform:apply(self.transform)
+end
+
+--使用父矩阵
+function Matrix:applyParent(obj)
+    if obj.parent and obj.parent.transform then
+        self:applyParent(obj.parent);
+    end
+    -- self.parenttransform:setMatrix(self.parenttransform:apply(obj.transform.transform):getMatrix());
+    self.parenttransform = obj.transform.transform;
+end
+
+function Matrix:use(obj)
+    if obj and obj.parent then
+        -- self.parenttransform:reset();
+       
+        self.parenttransform = obj.parent.transform.transform;
+        self.parenttransform = self.parenttransform:apply(self.transform);
+        love.graphics.applyTransform(self.parenttransform)
+        return;
+    end
     love.graphics.applyTransform(self.transform);
 end
 
