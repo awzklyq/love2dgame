@@ -8,7 +8,12 @@ end
 
 function CameraManager.update(dt)
     mx, my = camera:toWorldCoords(love.mouse.getPosition())
-    -- camera:update(dt)
+    camera:update(dt)
+    local me = _G.getMe()
+    if me then
+        local pos = me:getPosition()
+        camera:follow(pos.x, pos.y)
+    end
 end
 
 function CameraManager.begineDraw()

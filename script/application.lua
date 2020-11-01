@@ -27,6 +27,8 @@ _G.app.load = setmetatable({},  metatab)
 
 _G.app.mousereleased = setmetatable({},  metatab)
 
+_G.app.keypressed = setmetatable({},  metatab)
+
 function love.mousereleased(x, y, button, isTouch)
     _G.UIHelper.mouseUp(x, y, button, isTouch)
     _G.app.mousereleased(x, y, button, isTouch)
@@ -37,7 +39,11 @@ function love.keypressed(key, scancode, isrepeat)
         _G.UIHelper.keyDown(key, scancode, isrepeat)
     end
     
+    _G.app.keypressed(key, scancode, isrepeat)
+
     _G.CameraManager.keypressed(key)
+
+    
 end
 
 function love.keyreleased(key)
@@ -124,3 +130,7 @@ function love.mousepressed(x, y, button, istouch)
 
     _G.LightManager.load();
  end
+
+ _G.isKeyDown = function(...)
+    return love.keyboard.isDown(...)
+end

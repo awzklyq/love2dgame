@@ -46,3 +46,13 @@ _G.lovedebug.showstat = false
 app.load(function()
 	_G.GroupManager.loadGroup("Login");
 end)
+
+--游戏全局函数
+local me = nil;
+_G.setMe = function(obj)
+	me = obj;
+end
+
+_G.getMe = function(obj)
+	return me
+end

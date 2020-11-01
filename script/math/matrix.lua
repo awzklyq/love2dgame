@@ -7,9 +7,7 @@ function Matrix.new(lmat)
 
     mat.parenttransform = love.math.newTransform( );
 
-    mat.des = Vector.new();
-    mat.offsetpos = Vector.new();
-    mat.angle = 0;
+    mat:reset();
     return mat;
 end
 
@@ -76,6 +74,11 @@ function Matrix:rotateLeft(angle)
     self.angle = self.angle + angle;
 end
 
+function Matrix:rotate(angle)
+    self.transform:rotate(angle)
+    self.angle = self.angle + angle;
+end
+
 
 function Matrix:getPosition()
     return self.des;
@@ -83,6 +86,14 @@ end
 
 function Matrix:getOffsetPos()
     return self.offsetpos;
+end
+
+function Matrix:getPositionXY()
+    return self.des.x, self.des.y;
+end
+
+function Matrix:getOffsetPosXY()
+    return self.offsetpos.x ,self.offsetpos.y;
 end
 
 function Matrix:getAngle()
@@ -129,6 +140,22 @@ function Matrix:setYDirection( x, y )
     end
 end
 
+function Matrix:reset()
+    if not self.des then
+        self.des = Vector.new();
+        self.offsetpos = Vector.new();
+    end
+
+    self.des.x = 0;
+    self.des.y = 0;
+
+    self.offsetpos.x = 0;
+    self.offsetpos.y = 0;
+    self.angle = 0;
+
+    self.transform:reset()
+end
+
 -- mul right
 function Matrix:apply(mat)
     local lovemat = self.transform:apply(mat);
@@ -138,7 +165,8 @@ end
 function Matrix:rotateLeft(angle)
     local mat = Matrix.new();
     mat:rotate(angle);
-    self.transform = mat.transform:apply(self.transform)
+    -- self.transform = mat.transform:apply(self.transform)
+    self.transform = self.transform:apply(mat.transform);
 end
 
 --使用父矩阵
@@ -170,7 +198,7 @@ function Matrix:use(obj)
     love.graphics.applyTransform(self.transform);
 end
 
-Matrix.reset = function()
+Matrix.useDefault = function()
     love.graphics.replaceTransform(math.defaulttransform);
 end
 

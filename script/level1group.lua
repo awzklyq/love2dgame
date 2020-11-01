@@ -15,6 +15,8 @@ function Level1Group:init()
 
     self.me:init();
 
+    _G.setMe(self.me);
+
     local button = self:createUI("Button")
     button:setPos(200, 200);
     button:setText("Game");

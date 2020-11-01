@@ -104,13 +104,18 @@ function Polygon:update(e)
  
         -- self.transform:rotateLeft(angle - (self.oldbox2dangle or 0))
         self.oldbox2dangle = angle;
-        
+    
 
+        local posx, posy = self.transform:getPositionXY()
+        local offsetx, offsety = self.transform:getOffsetPosXY();
+        self.transform:reset()
         self.transform:moveTo(x, y);
-        self.transform:rotateLeft(angle - (self.oldbox2dangle or 0))
+        self.transform:rotateLeft(angle)
 
-        -- self.transform:rotateLeft(0.2);
-        -- self.transform:rotate(0.2);
+        local newpos = self.transform:getPosition()
+        self.transform.offsetpos.x = offsetx + newpos.x - posx
+        self.transform.offsetpos.y = offsety + newpos.y - posy
+
     end
 end
 

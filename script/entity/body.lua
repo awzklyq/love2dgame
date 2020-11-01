@@ -18,8 +18,13 @@ function Body.new(name, order)
 end
 
 Body.__index = function(tab, key)
-    if key == 'transform' and tab["polygon"] then
-        return  tab["polygon"]["transform"];
+    local polygon = rawget(tab, "polygon");
+    if polygon then
+        if key == 'transform' then
+            return  polygon["transform"];
+        elseif key == "box2d" then
+            return polygon["box2d"]
+        end
     end
 
     if Body[key] then
@@ -80,9 +85,6 @@ function Body:setPolygon(polygon)
     self.w = self.x2 - self.x1
     self.h = self.y2 - self.y1
 
-    if self.name == "pao" then
-        print('aaaaaa', self.h)
-    end
     local vertices = {}
     for i =1,#polygon.vertices ,2 do 
         table.insert(vertices, polygon.vertices[i] - cx );
