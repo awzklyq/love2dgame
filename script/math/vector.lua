@@ -19,6 +19,11 @@ function Vector:normalize()
     self.x = self.x  / w;
     self.y = self.y  / w;
 end
+
+function Vector:mul(value)
+    self.x = self.x  * value;
+    self.y = self.y  * value;
+end
     
 Vector.distance = function(v1, v2)
     return math.sqrt(math.pow(v1.x - v2.x, 2) + math.pow(v1.y - v2.y, 2))

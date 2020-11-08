@@ -9,6 +9,8 @@ function Me.new()
     me.speed = 0.1;
 
     me.tempmat = Matrix.new()
+
+    me.noiseline = NoiseLine.new(100, 100, 300, 400, 5, 12)
     return me;
 end
 
@@ -34,6 +36,7 @@ end
 function Me:update(e)
     Entity.update(self, e);
 
+    self.noiseline:update(e)
     if _G.isKeyDown("left", "right") then
     self.pao.transform:translate(0, -self.pao.h * 0.5)
     self.pao.transform:rotate( _G.isKeyDown("left") and self.speed or -self.speed);
@@ -41,10 +44,25 @@ function Me:update(e)
     end
 end
 
+function Me:draw(e)
+    Entity.draw(self, e);
+
+    self.noiseline:draw(e)
+end
+
+local sss = 0
 app.keypressed(function(key, scancode, isrepeat)
-    if key == "space" then
-        local me = _G.getMe()
-        local dir = me:getPaoDir();
-        me.lun.box2d:applyLinearImpulse(dir.x * ss, dir.y *ss)
+    local powerbar = _G.GroupManager.currentgroup.powerbar
+    if powerbar then
+        if key == "space" then
+            local me = _G.getMe()
+            local dir = me:getPaoDir();
+            local value = powerbar:getValue()
+            print("current power value: ",value)
+            me.lun.box2d:applyLinearImpulse(-dir.x * value, -dir.y* value)
+            print(love.math.noise( 21, 1, sss ))
+            sss = sss + 0.2
+        end
     end
+    
 end)

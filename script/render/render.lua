@@ -11,6 +11,9 @@ Render.LineId = 5;
 
 Render.CrossLineId = 6;
 
+Render.PowerBarId = 7;
+
+Render.NoiseLineId = 8;
 Render.getRenderIdName = function(id)
     if Render.CircleId == id then
         return "Circle"
@@ -24,6 +27,10 @@ Render.getRenderIdName = function(id)
         return "Line"
     elseif Render.CrossLineId == id then
         return "CrossLine"
+    elseif Render.PowerBarId == id then
+        return "PowerBar"
+    elseif Render.NoiseLineId == id then
+        return "NoiseLine"
     end
 
     return "Null"
@@ -35,6 +42,10 @@ Render.RenderObject = function(obj)
 
     if obj.transform and obj.renderid ~= Render.EntityBodyId then
         obj.transform:use(obj);
+    end
+
+    if obj.shader then
+        love.graphics.setShader(obj.shader)
     end
     if _G.lovedebug.renderobject then
         if obj.renderid == Render.CircleId then
@@ -98,7 +109,34 @@ Render.RenderObject = function(obj)
             love.graphics.line( obj.x - 0.5 * obj.w, obj.y,  obj.x + 0.5 * obj.w, obj.y);
             love.graphics.line( obj.x, obj.y - 0.5 * obj.h,  obj.x, obj.y + 0.5 * obj.h);
             love.graphics.setLineWidth(lw);
+        elseif obj.renderid == Render.PowerBarId then
+            love.graphics.rectangle("fill", obj.x1, obj.y1, obj.x2 - obj.x1, obj.h)
+            love.graphics.setShader()
+            local lw = love.graphics.getLineWidth();
+            local r, g, b, a = love.graphics.getColor( );
+            love.graphics.setColor(obj.color._r, obj.color._g, obj.color._b);
+            love.graphics.setLineWidth( obj.lw);
+            
+            love.graphics.rectangle("line", obj.x1+0.5, obj.y2 - obj.oh+0.5, obj.x2 - obj.x1 -1, obj.oh-1)
+            love.graphics.setLineWidth(lw);
+            love.graphics.setColor(r, g, b, a);
+        elseif obj.renderid == Render.NoiseLineId then 
+            local lw = love.graphics.getLineWidth();
+            local r, g, b, a = love.graphics.getColor( );
+            love.graphics.setLineWidth( obj.lw);
+            love.graphics.setColor(obj.color._r, obj.color._g, obj.color._b);
+            -- love.graphics.polygon("line", obj.renderdatas)
+            -- local poss = {100, 100, 200, 250, 300, 400}
+            love.graphics.line(obj.renderdatas)
+            love.graphics.setLineWidth(lw);
+            love.graphics.setColor(r, g, b, a);
         end
+
+        
+        if obj.shader then
+            love.graphics.setShader()
+        end
+
         love.graphics.pop();
     end
     

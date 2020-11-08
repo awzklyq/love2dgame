@@ -17,12 +17,14 @@ function Level1Group:init()
 
     _G.setMe(self.me);
 
-    local button = self:createUI("Button")
-    button:setPos(200, 200);
-    button:setText("Game");
-    button.click = function()
-        _G.GroupManager.releaseGroup(self)
-    end
+    -- local button = self:createUI("Button")
+    -- button:setPos(200, 200);
+    -- button:setText("Game");
+    -- button.click = function()
+    --     _G.GroupManager.releaseGroup(self)
+    -- end
+
+    self.powerbar = PowerBar.new(40, 60, 30, 120);
 end
 
 function Level1Group:createUI(typename, ...)
@@ -38,20 +40,27 @@ function Level1Group:release()
 end
 
 function Level1Group:update(dt)
-    -- if self.level1 then
-    --     self.level1:draw(dt);
-    -- end
+    if self.powerbar then
+        self.powerbar:update(dt)
+    end
 
     if self.levelres then
-        self.levelres:update();
+        self.levelres:update(dt);
     end
 
     if self.me then
-        self.me:update();
+        self.me:update(dt);
     end
 end
 
-function Level1Group:draw(dt)
+function Level1Group:afterdraw()
+    if self.powerbar then
+        
+        self.powerbar:draw()
+    end
+end
+
+function Level1Group:draw()
     -- if self.level1 then
     --     self.level1:draw(dt);
     -- end

@@ -18,6 +18,12 @@ math.clamp = function(v, v1, v2)
     return v;
 end
 
+math.noise = function(...)
+    local value = love.math.noise( ... )
+    print(ss)
+    return 2 * value - 1
+end
+
 math.defaulttransform =  love.math.newTransform( );
 math.MinNumber = 0.000001;
 math.MaxNumber = 999999.0;

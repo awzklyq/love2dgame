@@ -17,7 +17,11 @@ local metatab =  {
   --参数统一
  _G.app.update = setmetatable({},  metatab)
 
+ _G.app.beforrender = setmetatable({},  metatab)
+
 _G.app.render = setmetatable({},  metatab)
+
+_G.app.afterrender = setmetatable({},  metatab)
 
 _G.app.mousepressed = setmetatable({}, metatab)
 
@@ -77,6 +81,7 @@ function love.update(dt)
 function love.draw()
     -- _G.UIHelper.update(dt);
     -- _G.app.update(dt);
+    _G.app.beforrender();
     if _G.LightManager.Need then
         _G.LightManager.draw(function()
             _G.CameraManager.begineDraw();
@@ -88,6 +93,8 @@ function love.draw()
         _G.app.render();
         _G.CameraManager.endDraw();
     end
+
+    _G.app.afterrender();
 
     _G.UIHelper.draw()
     if _G.lovedebug.showstat then

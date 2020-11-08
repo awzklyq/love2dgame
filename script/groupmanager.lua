@@ -30,10 +30,26 @@ app.update(function(dt)
     end
 end)
 
+app.beforrender(function(dt)
+    for i, v in pairs(_G.GroupManager.groups) do
+        if v.firstdraw then
+            v:firstdraw(dt);
+        end
+    end
+end)
+
 app.render(function(dt)
     for i, v in pairs(_G.GroupManager.groups) do
         if v.draw then
             v:draw(dt);
+        end
+    end
+end)
+
+app.afterrender(function(dt)
+    for i, v in pairs(_G.GroupManager.groups) do
+        if v.afterdraw then
+            v:afterdraw(dt);
         end
     end
 end)
