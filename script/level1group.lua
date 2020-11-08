@@ -25,6 +25,8 @@ function Level1Group:init()
     -- end
 
     self.powerbar = PowerBar.new(40, 60, 30, 120);
+
+    self.grid = Grid.new(-1000, -1000, 10000, 10000, 150);
 end
 
 function Level1Group:createUI(typename, ...)
@@ -50,6 +52,13 @@ function Level1Group:update(dt)
 
     if self.me then
         self.me:update(dt);
+    end
+end
+
+function Level1Group:firstdraw()
+    if self.grid then
+        
+        self.grid:draw()
     end
 end
 

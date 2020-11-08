@@ -92,11 +92,6 @@ function NoiseLine.new(x1, y1, x2, y2, lw, segment, power, speed)-- random
         
     end
 
-    local ss = "'"
-    for i, v in ipairs(line.renderdatas) do
-        ss = ss.. ", "..v
-    end
-    print(ss)
     line.color = LColor.new(200,0,0, 255)
 
     line.renderid = Render.NoiseLineId;

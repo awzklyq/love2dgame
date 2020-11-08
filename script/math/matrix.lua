@@ -59,6 +59,15 @@ function Matrix:moveTo(x, y)
 
     self.des.x = x
     self.des.y = y
+
+    local currentgroup = _G.GroupManager.currentgroup
+    
+    if currentgroup and currentgroup.grid and self.obj and self.obj.box then
+        local  box = rawget(self.obj, "box");
+        if box then
+            currentgroup.grid:addOrChange(self.obj)
+        end
+    end
 end
 
 function Matrix:scale(x, y)

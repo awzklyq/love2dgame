@@ -20,14 +20,9 @@ function Polygon.new(x ,y)
 
     polygon.transform =  Matrix.new();
 
-    polygon.x1 = 0
-    polygon.y1 = 0;
+    polygon.transform.obj = polygon;
 
-    polygon.x2 = 0;
-    polygon.y2 = 0;
-
-    polygon.cx = 0;
-    polygon.cy = 0;
+    polygon.box = Box.new()
 
   
 

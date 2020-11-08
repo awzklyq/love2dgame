@@ -6,12 +6,6 @@ function Body.new(name, order)
     body.polygon = nil;--TODO
     body.name = name or "";
     body.order = order or 0;
-    
-    body.x1 = 0
-    body.y1 = 0;
-
-    body.x2 = 0;
-    body.y2 = 0;
 
     body.renderid = Render.EntityBodyId;
     return body;
@@ -24,6 +18,8 @@ Body.__index = function(tab, key)
             return  polygon["transform"];
         elseif key == "box2d" then
             return polygon["box2d"]
+        elseif key == "box" then
+            return polygon["box"]
         end
     end
 
@@ -66,24 +62,22 @@ end
 function Body:setPolygon(polygon)
     polygon.body = self;
 
-    self.x1 = polygon.vertices[1];
-    self.y1 = polygon.vertices[2];
+    local box = Box.new()
+    box.x1 = polygon.vertices[1];
+    box.y1 = polygon.vertices[2];
 
-    self.x2 = self.x1;
-    self.y2 = self.y1;
+    box.x2 = box.x1;
+    box.y2 = box.y1;
     for i =1,#polygon.vertices ,2 do 
-        self.x1 = math.min(polygon.vertices[i], self.x1);
-        self.y1 = math.min(polygon.vertices[i + 1], self.y1);
+        box.x1 = math.min(polygon.vertices[i], box.x1);
+        box.y1 = math.min(polygon.vertices[i + 1], box.y1);
         
-        self.x2 = math.max(polygon.vertices[i], self.x2);
-        self.y2 = math.max(polygon.vertices[i + 1], self.y2);
+        box.x2 = math.max(polygon.vertices[i], box.x2);
+        box.y2 = math.max(polygon.vertices[i + 1], box.y2);
     end
 
-    local cx = (self.x1 + self.x2) * 0.5
-    local cy = (self.y1 + self.y2) * 0.5
-
-    self.w = self.x2 - self.x1
-    self.h = self.y2 - self.y1
+    local cx = (box.x1 + box.x2) * 0.5
+    local cy = (box.y1 + box.y2) * 0.5
 
     local vertices = {}
     for i =1,#polygon.vertices ,2 do 
@@ -91,16 +85,14 @@ function Body:setPolygon(polygon)
         table.insert(vertices, polygon.vertices[i + 1] - cy);
     end
 
-    local cx = (self.x1 + self.x2) * 0.5
-    local cy = (self.y1 + self.y2) * 0.5
+    box.x1 = box.x1 - cx;
+    box.y1 = box.y1 - cx;
+    box.x2 = box.x2 - cx;
+    box.y2 = box.y2 - cx;
 
+    polygon.box = box;
+    box.obj = polygon;
     polygon.vertices = vertices;
-    polygon.x1 = self.x1;
-
-    polygon.x2 = self.x2;
-
-    polygon.cx = cx;
-    polygon.cy = cy;
 
     polygon.transform:moveTo(cx, cy);
 

@@ -14,6 +14,8 @@ Render.CrossLineId = 6;
 Render.PowerBarId = 7;
 
 Render.NoiseLineId = 8;
+
+Render.GridDebugViewId = 9;
 Render.getRenderIdName = function(id)
     if Render.CircleId == id then
         return "Circle"
@@ -31,6 +33,8 @@ Render.getRenderIdName = function(id)
         return "PowerBar"
     elseif Render.NoiseLineId == id then
         return "NoiseLine"
+    elseif Render.GridDebugViewId == id then
+        return "GridDebugView"
     end
 
     return "Null"
@@ -130,6 +134,8 @@ Render.RenderObject = function(obj)
             love.graphics.line(obj.renderdatas)
             love.graphics.setLineWidth(lw);
             love.graphics.setColor(r, g, b, a);
+        elseif obj.renderid == Render.GridDebugViewId then 
+            obj:renderDebugView()
         end
 
         

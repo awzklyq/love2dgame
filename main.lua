@@ -21,6 +21,7 @@ dofile('script/map/terrain/tiled.lua')
 dofile('script/polygon/rect.lua')
 dofile('script/polygon/circle.lua')
 dofile('script/polygon/line.lua')
+dofile('script/polygon/box.lua')
 
 dofile('script/polygon/polygon.lua')
 
@@ -39,10 +40,16 @@ dofile('script/entity/entity.lua')
 dofile('script/entity/body.lua')
 dofile('script/entity/me.lua')
 dofile('script/entity/powerbar.lua')
+
+dofile('script/grid/grid.lua')
+
 _G.lovedebug.renderbox2d = true;   
 _G.lovedebug.renderobject = true;
 
 _G.lovedebug.showstat = false
+
+
+_G.lovedebug.showgridinfo = true
 
 app.load(function()
 	_G.GroupManager.loadGroup("Login");

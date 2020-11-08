@@ -20,7 +20,6 @@ end
 
 math.noise = function(...)
     local value = love.math.noise( ... )
-    print(ss)
     return 2 * value - 1
 end
 
