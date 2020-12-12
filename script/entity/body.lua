@@ -86,19 +86,57 @@ function Body:setPolygon(polygon)
     end
 
     box.x1 = box.x1 - cx;
-    box.y1 = box.y1 - cx;
+    box.y1 = box.y1 - cy;
     box.x2 = box.x2 - cx;
-    box.y2 = box.y2 - cx;
+    box.y2 = box.y2 - cy;
 
     polygon.box = box;
     box.obj = polygon;
     polygon.vertices = vertices;
 
     polygon.transform:moveTo(cx, cy);
-
     polygon.crossline = CrossLine.new(0, 0, 20, 20, 5);
     polygon.crossline.transform = polygon.transform;
     self.polygon = polygon;
+    local currentgroup = _G.GroupManager.currentgroup
+    
+    if currentgroup and currentgroup.grid then      
+        currentgroup.grid:addOrChange(self.polygon)
+    end
+
+    if polygon.isConvex == false then
+        local centerx, centery = 0, 0
+        local num = #polygon.vertices
+        for i = 1, num, 2 do
+            centerx = centerx + polygon.vertices[i];
+            centery = centery + polygon.vertices[i +1]
+        end
+
+        centerx = centerx / (num / 2)
+        centery = centery / (num / 2)
+
+        for i = 1, num, 2 do
+            local triangle = {}
+            table.insert(triangle, polygon.vertices[i])
+            table.insert(triangle, polygon.vertices[i +1])
+
+            table.insert(triangle, centerx)
+            table.insert(triangle, centery)
+
+            if i + 1 == num then
+                table.insert(triangle, polygon.vertices[1])
+                table.insert(triangle, polygon.vertices[2])
+                
+            else
+                table.insert(triangle, polygon.vertices[i +2])
+                table.insert(triangle, polygon.vertices[i +3])
+            end
+
+            table.insert(polygon.triangles, triangle)
+        end
+
+        -- polygon.mesh = Mesh.CreteMeshFormSimpleConcavePolygon(polygon.vertices)
+    end
 end
 
 function Body:findBodyByName(name)

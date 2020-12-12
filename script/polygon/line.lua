@@ -70,28 +70,6 @@ function NoiseLine.new(x1, y1, x2, y2, lw, segment, power, speed)-- random
 
     line.lw = lw or 2;
 
-    line.datas = {}
-
-    line.renderdatas = {}
-
-    line.datas[1]= x1
-    line.datas[2]= y1
-    line.renderdatas[1]= x1
-    line.renderdatas[2]= y1
-    local vec = Vector.new(x2 - x1, y2 - y1)
-    local offset = 1 / segment
-    vec:normalize()
-
-    vec:mul(offset)
-    for i = 1, segment do
-        line.datas[#line.datas + 1] = math.lerp(x1, x2, offset * i)
-        line.datas[#line.datas + 1] = math.lerp(y1, y2, offset * i)
-
-        line.renderdatas[#line.renderdatas + 1] = math.lerp(x1, x2, offset * i)
-        line.renderdatas[#line.renderdatas + 1] = math.lerp(y1, y2, offset * i)
-        
-    end
-
     line.color = LColor.new(200,0,0, 255)
 
     line.renderid = Render.NoiseLineId;
@@ -103,7 +81,38 @@ function NoiseLine.new(x1, y1, x2, y2, lw, segment, power, speed)-- random
     line.power = power or 20
 
     line.speed = speed or 10
+
+    line.segment = segment
+
+    line:resetData(x1, y1, x2, y2)
+
+    line.mode = "x"
     return line;
+end
+
+function NoiseLine:resetData(x1, y1, x2, y2)
+    self.datas = {}
+
+    self.renderdatas = {}
+
+    self.datas[1]= x1
+    self.datas[2]= y1
+    self.renderdatas[1]= x1
+    self.renderdatas[2]= y1
+    local offset = 1 / self.segment
+
+    for i = 1, self.segment do
+        self.datas[#self.datas + 1] = math.lerp(x1, x2, offset * i)
+        self.datas[#self.datas + 1] = math.lerp(y1, y2, offset * i)
+
+        self.renderdatas[#self.renderdatas + 1] = math.lerp(x1, x2, offset * i)
+        self.renderdatas[#self.renderdatas + 1] = math.lerp(y1, y2, offset * i)
+        
+    end
+end
+
+function NoiseLine:setMode(mode)
+    self.mode = mode
 end
 
 function NoiseLine:setColor(r, g, b, a)
@@ -116,7 +125,11 @@ end
 function NoiseLine:update(e)
     if self.visible then
         for i = 3,  #self.renderdatas - 2, 2 do
-            self.renderdatas[i] = self.datas[i] + math.noise(self.datas[i], self.tick * self.speed) * self.power
+            if self.mode == "x" then
+                self.renderdatas[i] = self.datas[i] + math.noise(self.datas[i], self.tick * self.speed) * self.power
+            else
+                self.renderdatas[i + 1] = self.datas[i + 1] + math.noise(self.datas[i +1], self.tick * self.speed) * self.power
+            end
             -- self.renderdatas[i + 1] = self.datas[i + 1] + math.noise(self.datas[i], self.tick * 10) * 100
         end
         self.tick = self.tick + e

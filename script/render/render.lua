@@ -16,6 +16,10 @@ Render.PowerBarId = 7;
 Render.NoiseLineId = 8;
 
 Render.GridDebugViewId = 9;
+
+Render.BoxBoundId = 10;
+
+Render.MeshId = 11;
 Render.getRenderIdName = function(id)
     if Render.CircleId == id then
         return "Circle"
@@ -35,12 +39,19 @@ Render.getRenderIdName = function(id)
         return "NoiseLine"
     elseif Render.GridDebugViewId == id then
         return "GridDebugView"
+    elseif Render.BoxBoundId == id then
+        return "Box"
+    elseif Render.MeshId == id then
+        return "Mesh"
     end
 
     return "Null"
 end
 
+local temp = 1
+local temp2 = 1
 Render.RenderObject = function(obj)
+    
     if not _G.lovedebug.renderobject then return end
     love.graphics.push();
 
@@ -93,7 +104,14 @@ Render.RenderObject = function(obj)
         
                 if obj.fill_paint then
                     love.graphics.setColor(obj.fill_paint.r, obj.fill_paint.g, obj.fill_paint.b, obj.fill_paint.a);
-                    love.graphics.polygon("fill", obj.vertices);
+                    if obj.isConvex or obj.isConvex == nil then
+                        love.graphics.polygon("fill", obj.vertices);
+                    elseif #obj.triangles > 0 then
+                        for i = 1, #obj.triangles do
+                            love.graphics.polygon("fill", obj.triangles[i]);
+                        end
+                    end
+                    
                 end
             end
 
@@ -136,6 +154,17 @@ Render.RenderObject = function(obj)
             love.graphics.setColor(r, g, b, a);
         elseif obj.renderid == Render.GridDebugViewId then 
             obj:renderDebugView()
+        elseif obj.renderid == Render.BoxBoundId then 
+            local lw = love.graphics.getLineWidth();
+            local r, g, b, a = love.graphics.getColor( );
+            love.graphics.setLineWidth( 3);
+            love.graphics.setColor(0.9, 0.9, 0.0);
+            local x1, y1, x2, y2 = obj:getBoxValueFromObj()
+            love.graphics.rectangle("line", x1 - 3, y1 - 3, x2 - x1 + 6, y2 - y1 + 6)
+            love.graphics.setLineWidth(lw);
+            love.graphics.setColor(r, g, b, a);
+        elseif obj.renderid == Render.MeshId then
+            love.graphics.drawInstanced( obj.mesh, 1)
         end
 
         

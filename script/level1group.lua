@@ -5,17 +5,24 @@ function Level1Group.new()
     return group;
 end
 
+
 function Level1Group:init()
-    self.levelres = Entity.new()
-    self.level1 = Polygon.new(100, 100);
-    self.level1:createSVG("levels/level1.svg", self.levelres);--method-draw-image.svg
+    self.grid = Grid.new(-1000, -1000, 10000, 10000, 150);
 
     self.me = Me.new()
+
+    _G.setMe(self.me);
+
+    self.level1 = Polygon.new(100, 100);
+
     self.level1:createSVG("demo_files/me.svg", self.me);--method-draw-image.svg
 
     self.me:init();
 
-    _G.setMe(self.me);
+    self.levelres = Entity.new()
+
+    self.level1:createSVG("levels/level1.svg", self.levelres);--method-draw-image.svg
+
 
     -- local button = self:createUI("Button")
     -- button:setPos(200, 200);
@@ -26,7 +33,8 @@ function Level1Group:init()
 
     self.powerbar = PowerBar.new(40, 60, 30, 120);
 
-    self.grid = Grid.new(-1000, -1000, 10000, 10000, 150);
+    self:addNeednotCheckForNoiseLine(self.me.pao.polygon)
+    self:addNeednotCheckForNoiseLine(self.me.lun.polygon)
 end
 
 function Level1Group:createUI(typename, ...)
@@ -35,6 +43,14 @@ end
 
 function Level1Group:clearUI()
     return UIHelper.clearGroupUI("Level1");
+end
+
+function Level1Group:findNearestPointByLine(x1, y1, x2, y2)
+    return self.grid:findNearestPointByLine(x1, y1, x2, y2)
+end
+
+function Level1Group:addNeednotCheckForNoiseLine(obj)
+    return self.grid:addNeednotCheckForNoiseLine(obj)
 end
 
 function Level1Group:release()
@@ -56,10 +72,10 @@ function Level1Group:update(dt)
 end
 
 function Level1Group:firstdraw()
-    if self.grid then
+    -- if self.grid then
         
-        self.grid:draw()
-    end
+    --     self.grid:draw()
+    -- end
 end
 
 function Level1Group:afterdraw()
@@ -70,9 +86,10 @@ function Level1Group:afterdraw()
 end
 
 function Level1Group:draw()
-    -- if self.level1 then
-    --     self.level1:draw(dt);
-    -- end
+    if self.grid then
+        
+        self.grid:draw()
+    end
 
     if self.levelres then
         self.levelres:draw();

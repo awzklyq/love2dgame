@@ -8,12 +8,12 @@ _G.GroupManager.loadGroup = function(name)
         dofile("script/"..name..'Group.lua');
     end
     local group = _G[name..'Group'].new();
-    group:init();
+    
     _G.GroupManager.groups[group] = group;
 
     
     _G.GroupManager.currentgroup = group;
-
+    group:init();
     return group
 end
 

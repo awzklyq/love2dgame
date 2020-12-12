@@ -9,6 +9,16 @@ end
 function CameraManager.update(dt)
     mx, my = camera:toWorldCoords(love.mouse.getPosition())
     camera:update(dt)
+
+    -- local group = _G.GroupManager.currentgroup
+    -- if group and group.levelres then
+    --     local body = group.levelres:findBodyByName("asd")
+    --     if body then
+    --         local pos = body.transform:getPosition()
+    --         camera:follow(pos.x, pos.y)
+    --     end
+    -- end
+
     local me = _G.getMe()
     if me then
         local pos = me:getPosition()

@@ -14,6 +14,8 @@ function Polygon.new(x ,y)
 
     polygon.vertices = {};
 
+    polygon.triangles = {};
+
     polygon.svgpaths = {};
 
     polygon.usesvgpaths = false;
@@ -74,6 +76,30 @@ function Polygon:addRect(rect)
     table.insert(self.rects, rect);
 end
 
+function Polygon:getWorldPointsBox2d(...)
+    if self.box2d then
+        return self.box2d:getWorldPoints(...)
+    end
+
+    return nil
+end
+
+function Polygon:getPoints(needparentposition, needparentoffsetpos, needall)
+    local points  = {}
+    if self.vertices and #self.vertices > 1 then
+        for i = 1, #self.vertices, 2 do
+            local x, y = self.transform:transformPoint(self.vertices[i], self.vertices[i + 1],needparentposition, needparentoffsetpos, needall)
+            
+            points[#points + 1] = x
+            points[#points + 1] = y
+        end
+    end
+    return points
+end
+
+function Polygon:hasBox2d()
+    return self.box2d ~= nil
+end
 
 function Polygon:update(e)
     --同步物理信息
@@ -115,6 +141,7 @@ function Polygon:update(e)
 end
 
 function Polygon:draw()
+
     -- local r, g, b, a = love.graphics.getColor( );
     -- love.graphics.setColor(self.color.r, self.color.g, self.color.b, self.color.a );
     Render.RenderObject(self);
@@ -126,6 +153,7 @@ function Polygon:draw()
     if self.crossline then
         self.crossline:draw();
     end
+    self.box:draw()
 end
 
 function Polygon:createSVG(file, entity)
@@ -144,6 +172,7 @@ function Polygon:createSVG(file, entity)
        end
     end
 
+    self.debugsvg = svg; --TODO
     return svg;
 end
 
@@ -181,44 +210,55 @@ function Polygon:createSVGRenderPaths(svgpaths, entity, rootbody)
         if entity and svgpath.rendervertices then--需要创建entity
             local polygon = Polygon.new(0, 0);
     
+            local transform = Matrix.new()
+            if svgpath.matrix then
+                transform.transform = transform.transform:apply(svgpath.matrix);
+                -- polygon.transform.transform = svgpath.matrix
+
+            end
+            
             if svgpath.translate then
-                polygon.transform:moveTo(svgpath.translate.x, svgpath.translate.y)
+                transform:moveTo(svgpath.translate.x, svgpath.translate.y)
             end
 
             if svgpath.scale then
-                polygon.transform:scale(svgpath.scale.x, svgpath.scale.y)
+                transform:scale(svgpath.scale.x, svgpath.scale.y)
             end
 
             if svgpath.rotate then
-                polygon.transform:rotateLeft(svgpath.rotate.a);
+                transform:rotateLeft(svgpath.rotate.a);
 
                 -- polygon.transform:translate(svgpath.rotate.x, svgpath.rotate.y);
                 -- polygon.transform:rotate(svgpath.rotate.a);
                 -- polygon.transform:translate(-svgpath.rotate.x, -svgpath.rotate.y);
             end
-
-            
-            if svgpath.matrix then
-                polygon.transform:applyTransform(svgpath.matrix);
-            end
     
             if svgpath.skewx then
-                polygon.transform:shear(svgpath.skewx, 0);
+                transform:shear(svgpath.skewx, 0);
+
             end
             if svgpath.skewy then
-                polygon.transform:shear(0, svgpath.skewy);
+                transform:shear(0, svgpath.skewy);
             end
 
             
             local vertices = {}
-            for n = 1,#svgpath.rendervertices,2 do
-                local localX, localY = polygon.transform:transformPoint( svgpath.rendervertices[n], svgpath.rendervertices[n+1] );
+
+
+            if v.typename == 'path' then
+                table.remove(svgpath.rendervertices,#svgpath.rendervertices)
+                table.remove(svgpath.rendervertices,#svgpath.rendervertices)
+            end
+            for n = 1, #svgpath.rendervertices, 2 do
+                local localX, localY = transform:transformPoint( svgpath.rendervertices[n], svgpath.rendervertices[n+1] );
                 table.insert(polygon.vertices, localX);
                 table.insert(polygon.vertices, localY);
-                -- table.insert(polygon.vertices, svgpath.rendervertices[n]);
-                -- table.insert(polygon.vertices, svgpath.rendervertices[n+1]);
             end
             
+
+            polygon.isConvex = love.math.isConvex(polygon.vertices);
+            
+
             if svgpath.stroke_paint and svgpath.paths then
    
                 polygon.stroke_width = svgpath.stroke_width or 2;
@@ -232,19 +272,19 @@ function Polygon:createSVGRenderPaths(svgpaths, entity, rootbody)
             if svgpath.fill_paint then
                
                 polygon.fill_paint = svgpath.fill_paint;--todo;
-                -- if svgpath.paths and svgpath.rendervertices and #svgpath.rendervertices > 4 then
-                --     love.graphics.polygon("fill", svgpath.rendervertices );
-                -- end
             end
-
+           
+            if v.typename == 'path' then
+                log("polygon.vertices", #polygon.vertices)
+            end
             if v.paths and v["user_phytype"] then
                 if v.typename == 'rect' then
                     
                     polygon.box2d = Box2dObject:newPolygon(polygon.vertices);
                     polygon.box2d:setType(v["user_phytype"] == "1" and 'static' or 'dynamic');
-                elseif v.typename == 'ellipse' then
-                    
+                elseif v.typename == 'ellipse' or  v.typename == 'path' then
                     if #polygon.vertices <= 32 then
+                        print( v.typename )
                         polygon.box2d = Box2dObject:newPolygon(polygon.vertices);
                     else
                         local vertices = {}
@@ -260,9 +300,11 @@ function Polygon:createSVGRenderPaths(svgpaths, entity, rootbody)
                     end
 
                     polygon.box2d:setType(v["user_phytype"] == "1" and 'static' or 'dynamic');
+                -- elseif v.typename == 'path' then
                 end
             end 
          
+            polygon['svg_typename'] = v.typename
             if not body then
                 if not rootbody then --没有body的时候 创建rootbody
                     rootbody = Body.new(v["name"], 0);--name, order
@@ -281,7 +323,6 @@ function Polygon:createSVGRenderPaths(svgpaths, entity, rootbody)
             for m, n in pairs(v) do
                 if string.find(m, "user_") then
                     body[string.gsub(m, "user_", "")] = n
-                    --print('ttttttttt', string.gsub(m, "user_", ""), m, n)
                 end
             end
 

@@ -9,3 +9,23 @@ _G.lovedebug.logtab = function(tab)
 end
 
 _G.log = print
+
+_G._warn = function(...)
+    log("waring: ", ...)
+end
+
+_G._errorAssert = function(a, ...)
+    assert(a, "Error : ".. ...)
+end
+
+--deubg
+_G.lovedebug.renderbox2d = true;   
+_G.lovedebug.renderobject = true;
+
+_G.lovedebug.showstat = false
+
+
+_G.lovedebug.showgridinfo = false
+
+
+_G.lovedebug.showBox = false

@@ -46,6 +46,15 @@ function Matrix:move(x, y)
 
     self.offsetpos.x = self.offsetpos.x + x
     self.offsetpos.y = self.offsetpos.y + y
+
+    local currentgroup = _G.GroupManager.currentgroup
+    
+    if currentgroup and currentgroup.grid and self.obj and self.obj.box then
+        local  box = rawget(self.obj, "box");
+        if box then
+            currentgroup.grid:addOrChange(self.obj)
+        end
+    end
 end
 
 function Matrix:moveTo(x, y)
@@ -60,7 +69,7 @@ function Matrix:moveTo(x, y)
     self.des.x = x
     self.des.y = y
 
-    local currentgroup = _G.GroupManager.currentgroup
+   local currentgroup = _G.GroupManager.currentgroup
     
     if currentgroup and currentgroup.grid and self.obj and self.obj.box then
         local  box = rawget(self.obj, "box");
@@ -97,7 +106,25 @@ function Matrix:getOffsetPos()
     return self.offsetpos;
 end
 
-function Matrix:getPositionXY()
+function Matrix:getParentOffsetPos()
+    if self.obj and self.obj.parent then
+       _errorAssert(self.obj.parent.transform, "getParentOffsetPos parent.transform is nil")
+       local ppoffset = self.obj.parent.transform:getParentOffsetPos()
+        
+       local poffset = self.obj.parent.transform:getOffsetPos()
+
+       return Vector.new(ppoffset.x + poffset.x, ppoffset.y + poffset.y)
+    end
+    return Vector.new(0, 0);
+end 
+
+function Matrix:getPositionXY(needparent)
+    if needparent then
+        if self.obj and self.obj.parent and self.obj.parent.transform then
+            local px, py = self.obj.parent.transform:getPositionXY(true);
+            return self.des.x + px, self.des.y + py;
+        end
+    end
     return self.des.x, self.des.y;
 end
 
@@ -178,13 +205,25 @@ function Matrix:rotateLeft(angle)
     self.transform = self.transform:apply(mat.transform);
 end
 
+function Matrix:transformPoint(x, y, needparentposition, needparentoffsetpos, needall)
+    if self.obj and self.obj.parent then
+        self.parenttransform:reset();
+        self:applyParent(self.obj.parent, needparentposition, needparentoffsetpos, needall);
+        self.parenttransform = self.parenttransform:apply(self.transform);
+        return self.parenttransform:transformPoint( x, y );
+    end
+    return self.transform:transformPoint( x, y );
+end
+
 --使用父矩阵
-function Matrix:applyParent(obj, needparentposition, needparentoffsetpos)
+function Matrix:applyParent(obj, needparentposition, needparentoffsetpos, needall)
     if obj.parent and obj.parent.transform then
         self:applyParent(obj.parent, needparentposition);
     end
 
-    if needparentposition then
+    if needall then
+        self.parenttransform = self.parenttransform:apply(obj.transform.transform)
+    elseif needparentposition then
         local pos = obj.transform:getPosition();
         self.parenttransform:translate(pos.x, pos.y);
     elseif needparentoffsetpos then
@@ -195,15 +234,15 @@ function Matrix:applyParent(obj, needparentposition, needparentoffsetpos)
 end
 
 function Matrix:use(obj)
-    if obj and (obj["needparentposition"] or obj["needparentoffsetpos"]) and obj.parent then
+    -- if obj and (obj["needparentposition"] or obj["needparentoffsetpos"]) and obj.parent then
 
-        self.parenttransform:reset();
+    --     self.parenttransform:reset();
         
-        self:applyParent(obj.parent,  obj["needparentposition"], obj["needparentoffsetpos"]);
-        self.parenttransform = self.parenttransform:apply(self.transform);
-        love.graphics.applyTransform(self.parenttransform)
-        return;
-    end
+    --     self:applyParent(obj.parent,  obj["needparentposition"], obj["needparentoffsetpos"]);
+    --     self.parenttransform = self.parenttransform:apply(self.transform);
+    --     love.graphics.applyTransform(self.parenttransform)
+    --     return;
+    -- end
     love.graphics.applyTransform(self.transform);
 end
 
