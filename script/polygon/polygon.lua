@@ -26,7 +26,7 @@ function Polygon.new(x ,y)
 
     polygon.box = Box.new()
 
-  
+    -- polygon.revisexy = Vector.new() --TODO for triangles box2d position..
 
     --polygon.box2d
     return polygon;
@@ -130,12 +130,22 @@ function Polygon:update(e)
         local posx, posy = self.transform:getPositionXY()
         local offsetx, offsety = self.transform:getOffsetPosXY();
         self.transform:reset()
-        self.transform:moveTo(x, y);
+        -- if self.isConvex == false then
+        --     self.transform:moveTo(x - self.revisexy.x, y - self.revisexy.y );
+        -- else
+            self.transform:moveTo(x, y);
+        -- end
+        
         self.transform:rotateLeft(angle)
 
         local newpos = self.transform:getPosition()
-        self.transform.offsetpos.x = offsetx + newpos.x - posx
-        self.transform.offsetpos.y = offsety + newpos.y - posy
+        -- if self.isConvex == false then
+        --     self.transform.offsetpos.x = offsetx + newpos.x - posx - self.revisexy.x
+        --     self.transform.offsetpos.y = offsety + newpos.y - posy - self.revisexy.y
+        -- else
+            self.transform.offsetpos.x = offsetx + newpos.x - posx
+            self.transform.offsetpos.y = offsety + newpos.y - posy
+        -- end
 
     end
 end
@@ -274,35 +284,33 @@ function Polygon:createSVGRenderPaths(svgpaths, entity, rootbody)
                 polygon.fill_paint = svgpath.fill_paint;--todo;
             end
            
-            if v.typename == 'path' then
-                log("polygon.vertices", #polygon.vertices)
-            end
-            if v.paths and v["user_phytype"] then
-                if v.typename == 'rect' then
-                    
-                    polygon.box2d = Box2dObject:newPolygon(polygon.vertices);
-                    polygon.box2d:setType(v["user_phytype"] == "1" and 'static' or 'dynamic');
-                elseif v.typename == 'ellipse' or  v.typename == 'path' then
-                    if #polygon.vertices <= 32 then
-                        print( v.typename )
+            if polygon.isConvex then
+                if v.paths and v["user_phytype"] then
+                    if v.typename == 'rect' then
                         polygon.box2d = Box2dObject:newPolygon(polygon.vertices);
-                    else
-                        local vertices = {}
-                        local count = #polygon.vertices / 2;
-                        local op =math.ceil(count / 16);
+                    
+                        polygon.box2d:setType(v["user_phytype"] == "1" and 'static' or 'dynamic');
+                    elseif v.typename == 'ellipse' or  v.typename == 'path' then
+                        if #polygon.vertices <= 32 then
+                            polygon.box2d = Box2dObject:newPolygon(polygon.vertices);
+                        else
+                            local vertices = {}
+                            local count = #polygon.vertices / 2;
+                            local op =math.ceil(count / 16);
 
-                        for offset =1,#polygon.vertices ,op * 2 do 
-                            table.insert(vertices, polygon.vertices[offset] );
-                            table.insert(vertices, polygon.vertices[offset + 1] );
+                            for offset =1,#polygon.vertices ,op * 2 do 
+                                table.insert(vertices, polygon.vertices[offset] );
+                                table.insert(vertices, polygon.vertices[offset + 1] );
+                            end
+                            
+                            polygon.box2d = Box2dObject:newPolygon(vertices);
                         end
-                        
-                        polygon.box2d = Box2dObject:newPolygon(vertices);
-                    end
 
-                    polygon.box2d:setType(v["user_phytype"] == "1" and 'static' or 'dynamic');
-                -- elseif v.typename == 'path' then
-                end
-            end 
+                        polygon.box2d:setType(v["user_phytype"] == "1" and 'static' or 'dynamic');
+                    -- elseif v.typename == 'path' then
+                    end
+                end 
+            end
          
             polygon['svg_typename'] = v.typename
             if not body then
@@ -323,6 +331,49 @@ function Polygon:createSVGRenderPaths(svgpaths, entity, rootbody)
             for m, n in pairs(v) do
                 if string.find(m, "user_") then
                     body[string.gsub(m, "user_", "")] = n
+                end
+            end
+ 
+            if polygon.isConvex == false then
+                local centerx, centery = 0, 0
+                local num = #polygon.vertices
+                for i = 1, num, 2 do
+                    centerx = centerx + polygon.vertices[i];
+                    centery = centery + polygon.vertices[i +1]
+                end
+        
+                centerx = centerx / (num / 2)
+                centery = centery / (num / 2)
+        
+                for i = 1, num, 2 do
+                    local triangle = {}
+                    table.insert(triangle, polygon.vertices[i])
+                    table.insert(triangle, polygon.vertices[i +1])
+        
+                    table.insert(triangle, centerx)
+                    table.insert(triangle, centery)
+        
+                    if i + 1 == num then
+                        table.insert(triangle, polygon.vertices[1])
+                        table.insert(triangle, polygon.vertices[2])
+                        
+                    else
+                        table.insert(triangle, polygon.vertices[i +2])
+                        table.insert(triangle, polygon.vertices[i +3])
+                    end
+        
+                    table.insert(polygon.triangles, triangle)
+                end
+
+                if v.paths and v["user_phytype"] then
+                    --polygon.triangles[1][3], polygon.triangles[1][4]  -> centerx, centery
+                    polygon.box2d = Box2dObject:newPolygon(polygon.triangles[1]);
+                    local box2d1 = polygon.box2d
+                    for i = 2, #polygon.triangles, 2 do
+                        local box2d2 = Box2dObject:newPolygon(polygon.triangles[i]);
+                        local joine = polygon.box2d:addJoint('WeldJoint', box2d1, box2d2, polygon.triangles[1][3], polygon.triangles[1][4], true)
+                        box2d1 = box2d2
+                    end
                 end
             end
 

@@ -20,6 +20,12 @@ function Box2dObject.new()
 
         return nil;
       end});
+
+    obj.joints = {}
+
+    obj.renderid = Render.Box2dId;
+    
+    obj.relatedbox2ds = {}
     return obj;
 end
 
@@ -58,4 +64,29 @@ function Box2dObject:newChain(vertices, loop, settings)
     local obj = Box2dObject.new()
     obj.obj = _G.box2dworld:newChainCollider(vertices, loop, settings)
     return obj
+end
+
+function Box2dObject:addJoint(joint_type, box2d1, box2d2, ...)
+    local joint, obj1, obj2
+    if box2d1.renderid == Render.Box2dId then
+        obj1 = box2d1.obj
+    else
+        obj1 = box2d1
+    end
+
+    if box2d2.renderid == Render.Box2dId then
+        obj2 = box2d2.obj
+    else
+        obj2 = box2d2
+    end
+
+    local joint = _G.box2dworld:addJoint(joint_type, obj1, obj2, ...)
+    table.insert(self.joints, joint)
+    return joint
+end
+
+function Box2dObject:addRelatedBox2d(box2d)
+    assert(box2d.renderid == Render.Box2dId)
+
+    table.insert(self.relatedbox2ds, box2d)
 end

@@ -20,6 +20,8 @@ Render.GridDebugViewId = 9;
 Render.BoxBoundId = 10;
 
 Render.MeshId = 11;
+
+Render.Box2dId = 12;
 Render.getRenderIdName = function(id)
     if Render.CircleId == id then
         return "Circle"
@@ -48,8 +50,6 @@ Render.getRenderIdName = function(id)
     return "Null"
 end
 
-local temp = 1
-local temp2 = 1
 Render.RenderObject = function(obj)
     
     if not _G.lovedebug.renderobject then return end

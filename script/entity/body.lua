@@ -85,6 +85,28 @@ function Body:setPolygon(polygon)
         table.insert(vertices, polygon.vertices[i + 1] - cy);
     end
 
+    if polygon.isConvex == false then
+        local tcx, tcy =0, 0
+        for i = 1, #polygon.triangles[1], 2 do
+            tcx = tcx + polygon.triangles[1][i]
+            tcy = tcy + polygon.triangles[1][i + 1]
+        end
+
+        tcx = tcx / 3
+        tcy = tcy / 3
+
+        -- polygon.revisexy.x = tcx - cx
+        -- polygon.revisexy.y = tcy - cy
+
+        for i = 1,#polygon.triangles do
+            local triangle = polygon.triangles[i]
+            for j = 1, #triangle, 2 do
+                triangle[j] = triangle[j] - tcx
+                triangle[j+ 1] = triangle[j+ 1] - tcy
+            end
+        end
+    end
+
     box.x1 = box.x1 - cx;
     box.y1 = box.y1 - cy;
     box.x2 = box.x2 - cx;
@@ -104,39 +126,6 @@ function Body:setPolygon(polygon)
         currentgroup.grid:addOrChange(self.polygon)
     end
 
-    if polygon.isConvex == false then
-        local centerx, centery = 0, 0
-        local num = #polygon.vertices
-        for i = 1, num, 2 do
-            centerx = centerx + polygon.vertices[i];
-            centery = centery + polygon.vertices[i +1]
-        end
-
-        centerx = centerx / (num / 2)
-        centery = centery / (num / 2)
-
-        for i = 1, num, 2 do
-            local triangle = {}
-            table.insert(triangle, polygon.vertices[i])
-            table.insert(triangle, polygon.vertices[i +1])
-
-            table.insert(triangle, centerx)
-            table.insert(triangle, centery)
-
-            if i + 1 == num then
-                table.insert(triangle, polygon.vertices[1])
-                table.insert(triangle, polygon.vertices[2])
-                
-            else
-                table.insert(triangle, polygon.vertices[i +2])
-                table.insert(triangle, polygon.vertices[i +3])
-            end
-
-            table.insert(polygon.triangles, triangle)
-        end
-
-        -- polygon.mesh = Mesh.CreteMeshFormSimpleConcavePolygon(polygon.vertices)
-    end
 end
 
 function Body:findBodyByName(name)
