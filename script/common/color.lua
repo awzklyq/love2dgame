@@ -2,10 +2,10 @@ _G.LColor = {}
 function LColor.new(r, g, b, a)
     local color = setmetatable({}, LColor);
 
-    color.r = r;
-    color.b = b;
-    color.g = g;
-    color.a = a;
+    color.r = r or 255;
+    color.b = b or 255;
+    color.g = g or 255;
+    color.a = a or 255;
     
     return color;
 end

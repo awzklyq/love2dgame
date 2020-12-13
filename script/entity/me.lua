@@ -118,16 +118,18 @@ function Me:draw(e)
 end
 
 app.keypressed(function(key, scancode, isrepeat)
-    local powerbar = _G.GroupManager.currentgroup.powerbar
-    if powerbar then
-        if key == "space" then
-            local me = _G.getMe()
-            local dir = me:getPaoDir();
-            local value = powerbar:getValue()
-            log("current power value: ",value)
-            
-            me:applyLinearImpulse(value)
+    if _G.GroupManager.currentgroup then
+        local powerbar = _G.GroupManager.currentgroup.powerbar
+        if powerbar then
+            if key == "space" then
+                local me = _G.getMe()
+                local dir = me:getPaoDir();
+                local value = powerbar:getValue()
+                log("current power value: ",value)
+                
+                me:applyLinearImpulse(value)
 
+            end
         end
     end
     

@@ -79,7 +79,7 @@ function love.update(dt)
   end
 
 function love.draw()
-    love.graphics.clear(0.5,0.5,0.5)
+    -- love.graphics.clear(0.5,0.5,0.5)
     -- _G.UIHelper.update(dt);
     -- _G.app.update(dt);
     _G.app.beforrender();
