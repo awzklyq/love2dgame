@@ -39,6 +39,11 @@ Canvas.__newindex = function(tab, key, value)
     rawset(tab, key, value);
 end
 
+function Canvas:getPixel(x, y)
+    local data = self:newImageData()
+    return data:getPixel(x, y);
+end
+
 function Canvas:draw()
     Render.RenderObject(self)
 end

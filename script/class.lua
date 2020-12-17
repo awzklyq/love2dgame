@@ -18,3 +18,33 @@ _G.__setParentObject = function(obj, parent)
         end
     end
 end
+
+_G.__createClassFromLoveObj = function(objname)
+    _G[objname] = {}
+    _G[objname].__index = function(tab, key, ...)
+        local value = rawget(tab, key);
+        if value then
+            return value;
+        end
+    
+        if _G[objname][key] then
+            return _G[objname][key];
+        end
+        
+        if tab["obj"] and tab["obj"][key] then
+            if type(tab["obj"][key]) == "function" then
+                tab[key] = function(tab, ...)
+                    return tab["obj"][key](tab["obj"], ...);--todo..
+                end
+                return  tab[key]
+            end
+            return tab["obj"][key];
+        end
+    
+        return nil;
+    end
+
+    _G[objname].__newindex = function(tab, key, value)
+        rawset(tab, key, value);
+    end
+end

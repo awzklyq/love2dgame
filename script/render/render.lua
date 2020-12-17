@@ -25,6 +25,7 @@ Render.Box2dId = 12;
 
 Render.CanvasId = 13;
 
+Render.ShaderId = 14
 Render.getRenderIdName = function(id)
     if Render.CircleId == id then
         return "Circle"
@@ -50,6 +51,8 @@ Render.getRenderIdName = function(id)
         return "Mesh"
     elseif Render.CanvasId == id then
         return "Canvas"
+    elseif Render.ShaderId == id then
+        return "Shader"
     end
 
     return "Null"
@@ -65,7 +68,11 @@ Render.RenderObject = function(obj)
     end
 
     if obj.shader then
-        love.graphics.setShader(obj.shader)
+        if obj.shader.renderid == Render.ShaderId then
+            love.graphics.setShader(obj.shader.obj)
+        else
+            love.graphics.setShader(obj.shader)
+        end
     end
 
     if _G.lovedebug.renderobject then

@@ -7,6 +7,7 @@ function CameraManager.load()
 end
 
 function CameraManager.update(dt)
+    if _G.lovedebug.useCamera == false then return end
     mx, my = camera:toWorldCoords(love.mouse.getPosition())
     camera:update(dt)
 
@@ -27,16 +28,19 @@ function CameraManager.update(dt)
 end
 
 function CameraManager.begineDraw()
+    if _G.lovedebug.useCamera == false then return end
     camera:attach()
 end
 
 function CameraManager.endDraw()
+    if _G.lovedebug.useCamera == false then return end
        -- Draw your game here
        camera:detach()
     --    camera:draw() -- Call this here if you're using camera:fade, camera:flash or debug drawing the deadzone
 end
 
 function CameraManager.wheelmoved(x, y)
+    if _G.lovedebug.useCamera == false then return end
     if y > 0 then
         camera.scale = camera.scale *0.8;
     elseif y < 0 then
@@ -45,6 +49,7 @@ function CameraManager.wheelmoved(x, y)
 end
 
 function CameraManager.keypressed(key)
+    if _G.lovedebug.useCamera == false then return end
     -- if key == 'f' then
     --     camera:fade(1, {0, 0, 0, 1})
     -- end
@@ -55,6 +60,7 @@ function CameraManager.keypressed(key)
 end
 
 function CameraManager.mousemoved(x, y, dx, dy, istouch)
+    if _G.lovedebug.useCamera == false then return end
     -- if button == 1 then -- Versions prior to 0.10.0 use the MouseConstant 'l'
     --    printx = x
     --    printy = y

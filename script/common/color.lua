@@ -10,6 +10,7 @@ function LColor.new(r, g, b, a)
     return color;
 end
 
+
 LColor.__index = function(tab, key)
     if key == 'r' then
         return  rawget(tab, '_r') * 255;
@@ -21,21 +22,29 @@ LColor.__index = function(tab, key)
         return  rawget(tab, '_a') * 255;
     end
 
+    if _G["LColor"][key] then
+        return _G["LColor"][key];
+    end
+
     return rawget(tab, key);
 end
 
 LColor.__newindex = function(tab, key, value)
     if value then
         if key == 'r' then
-            rawset(tab, '_r', value / 255);
+            return rawset(tab, '_r', value / 255);
         elseif key == 'g' then
-            rawset(tab, '_g', value / 255);
+            return rawset(tab, '_g', value / 255);
         elseif key == 'b' then
-            rawset(tab, '_b', value / 255);
+            return rawset(tab, '_b', value / 255);
         elseif key == 'a' then
-            rawset(tab, '_a', value / 255);
+            return rawset(tab, '_a', value / 255);
         end
     end
 
-    rawset(tab, key, value);
+    return rawset(tab, key, value);
+end
+
+function LColor:getBrightness()
+    return 0.2126 * self._r + 0.7152 * self._g + 0.0722 *self._b
 end

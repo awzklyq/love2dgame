@@ -29,3 +29,5 @@ _G.lovedebug.showgridinfo = false
 
 
 _G.lovedebug.showBox = false
+
+_G.lovedebug.useCamera = false
