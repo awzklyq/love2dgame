@@ -26,6 +26,10 @@ Render.Box2dId = 12;
 Render.CanvasId = 13;
 
 Render.ShaderId = 14
+
+Render.Camera3DId = 15
+
+Render.Mesh3DId = 16
 Render.getRenderIdName = function(id)
     if Render.CircleId == id then
         return "Circle"
@@ -53,6 +57,8 @@ Render.getRenderIdName = function(id)
         return "Canvas"
     elseif Render.ShaderId == id then
         return "Shader"
+    elseif Render.Mesh3D == id then
+        return "Mesh3D"
     end
 
     return "Null"
@@ -177,6 +183,8 @@ Render.RenderObject = function(obj)
             love.graphics.setLineWidth(lw);
             love.graphics.setColor(r, g, b, a);
         elseif obj.renderid == Render.MeshId then
+            love.graphics.draw( obj.obj )
+        elseif obj.renderid == Render.Mesh3DId then
             love.graphics.draw( obj.obj )
         elseif obj.renderid == Render.CanvasId then
             love.graphics.draw( obj.obj)

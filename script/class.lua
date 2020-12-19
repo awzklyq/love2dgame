@@ -21,6 +21,7 @@ end
 
 _G.__createClassFromLoveObj = function(objname)
     _G[objname] = {}
+
     _G[objname].__index = function(tab, key, ...)
         local value = rawget(tab, key);
         if value then

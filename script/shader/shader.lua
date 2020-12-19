@@ -337,3 +337,55 @@ function Shader.GetFXAAShader(w, h)
     shader:send('h', h)
     return shader
 end
+
+
+function Shader.GetBase3DShader(projectionMatrix, modelMatrix, viewMatrix)
+   
+    local pixelcode = [[
+        vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
+        {
+            vec4 texcolor = Texel(tex, texture_coords);
+            return texcolor * color;
+        }
+    ]]
+ 
+    local vertexcode = [[
+        uniform mat4 projectionMatrix;
+        uniform mat4 modelMatrix;
+        uniform mat4 viewMatrix;
+        vec4 position(mat4 transform_projection, vec4 vertex_position)
+        {
+            return projectionMatrix * viewMatrix * modelMatrix * VertexPosition;
+        }
+]]
+
+    local shader = Shader.new(pixelcode, vertexcode)
+    assert(shader:hasUniform( "projectionMatrix") and shader:hasUniform( "modelMatrix") and shader:hasUniform( "viewMatrix"))
+    if projectionMatrix then
+        shader:send('projectionMatrix', projectionMatrix)
+    end
+
+    if modelMatrix then
+        shader:send('modelMatrix', modelMatrix)
+    end
+
+    if viewMatrix then
+        shader:send('viewMatrix', viewMatrix)
+    end
+    
+    shader.setCameraAndMatrix3D = function(obj, modelMatrix, projectionMatrix, viewMatrix)
+        if projectionMatrix then
+            shader:send('projectionMatrix', projectionMatrix)
+        end
+    
+        if modelMatrix then
+            shader:send('modelMatrix', modelMatrix)
+        end
+    
+        if viewMatrix then
+            shader:send('viewMatrix', viewMatrix)
+        end
+    end
+   
+    return  shader
+end

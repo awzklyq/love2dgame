@@ -129,6 +129,7 @@ function love.mousepressed(x, y, button, istouch)
     _G.UIHelper.mousemoved(x, y, dx, dy);
     _G.CameraManager.mousemoved(x, y, dx, dy, istouch);
     _G.LightManager.mousemoved(x, y, dx, dy, istouch)
+
     _G.app.mousemoved(x, y, dx, dy, istouch);
  end
 
