@@ -32,26 +32,12 @@ plane.transform3d:mulTranslationRight(0,-100,-100)
 -- plane.transform3d:mulRotationLeft(0,1,0, 0.3)
 -- plane.transform3d:mulScalingLeft(50,1,50)
 plane.transform3d:mulScalingLeft(50,1,50)
-local svshader = Shader.GetShadowVolumeShader()
 local clearcolor = false
-
-local depth_front = Canvas.new(width, height, {format = "depth32f", readable = true, msaa = 0, mipmaps="none"})
-local depth_back = Canvas.new(width, height, {format = "depth32f", readable = true, msaa = 0, mipmaps="none"})
-local color_front = Canvas.new(width, height, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
-local color_back = Canvas.new(width, height, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
-local depth_front_buff = Canvas.new(width, height, {format = "r16f", readable = true, msaa = 0})
-local depth_back_buff = Canvas.new(width, height, {format = "r16f", readable = true, msaa = 0})
-
-local stencilbuff = Canvas.new(width, height, {format = "depth32fstencil8", readable = true, msaa = 0, mipmaps="none"})
-
--- plane.shader:setShadowVoluneValue(depth_front_buff.obj, depth_back_buff.obj)
-
--- plane.shader:setDepthSize(width, height)
 
 local baseshader = Shader.GetBase3DShader()
 plane:setBaseColor(LColor.new(125, 125,125, 255))
 local depth_buffer = Canvas.new(width, height, {format = "depth32fstencil8", readable = true, msaa = 0, mipmaps="none"})
-local depth_buffer1 = Canvas.new(width, height, {format = "depth32fstencil8", readable = true, msaa = 0, mipmaps="none"})	
+local depth_buffer1 = Canvas.new(width, height, {format = "depth24", readable = true, msaa = 0, mipmaps="none"})	
 local color_buffer = Canvas.new(width, height, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
 local color_buffer1= Canvas.new(width, height, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
 local function renderShadowVolumeFront()
@@ -88,71 +74,33 @@ local function renderMesh()
     plane:draw()
 end
 
-local function renderMeshShadow(shadow)
-
-    svshader:setShadowMap(shadow)
-    love.graphics.setMeshCullMode("front")
-    love.graphics.setDepthMode("less", true)
-    for i = 1, #cubes do
-        cubes[i].shader = svshader
-        cubes[i]:draw()
-    end
-    plane.shader = svshader
-    plane:draw()
-end
-
-
 local StencilRect = Rect.new(0, 0, width, height)
 StencilRect.color = LColor.new(0,0,0,255)
 local testrect = Rect.new(100, 100, 200, 200)
--- love.graphics.setDepthMode("less", true)
 local renderselect = 1
 
-local meshquad = MeshQuad.new(width, height, LColor.new(255, 255, 255, 255))
-meshquad:setCanvas(color_buffer)
-meshquad:setBaseTexture(color_buffer1)
-app.render(function(dt)
-
-    if clearcolor then
-        love.graphics.clear(0.5,0.5,0.5)
-    end
-
-    -- love.graphics.setCanvas({color_buffer.obj, depthstencil = depth_buffer.obj})
-    -- -- love.graphics.setStencilTest( comparemode, comparevalue )
-    -- -- love.graphics.stencil(renderMesh, "replace", 1)
-    -- love.graphics.stencil(function()
-    --     -- love.graphics.rectangle( "fill", -100, -100, 1200,800);
-    --     StencilRect:draw()
-        -- renderMesh()
-    -- end, "replace", 0)
+local function renderShadowVolume()
 
     love.graphics.setCanvas({ color_buffer.obj, depthstencil = depth_buffer.obj})
     love.graphics.clear(1,1, 1, 1)
     love.graphics.setCanvas()
+
     love.graphics.setCanvas({ depthstencil = depth_buffer.obj})
-    -- love.graphics.setStencilTest( comparemode, comparevalue )
-    -- love.graphics.stencil(renderMesh, "replace", 1)
     
     love.graphics.stencil(function()
-        -- love.graphics.rectangle( "fill", -100, -100, 1200,800);
         love.graphics.clear(1,1,1, 1)
         love.graphics.rectangle( "fill", -100, -100, 1200,800);
         
-        -- renderMesh()
     end, "replace", 0, false)
-    -- love.graphics.setCanvas()
-    -- love.graphics.setCanvas({color_buffer.obj, depthstencil = depth_buffer.obj})
+
     renderMesh()
     love.graphics.setCanvas()
     love.graphics.setCanvas({ depthstencil = depth_buffer.obj})
-    -- love.graphics.setStencilTest("equal",1)
     love.graphics.stencil(renderShadowVolumeFront, "increment",1, true)--increment
-    -- love.graphics.setStencilTest()
+
     love.graphics.stencil(renderShadowVolumeBack, "increment", 1, true)
 
-    -- love.graphics.stencil(function()
-    --     testrect:draw()
-    -- end, "increment", 0, true)--increment
+
     love.graphics.setCanvas()
     
     love.graphics.setCanvas({color_buffer.obj, depthstencil = depth_buffer.obj})
@@ -161,15 +109,20 @@ app.render(function(dt)
 
     love.graphics.setStencilTest()
     love.graphics.setCanvas()
-    -- love.graphics.setStencilTest()
+end
+
+
+local meshquad = MeshQuad.new(width, height, LColor.new(255, 255, 255, 255))
+meshquad:setCanvas(color_buffer1)
+meshquad:setBaseTexture(color_buffer)
+app.render(function(dt)
+
+    if clearcolor then
+        love.graphics.clear(0.5,0.5,0.5)
+    end
     
-    -- love.graphics.setCanvas({color_buffer.obj, depthstencil = depth_buffer.obj})
+    renderShadowVolume()
 
-    -- love.graphics.setCanvas({color_buffer.obj, depthstencil = depth_buffer.obj})
-    -- love.graphics.setStencilTest("equal",2)
-
-    -- color_buffer:draw()
-    -- color_buffer1:draw()
     meshquad:draw()
 
 end)
@@ -179,15 +132,12 @@ app.keypressed(function(key, scancode, isrepeat)
     if key == "space" then
         -- log('eye: ',currentCamera3D.eye.x, currentCamera3D.eye.y, currentCamera3D.eye.z)
         -- log('look: ',currentCamera3D.look.x, currentCamera3D.look.y, currentCamera3D.look.z)
-        renderselect = 3 - renderselect
-        print('renderselect', renderselect)
 
-        love.graphics.push();
         love.graphics.setCanvas({color_buffer1.obj, depthstencil = depth_buffer1.obj})
         love.graphics.clear(0,0, 0, 0)
         renderMesh()
         love.graphics.setCanvas()
-        love.graphics.pop();
+   
     end
 
     -- if key == "up" then

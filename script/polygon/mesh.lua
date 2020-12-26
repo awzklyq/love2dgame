@@ -70,6 +70,9 @@ Mesh.CreteMeshFormSimpleConcavePolygon = function(vertices, ...)
     local datas = {}
     for i = 1, #vertices, 2 do
         local color = colors[i % #colors + 1]
+        if #colors == 1 then
+            color = colors[1]
+        end
         table.insert(datas, {vertices[i], vertices[i +1], -- position of the vertex
         (vertices[i] - minx) / (maxx - minx), (vertices[i + 1] - miny) / (maxy - miny), -- texture coordinate at the vertex position
         color._r, color._g, color._b, color._a})
