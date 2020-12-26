@@ -133,10 +133,10 @@ end
 
 -- returns a view matrix
 -- eye, target, and down are all 3d vectors
-Matrix3D.getViewMatrix = function(eye, target, down)
-    local z = Vector3.new(eye.x - target.x, eye.y - target.y, eye.z - target.z)
+Matrix3D.getViewMatrix = function(eye, look, up)
+    local z = Vector3.new(eye.x - look.x, eye.y - look.y, eye.z - look.z)
     z:normalize()
-    local x = Vector3.cross(down, z)
+    local x = Vector3.cross(Vector3.new(-up.x, -up.y, -up.z), z)
     x:normalize()
     local y = Vector3.cross(z, x)
 
@@ -166,7 +166,7 @@ function Matrix3D:mulTranslationRight(x, y, z)
     mm[13] = x
     mm[14] = y
     mm[15] = z
-	self:mulright(mm)
+	self:mulleft(mm)
 end
 
 function Matrix3D:mulRotationRight(x, y, z, r)
@@ -196,7 +196,7 @@ function Matrix3D:mulRotationRight(x, y, z, r)
 	mm[14] = 0
 	mm[15] = 0
 	mm[16] = 1
-	self:mulright(mm)
+	self:mulleft(mm)
 end
 
 function Matrix3D:mulScalingRight(x, y, z)
@@ -204,14 +204,14 @@ function Matrix3D:mulScalingRight(x, y, z)
 	mm[1] = x
 	mm[6] = y
 	mm[11] = z
-	self:mulright(mm)
+	self:mulleft(mm)
 end
 
 			
 function Matrix3D:mulTranslationLeft(x, y, z)
 	local mm = Matrix3D.new()
 	mm[13] = x mm[14] = y mm[15] = z
-	self:mulleft(mm)
+	self:mulright(mm)
 end
 
 function Matrix3D:mulRotationLeft(x, y, z, r)
@@ -241,7 +241,7 @@ function Matrix3D:mulRotationLeft(x, y, z, r)
 	mm[14] = 0
 	mm[15] = 0
 	mm[16] = 1
-	self:mulleft(mm)
+	self:mulright(mm)
 end
 
 function Matrix3D:mulScalingLeft(x, y, z)
@@ -249,12 +249,12 @@ function Matrix3D:mulScalingLeft(x, y, z)
 	mm[1] = x
 	mm[6] = y
 	mm[11] = z
-	self:mulleft(mm)
+	self:mulright(mm)
 end
 
 
 function Matrix3D:mulright(tab)
-    self:transpose()
+    -- self:transpose()
     tab:transpose()
 	local mat = self
 	local m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33 = mat[1], mat[2], mat[3], mat[4], mat[5], mat[6], mat[7], mat[8], mat[9], mat[10], mat[11], mat[12], mat[13], mat[14], mat[15], mat[16]
@@ -282,7 +282,7 @@ function Matrix3D:mulright(tab)
 end
 
 function Matrix3D:mulleft(tab)
-    self:transpose()
+    -- self:transpose()
     tab:transpose()
 	local m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33 = self[1], self[2], self[3], self[4], self[5], self[6], self[7], self[8], self[9], self[10], self[11], self[12], self[13], self[14], self[15], self[16]
 	self[1] = tab[1]* m00+ tab[2] * m10 + tab[3] * m20 + tab[4] * m30  
@@ -327,6 +327,5 @@ function Matrix3D:transpose( )
             end
         end
 
-        print('ssssssssss',self[1], self[2], self[3], self[4])
 	-- return *this;
 end

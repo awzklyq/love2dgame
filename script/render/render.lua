@@ -30,6 +30,8 @@ Render.ShaderId = 14
 Render.Camera3DId = 15
 
 Render.Mesh3DId = 16
+
+Render.Vector3Id = 17
 Render.getRenderIdName = function(id)
     if Render.CircleId == id then
         return "Circle"
@@ -68,7 +70,6 @@ Render.RenderObject = function(obj)
     
     if not _G.lovedebug.renderobject then return end
     love.graphics.push();
-
     if obj.transform and obj.renderid ~= Render.EntityBodyId then
         obj.transform:use(obj);
     end
