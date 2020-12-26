@@ -5,6 +5,8 @@ function Vector3.new(x ,y, z)
     v.x = x or 0;
     v.y = y or 0;
     v.z = z or 0;
+
+    v.renderid = Render.Vector3Id
     return v;
 end
 
@@ -43,6 +45,68 @@ end
 function Vector3:distanceself()
     return math.sqrt(math.pow(self.x, 2) + math.pow(self.y, 2) + math.pow(self.z, 2))
 end
+
+function Vector3:equal(v)
+    return math.abs(self.x -v.x ) <= math.cEpsilon and math.abs(self.y -v.y ) <= math.cEpsilon and math.abs(self.z -v.z ) <= math.cEpsilon
+end
+
+function Vector3:Cartesian2Spherical( )
+	local xx = math.sqrt( self.x * self.x + self.y * self.y + self.z * self.z );
+	local yy = xx == 0.0 and 0.0 or math.acos( self.z / xx );
+	local zz = ( self.x == 0.0 and self.y == 0.0 ) and 0.0 or math.asin( self.y / math.sqrt( self.x * self.x + self.y * self.y ) );
+
+	if ( self.x < 0.0 ) then
+        zz = math.pi - zz;
+    end
+
+	if ( zz < 0.0 ) then
+        zz = zz + math.pi * 2;
+    end
+
+    self.x = xx;
+	self.y = yy;
+    self.z = zz;
+    
+    return self
+end
+
+function Vector3:Spherical2Cartesian( )
+
+	local xx = self.x * math.sin( self.y ) * math.cos( self.z );
+	local yy = self.x * math.sin( self.y ) * math.sin( self.z );
+	local zz = self.x * math.cos( self.y );
+
+	self.x = xx;
+	self.y = yy;
+    self.z = zz;
+    
+    return self
+end
+
+-- Vector3& Vector3::Cartesian2Cylindrical( )
+-- {
+-- 	_float xx = Math::Atan( y / x );
+-- 	_float yy = Math::Sqrt( x * x + y * y );
+
+-- 	if ( x < 0.0f )
+-- 		xx += Math::cPi;
+
+-- 	x = xx;
+-- 	y = yy;
+
+-- 	return *this;
+-- }
+
+-- Vector3& Vector3::Cylindrical2Cartesian( )
+-- {
+-- 	_float xx = y * Math::Cos( x );
+-- 	_float yy = y * Math::Sin( x );
+
+-- 	x = xx;
+-- 	y = yy;
+
+-- 	return *this;
+-- }
     
 Vector3.mul = function(a, value)
     return Vector3.new(a.x *value, a.y * value, a.z * value);

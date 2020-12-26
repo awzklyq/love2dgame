@@ -33,6 +33,8 @@ _G.app.mousereleased = setmetatable({},  metatab)
 
 _G.app.keypressed = setmetatable({},  metatab)
 
+_G.app.wheelmoved = setmetatable({},  metatab)
+
 function love.mousereleased(x, y, button, isTouch)
     _G.UIHelper.mouseUp(x, y, button, isTouch)
     _G.app.mousereleased(x, y, button, isTouch)
@@ -62,6 +64,7 @@ function love.wheelmoved(x, y)
     end
     _G.CameraManager.wheelmoved(x, y);
     _G.LightManager.wheelmoved(x, y);
+    app.wheelmoved(x, y)
 end
 
 function love.textinput(text)

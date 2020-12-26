@@ -19,6 +19,21 @@ function Mesh3D.new(file)-- lw :line width
     return mesh;
 end
 
+--{x,y,z,u,v,nx,ny,nz}
+function Mesh3D.createFromPoints(datas)
+    local mesh = setmetatable({}, Mesh3D);
+    mesh.transform3d = Matrix3D.new();
+
+    mesh.verts = datas
+    mesh.shader = Shader.GetBase3DShader()
+    mesh.obj = love.graphics.newMesh(vertexFormat, mesh.verts, "triangles")
+
+    mesh.renderid = Render.Mesh3DId;
+
+    mesh.bcolor = LColor.new(255,255,255,255)
+    return mesh
+end
+
 
 local function NormalizeVector(vector)
     local dist = math.sqrt(vector[1]^2 + vector[2]^2 + vector[3]^2)
@@ -37,6 +52,10 @@ local function CrossProduct(a,b)
     }
 end
 
+function Mesh3D:setBaseColor(color)
+    self.bcolor = color
+    
+end
 
 -- populate model's normals in model's mesh automatically
 function Mesh3D:makeNormals()
@@ -65,7 +84,11 @@ end
 function Mesh3D:draw()
     local camera3d = _G.getGlobalCamera3D()
     --modelMatrix, projectionMatrix, viewMatrix
-    self.shader:setCameraAndMatrix3D(self.transform3d, Matrix3D.getProjectionMatrix(camera3d.fov, camera3d.nearClip, camera3d.farClip, camera3d.aspectRatio),Matrix3D.getViewMatrix(camera3d.position, camera3d.target, camera3d.down))
+    self.shader:setCameraAndMatrix3D(self.transform3d, Matrix3D.getProjectionMatrix(camera3d.fov, camera3d.nearClip, camera3d.farClip, camera3d.aspectRatio),Matrix3D.getViewMatrix(camera3d.eye, camera3d.look, camera3d.up))
+
+    if self.shader:hasUniform( "bcolor")  then
+        self.shader:send('bcolor',{self.bcolor._r, self.bcolor._g, self.bcolor._b, self.bcolor._a})
+    end
     Render.RenderObject(self)
 end
 

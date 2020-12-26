@@ -413,7 +413,7 @@ function Graphics:scale(x, y)
 end
 
 --- Applies the matrix to the coordinate system.
-function Graphics:apply_transform(a, b, c, d, e, f)
+function Graphics:apply_transform(svg, a, b, c, d, e, f)
     assert(a)
     assert(b)
     assert(c)
@@ -422,9 +422,10 @@ function Graphics:apply_transform(a, b, c, d, e, f)
     assert(f)
 
     local matrix = love.math.newTransform()
+    local scale = 1
     matrix:setMatrix(
-        a, c, 0, e,
-        b, d, 0, f,
+        a * scale, c* scale, 0, e,
+        b* scale, d* scale, 0, f,
         0, 0, 1, 0,
         0, 0, 0, 1
     )

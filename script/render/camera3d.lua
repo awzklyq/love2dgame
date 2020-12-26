@@ -3,17 +3,15 @@ function Camera3D.new(x1, y1, x2, y2, lw)-- lw :line width
     local camera = setmetatable({}, {__index = Camera3D});
 
     camera.fov = math.pi/2
-    camera.nearClip = 0.01
-    camera.farClip = 1000
+    camera.nearClip = 0.1
+    camera.farClip = 100000
     camera.aspectRatio = love.graphics.getWidth()/love.graphics.getHeight()
 
-    camera.position = Vector3.new(0,0,0)
-    camera.direction = 0
-    camera.pitch = 0
-    camera.theta = 0
-    camera.down = Vector3.new(0,-1,0)
+    camera.eye = Vector3.new(0,0,0)
 
-    camera.target = Vector3.new(0,0,-1)
+    camera.up = Vector3.new(0,1,0)
+
+    camera.look = Vector3.new(0,0,-1)
 
     camera.renderid = Render.Camera3DId
     --  -- so that far polygons don't overlap near polygons
@@ -21,70 +19,99 @@ function Camera3D.new(x1, y1, x2, y2, lw)-- lw :line width
     return camera;
 end
 
+function Camera3D:getPhi( )
 
--- function Camera3D:movePhi( phi )
+    return ( Vector3.sub(self.eye, self.look) ):Cartesian2Spherical( ).z;
+end
 
--- 	if phi == 0 then
--- 		return;
+function Camera3D:getTheta( )
+    return ( Vector3.sub(self.eye, self.look) ).Cartesian2Spherical( ).y;
+end
 
--- 	-- if ( mPhiLimit.x != Math::cMinFloat && mPhiLimit.y != Math::cMaxFloat )
--- 	{
--- 		_float curPhi = _phi_get( );
-	
--- 			if ( curPhi + phi < c.x )
--- 				phi = mPhiLimit.x - curPhi;
--- 			else if ( curPhi + phi > mPhiLimit.y )
--- 				phi = mPhiLimit.y - curPhi;
--- 		}
-		
--- 	}
+function Camera3D:getRadius( )
+    return Vector3.distance(self.eye, self.look)
+end
 
--- 	Vector3 eye = mEye->mVector * Matrix4( ).Translation( - mLook->mVector ) *
--- 		Matrix4( ).Rotation( mUp->mVector, phi ) * Matrix4( ).Translation( mLook->mVector );
+function Camera3D:movePhi( phi )
 
--- 	_moveEye( eye.x, eye.y, eye.z, time );
--- }
+	if phi == 0 then
+        return;
+    end
 
--- _void FancyCamera::_moveTheta( _float theta, _dword time )
--- {
--- 	if ( _lockTheta_get( ) )
--- 		return;
+    local curPhi = self:getPhi()
+    local temp = curPhi + phi;
+	while ( temp > math.c2pi ) do
+        temp = temp - math.c2pi;
+    end
 
--- 	if ( theta == 0.0f )
--- 		return;
+    while ( temp < 0 ) do
+        temp = temp + math.c2pi;
+    end
 
--- 	if ( mThetaLimit.x != Math::cMinFloat && mThetaLimit.y != Math::cMaxFloat )
--- 	{
--- 		_float temp = _theta_get( );
+    if  temp < math.MinNumber and temp > math.MaxNumber then
+    
+        if  math.abs( curPhi - math.MinNumber ) < math.abs( curPhi - math.MaxNumber ) then
+            phi = mPhiLimit.x - curPhi;
+        else
+            phi = mPhiLimit.y - curPhi;
+        end
+    end
 
--- 		if ( temp - theta < mThetaLimit.x )
--- 			theta = temp - mThetaLimit.x;
--- 		else if ( temp - theta > mThetaLimit.y )
--- 			theta = temp - mThetaLimit.y;
--- 	}
+    local mat = Matrix3D.new()
+    mat:mulTranslationRight(-self.look.x, -self.look.y, -self.look.z)
+    mat:mulRotationRight(self.up.x, self.up.y, self.up.z, phi)
+    mat:mulTranslationRight(self.look.x, self.look.y, self.look.z)
 
--- 	Vector3 right = Vector3::Cross( mUp->mVector, mLook->mVector - mEye->mVector ).Normalize( );
+    self.eye = mat:mul(self.eye)
+end
 
--- 	Vector3 vec1 = Vector3::Cross( mEye->mVector - mLook->mVector, right );
+function Camera3D:moveTheta( theta)
+	if ( theta == 0.0 ) then
+        return;
+    end
 
--- 	Vector3 eye = mEye->mVector * Matrix4( ).Translation( - mLook->mVector ) *
--- 		Matrix4( ).Rotation( right, theta ) * Matrix4( ).Translation( mLook->mVector );
 
--- 	Vector3 vec2 = Vector3::Cross( eye - mLook->mVector, right );
+    local right = Vector3.cross( self.up, Vector3.sub(self.look, self.eye) )
+    right:normalize( )
 
--- 	if ( Vector3::Dot( vec1, mUp->mVector ) * Vector3::Dot( vec2, mUp->mVector ) < 0.0f )
--- 		mUp->mVector = - mUp->mVector;
+	local vec1 = Vector3.cross( Vector3.sub(self.eye, self.look), right );
 
--- 	_moveEye( eye.x, eye.y, eye.z, time );
--- }
+    local mat = Matrix3D.new()
+    mat:mulTranslationRight(-self.look.x, -self.look.y, -self.look.z)
+    mat:mulRotationRight(right.x, right.y, right.z, theta)
+    mat:mulTranslationRight(self.look.x, self.look.y, self.look.z)
+
+    local eye = mat:mul(self.eye);
+	local vec2 = Vector3.cross( Vector3.sub(self.eye, self.look), right );
+
+	if ( Vector3.dot( vec1, self.up ) * Vector3.dot( vec2, self.up ) < 0.0 ) then
+        self.up = Vector3.new(-self.up.x, -self.up.y, -self.up.z)
+    end
+
+	self.eye = eye
+end
+
+function Camera3D:moveRadius( radius)
+	if ( radius == 0.0 ) then
+        return;
+    end
+
+	if self.eye:equal(self.look ) then
+        return;
+    end
+
+    local dir = Vector3.sub(self.eye, self.look)
+    dir:normalize()
+	self.eye = Vector3.add(self.eye, dir:mul(radius))
+end
 
 -- give the camera a point to look from and a point to look towards
 function Camera3D:setCameraAndLookAt(x,y,z, xAt,yAt,zAt)
-    self.position:setXYZ(x,y,z)
-    self.target:setXYZ(xAt,yAt,zAt)
+    self.eye:setXYZ(x,y,z)
+    self.look:setXYZ(xAt,yAt,zAt)
 
     -- update the camera in the shader
-    -- CameraShader:send("viewMatrix", GetViewMatrix(Camera.position, Camera.target, Camera.down))
+    -- CameraShader:send("viewMatrix", GetViewMatrix(Camera.position, Camera.look, Camera.up))
 end
 
 _G.currentCamera3D = Camera3D.new()
@@ -100,14 +127,12 @@ local mouse = {mousex = 0, mousey = 0}
 app.mousemoved(function(x, y, dx, dy, istouch)
 	if love.mouse.isDown(3) then
 		if love.keyboard.isDown("lalt") then
-			-- _rd.camera:movePhi(-(mouse.mousex - x) * 0.005)
-            -- _rd.camera:moveTheta(-(mouse.mousey - y) * 0.005)
-            _G.currentCamera3D .pitch = -(mouse.mousex - x) * 0.005
-            local direction = Vector3.sub(_G.currentCamera3D.target, _G.currentCamera3D.position)
-            currentCamera3D:setCamera(_G.currentCamera3D.position.x, _G.currentCamera3D.position.y, _G.currentCamera3D.position.z, 1,_G.currentCamera3D .pitch )
+			_G.currentCamera3D:movePhi(-(mouse.mousex - x) * 0.005)
+            _G.currentCamera3D:moveTheta((mouse.mousey - y) * 0.005)
+            
         else
-            local dir = Vector3.sub(_G.currentCamera3D.target, _G.currentCamera3D.position)
-            local vx = Vector3.cross(dir, _G.currentCamera3D.down)
+            local dir = Vector3.sub(_G.currentCamera3D.look, _G.currentCamera3D.eye)
+            local vx = Vector3.cross(dir, _G.currentCamera3D.up)
             vx:normalize()
             local vy = Vector3.cross(dir, vx)
             vy:normalize()
@@ -116,9 +141,8 @@ app.mousemoved(function(x, y, dx, dy, istouch)
 			local movex = Vector3.mul(nearx, dir:distanceself() / _G.currentCamera3D.nearClip)
 			local movey = Vector3.mul(neary, dir:distanceself() / _G.currentCamera3D.nearClip)
 			local move = Vector3.add(movex , movey)
-			_G.currentCamera3D.position = Vector3.new(_G.currentCamera3D.position.x + move.x, _G.currentCamera3D.position.y + move.y, _G.currentCamera3D.position.z + move.z)
-            _G.currentCamera3D.target = Vector3.new(_G.currentCamera3D.target.x + move.x, _G.currentCamera3D.target.y + move.y, _G.currentCamera3D.target.z + move.z)
-            print('aaaaaa', _G.currentCamera3D.position.x, _G.currentCamera3D.position.y, _G.currentCamera3D.position.z)
+			_G.currentCamera3D.eye = Vector3.new(_G.currentCamera3D.eye.x + move.x, _G.currentCamera3D.eye.y + move.y, _G.currentCamera3D.eye.z + move.z)
+            _G.currentCamera3D.look = Vector3.new(_G.currentCamera3D.look.x + move.x, _G.currentCamera3D.look.y + move.y, _G.currentCamera3D.look.z + move.z)
         end
         
 	end
@@ -129,6 +153,10 @@ end)
 -- app:onMouseWheel(function(d)
 -- 	-- _G.currentCamera3D:moveRadius(d * -0.1 * _G.currentCamera3D.radius)
 -- end)
+
+app.wheelmoved(function(x, y)
+    _G.currentCamera3D:moveRadius(y * -0.1 * _G.currentCamera3D:getRadius())
+end)
 
 app.keypressed(function(key, scancode, isrepeat)
     print(key)

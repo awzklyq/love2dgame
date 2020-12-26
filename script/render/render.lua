@@ -30,6 +30,8 @@ Render.ShaderId = 14
 Render.Camera3DId = 15
 
 Render.Mesh3DId = 16
+
+Render.Vector3Id = 17
 Render.getRenderIdName = function(id)
     if Render.CircleId == id then
         return "Circle"
@@ -68,7 +70,6 @@ Render.RenderObject = function(obj)
     
     if not _G.lovedebug.renderobject then return end
     love.graphics.push();
-
     if obj.transform and obj.renderid ~= Render.EntityBodyId then
         obj.transform:use(obj);
     end
@@ -85,6 +86,10 @@ Render.RenderObject = function(obj)
         if obj.renderid == Render.CircleId then
             love.graphics.circle( obj.mode, obj.x, obj.y, obj.r, obj.seg);
         elseif obj.renderid == Render.RectId then
+            if obj.color then
+                love.graphics.setColor(obj.color._r, obj.color._g, obj.color._b, obj.color._a);
+            end
+            
             love.graphics.rectangle( obj.mode, obj.x, obj.y, obj.w, obj.h);
         elseif obj.renderid == Render.EntityBodyId then
            

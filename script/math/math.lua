@@ -24,7 +24,9 @@ math.noise = function(...)
 end
 
 math.defaulttransform =  love.math.newTransform( );
-math.MinNumber = 0.000001;
+math.MinNumber = 0.00001;
 math.MaxNumber = 999999.0;
-math.cEpsilon = 0.000001;
+math.cEpsilon = 0.00001;
+
+math.c2pi = math.pi * 2
 -- math.ARC = math.PI * 2;

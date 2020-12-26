@@ -40,6 +40,16 @@ function Mesh:setCanvas(canvas)
     self:setTexture(canvas.obj)
 end
 
+function Mesh:setBaseTexture(canvas)
+    if not canvas then
+        self.shader = Shader.GetBaseShader()
+    else
+        self.shader = Shader.GetBaseImageShader()
+        self.shader:setBaseImage(canvas.obj)
+    end
+end
+
+
 function Mesh:draw()
     Render.RenderObject(self);
 end

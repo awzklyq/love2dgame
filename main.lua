@@ -1,15 +1,22 @@
+--config
+dofile('script/config.lua')
+
+_G.TEST = false
+
 --file
 _G.log = require "script/log"
 dofile('script/class.lua')
 dofile("script/ui/uihelper.lua")
 dofile('script/debug.lua')
 
+_G.lovector = require "lovector"
 dofile 'script/render/cameramanager.lua'
+
 dofile 'script/light/lightmanager.lua'
 dofile('script/application.lua')
 dofile('script/render/render.lua')
+dofile('script/render/canvas.lua')
 
-_G.lovector = require "lovector"
 dofile('script/common/color.lua')
 
 dofile('script/file/file.lua')
@@ -22,7 +29,8 @@ dofile('script/polygon/rect.lua')
 dofile('script/polygon/circle.lua')
 dofile('script/polygon/line.lua')
 dofile('script/polygon/box.lua')
-
+dofile('script/polygon/mesh.lua')
+dofile('script/polygon/mesh3d.lua')
 dofile('script/polygon/polygon.lua')
 
 dofile('script/uisystem/uisystem.lua')
@@ -31,6 +39,8 @@ dofile('script/uisystem/button.lua')
 dofile('script/math/math.lua')
 dofile('script/math/vector.lua')
 dofile('script/math/matrix.lua')
+dofile('script/math/vector3.lua')
+dofile('script/math/matrix3d.lua')
 
 dofile('script/groupmanager.lua')
 
@@ -42,18 +52,11 @@ dofile('script/entity/me.lua')
 dofile('script/entity/powerbar.lua')
 
 dofile('script/grid/grid.lua')
+dofile('script/shader/shader.lua')
+dofile 'script/render/camera3d.lua'
+dofile 'script/render/shadow.lua'
 
-_G.lovedebug.renderbox2d = true;   
-_G.lovedebug.renderobject = true;
-
-_G.lovedebug.showstat = false
-
-
-_G.lovedebug.showgridinfo = true
-
-app.load(function()
-	_G.GroupManager.loadGroup("Login");
-end)
+_G.mlib = require 'script/mlib' 
 
 --游戏全局函数
 local me = nil;
@@ -63,4 +66,13 @@ end
 
 _G.getMe = function(obj)
 	return me
+end
+
+if _G.TEST then
+app.load(function()
+	_G.GroupManager.loadGroup("Login");
+end)
+
+else
+	dofile('script/test/shadowvolume.lua')
 end

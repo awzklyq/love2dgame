@@ -340,7 +340,7 @@ function common.apply_transform(svg, element)
                 local e =  tonumber(next_num(), 10);
                 local f = tonumber(next_num(), 10);
 
-                svg.graphics:apply_transform(a, b, c, d, e, f);
+                svg.graphics:apply_transform(svg, a, b, c, d, e, f);
                
             elseif cmd == "skewX" then
                 local skewx = math.rad(tonumber(next_num(), 10));
