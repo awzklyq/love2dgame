@@ -25,7 +25,7 @@ function Camera3D:getPhi( )
 end
 
 function Camera3D:getTheta( )
-    return ( Vector3.sub(self.eye, self.look) ).Cartesian2Spherical( ).y;
+    return ( Vector3.sub(self.eye, self.look) ):Cartesian2Spherical( ).y;
 end
 
 function Camera3D:getRadius( )
@@ -39,23 +39,30 @@ function Camera3D:movePhi( phi )
     end
 
     local curPhi = self:getPhi()
-    local temp = curPhi + phi;
-	while ( temp > math.c2pi ) do
-        temp = temp - math.c2pi;
-    end
 
-    while ( temp < 0 ) do
-        temp = temp + math.c2pi;
+    if  curPhi + phi < math.MinNumber  then
+        phi = math.MinNumber - curPhi;
+    elseif  curPhi + phi >math.MaxNumber  then
+        phi = math.MaxNumber - curPhi;
     end
+                
+    -- local temp = curPhi + phi;
+	-- while ( temp > math.c2pi ) do
+    --     temp = temp - math.c2pi;
+    -- end
 
-    if  temp < math.MinNumber and temp > math.MaxNumber then
+    -- while ( temp < 0 ) do
+    --     temp = temp + math.c2pi;
+    -- end
+
+    -- if  temp < math.MinNumber and temp > math.MaxNumber then
     
-        if  math.abs( curPhi - math.MinNumber ) < math.abs( curPhi - math.MaxNumber ) then
-            phi = mPhiLimit.x - curPhi;
-        else
-            phi = mPhiLimit.y - curPhi;
-        end
-    end
+    --     if  math.abs( curPhi - math.MinNumber ) < math.abs( curPhi - math.MaxNumber ) then
+    --         phi = mPhiLimit.x - curPhi;
+    --     else
+    --         phi = mPhiLimit.y - curPhi;
+    --     end
+    -- end
 
     local mat = Matrix3D.new()
     mat:mulTranslationRight(-self.look.x, -self.look.y, -self.look.z)
@@ -70,6 +77,13 @@ function Camera3D:moveTheta( theta)
         return;
     end
 
+    local temp = self:getTheta( );
+    if ( temp - theta < math.MinNumber) then
+        theta = temp - math.MinNumber;
+    elseif ( temp - theta > math.MaxNumber ) then
+        theta = temp - math.MaxNumber;
+    end
+            
 
     local right = Vector3.cross( self.up, Vector3.sub(self.look, self.eye) )
     right:normalize( )

@@ -1,5 +1,7 @@
 _G.__createClassFromLoveObj("Shader")
 
+local ShaderObjects = {}
+Shader.neednormal = 0
 function Shader.new(pixelcode, vertexcode)
     local shader = setmetatable({}, Shader);
 
@@ -9,7 +11,18 @@ function Shader.new(pixelcode, vertexcode)
     return shader;
 end
 
-function Shader.GetBaseShader()
+function Shader.GetBaseVSCodeShader()
+    local vertexcode = [[
+    vec4 position( mat4 transform_projection, vec4 vertex_position )
+    {
+        return transform_projection * vertex_position;
+    }
+]]
+
+    return  vertexcode
+end
+
+function Shader.GetBasePSCodeShader()
     local pixelcode = [[
     vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
     {
@@ -18,14 +31,12 @@ function Shader.GetBaseShader()
     }
 ]]
  
-    local vertexcode = [[
-    vec4 position( mat4 transform_projection, vec4 vertex_position )
-    {
-        return transform_projection * vertex_position;
-    }
-]]
 
-    return  Shader.new(pixelcode, vertexcode)
+    return  pixelcode
+end
+
+function Shader.GetBaseShader()
+    return  Shader.new(Shader.GetBasePSCodeShader(), Shader.GetBaseVSCodeShader())
 end
 
 function Shader.GetBaseImageShader()
@@ -51,39 +62,6 @@ function Shader.GetBaseImageShader()
     obj:send('baseimg', img);
     end
    return shader
-end
-
-function Shader.GetWBlur3Shader(w)
-    local pixelcode = [[
-    extern float w;
-    extern float height;
-    vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
-    {
-        float offset = 1 / w;
-        vec2 coords = texture_coords;
-        vec4 texcolor = Texel(tex, texture_coords);
-        for(int i = -3; i <= 3; i ++ )
-        {
-            coords.x = texture_coords.x + i * offset;
-            texcolor += Texel(tex, coords);
-
-        }
-         texcolor /= 7;
-        return texcolor * color;
-    }
-]]
- 
-    local vertexcode = [[
-    vec4 position( mat4 transform_projection, vec4 vertex_position )
-    {
-        return transform_projection * vertex_position;
-    }
-]]
-    local shader = Shader.new(pixelcode, vertexcode);
-    assert(shader:hasUniform( "w"))
-    shader:send('w', w);
-   
-    return shader;
 end
 
 function Shader.GetWBlurShader(w, offset, blurnum, power)
@@ -362,28 +340,85 @@ function Shader.GetFXAAShader(w, h)
     return shader
 end
 
-function Shader.GetBase3DShader(color, projectionMatrix, modelMatrix, viewMatrix)
-   
-    local pixelcode = [[
-        uniform vec4 bcolor;
-        vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
-        {
-            vec4 texcolor = Texel(tex, texture_coords);
-            return texcolor * bcolor;
-        }
-    ]]
- 
-    local vertexcode = [[
+function Shader.GetBase3DVSShaderCode()
+    local vertexcode = ""
+    
+    vertexcode = vertexcode..[[
         uniform mat4 projectionMatrix;
         uniform mat4 modelMatrix;
-        uniform mat4 viewMatrix;
+        uniform mat4 viewMatrix; ]];
+    
+    if Shader.neednormal > 0 then
+        vertexcode = vertexcode .. "varying vec4 vnormal; "
+    end
+
+     vertexcode = vertexcode..[[    
         vec4 position(mat4 transform_projection, vec4 vertex_position)
         {
+            ]];
+
+    if Shader.neednormal > 0 then
+        vertexcode = vertexcode.."   vnormal = VertexColor; "
+    end
+
+    vertexcode = vertexcode..[[
             return projectionMatrix * viewMatrix * modelMatrix * VertexPosition;
         }
-]]
+]];
 
-    local shader = Shader.new(pixelcode, vertexcode)
+print(vertexcode)
+    return vertexcode
+end
+
+function Shader.GetBase3DPSShaderCode()
+    local pixelcode = "uniform vec4 bcolor; "
+
+
+    --collect direction lights
+    local directionlights = Lights.getDirectionLights()
+
+    for i = 1, #directionlights do
+        local light = directionlights[i]
+        pixelcode = pixelcode .. " uniform vec4 directionlight"..i.."; ";
+        pixelcode = pixelcode .. " uniform vec4 directionlightcolor"..i.."; ";
+    end
+
+    if Shader.neednormal > 0 then
+        pixelcode = pixelcode.."varying vec4 vnormal; "
+    end
+
+    pixelcode = pixelcode ..[[
+        vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
+        {
+            vec4 texcolor = Texel(tex, texture_coords); ]];
+
+        if Shader.neednormal > 0 then
+            pixelcode = pixelcode.."vec4 normal = normalize(vnormal); ";
+        end
+
+        if #directionlights > 0 then
+            pixelcode = pixelcode .. " float dotn = 0; ";
+        end
+        for i = 1, #directionlights do
+            local light = directionlights[i]
+            pixelcode = pixelcode .. " dotn = clamp(dot(normalize(directionlight"..i..".xyz), normal.xyz), 0.1, 1); ";
+            pixelcode = pixelcode .. " texcolor.xyz = texcolor.xyz * directionlightcolor"..i..".xyz * dotn; ";
+        end
+
+    pixelcode = pixelcode ..[[
+            return texcolor * bcolor;
+        }
+    ]];
+
+    return pixelcode
+end
+
+function Shader.GetBase3DShader(color, projectionMatrix, modelMatrix, viewMatrix)
+    local directionlights = Lights.getDirectionLights()
+    if ShaderObjects["base3dshader".."directionlights"..#directionlights] then
+        return ShaderObjects["base3dshader".."directionlights"..#directionlights]
+    end
+    local shader = Shader.new(Shader.GetBase3DPSShaderCode(), Shader.GetBase3DVSShaderCode())
     assert(shader:hasUniform( "projectionMatrix") and shader:hasUniform( "modelMatrix") and shader:hasUniform( "viewMatrix"))
     if projectionMatrix then
         shader:send('projectionMatrix', projectionMatrix)
@@ -417,6 +452,7 @@ function Shader.GetBase3DShader(color, projectionMatrix, modelMatrix, viewMatrix
         end
     end
    
+    ShaderObjects["base3dshader".."directionlights"..#directionlights] = shader
     return  shader
 end
 
@@ -474,186 +510,3 @@ function Shader.GeDepth3DShader(projectionMatrix, modelMatrix, viewMatrix)
    
     return  shader
 end
-
-
-function Shader.GetShadowVolumeShader(projectionMatrix, modelMatrix, viewMatrix)
-
-    local pixelcode = [[
-        uniform sampler2D shadowimg;
-        uniform vec4 bcolor;
-        varying vec4 vpos;
-        vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
-        {
-            vec2 uv= vpos.xy / vpos.w;
-           uv =  uv * 0.5 + 0.5;
-           vec4 texcolor = Texel(shadowimg, uv);
-           return texcolor;//bcolor * color * texcolor;
-        }
-    ]]
- 
-    local vertexcode = [[
-        uniform mat4 projectionMatrix;
-        uniform mat4 modelMatrix;
-        uniform mat4 viewMatrix;
-        varying vec4 vpos;
-        vec4 position(mat4 transform_projection, vec4 vertex_position)
-        {
-            vec4 basepos = projectionMatrix * viewMatrix * modelMatrix * VertexPosition;
-            vpos=basepos;
-            return basepos;
-        }
-]]
-
-    local shader = Shader.new(pixelcode, vertexcode)
-    assert(shader:hasUniform( "projectionMatrix") and shader:hasUniform( "modelMatrix") and shader:hasUniform( "viewMatrix"))
-    if projectionMatrix then
-        shader:send('projectionMatrix', projectionMatrix)
-    end
-
-    if modelMatrix then
-        shader:send('modelMatrix', modelMatrix)
-    end
-
-    if viewMatrix then
-        shader:send('viewMatrix', viewMatrix)
-    end
-    
-    shader.setCameraAndMatrix3D = function(obj, modelMatrix, projectionMatrix, viewMatrix)
-        if projectionMatrix then
-            obj:send('projectionMatrix', projectionMatrix)
-        end
-    
-        if modelMatrix then
-            obj:send('modelMatrix', modelMatrix)
-        end
-    
-        if viewMatrix then
-            obj:send('viewMatrix', viewMatrix)
-        end
-    end
-
-    shader.setShadowMap = function(obj, shadowimg)
-        if shadowmap then
-            obj:send('shadowimg', shadowimg)
-        end
-    end
-    
-  
-    return  shader
-end
-
--- function Shader.GetShadowVolumeShader(color, projectionMatrix, modelMatrix, viewMatrix, frontdepthbuff, backdepthbuff, w, h)
-
---     local pixelcode = [[
---         uniform vec4 bcolor;
---         uniform sampler2D frontdepthbuff;
---         uniform sampler2D backdepthbuff;
---         uniform float w;
---         uniform float h;
---         varying vec4 vpos;
---         varying float zdepth;
---         vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
---         {
---             vec2 screen = vpos.xy / vpos.w;
--- 	        screen.xy = screen.xy * 0.5 + 0.5;
---             float bz = 1/ Texel(backdepthbuff, screen).r;
---             float fz = 1/ Texel(frontdepthbuff, screen).r;
---           //  float bz = Texel(backdepthbuff, screen_coords).r;
---            // float fz = Texel(frontdepthbuff, screen_coords).r;
-
---             float depth =  vpos.z;
---             if( fz < depth && bz > depth  && fz != 0 && bz != 0)
---             {
---                  return vec4(0, bz + 1, fz +1, 1);
---                 //return vec4(bz, bz, bz, bcolor.a);
---             }
---            // return vec4(fz, fz, fz, bcolor.a);
---             vec4 texcolor = Texel(tex, texture_coords);
---            return texcolor * bcolor;
---         }
---     ]]
- 
---     local vertexcode = [[
---         uniform mat4 projectionMatrix;
---         uniform mat4 modelMatrix;
---         uniform mat4 viewMatrix;
---         varying vec4 vpos;
---         varying float zdepth;
---         vec4 position(mat4 transform_projection, vec4 vertex_position)
---         {
---             vec4 basepos = projectionMatrix * viewMatrix * modelMatrix * VertexPosition;
---             vpos = basepos;
---             zdepth = basepos.z;
---             return basepos;
---         }
--- ]]
-
---     local shader = Shader.new(pixelcode, vertexcode)
---     assert(shader:hasUniform( "projectionMatrix") and shader:hasUniform( "modelMatrix") and shader:hasUniform( "viewMatrix"))
---     if projectionMatrix then
---         shader:send('projectionMatrix', projectionMatrix)
---     end
-
---     if modelMatrix then
---         shader:send('modelMatrix', modelMatrix)
---     end
-
---     if viewMatrix then
---         shader:send('viewMatrix', viewMatrix)
---     end
-
---     if not color then
---         shader:send('bcolor', {1,1,1,1})
---     else
---         shader:send('bcolor', {color._r,color._g, color._b, color._a})
---     end
-    
---     shader.setCameraAndMatrix3D = function(obj, modelMatrix, projectionMatrix, viewMatrix)
---         if projectionMatrix then
---             shader:send('projectionMatrix', projectionMatrix)
---         end
-    
---         if modelMatrix then
---             shader:send('modelMatrix', modelMatrix)
---         end
-    
---         if viewMatrix then
---             shader:send('viewMatrix', viewMatrix)
---         end
---     end
-
---     if frontdepthbuff and backdepthbuff then
---         shader:send('frontdepthbuff', frontdepthbuff)
---         shader:send('backdepthbuff', backdepthbuff)
---     end
-
---     if w and h then
---         shader:send('w', w)
---         shader:send('h', h)
---     end
-    
---     shader.setShadowVoluneValue = function(shaderself, frontdepthbuff, backdepthbuff)
---         shaderself:send('frontdepthbuff', frontdepthbuff)
---         shaderself:send('backdepthbuff', backdepthbuff)
---     end
-
---     shader.setDepthSize = function(shaderself, w, h)
---         -- shaderself:send('w', w)
---         -- shaderself:send('h', h)
---     end
-
---     shader.setCameraAndMatrix3D = function(obj, modelMatrix, projectionMatrix, viewMatrix)
---         if projectionMatrix then
---             obj:send('projectionMatrix', projectionMatrix)
---         end
-    
---         if modelMatrix then
---             obj:send('modelMatrix', modelMatrix)
---         end
-    
---         if viewMatrix then
---             obj:send('viewMatrix', viewMatrix)
---         end
---     end
---     return  shader
--- end

@@ -32,6 +32,8 @@ Render.Camera3DId = 15
 Render.Mesh3DId = 16
 
 Render.Vector3Id = 17
+
+Render.DirectionLightId = 18
 Render.getRenderIdName = function(id)
     if Render.CircleId == id then
         return "Circle"

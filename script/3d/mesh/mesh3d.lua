@@ -3,8 +3,8 @@ _G.__createClassFromLoveObj("Mesh3D")
 local vertexFormat = {
     {"VertexPosition", "float", 3},
     {"VertexTexCoord", "float", 2},
-    {"VertexNormal", "float", 3},
-    {"VertexColor", "byte", 4},
+    {"VertexColor", "float", 3},--normal
+    {"ConstantColor", "byte", 4},
 }
 function Mesh3D.new(file)-- lw :line width
     local mesh = setmetatable({}, Mesh3D);
@@ -15,6 +15,7 @@ function Mesh3D.new(file)-- lw :line width
     mesh:makeNormals()
     mesh.obj = love.graphics.newMesh(vertexFormat, mesh.verts, "triangles")
 
+    mesh.bcolor = LColor.new(255,255,255,255)
     mesh.renderid = Render.Mesh3DId;
     return mesh;
 end
@@ -81,12 +82,29 @@ function Mesh3D:makeNormals()
     end
 end
 
+function Mesh3D:useLights()
+    local directionlights = _G.Lights.getDirectionLights()
+
+    if #directionlights == 0 then
+        return
+    end
+
+    self.shader = Shader.GetBase3DShader();
+    for i = 1, #directionlights do
+        local light = directionlights[i]
+
+        self.shader:send("directionlight"..i, {light.dir.x, light.dir.y, light.dir.z, 1})
+        self.shader:send("directionlightcolor"..i, {light.color._r, light.color._g, light.color._b, light.color._a})
+    end
+end
+
 function Mesh3D:draw()
     local camera3d = _G.getGlobalCamera3D()
     --modelMatrix, projectionMatrix, viewMatrix
+    self:useLights()
     self.shader:setCameraAndMatrix3D(self.transform3d, Matrix3D.getProjectionMatrix(camera3d.fov, camera3d.nearClip, camera3d.farClip, camera3d.aspectRatio),Matrix3D.getViewMatrix(camera3d.eye, camera3d.look, camera3d.up))
 
-    if self.shader:hasUniform( "bcolor")  then
+    if self.shader:hasUniform( "bcolor") and self.bcolor then
         self.shader:send('bcolor',{self.bcolor._r, self.bcolor._g, self.bcolor._b, self.bcolor._a})
     end
     Render.RenderObject(self)

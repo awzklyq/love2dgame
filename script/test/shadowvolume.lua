@@ -1,5 +1,5 @@
-local width = love.graphics.getPixelWidth() -- love.graphics.getWidth() * 2
-local height = love.graphics.getPixelHeight()  --love.graphics.getHeight() * 2
+local width = love.graphics.getPixelWidth() * 1.5 -- love.graphics.getWidth() * 2
+local height = love.graphics.getPixelHeight()  * 1.5--love.graphics.getHeight() * 2
 
 local plane = Mesh3D.new("assert/obj/plane.obj")
 plane:setBaseColor(LColor.new(125,125,125, 255))
@@ -8,7 +8,7 @@ plane:setBaseColor(LColor.new(125,125,125, 255))
 local cubes = {}
 local cubenum = 20
 for i = 1, cubenum do
-    local mesh3d = Mesh3D.new("assert/obj/aaa.obj")
+    local mesh3d = Mesh3D.new("assert/obj/bbb.obj")
     mesh3d.transform3d:mulTranslationRight(math.random(-400, 400), math.random(-200, 200), math.random(-200, 200))
     mesh3d.transform3d:mulScalingLeft(0.5, 0.5, 0.5)
     mesh3d:setBaseColor(LColor.new(math.random(1, 255), math.random(1, 255), math.random(1, 255), 255))
@@ -18,12 +18,12 @@ end
 currentCamera3D.eye = Vector3.new( 33.386304308313, 363.36230638215, 232.64515424476)
 currentCamera3D.look = Vector3.new( 22.558604721495, -61.107337559643, 5.2498110475302)
 
-local lightdir = Vector3.sub(currentCamera3D.look, currentCamera3D.eye)
+local lightdir =Vector3.new(0,-1,0) --Vector3.sub(currentCamera3D.look, currentCamera3D.eye)
 local cubevolumes = {}
 for i = 1, cubenum do
     local mesh3d = Shadow.buildShadowVolume(cubes[i], lightdir);
     mesh3d.transform3d = cubes[i].transform3d
-    mesh3d.shader = Shader.GetBase3DShader()--Shader.GeDepth3DShader()
+    mesh3d.shader = Shader.GetBase3DShader()
     mesh3d:setBaseColor(LColor.new(0,0,0,0))
     table.insert(cubevolumes, mesh3d)
 end
