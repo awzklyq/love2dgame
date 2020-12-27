@@ -340,6 +340,7 @@ function Shader.GetFXAAShader(w, h)
     return shader
 end
 
+<<<<<<< HEAD
 function Shader.GetBase3DVSShaderCode()
     local vertexcode = ""
     
@@ -463,6 +464,77 @@ function Shader.GeDepth3DShader(projectionMatrix, modelMatrix, viewMatrix)
         vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
         {
             return vec4(depth, depth, depth, 1);
+=======
+function Shader.GetBase3DShader(color, projectionMatrix, modelMatrix, viewMatrix)
+   
+    local pixelcode = [[
+        uniform vec4 bcolor;
+        vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
+        {
+            vec4 texcolor = Texel(tex, texture_coords);
+            return texcolor * bcolor;
+>>>>>>> da3d613993fc87d2fd322da11e9d251f5f7a3dcc
+        }
+    ]]
+ 
+    local vertexcode = [[
+        uniform mat4 projectionMatrix;
+        uniform mat4 modelMatrix;
+        uniform mat4 viewMatrix;
+        varying float depth;
+
+        vec4 position(mat4 transform_projection, vec4 vertex_position)
+        {
+            vec4 basepos = projectionMatrix * viewMatrix * modelMatrix * VertexPosition;
+            depth = basepos.z;
+            return basepos;
+        }
+]]
+
+    local shader = Shader.new(pixelcode, vertexcode)
+    assert(shader:hasUniform( "projectionMatrix") and shader:hasUniform( "modelMatrix") and shader:hasUniform( "viewMatrix"))
+    if projectionMatrix then
+        shader:send('projectionMatrix', projectionMatrix)
+    end
+
+    if modelMatrix then
+        shader:send('modelMatrix', modelMatrix)
+    end
+
+    if viewMatrix then
+        shader:send('viewMatrix', viewMatrix)
+    end
+
+    if not color then
+        shader:send('bcolor', {1,1,1,1})
+    else
+        shader:send('bcolor', {color._r,color._g, color._b, color._a})
+    end
+    
+    shader.setCameraAndMatrix3D = function(obj, modelMatrix, projectionMatrix, viewMatrix)
+        if projectionMatrix then
+            obj:send('projectionMatrix', projectionMatrix)
+        end
+    
+        if modelMatrix then
+            obj:send('modelMatrix', modelMatrix)
+        end
+    
+        if viewMatrix then
+            obj:send('viewMatrix', viewMatrix)
+        end
+    end
+   
+    return  shader
+end
+
+function Shader.GeDepth3DShader(projectionMatrix, modelMatrix, viewMatrix)
+   
+    local pixelcode = [[
+        varying float depth;
+        vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
+        {
+            return vec4(depth, depth, depth, 1);
         }
     ]]
  
@@ -510,3 +582,173 @@ function Shader.GeDepth3DShader(projectionMatrix, modelMatrix, viewMatrix)
    
     return  shader
 end
+
+
+function Shader.GetShadowVolumeShader(projectionMatrix, modelMatrix, viewMatrix)
+
+    local pixelcode = [[
+        vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
+        {
+            
+           return vec4(0,0,0,1);
+        }
+    ]]
+ 
+    local vertexcode = [[
+        uniform mat4 projectionMatrix;
+        uniform mat4 modelMatrix;
+        uniform mat4 viewMatrix;
+        vec4 position(mat4 transform_projection, vec4 vertex_position)
+        {
+            vec4 basepos = projectionMatrix * viewMatrix * modelMatrix * VertexPosition;
+            return basepos;
+        }
+]]
+
+    local shader = Shader.new(pixelcode, vertexcode)
+    assert(shader:hasUniform( "projectionMatrix") and shader:hasUniform( "modelMatrix") and shader:hasUniform( "viewMatrix"))
+    if projectionMatrix then
+        shader:send('projectionMatrix', projectionMatrix)
+    end
+
+    if modelMatrix then
+        shader:send('modelMatrix', modelMatrix)
+    end
+
+    if viewMatrix then
+        shader:send('viewMatrix', viewMatrix)
+    end
+    
+    shader.setCameraAndMatrix3D = function(obj, modelMatrix, projectionMatrix, viewMatrix)
+        if projectionMatrix then
+            obj:send('projectionMatrix', projectionMatrix)
+        end
+    
+        if modelMatrix then
+            obj:send('modelMatrix', modelMatrix)
+        end
+    
+        if viewMatrix then
+            obj:send('viewMatrix', viewMatrix)
+        end
+    end
+
+  
+    return  shader
+end
+
+-- function Shader.GetShadowVolumeShader(color, projectionMatrix, modelMatrix, viewMatrix, frontdepthbuff, backdepthbuff, w, h)
+
+--     local pixelcode = [[
+--         uniform vec4 bcolor;
+--         uniform sampler2D frontdepthbuff;
+--         uniform sampler2D backdepthbuff;
+--         uniform float w;
+--         uniform float h;
+--         varying vec4 vpos;
+--         varying float zdepth;
+--         vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
+--         {
+--             vec2 screen = vpos.xy / vpos.w;
+-- 	        screen.xy = screen.xy * 0.5 + 0.5;
+--             float bz = 1/ Texel(backdepthbuff, screen).r;
+--             float fz = 1/ Texel(frontdepthbuff, screen).r;
+--           //  float bz = Texel(backdepthbuff, screen_coords).r;
+--            // float fz = Texel(frontdepthbuff, screen_coords).r;
+
+--             float depth =  vpos.z;
+--             if( fz < depth && bz > depth  && fz != 0 && bz != 0)
+--             {
+--                  return vec4(0, bz + 1, fz +1, 1);
+--                 //return vec4(bz, bz, bz, bcolor.a);
+--             }
+--            // return vec4(fz, fz, fz, bcolor.a);
+--             vec4 texcolor = Texel(tex, texture_coords);
+--            return texcolor * bcolor;
+--         }
+--     ]]
+ 
+--     local vertexcode = [[
+--         uniform mat4 projectionMatrix;
+--         uniform mat4 modelMatrix;
+--         uniform mat4 viewMatrix;
+--         varying vec4 vpos;
+--         varying float zdepth;
+--         vec4 position(mat4 transform_projection, vec4 vertex_position)
+--         {
+--             vec4 basepos = projectionMatrix * viewMatrix * modelMatrix * VertexPosition;
+--             vpos = basepos;
+--             zdepth = basepos.z;
+--             return basepos;
+--         }
+-- ]]
+
+--     local shader = Shader.new(pixelcode, vertexcode)
+--     assert(shader:hasUniform( "projectionMatrix") and shader:hasUniform( "modelMatrix") and shader:hasUniform( "viewMatrix"))
+--     if projectionMatrix then
+--         shader:send('projectionMatrix', projectionMatrix)
+--     end
+
+--     if modelMatrix then
+--         shader:send('modelMatrix', modelMatrix)
+--     end
+
+--     if viewMatrix then
+--         shader:send('viewMatrix', viewMatrix)
+--     end
+
+--     if not color then
+--         shader:send('bcolor', {1,1,1,1})
+--     else
+--         shader:send('bcolor', {color._r,color._g, color._b, color._a})
+--     end
+    
+--     shader.setCameraAndMatrix3D = function(obj, modelMatrix, projectionMatrix, viewMatrix)
+--         if projectionMatrix then
+--             shader:send('projectionMatrix', projectionMatrix)
+--         end
+    
+--         if modelMatrix then
+--             shader:send('modelMatrix', modelMatrix)
+--         end
+    
+--         if viewMatrix then
+--             shader:send('viewMatrix', viewMatrix)
+--         end
+--     end
+
+--     if frontdepthbuff and backdepthbuff then
+--         shader:send('frontdepthbuff', frontdepthbuff)
+--         shader:send('backdepthbuff', backdepthbuff)
+--     end
+
+--     if w and h then
+--         shader:send('w', w)
+--         shader:send('h', h)
+--     end
+    
+--     shader.setShadowVoluneValue = function(shaderself, frontdepthbuff, backdepthbuff)
+--         shaderself:send('frontdepthbuff', frontdepthbuff)
+--         shaderself:send('backdepthbuff', backdepthbuff)
+--     end
+
+--     shader.setDepthSize = function(shaderself, w, h)
+--         -- shaderself:send('w', w)
+--         -- shaderself:send('h', h)
+--     end
+
+--     shader.setCameraAndMatrix3D = function(obj, modelMatrix, projectionMatrix, viewMatrix)
+--         if projectionMatrix then
+--             obj:send('projectionMatrix', projectionMatrix)
+--         end
+    
+--         if modelMatrix then
+--             obj:send('modelMatrix', modelMatrix)
+--         end
+    
+--         if viewMatrix then
+--             obj:send('viewMatrix', viewMatrix)
+--         end
+--     end
+--     return  shader
+-- end

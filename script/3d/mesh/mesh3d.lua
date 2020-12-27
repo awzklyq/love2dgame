@@ -101,10 +101,16 @@ end
 function Mesh3D:draw()
     local camera3d = _G.getGlobalCamera3D()
     --modelMatrix, projectionMatrix, viewMatrix
+<<<<<<< HEAD:script/3d/mesh/mesh3d.lua
     self:useLights()
     self.shader:setCameraAndMatrix3D(self.transform3d, Matrix3D.getProjectionMatrix(camera3d.fov, camera3d.nearClip, camera3d.farClip, camera3d.aspectRatio),Matrix3D.getViewMatrix(camera3d.eye, camera3d.look, camera3d.up))
 
     if self.shader:hasUniform( "bcolor") and self.bcolor then
+=======
+    self.shader:setCameraAndMatrix3D(self.transform3d, Matrix3D.getProjectionMatrix(camera3d.fov, camera3d.nearClip, camera3d.farClip, camera3d.aspectRatio),Matrix3D.getViewMatrix(camera3d.eye, camera3d.look, camera3d.up))
+
+    if self.shader:hasUniform( "bcolor")  then
+>>>>>>> da3d613993fc87d2fd322da11e9d251f5f7a3dcc:script/polygon/mesh3d.lua
         self.shader:send('bcolor',{self.bcolor._r, self.bcolor._g, self.bcolor._b, self.bcolor._a})
     end
     Render.RenderObject(self)
