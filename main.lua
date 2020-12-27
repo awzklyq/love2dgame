@@ -56,6 +56,8 @@ dofile('script/shader/shader.lua')
 dofile 'script/3d/camera/camera3d.lua'
 dofile 'script/render/shadow.lua'
 
+dofile 'script/3d/light/light.lua'
+
 _G.mlib = require 'script/mlib' 
 
 --游戏全局函数
