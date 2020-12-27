@@ -30,7 +30,7 @@ dofile('script/polygon/circle.lua')
 dofile('script/polygon/line.lua')
 dofile('script/polygon/box.lua')
 dofile('script/polygon/mesh.lua')
-dofile('script/polygon/mesh3d.lua')
+dofile('script/3d/mesh/mesh3d.lua')
 dofile('script/polygon/polygon.lua')
 
 dofile('script/uisystem/uisystem.lua')
@@ -39,8 +39,8 @@ dofile('script/uisystem/button.lua')
 dofile('script/math/math.lua')
 dofile('script/math/vector.lua')
 dofile('script/math/matrix.lua')
-dofile('script/math/vector3.lua')
-dofile('script/math/matrix3d.lua')
+dofile('script/3d/math/vector3.lua')
+dofile('script/3d/math/matrix3d.lua')
 
 dofile('script/groupmanager.lua')
 
@@ -53,7 +53,7 @@ dofile('script/entity/powerbar.lua')
 
 dofile('script/grid/grid.lua')
 dofile('script/shader/shader.lua')
-dofile 'script/render/camera3d.lua'
+dofile 'script/3d/camera/camera3d.lua'
 dofile 'script/render/shadow.lua'
 
 _G.mlib = require 'script/mlib' 

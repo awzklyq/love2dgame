@@ -340,7 +340,6 @@ function Shader.GetFXAAShader(w, h)
     return shader
 end
 
-<<<<<<< HEAD
 function Shader.GetBase3DVSShaderCode()
     local vertexcode = ""
     

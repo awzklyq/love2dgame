@@ -136,10 +136,6 @@ end
 Matrix3D.getViewMatrix = function(eye, look, up)
     local z = Vector3.new(eye.x - look.x, eye.y - look.y, eye.z - look.z)
     z:normalize()
-<<<<<<< HEAD
-    -- local x = Vector3.cross(Vector3.new(-up.x, -up.y, -up.z), z)
-=======
->>>>>>> da3d613993fc87d2fd322da11e9d251f5f7a3dcc
     local x = Vector3.cross(Vector3.new(-up.x, -up.y, -up.z), z)
     x:normalize()
     local y = Vector3.cross(z, x)

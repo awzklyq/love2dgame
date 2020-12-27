@@ -1,17 +1,2 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="210mm" height="297mm" version="1.1" viewBox="0 0 210 297" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
- <metadata>
-  <rdf:RDF>
-   <cc:Work rdf:about="">
-    <dc:format>image/svg+xml</dc:format>
-    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:title/>
-   </cc:Work>
-  </rdf:RDF>
- </metadata>
- <g transform="matrix(1.0002 0 0 1 .030922 0)" fill-rule="evenodd" stroke-width=".26458" user_phytype="2">
-  <rect x="-2001" y="264.58" width="4e3" height="42.333" fill="#00f" stroke-width=".26462" user_define="3" user_phytype="1"/>
-  <rect x="3.7798" y="12.095" width="58.964" height="252.49" fill="#93aca7" name="test1" user_phytype="2"/>
-  <rect x="566.02" y="-8.5005" width="58.964" height="252.49" fill="#93aca7" stroke-width="1" name="test2" user_phytype="2"/>
- </g>
-</svg>
+<svg width="210mm" height="297mm" version="1.1" viewBox="0 0 210 297" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"><metadata><rdf:RDF><cc:Work rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/><dc:title/></cc:Work></rdf:RDF></metadata><g transform="matrix(1.0002 0 0 1 .030922 0)" fill-rule="evenodd" stroke-width=".26458" user_phytype="2"><rect x="-2001" y="264.58" width="33726" height="42.333" fill="#0000ff" stroke-width="134912" user_define="3" user_phytype="1"/><rect x="372.11" y="-13.993" width="71.35" height="284.06" fill="#000080" stroke-width=".069996"/><rect x="-275.68" y="-103.55" width="719.14" height="89.555" fill="#ff0000" stroke-width=".071441"/><path transform="matrix(-.029431 .40709 -.17965 -.048899 356.08 199.98)" d="m-5.2887 618.77-178.37-241.1-246.76 170.46 174.18-244.15-238.37-182.01 286.02 90.213 99.444-282.95 2.5887 299.9 299.83 7.1415-284.42 95.137z" fill="#ffff00" user_phytype="2"/><path transform="matrix(.26453 0 0 .26458 -.030916 0)" d="m-923.69 269.26 177.72 242.91 300.96-3.5721-242.91 177.72 3.5721 300.96-177.72-242.91-300.96 3.5721 242.91-177.72z" fill="#000080" user_phytype="2"/></g></svg>
