@@ -76,5 +76,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/shadowvolume.lua')
+	dofile('script/test/hdr.lua')
 end

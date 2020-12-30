@@ -463,16 +463,6 @@ function Shader.GeDepth3DShader(projectionMatrix, modelMatrix, viewMatrix)
         vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
         {
             return vec4(depth, depth, depth, 1);
-=======
-function Shader.GetBase3DShader(color, projectionMatrix, modelMatrix, viewMatrix)
-   
-    local pixelcode = [[
-        uniform vec4 bcolor;
-        vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
-        {
-            vec4 texcolor = Texel(tex, texture_coords);
-            return texcolor * bcolor;
->>>>>>> da3d613993fc87d2fd322da11e9d251f5f7a3dcc
         }
     ]]
  
