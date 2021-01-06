@@ -76,5 +76,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/hdr.lua')
+	dofile('script/test/renderdepth.lua')
 end

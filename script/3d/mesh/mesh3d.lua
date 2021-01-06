@@ -6,6 +6,9 @@ local vertexFormat = {
     {"VertexColor", "float", 3},--normal
     {"ConstantColor", "byte", 4},
 }
+
+Mesh3D.RenderNormal = 1
+Mesh3D.RenderDepth = 2
 function Mesh3D.new(file)-- lw :line width
     local mesh = setmetatable({}, Mesh3D);
     mesh.transform3d = Matrix3D.new();
@@ -17,7 +20,24 @@ function Mesh3D.new(file)-- lw :line width
 
     mesh.bcolor = LColor.new(255,255,255,255)
     mesh.renderid = Render.Mesh3DId;
+
+    mesh.rendertype = Mesh3D.RenderNormal
+
+    mesh:setRenderType("normal")
     return mesh;
+end
+
+function Mesh3D:setRenderType(typename)
+    if typename == "normal" then
+        self.rendertype = Mesh3D.RenderNormal
+        self.shader = Shader.GetBase3DShader();
+    elseif typename == "depth" then
+        self.rendertype = Mesh3D.RenderDepth
+        self.shader = Shader.GeDepth3DShader()
+    else
+        self.rendertype = Mesh3D.RenderNormal
+        self.shader = Shader.GetBase3DShader();
+    end
 end
 
 --{x,y,z,u,v,nx,ny,nz}
@@ -83,6 +103,9 @@ function Mesh3D:makeNormals()
 end
 
 function Mesh3D:useLights()
+    if self.rendertype ~=  Mesh3D.RenderNormal then
+        return
+    end
     local directionlights = _G.Lights.getDirectionLights()
 
     if #directionlights == 0 then
