@@ -58,6 +58,9 @@ dofile 'script/render/shadow.lua'
 
 dofile 'script/3d/light/light.lua'
 
+dofile 'script/3d/scene/scene.lua'
+dofile 'script/3d/scene/scenenode.lua'
+
 _G.mlib = require 'script/mlib' 
 
 --游戏全局函数

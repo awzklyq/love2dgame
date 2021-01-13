@@ -41,95 +41,6 @@ function Matrix3D.matrixMult(a,b)
     return ret
 end
 
-----------------------------------------------------------------------------------------------------
--- transformation, projection, and rotation matrices
-----------------------------------------------------------------------------------------------------
--- the three most important matrices for 3d graphics
--- these three matrices are all you need to write a simple 3d shader
-
--- returns a transformation matrix
--- translation and rotation are 3d vectors
-Matrix3D.getTransformationMatrix = function(translation, rotation, scale)
-    local ret = Matrix3D.new()
-
-    ret.translation = translation;
-    ret.rotation = rotation;
-    ret.scale = scale;
-
-    -- translations
-    ret[4] = translation.x
-    ret[8] = translation.y
-    ret[12] = translation.z
-
-    -- rotations
-    -- x
-    local rx = Matrix3D.new()
-    rx[6] = math.cos(rotation.x)
-    rx[7] = -1*math.sin(rotation.x)
-    rx[10] = math.sin(rotation.x)
-    rx[11] = math.cos(rotation.x)
-    ret = Matrix3D.matrixMult(ret, rx)
-
-    -- y
-    local ry = Matrix3D.new()
-    ry[1] = math.cos(rotation.y)
-    ry[3] = math.sin(rotation.y)
-    ry[9] = -math.sin(rotation.y)
-    ry[11] = math.cos(rotation.y)
-    ret = Matrix3D.matrixMult(ret, ry)
-
-    -- z
-    local rz = Matrix3D.new()
-    rz[1] = math.cos(rotation.z)
-    rz[2] = -math.sin(rotation.z)
-    rz[5] = math.sin(rotation.z)
-    rz[6] = math.cos(rotation.z)
-    ret = Matrix3D.matrixMult(ret, rz)
-
-    -- scale
-    local sm = Matrix3D.new()
-    sm[1] = scale.x
-    sm[6] = scale.y
-    sm[11] = scale.z
-    -- ret = Matrix3D.matrixMult(ret, sm)
-
-    ret:mulright(sm)
-    return ret
-end
-
--- returns a standard projection matrix
--- (things farther away appear smaller)
--- all arguments are scalars aka normal numbers
--- aspectRatio is defined as window width divided by window height
-Matrix3D.getProjectionMatrix = function(fov, near, far, aspectRatio)
-    local top = near * math.tan(fov/2)
-    local bottom = -1*top
-    local right = top * aspectRatio
-    local left = -1*right
-    return Matrix3D.createFromNumbers(
-        2*near/(right-left), 0, (right+left)/(right-left), 0,
-        0, 2*near/(top-bottom), (top+bottom)/(top-bottom), 0,
-        0, 0, -1*(far+near)/(far-near), -2*far*near/(far-near),
-        0, 0, -1, 0
-)
-end
-
--- returns an orthographic projection matrix
--- (things farther away are the same size as things closer)
--- all arguments are scalars aka normal numbers
--- aspectRatio is defined as window width divided by window height
-Matrix3D.getOrthoMatrix = function(fov, size, near, far, aspectRatio)
-    local top = size * math.tan(fov/2)
-    local bottom = -1*top
-    local right = top * aspectRatio
-    local left = -1*right
-    return Matrix3D.createFromNumbers(
-        2/(right-left), 0, 0, -1*(right+left)/(right-left),
-        0, 2/(top-bottom), 0, -1*(top+bottom)/(top-bottom),
-        0, 0, -2/(far-near), -(far+near)/(far-near),
-        0, 0, 0, 1
-)
-end
 
 -- returns a view matrix
 -- eye, target, and down are all 3d vectors
@@ -328,4 +239,110 @@ function Matrix3D:transpose( )
         end
 
 	-- return *this;
+end
+
+
+----------------------------------------------------------------------------------------------------
+-- transformation, projection, and rotation matrices
+----------------------------------------------------------------------------------------------------
+-- the three most important matrices for 3d graphics
+-- these three matrices are all you need to write a simple 3d shader
+
+-- returns a transformation matrix
+-- translation and rotation are 3d vectors
+Matrix3D.getTransformationMatrix = function(translation, rotation, scale)
+    local ret = Matrix3D.new()
+
+    ret.translation = translation;
+    ret.rotation = rotation;
+    ret.scale = scale;
+
+    -- translations
+    ret[4] = translation.x
+    ret[8] = translation.y
+    ret[12] = translation.z
+
+    -- rotations
+    -- x
+    local rx = Matrix3D.new()
+    rx[6] = math.cos(rotation.x)
+    rx[7] = -1*math.sin(rotation.x)
+    rx[10] = math.sin(rotation.x)
+    rx[11] = math.cos(rotation.x)
+    ret = Matrix3D.matrixMult(ret, rx)
+
+    -- y
+    local ry = Matrix3D.new()
+    ry[1] = math.cos(rotation.y)
+    ry[3] = math.sin(rotation.y)
+    ry[9] = -math.sin(rotation.y)
+    ry[11] = math.cos(rotation.y)
+    ret = Matrix3D.matrixMult(ret, ry)
+
+    -- z
+    local rz = Matrix3D.new()
+    rz[1] = math.cos(rotation.z)
+    rz[2] = -math.sin(rotation.z)
+    rz[5] = math.sin(rotation.z)
+    rz[6] = math.cos(rotation.z)
+    ret = Matrix3D.matrixMult(ret, rz)
+
+    -- scale
+    local sm = Matrix3D.new()
+    sm[1] = scale.x
+    sm[6] = scale.y
+    sm[11] = scale.z
+    -- ret = Matrix3D.matrixMult(ret, sm)
+
+    ret:mulright(sm)
+    return ret
+end
+
+-- returns a standard projection matrix
+-- (things farther away appear smaller)
+-- all arguments are scalars aka normal numbers
+-- aspectRatio is defined as window width divided by window height
+Matrix3D.getProjectionMatrix = function(fov, near, far, aspectRatio)
+    local top = near * math.tan(fov/2)
+    local bottom = -1*top
+    local right = top * aspectRatio
+    local left = -1*right
+    return Matrix3D.createFromNumbers(
+        2*near/(right-left), 0, (right+left)/(right-left), 0,
+        0, 2*near/(top-bottom), (top+bottom)/(top-bottom), 0,
+        0, 0, -1*(far+near)/(far-near), -2*far*near/(far-near),
+        0, 0, -1, 0
+)
+end
+
+-- returns an orthographic projection matrix
+-- (things farther away are the same size as things closer)
+-- all arguments are scalars aka normal numbers
+-- aspectRatio is defined as window width divided by window height
+Matrix3D.getOrthoMatrix = function(fov, size, near, far, aspectRatio)
+    local top = size * math.tan(fov/2)
+    local bottom = -1*top
+    local right = top * aspectRatio
+    local left = -1*right
+    return Matrix3D.createFromNumbers(
+        2/(right-left), 0, 0, -1*(right+left)/(right-left),
+        0, 2/(top-bottom), 0, -1*(top+bottom)/(top-bottom),
+        0, 0, -2/(far-near), -(far+near)/(far-near),
+        0, 0, 0, 1
+)
+end
+
+Matrix3D.createOrthoOffCenterLH = function(left, right, bottom, top, znear, zfar )
+	local xs1 = 2.0 / ( right - left );
+	local xs2 = ( left + right ) / ( left - right );
+	local ys1 = 2.0 / ( top - bottom );
+	local ys2 = ( bottom + top ) / ( bottom - top );
+	local zf  = 1.0 / ( zfar - znear );
+	local zn  = - znear * zf;
+
+	return Matrix3D.createFromNumbers(
+		 xs1, 0.0, 0.0, 0.0,
+		0.0,  ys1, 0.0, 0.0,
+		0.0, 0.0,   zf, 0.0,
+         xs2,  ys2,   zn, 1.0);
 end

@@ -35,6 +35,10 @@ Render.Vector3Id = 17
 
 Render.DirectionLightId = 18
 
+Render.Scene3DId = 19
+
+Render.SceneNode3DId = 20
+
 Render.getRenderIdName = function(id)
     if Render.CircleId == id then
         return "Circle"
@@ -62,8 +66,14 @@ Render.getRenderIdName = function(id)
         return "Canvas"
     elseif Render.ShaderId == id then
         return "Shader"
-    elseif Render.Mesh3D == id then
-        return "Mesh3D"
+    elseif Render.Vector3Id == id then
+        return "Vector3"
+    elseif Render.DirectionLightId == id then
+        return "DirectionLight"
+    elseif Render.Scene3DId == id then
+        return "Scene3D"
+    elseif Render.SceneNode3DId == id then
+        return "SceneNode3D"
     end
 
     return "Null"

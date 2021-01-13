@@ -23,6 +23,8 @@ function Mesh3D.new(file)-- lw :line width
 
     mesh.rendertype = Mesh3D.RenderNormal
 
+    mesh.nolight = false
+
     mesh:setRenderType("normal")
     return mesh;
 end
@@ -38,6 +40,10 @@ function Mesh3D:setRenderType(typename)
         self.rendertype = Mesh3D.RenderNormal
         self.shader = Shader.GetBase3DShader();
     end
+end
+
+function Mesh3D:getRenderType()
+    return self.rendertype
 end
 
 --{x,y,z,u,v,nx,ny,nz}
@@ -103,6 +109,9 @@ function Mesh3D:makeNormals()
 end
 
 function Mesh3D:useLights()
+    if self.nolight then
+        return
+    end
     if self.rendertype ~=  Mesh3D.RenderNormal then
         return
     end
