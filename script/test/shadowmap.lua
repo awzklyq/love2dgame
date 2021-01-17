@@ -1,3 +1,5 @@
+math.randomseed(os.time()%10000)
+
 local width = love.graphics.getPixelWidth() * 1.5 -- love.graphics.getWidth() * 2
 local height = love.graphics.getPixelHeight()  * 1.5--love.graphics.getHeight() * 2
 local scene = Scene3D.new()
@@ -5,7 +7,7 @@ local plane = Mesh3D.new("assert/obj/plane.obj")
 plane:setBaseColor(LColor.new(125,125,125, 255))
 -- mesh3d:setTexture(love.graphics.newImage("assert/obj/earth.png"))
 -- mesh3d.transform3d = Matrix3D.getTransformationMatrix(Vector3.new(0,0,-20), Vector3.new(), Vector3.new(1,1,1))
-local cubenum = 50
+local cubenum = 8
 for i = 1, cubenum do
     local mesh3d = Mesh3D.new("assert/obj/bbb.obj")
     mesh3d.transform3d:mulTranslationRight(math.random(-700, 700), math.random(-200, 400), math.random(-500, 500))
