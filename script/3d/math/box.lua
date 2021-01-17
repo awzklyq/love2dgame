@@ -5,7 +5,33 @@ function BoundBox.new()
     box.min = Vector3.new(0,0,0)
     box.max = Vector3.new(1,1,1)
 
+    box.center = Vector3.new(0.5, 0.5, 0.5)
     return box
+end
+
+function BoundBox:addSelf(bb)
+    self.min.x = math.min(self.min.x, bb.min.x)
+    self.min.y = math.min(self.min.y, bb.min.y)
+    self.min.z = math.min(self.min.z, bb.min.z)
+
+    self.max.x = math.max(self.max.x, bb.max.x)
+    self.max.y = math.max(self.max.y, bb.max.y)
+    self.max.z = math.max(self.max.z, bb.max.z)
+
+    self.center = Vector3.new((self.min.x + self.max.x) * 0.5, (self.min.y + self.max.y) * 0.5, (self.min.z + self.max.z) * 0.5)
+end
+
+function BoundBox.add(bb1, bb2)
+    local box = BoundBox.new()
+    box.min.x = math.min(bb1.min.x, bb2.min.x)
+    box.min.y = math.min(bb1.min.y, bb2.min.y)
+    box.min.z = math.min(bb1.min.z, bb2.min.z)
+
+    box.max.x = math.max(bb1.max.x, bb2.max.x)
+    box.max.y = math.max(bb1.max.y, bb2.max.y)
+    box.max.z = math.max(bb1.max.z, bb2.max.z)
+
+    box.center = Vector3.new((box.min.x + box.max.x) * 0.5, (box.min.y + box.max.y) * 0.5, (box.min.z + box.max.z) * 0.5)
 end
 
 BoundBox.buildFromMesh3D = function(mesh)
@@ -24,7 +50,135 @@ BoundBox.buildFromMesh3D = function(mesh)
         box.max.z = math.max(mesh.verts[i][3], box.max.z)
     end
 
+    box.center = Vector3.new((box.min.x + box.max.x) * 0.5, (box.min.y + box.max.y) * 0.5, (box.min.z + box.max.z) * 0.5)
     return box
+end
+
+BoundBox.buildFromMinMax = function(min, max)
+    local box = BoundBox.new()
+    box.min = min
+    box.max = max
+    box.center = Vector3.new((box.min.x + box.max.x) * 0.5, (box.min.y + box.max.y) * 0.5, (box.min.z + box.max.z) * 0.5)
+    return box
+end
+
+function BoundBox:buildMesh()
+    local verts = {}
+    local center = Vector3.new(self.center.x, self.center.y, self.center.z)
+    local weidth = Vector3.new(self.max.x - self.min.x, 0, 0)
+    local height = Vector3.new(0, self.max.y - self.min.y, 0)
+    local depth = Vector3.new(0, 0, self.max.z - self.min.z)
+
+    -- Bottom ol 1
+    local position = Vector3.sub(Vector3.sub(Vector3.sub(center, weidth),height),depth)
+	-- vb->mPosition = pm.mCenter - pm.mWidth - pm.mHeight - pm.mDepth;
+
+    verts[#verts + 1] = {position.x, position.y, position.z}
+
+    position = Vector3.sub(Vector3.sub(Vector3.add(center, weidth),height),depth)
+    -- vb->mPosition	= pm.mCenter + pm.mWidth - pm.mHeight - pm.mDepth;
+    verts[#verts + 1] = {position.x, position.y, position.z}
+
+    -- Bottom ol 2
+    position = Vector3.sub(Vector3.sub(Vector3.add(center, weidth),height),depth)
+	-- vb->mPosition	= pm.mCenter + pm.mWidth - pm.mHeight - pm.mDepth;
+    verts[#verts + 1] = {position.x, position.y, position.z}
+
+    position = Vector3.sub(Vector3.add(Vector3.add(center, weidth),height),depth)
+	-- vb->mPosition	= pm.mCenter + pm.mWidth + pm.mHeight - pm.mDepth;
+    verts[#verts + 1] = {position.x, position.y, position.z}
+
+    -- Bottom ol 3
+    position = Vector3.sub(Vector3.add(Vector3.add(center, weidth),height),depth)
+	-- vb->mPosition	= pm.mCenter + pm.mWidth + pm.mHeight - pm.mDepth;
+    verts[#verts + 1] = {position.x, position.y, position.z}
+    
+    position = Vector3.sub(Vector3.add(Vector3.sub(center, weidth),height),depth)
+	-- vb->mPosition	= pm.mCenter - pm.mWidth + pm.mHeight - pm.mDepth;
+    verts[#verts + 1] = {position.x, position.y, position.z}
+
+	-- Bottom ol 4
+    position = Vector3.sub(Vector3.add(Vector3.sub(center, weidth),height),depth)
+    -- vb->mPosition	= pm.mCenter - pm.mWidth + pm.mHeight - pm.mDepth;
+    verts[#verts + 1] = {position.x, position.y, position.z}
+    
+    position = Vector3.sub(Vector3.sub(Vector3.sub(center, weidth),height),depth)
+	-- vb->mPosition	= pm.mCenter - pm.mWidth - pm.mHeight - pm.mDepth;
+    verts[#verts + 1] = {position.x, position.y, position.z}
+    
+	-- Top ol 1
+    position = Vector3.add(Vector3.sub(Vector3.sub(center, weidth),height),depth)
+    -- vb->mPosition	= pm.mCenter - pm.mWidth - pm.mHeight + pm.mDepth;
+    verts[#verts + 1] = {position.x, position.y, position.z}
+
+    position = Vector3.add(Vector3.sub(Vector3.add(center, weidth),height),depth)
+	-- vb->mPosition	= pm.mCenter + pm.mWidth - pm.mHeight + pm.mDepth;
+    verts[#verts + 1] = {position.x, position.y, position.z}
+    
+	-- Top ol 2
+    position = Vector3.add(Vector3.sub(Vector3.add(center, weidth),height),depth)
+    -- vb->mPosition	= pm.mCenter + pm.mWidth - pm.mHeight + pm.mDepth;
+    verts[#verts + 1] = {position.x, position.y, position.z}
+
+    position = Vector3.add(Vector3.sub(Vector3.add(center, weidth),height),depth)
+	-- vb->mPosition	= pm.mCenter + pm.mWidth + pm.mHeight + pm.mDepth;
+    verts[#verts + 1] = {position.x, position.y, position.z}
+
+	-- Top ol 3
+    position = Vector3.add(Vector3.add(Vector3.add(center, weidth),height),depth)
+    -- vb->mPosition	= pm.mCenter + pm.mWidth + pm.mHeight + pm.mDepth;
+    verts[#verts + 1] = {position.x, position.y, position.z}
+
+    position = Vector3.add(Vector3.add(Vector3.sub(center, weidth),height),depth)
+    -- vb->mPosition	= pm.mCenter - pm.mWidth + pm.mHeight + pm.mDepth;
+    verts[#verts + 1] = {position.x, position.y, position.z}
+
+	-- Top ol 4
+    position = Vector3.add(Vector3.add(Vector3.sub(center, weidth),height),depth)
+    -- vb->mPosition	= pm.mCenter - pm.mWidth + pm.mHeight + pm.mDepth;
+    verts[#verts + 1] = {position.x, position.y, position.z}
+
+    position = Vector3.add(Vector3.sub(Vector3.sub(center, weidth),height),depth)
+	-- vb->mPosition	= pm.mCenter - pm.mWidth - pm.mHeight + pm.mDepth;
+    verts[#verts + 1] = {position.x, position.y, position.z}
+
+	-- Side ol 1
+    position = Vector3.sub(Vector3.sub(Vector3.sub(center, weidth),height),depth)
+    -- vb->mPosition	= pm.mCenter - pm.mWidth - pm.mHeight - pm.mDepth;
+    verts[#verts + 1] = {position.x, position.y, position.z}
+
+    position = Vector3.sub(Vector3.sub(Vector3.add(center, weidth),height),depth)
+	-- vb->mPosition	= pm.mCenter - pm.mWidth - pm.mHeight + pm.mDepth;
+    verts[#verts + 1] = {position.x, position.y, position.z}
+
+	-- Side ol 2
+    position = Vector3.sub(Vector3.sub(Vector3.add(center, weidth),height),depth)
+    -- vb->mPosition	= pm.mCenter + pm.mWidth - pm.mHeight - pm.mDepth;
+    verts[#verts + 1] = {position.x, position.y, position.z}
+
+    position = Vector3.add(Vector3.sub(Vector3.add(center, weidth),height),depth)
+	-- vb->mPosition	= pm.mCenter + pm.mWidth - pm.mHeight + pm.mDepth;
+    verts[#verts + 1] = {position.x, position.y, position.z}
+
+	-- Side ol 3
+    position = Vector3.sub(Vector3.add(Vector3.add(center, weidth),height),depth)
+    -- vb->mPosition	= pm.mCenter + pm.mWidth + pm.mHeight - pm.mDepth;
+    verts[#verts + 1] = {position.x, position.y, position.z}
+
+    position = Vector3.add(Vector3.add(Vector3.add(center, weidth),height),depth)
+	-- vb->mPosition	= pm.mCenter + pm.mWidth + pm.mHeight + pm.mDepth;
+    verts[#verts + 1] = {position.x, position.y, position.z}
+
+	-- Side ol 4
+    position = Vector3.sub(Vector3.add(Vector3.sub(center, weidth),height),depth)
+    -- vb->mPosition	= pm.mCenter - pm.mWidth + pm.mHeight - pm.mDepth;
+    verts[#verts + 1] = {position.x, position.y, position.z}
+
+    position = Vector3.add(Vector3.add(Vector3.sub(center, weidth),height),depth)
+	-- vb->mPosition	= pm.mCenter - pm.mWidth + pm.mHeight + pm.mDepth;
+    verts[#verts + 1] = {position.x, position.y, position.z}
+
+    return Mesh3D.createFromPoints(verts)
 end
 
 _G.OrientedBox = {}

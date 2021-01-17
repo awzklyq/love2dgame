@@ -58,6 +58,8 @@ function Mesh3D.createFromPoints(datas)
     mesh.renderid = Render.Mesh3DId;
 
     mesh.bcolor = LColor.new(255,255,255,255)
+
+    mesh:setRenderType("normal")
     return mesh
 end
 
@@ -124,9 +126,9 @@ function Mesh3D:useLights()
     self.shader = Shader.GetBase3DShader();
     for i = 1, #directionlights do
         local light = directionlights[i]
-
         self.shader:send("directionlight"..i, {light.dir.x, light.dir.y, light.dir.z, 1})
         self.shader:send("directionlightcolor"..i, {light.color._r, light.color._g, light.color._b, light.color._a})
+        self.shader:setShadowParam()
     end
 end
 
@@ -135,7 +137,7 @@ function Mesh3D:draw()
     --modelMatrix, projectionMatrix, viewMatrix
 
     self:useLights()
-    self.shader:setCameraAndMatrix3D(self.transform3d, Matrix3D.getProjectionMatrix(camera3d.fov, camera3d.nearClip, camera3d.farClip, camera3d.aspectRatio),Matrix3D.getViewMatrix(camera3d.eye, camera3d.look, camera3d.up))
+    self.shader:setCameraAndMatrix3D(self.transform3d, RenderSet.getUseProjectMatrix(), RenderSet.getUseViewMatrix())
 
     if self.shader:hasUniform( "bcolor") and self.bcolor then
         self.shader:send('bcolor',{self.bcolor._r, self.bcolor._g, self.bcolor._b, self.bcolor._a})

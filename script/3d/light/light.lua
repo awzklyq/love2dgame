@@ -29,6 +29,7 @@ _G.Lights.getDirectionLights = function()
        
         if  light.renderid == Render.DirectionLightId then
             table.insert(directionlights, light)
+         
         end
         if  #directionlights == 4 then
             break

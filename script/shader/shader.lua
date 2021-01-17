@@ -352,6 +352,21 @@ function Shader.GetBase3DVSShaderCode()
         vertexcode = vertexcode .. "varying vec4 vnormal; "
     end
 
+    local directionlights = Lights.getDirectionLights()
+
+    local needshadow = false
+    if RenderSet.getshadowReceiver() then
+        for i = 1, #directionlights do
+            local light = directionlights[i]
+            if light.node and light.node.needshadow then
+                vertexcode = vertexcode .. " uniform mat4 directionlightMatrix; ";
+                vertexcode = vertexcode .. "varying vec4 lightpos; "
+                needshadow = true
+                break
+            end
+        end
+    end
+
      vertexcode = vertexcode..[[    
         vec4 position(mat4 transform_projection, vec4 vertex_position)
         {
@@ -361,36 +376,53 @@ function Shader.GetBase3DVSShaderCode()
         vertexcode = vertexcode.."   vnormal = VertexColor; "
     end
 
+    if needshadow and RenderSet.getshadowReceiver() then
+        vertexcode = vertexcode.."   lightpos = directionlightMatrix * modelMatrix * VertexPosition; "
+    end
+
     vertexcode = vertexcode..[[
-            return projectionMatrix * viewMatrix * modelMatrix * VertexPosition;
-        }
+        return projectionMatrix * viewMatrix * modelMatrix * VertexPosition;
+    }
+
+
 ]];
 
-print(vertexcode)
     return vertexcode
 end
 
 function Shader.GetBase3DPSShaderCode()
-    local pixelcode = "uniform vec4 bcolor; "
+    local pixelcode = "uniform vec4 bcolor;"
 
 
     --collect direction lights
     local directionlights = Lights.getDirectionLights()
 
+    local needshadow = false
     for i = 1, #directionlights do
         local light = directionlights[i]
         pixelcode = pixelcode .. " uniform vec4 directionlight"..i.."; ";
         pixelcode = pixelcode .. " uniform vec4 directionlightcolor"..i.."; ";
+        if RenderSet.getshadowReceiver() and needshadow == false and light.node and light.node.needshadow then
+            -- pixelcode = pixelcode .. " uniform mat4 directionlightMatrix; ";
+            pixelcode = pixelcode .. " uniform Image directionlightShadowMap; ";
+            pixelcode = pixelcode .. " uniform float shadowmapsize; ";
+            needshadow = true
+        end
     end
 
     if Shader.neednormal > 0 then
         pixelcode = pixelcode.."varying vec4 vnormal; "
     end
 
+    if needshadow  and RenderSet.getshadowReceiver() then
+        pixelcode = pixelcode .. "varying vec4 lightpos; "
+        
+    end
+
     pixelcode = pixelcode ..[[
         vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
         {
-            vec4 texcolor = Texel(tex, texture_coords); ]];
+            vec4 texcolor = Texel(tex, texture_coords) * bcolor; ]];
 
         if Shader.neednormal > 0 then
             pixelcode = pixelcode.."vec4 normal = normalize(vnormal); ";
@@ -402,11 +434,25 @@ function Shader.GetBase3DPSShaderCode()
         for i = 1, #directionlights do
             local light = directionlights[i]
             pixelcode = pixelcode .. " dotn = clamp(dot(normalize(directionlight"..i..".xyz), normal.xyz), 0.1, 1); ";
-            pixelcode = pixelcode .. " texcolor.xyz = texcolor.xyz * directionlightcolor"..i..".xyz * dotn; ";
+            -- pixelcode = pixelcode .. " texcolor.xyz = texcolor.xyz * directionlightcolor"..i..".xyz * dotn; ";
+            pixelcode = pixelcode .. " texcolor.xyz = texcolor.xyz + directionlightcolor"..i..".xyz * dotn; ";
         end
 
+        if needshadow and RenderSet.getshadowReceiver() then
+            -- log('ssssssssssss')
+            pixelcode = pixelcode..[[
+                vec2 suv = lightpos.xy;// / shadowmapsize;
+                float sd = Texel(directionlightShadowMap, suv).r;
+                if(sd < lightpos.z * 0.5 + 0.5)
+                {
+                    texcolor = vec4(0, 0, 0,1);
+                }
+            ]]
+        end
+    
+
     pixelcode = pixelcode ..[[
-            return texcolor * bcolor;
+            return texcolor;
         }
     ]];
 
@@ -415,9 +461,24 @@ end
 
 function Shader.GetBase3DShader(color, projectionMatrix, modelMatrix, viewMatrix)
     local directionlights = Lights.getDirectionLights()
-    if ShaderObjects["base3dshader".."directionlights"..#directionlights] then
-        return ShaderObjects["base3dshader".."directionlights"..#directionlights]
+    local needshadow = false
+    if RenderSet.getshadowReceiver() then
+
+        for i = 1, #directionlights do
+            local light = directionlights[i]
+            if light.node and light.node.needshadow then
+                needshadow = true
+                
+                break
+            end
+        end 
     end
+    if ShaderObjects["base3dshader".."directionlights"..#directionlights .. tostring(needshadow)] then
+        return ShaderObjects["base3dshader".."directionlights"..#directionlights..tostring(needshadow)]
+    end
+
+        log(Shader.GetBase3DPSShaderCode())
+    log(Shader.GetBase3DVSShaderCode())
     local shader = Shader.new(Shader.GetBase3DPSShaderCode(), Shader.GetBase3DVSShaderCode())
     assert(shader:hasUniform( "projectionMatrix") and shader:hasUniform( "modelMatrix") and shader:hasUniform( "viewMatrix"))
     if projectionMatrix then
@@ -451,8 +512,29 @@ function Shader.GetBase3DShader(color, projectionMatrix, modelMatrix, viewMatrix
             obj:send('viewMatrix', viewMatrix)
         end
     end
-   
-    ShaderObjects["base3dshader".."directionlights"..#directionlights] = shader
+
+    shader.setShadowParam = function(obj)
+        if not RenderSet.getshadowReceiver() then return end
+        local needshadow = false
+        local node
+        for i = 1, #directionlights do
+            local light = directionlights[i]
+            if light.node and light.node.needshadow then
+                needshadow = true
+                node = light.node
+                break
+            end
+        end
+
+        if needshadow and node.directionlightMatrix then
+            -- obj:send('shadowmapsize', RenderSet.getShadowMapSize())
+            obj:send('directionlightShadowMap', node.shadowmap.obj)
+            obj:send('directionlightMatrix', node.directionlightMatrix)
+            
+        end
+    end
+
+    ShaderObjects["base3dshader".."directionlights"..#directionlights..tostring(needshadow)] = shader
     return  shader
 end
 
@@ -476,7 +558,7 @@ function Shader.GeDepth3DShader(projectionMatrix, modelMatrix, viewMatrix)
             vec4 position(mat4 transform_projection, vec4 vertex_position)
             {
                 vec4 basepos = projectionMatrix * viewMatrix * modelMatrix * VertexPosition;
-                depth = 1 / basepos.z;
+                depth = basepos.z *0.5 + 0.5;
                 return basepos;
             }
     ]]

@@ -71,13 +71,22 @@ function Matrix3D:mul(tab2)
 
 	return rsult
 end
+
+function Matrix3D:mulBoundBox(boundbox)
+
+	local mat = Matrix3D.transpose(self)
+	local min = mat:mul(boundbox.min)
+	local max = mat:mul(boundbox.max)
+	return BoundBox.buildFromMinMax(min, max)
+end
+		
 			
 function Matrix3D:mulTranslationRight(x, y, z)
 	local mm = Matrix3D.new()
     mm[13] = x
     mm[14] = y
     mm[15] = z
-	self:mulleft(mm)
+	self:mulLeft(mm)
 end
 
 function Matrix3D:mulRotationRight(x, y, z, r)
@@ -107,7 +116,7 @@ function Matrix3D:mulRotationRight(x, y, z, r)
 	mm[14] = 0
 	mm[15] = 0
 	mm[16] = 1
-	self:mulleft(mm)
+	self:mulLeft(mm)
 end
 
 function Matrix3D:mulScalingRight(x, y, z)
@@ -115,14 +124,14 @@ function Matrix3D:mulScalingRight(x, y, z)
 	mm[1] = x
 	mm[6] = y
 	mm[11] = z
-	self:mulleft(mm)
+	self:mulLeft(mm)
 end
 
 			
 function Matrix3D:mulTranslationLeft(x, y, z)
 	local mm = Matrix3D.new()
 	mm[13] = x mm[14] = y mm[15] = z
-	self:mulright(mm)
+	self:mulRight(mm)
 end
 
 function Matrix3D:mulRotationLeft(x, y, z, r)
@@ -152,7 +161,7 @@ function Matrix3D:mulRotationLeft(x, y, z, r)
 	mm[14] = 0
 	mm[15] = 0
 	mm[16] = 1
-	self:mulright(mm)
+	self:mulRight(mm)
 end
 
 function Matrix3D:mulScalingLeft(x, y, z)
@@ -160,13 +169,13 @@ function Matrix3D:mulScalingLeft(x, y, z)
 	mm[1] = x
 	mm[6] = y
 	mm[11] = z
-	self:mulright(mm)
+	self:mulRight(mm)
 end
 
 
-function Matrix3D:mulright(tab)
-    -- self:transpose()
-    tab:transpose()
+function Matrix3D:mulRight(tab)
+    -- self:transposeSelf()
+    tab = Matrix3D.transpose(tab)
 	local mat = self
 	local m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33 = mat[1], mat[2], mat[3], mat[4], mat[5], mat[6], mat[7], mat[8], mat[9], mat[10], mat[11], mat[12], mat[13], mat[14], mat[15], mat[16]
 
@@ -189,12 +198,12 @@ function Matrix3D:mulright(tab)
 	mat[14] = m30 * tab[2] + m31 * tab[6] + m32 * tab[10] + m33 * tab[14]
 	mat[15] = m30 * tab[3] + m31 * tab[7] + m32 * tab[11] + m33 * tab[15]
     mat[16] = m30 * tab[4] + m31 * tab[8] + m32 * tab[12] + m33 * tab[16]
-    -- self:transpose()
+    -- self:transposeSelf()
 end
 
-function Matrix3D:mulleft(tab)
-    -- self:transpose()
-    tab:transpose()
+function Matrix3D:mulLeft(tab)
+    -- self:transposeSelf()
+    tab = Matrix3D.transpose(tab)
 	local m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33 = self[1], self[2], self[3], self[4], self[5], self[6], self[7], self[8], self[9], self[10], self[11], self[12], self[13], self[14], self[15], self[16]
 	self[1] = tab[1]* m00+ tab[2] * m10 + tab[3] * m20 + tab[4] * m30  
 	self[2] = tab[1]* m01+ tab[2] * m11 + tab[3]* m21  + tab[4] *  m31
@@ -217,7 +226,7 @@ function Matrix3D:mulleft(tab)
     self[16] = tab[13] * m03 + tab[14] *m13 + tab[15] * m23 + tab[16] *   m33
 end
 
-function Matrix3D:transpose( )
+function Matrix3D:transposeSelf( )
 	-- local m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33 = self[1], self[2], self[3], self[4], self[5], self[6], self[7], self[8], self[9], self[10], self[11], self[12], self[13], self[14], self[15], self[16]
 
 	-- 	m[0][1] = m10; m[0][2] = m20; m[0][3] = m30;
@@ -239,6 +248,31 @@ function Matrix3D:transpose( )
         end
 
 	-- return *this;
+end
+
+function Matrix3D.transpose(m)
+	-- local m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33 = self[1], self[2], self[3], self[4], self[5], self[6], self[7], self[8], self[9], self[10], self[11], self[12], self[13], self[14], self[15], self[16]
+
+	-- 	m[0][1] = m10; m[0][2] = m20; m[0][3] = m30;
+	-- 	m[1][0] = m01; m[1][2] = m21; m[1][3] = m31;
+	-- 	m[2][0] = m02; m[2][1] = m12; m[2][3] = m32;
+	-- 	m[3][0] = m03; m[3][1] = m13; m[3][2] = m23;
+
+	local mat = Matrix3D.new()
+	local mats = {}
+	for x = 1, 4 do
+		for y = 1, 4 do
+			mats[x + (y-1)*4] = m[x + (y-1)*4]
+		end
+	end
+
+	for x = 1, 4 do
+		for y = 1, 4 do
+			mat[y + (x-1)*4] = mats[x + (y-1)*4]
+		end
+	end
+
+	return mat
 end
 
 
@@ -294,7 +328,7 @@ Matrix3D.getTransformationMatrix = function(translation, rotation, scale)
     sm[11] = scale.z
     -- ret = Matrix3D.matrixMult(ret, sm)
 
-    ret:mulright(sm)
+    ret:mulRight(sm)
     return ret
 end
 
@@ -345,4 +379,56 @@ Matrix3D.createOrthoOffCenterLH = function(left, right, bottom, top, znear, zfar
 		0.0,  ys1, 0.0, 0.0,
 		0.0, 0.0,   zf, 0.0,
          xs2,  ys2,   zn, 1.0);
+end
+
+Matrix3D.createOrthoOffCenterRH = function( left, right, bottom, top, znear, zfar )
+	local xs1 = 2.0 / ( right - left );
+	local xs2 = ( left + right ) / ( left - right );
+	local ys1 = 2.0 / ( top - bottom );
+	local ys2 = ( bottom + top ) / ( bottom - top );
+	local zf  = 1.0 / ( znear - zfar );
+	local zn  = znear * zf;
+
+	return Matrix3D.createFromNumbers(
+		 xs1, 0.0, 0.0, 0.0,
+		0.0,  ys1, 0.0, 0.0,
+		0.0, 0.0,   zf, 0.0,
+		 xs2,  ys2,   zn, 1.0 );
+end
+
+Matrix3D.createLookAtLH = function(eye, lookat, upaxis )
+	local zaxis = Vector3.sub( lookat, eye );
+	zaxis:normalize( )
+	local xaxis = Vector3.cross( upaxis, zaxis );
+	xaxis:normalize( )
+	local yaxis = Vector3.cross( zaxis, xaxis );
+	yaxis:normalize()
+
+	local xeye = - Vector3.dot( xaxis, eye );
+	local yeye = - Vector3.dot( yaxis, eye );
+	local zeye = - Vector3.dot( zaxis, eye );
+
+	return Matrix3D.createFromNumbers(
+		xaxis.x, yaxis.x, zaxis.x, 0.0,
+		xaxis.y, yaxis.y, zaxis.y, 0.0,
+		xaxis.z, yaxis.z, zaxis.z, 0.0,
+		   xeye,    yeye,    zeye, 1.0 );
+end
+
+
+Matrix3D.createLookAtRH = function(  eye, lookat, upaxis )
+
+	local zaxis = Vector3.sub( eye, lookat ):normalize( );
+	local xaxis = Vector3.cross( upaxis, zaxis ):normalize( );
+	local yaxis = Vector3.cross( zaxis, xaxis );
+
+	local xeye = - Vector3.dot( xaxis, eye );
+	local yeye = - Vector3.dot( yaxis, eye );
+	local zeye = - Vector3.dot( zaxis, eye );
+
+	return Matrix3D.createFromNumbers(
+		xaxis.x, yaxis.x, zaxis.x, 0.0,
+		xaxis.y, yaxis.y, zaxis.y, 0.0,
+		xaxis.z, yaxis.z, zaxis.z, 0.0,
+		   xeye,    yeye,    zeye, 1.0 );
 end

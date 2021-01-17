@@ -22,6 +22,8 @@ function Vector3:normalize()
     self.x = self.x  / w;
     self.y = self.y  / w;
     self.z = self.z  / w;
+
+    return self
 end
 
 function Vector3:mul(value)
@@ -81,6 +83,16 @@ function Vector3:Spherical2Cartesian( )
     self.z = zz;
     
     return self
+end
+
+function Vector3:negativeSelf(v)
+    self.x = -self.x
+    self.y = -self.y
+    self.z = -self.z
+end
+
+function Vector3.negative(v)
+    return Vector3.new(-v.x, -v.y, -v.z)
 end
 
 -- Vector3& Vector3::Cartesian2Cylindrical( )
@@ -144,3 +156,6 @@ Vector3.cross = function(a,b)
 )
     return result
 end
+
+
+Vector3.cOrigin = Vector3.new(0, 0, 0)

@@ -58,8 +58,12 @@ dofile 'script/render/shadow.lua'
 
 dofile 'script/3d/light/light.lua'
 
+dofile 'script/3d/render/renderset.lua'
+
 dofile 'script/3d/scene/scene.lua'
 dofile 'script/3d/scene/scenenode.lua'
+
+dofile 'script/3d/math/box.lua'
 
 _G.mlib = require 'script/mlib' 
 
@@ -79,5 +83,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/renderdepth.lua')
+	dofile('script/test/shadowmap.lua')
 end
