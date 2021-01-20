@@ -55,3 +55,6 @@ end
 RenderSet.getshadowReceiver = function()
     return shadowReceiver
 end
+
+RenderSet.screenwidth = love.graphics.getPixelWidth() -- love.graphics.getWidth() * 2
+RenderSet.screenheight = love.graphics.getPixelHeight()--love.graphics.getHeight() * 2

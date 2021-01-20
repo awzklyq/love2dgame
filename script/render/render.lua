@@ -205,7 +205,7 @@ Render.RenderObject = function(obj)
         elseif obj.renderid == Render.Mesh3DId then
             love.graphics.draw( obj.obj )
         elseif obj.renderid == Render.CanvasId then
-            love.graphics.draw( obj.obj)
+            love.graphics.draw( obj.obj, obj.x, obj.y, 0, obj.renderWidth / obj:getWidth(), obj.renderHeight / obj:getHeight())
         end
 
         

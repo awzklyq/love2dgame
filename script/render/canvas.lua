@@ -9,6 +9,13 @@ function Canvas.new(...)
 
     canvas.bgColor = LColor.new(0, 0, 0)
     canvas.renderid = Render.CanvasId;
+
+    canvas.renderWidth = canvas:getWidth()
+    canvas.renderHeight = canvas:getHeight()
+
+    canvas.x = 0
+    canvas.y = 0
+
     return canvas;
 end
 

@@ -68,6 +68,8 @@ function Scene3D:removeMesh(mesh)
 end
 
 function Scene3D:update(e)
+    self.screenwidth = love.graphics.getPixelWidth() -- love.graphics.getWidth() * 2
+    self.screenheight = love.graphics.getPixelHeight()--love.graphics.getHeight() * 2
 end
 
 function Scene3D:draw(isdrawCanvaColor)
@@ -126,6 +128,8 @@ function Scene3D:drawDepth()
 end
 
 function Scene3D:drawCanvaColor()
+    self.canvascolor.renderWidth = RenderSet.screenwidth
+    self.canvascolor.renderHeight = RenderSet.screenheight
     self.canvascolor:draw()
 end
 

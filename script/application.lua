@@ -78,6 +78,11 @@ function love.update(dt)
     
     _G.CameraManager.update(dt)
     _G.LightManager.update(dt);
+
+    if RenderSet then
+        RenderSet.screenwidth = love.graphics.getPixelWidth() -- love.graphics.getWidth() * 2
+        RenderSet.screenheight = love.graphics.getPixelHeight()--love.graphics.getHeight() * 2
+    end
     _G.app.update(dt);
   end
 
@@ -141,6 +146,8 @@ function love.mousepressed(x, y, button, istouch)
     _G.app.load();
 
     _G.LightManager.load();
+
+    love.window.setMode(800, 600, {resizable=true, vsync=false, minwidth=400, minheight=300})
  end
 
  _G.isKeyDown = function(...)
