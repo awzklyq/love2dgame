@@ -1,5 +1,5 @@
+dofile('script/shader/shaderfunction.lua')
 _G.__createClassFromLoveObj("Shader")
-
 local ShaderObjects = {}
 Shader.neednormal = 0
 function Shader.new(pixelcode, vertexcode)
@@ -24,7 +24,7 @@ end
 
 function Shader.GetBasePSCodeShader()
     local pixelcode = [[
-    vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
+    vec4 effect( vec4 color, sampler2D tex, vec2 texture_coords, vec2 screen_coords )
     {
         vec4 texcolor = Texel(tex, texture_coords);
         return texcolor * color;
@@ -42,7 +42,7 @@ end
 function Shader.GetBaseImageShader()
     local pixelcode = [[
     uniform sampler2D baseimg;
-    vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
+    vec4 effect( vec4 color, sampler2D tex, vec2 texture_coords, vec2 screen_coords )
     {
         vec4 texcolor = Texel(tex, texture_coords);
         vec4 imgcolor = Texel(baseimg, texture_coords);
@@ -73,7 +73,7 @@ function Shader.GetWBlurShader(w, offset, blurnum, power)
     uniform float offset;
     uniform int blurnum;
     uniform float power;
-    vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
+    vec4 effect( vec4 color, sampler2D tex, vec2 texture_coords, vec2 screen_coords )
     {
         float step = offset / w;
         vec2 coords = texture_coords;
@@ -115,7 +115,7 @@ function Shader.GetHBlurShader(h, offset, blurnum, power)
     uniform float offset;
     uniform int blurnum;
     uniform float power;
-    vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
+    vec4 effect( vec4 color, sampler2D tex, vec2 texture_coords, vec2 screen_coords )
     {
         float step = offset / h;
         vec2 coords = texture_coords;
@@ -153,7 +153,7 @@ function Shader.GetBrightnessShader(l)
     end
     local pixelcode = [[
     uniform float l;
-    vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
+    vec4 effect( vec4 color, sampler2D tex, vec2 texture_coords, vec2 screen_coords )
     {
         vec4 texcolor = Texel(tex, texture_coords);
         vec4 basecolor = texcolor * color;
@@ -212,7 +212,7 @@ function Shader.GetAddTextureHDRShader(tex1, tex2)
         return numerator / (1.0 + v);
     }
 
-    vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
+    vec4 effect( vec4 color, sampler2D tex, vec2 texture_coords, vec2 screen_coords )
     {
         vec4 texcolor = Texel(tex, texture_coords);
         vec4 texcolor1 = Texel(texture1, texture_coords);
@@ -275,7 +275,7 @@ function Shader.GetFXAAShader(w, h)
         return dot(color.rgb, vec3(0.299, 0.587, 0.114));
     }
 
-    vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
+    vec4 effect( vec4 color, sampler2D tex, vec2 texture_coords, vec2 screen_coords )
     {
         float offsetw = 1 / w;
         float offseth = 1 / h;
@@ -391,7 +391,7 @@ function Shader.GetBase3DVSShaderCode()
 end
 
 function Shader.GetBase3DPSShaderCode()
-    local pixelcode = "uniform vec4 bcolor;"
+    local pixelcode = "uniform vec4 bcolor;\n"
 
 
     --collect direction lights
@@ -400,22 +400,26 @@ function Shader.GetBase3DPSShaderCode()
     local needshadow = false
     for i = 1, #directionlights do
         local light = directionlights[i]
-        pixelcode = pixelcode .. " uniform vec4 directionlight"..i.."; ";
-        pixelcode = pixelcode .. " uniform vec4 directionlightcolor"..i.."; ";
+        pixelcode = pixelcode .. " uniform vec4 directionlight"..i..";  \n";
+        pixelcode = pixelcode .. " uniform vec4 directionlightcolor"..i..";  \n";
         if RenderSet.getshadowReceiver() and needshadow == false and light.node and light.node.needshadow then
             -- pixelcode = pixelcode .. " uniform mat4 directionlightMatrix; ";
-            pixelcode = pixelcode .. " uniform Image directionlightShadowMap; ";
-            pixelcode = pixelcode .. " uniform float shadowmapsize; ";
+            pixelcode = pixelcode .. " uniform sampler2D directionlightShadowMap;  \n";
+            pixelcode = pixelcode .. " uniform float shadowmapsize;  \n";
             needshadow = true
         end
     end
 
     if Shader.neednormal > 0 then
-        pixelcode = pixelcode.."varying vec4 vnormal; "
+        pixelcode = pixelcode.."varying vec4 vnormal; \n"
     end
 
     if needshadow  and RenderSet.getshadowReceiver() then
-        pixelcode = pixelcode .. "varying vec4 lightpos; "
+        pixelcode = pixelcode .. "varying vec4 lightpos;\n"
+    end
+
+    if needshadow  and RenderSet.getshadowReceiver() then
+        pixelcode = pixelcode .. _G.ShaderFunction.getShadowPCFCode
         
     end
 
@@ -441,12 +445,12 @@ function Shader.GetBase3DPSShaderCode()
         if needshadow and RenderSet.getshadowReceiver() then
             -- log('ssssssssssss')
             pixelcode = pixelcode..[[
-                vec2 suv = lightpos.xy;// / shadowmapsize;
-                float sd = Texel(directionlightShadowMap, suv).r;
-                if(sd < lightpos.z * 0.5 + 0.5)
-                {
-                    texcolor = vec4(0, 0, 0,1);
-                }
+                float offset = 1/shadowmapsize;
+                vec2 suv = lightpos.xy;;
+                float shadowdepth = lightpos.z * 0.5 + 0.5;
+                float shadow = getShadowPCF(suv, directionlightShadowMap, shadowdepth, shadowmapsize);
+               
+                texcolor.xyz *= shadow;
             ]]
         end
     
@@ -527,9 +531,17 @@ function Shader.GetBase3DShader(color, projectionMatrix, modelMatrix, viewMatrix
         end
 
         if needshadow and node.directionlightMatrix then
-            -- obj:send('shadowmapsize', RenderSet.getShadowMapSize())
-            obj:send('directionlightShadowMap', node.shadowmap.obj)
-            obj:send('directionlightMatrix', node.directionlightMatrix)
+            if shader:hasUniform( "shadowmapsize") then
+                obj:send('shadowmapsize', RenderSet.getShadowMapSize())
+            end
+
+            if shader:hasUniform( "directionlightShadowMap") then
+                obj:send('directionlightShadowMap',  node.shadowmap.obj)
+            end
+
+            if shader:hasUniform( "directionlightMatrix") then
+                obj:send('directionlightMatrix', node.directionlightMatrix)
+            end
             
         end
     end

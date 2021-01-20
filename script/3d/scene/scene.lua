@@ -146,7 +146,7 @@ function Scene3D:drawDirectionLightShadow(isdebug)
             local shadowprojectbox = BoundBox.new()
             for j = 1, #self.nodes do
                 local node = self.nodes[j]
-                if node.shadowReceiver then
+                if node.shadowCaster then--node.shadowReceiver
                     local box = node.mesh.transform3d:mulBoundBox(node.box)
                     shadowprojectbox:addSelf(box)
                 end
