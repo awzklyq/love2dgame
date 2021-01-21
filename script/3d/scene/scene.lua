@@ -18,6 +18,11 @@ function Scene3D.new()
     scene.canvasdepth = Canvas.new(scene.screenwidth, scene.screenheight, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
 
     scene.depth_buffer = Canvas.new(scene.screenwidth, scene.screenheight, {format = "depth32fstencil8", readable = true, msaa = 0, mipmaps="none"})
+
+    scene.meshquad = _G.MeshQuad.new(scene.screenwidth, scene.screenheight, LColor.new(255, 255, 255, 255))
+    scene.meshquad.w = scene.screenwidth
+    scene.meshquad.h = scene.screenheight
+    scene.needFXAA = false
     return scene
 end
 
@@ -68,8 +73,8 @@ function Scene3D:removeMesh(mesh)
 end
 
 function Scene3D:update(e)
-    self.screenwidth = love.graphics.getPixelWidth() -- love.graphics.getWidth() * 2
-    self.screenheight = love.graphics.getPixelHeight()--love.graphics.getHeight() * 2
+    self.screenwidth = RenderSet.screenwidth-- love.graphics.getWidth() * 2
+    self.screenheight = RenderSet.screenheight--love.graphics.getHeight() * 2
 end
 
 function Scene3D:draw(isdrawCanvaColor)
@@ -96,7 +101,7 @@ function Scene3D:draw(isdrawCanvaColor)
             -- end
         end
     end
-
+    love.graphics.setMeshCullMode("none")
     love.graphics.setCanvas()
 
     for i = 1, #self.lights do
@@ -123,14 +128,25 @@ function Scene3D:drawDepth()
             node.mesh:setRenderType(rendertype)
         end
     end
-
+    love.graphics.setMeshCullMode("none")
     love.graphics.setCanvas()
 end
 
 function Scene3D:drawCanvaColor()
-    self.canvascolor.renderWidth = RenderSet.screenwidth
-    self.canvascolor.renderHeight = RenderSet.screenheight
-    self.canvascolor:draw()
+    if self.needFXAA then
+        self.canvascolor.renderWidth = self.screenwidth
+        self.canvascolor.renderHeight = self.screenheight
+        if  self.meshquad.w ~= self.screenwidth or self.meshquad.h ~= self.screenheight then
+            self.meshquad = _G.MeshQuad.new(self.screenwidth, self.screenheight, LColor.new(255, 255, 255, 255))
+            self.meshquad.w = self.screenwidth
+            self.meshquad.h = self.screenheight
+        end
+        self.meshquad:setCanvas(self.canvascolor)
+        self.meshquad.shader = Shader.GetFXAAShader(self.canvascolor.renderWidth , self.canvascolor.renderHeight)
+        self.meshquad:draw()
+    else
+        self.canvascolor:draw()
+    end
 end
 
 function Scene3D:drawDirectionLightShadow(isdebug)
@@ -179,7 +195,7 @@ function Scene3D:drawDirectionLightShadow(isdebug)
             RenderSet.popProjectMatrix()
 
             love.graphics.setCanvas()
-
+            love.graphics.setMeshCullMode("none")
             -- local texmat = Matrix3D.new();
             -- texmat[1] =  0.5
             -- texmat[6] =  -0.5

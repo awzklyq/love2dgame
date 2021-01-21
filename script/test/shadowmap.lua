@@ -35,6 +35,10 @@ local directionlight = DirectionLight.new(Vector3.new(0, 0.5, 1), LColor.new(255
 local lightnode = scene:addLight(directionlight)
 lightnode.needshadow = true
 local rendertype = 1
+
+local canvas = Canvas.new(love.graphics.getPixelWidth(), love.graphics.getPixelHeight(), settings)
+local meshquad = _G.MeshQuad.new(love.graphics.getWidth(), love.graphics.getHeight(), LColor.new(255, 255, 255, 255), canvas)
+meshquad.shader = Shader.GetFXAAShader(canvas:getWidth(), canvas:getHeight())
 app.render(function(dt)
     scene:update(dt)
     if rendertype == 1 then
@@ -47,7 +51,7 @@ app.render(function(dt)
         scene:drawDirectionLightShadow(true)
     end
     
-    love.graphics.print( "Press Key Space", 10, 10)
+    love.graphics.print( "Press Key Space.  scene.needFXAA: "..tostring(scene.needFXAA), 10, 10)
 end)
 
 app.keypressed(function(key, scancode, isrepeat)
@@ -55,6 +59,8 @@ app.keypressed(function(key, scancode, isrepeat)
         -- log('eye: ',currentCamera3D.eye.x, currentCamera3D.eye.y, currentCamera3D.eye.z)
         -- log('look: ',currentCamera3D.look.x, currentCamera3D.look.y, currentCamera3D.look.z)
         rendertype = 3 - rendertype
+    elseif key == "a" then
+        scene.needFXAA = not scene.needFXAA
     end
 
     -- if key == "up" then

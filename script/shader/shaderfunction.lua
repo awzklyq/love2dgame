@@ -38,7 +38,7 @@ _G.ShaderFunction.getShadowPCFCode = [[
         Results.y += shadow2 * Fraction.x;
         Results.z += shadow7 * Fraction.x;
     
-        return clamp(0.25f * dot(Results, vec3(1.0 - Fraction.y, 1.0, Fraction.y)), 0, 1);
+        return shadow;//clamp(0.25f * dot(Results, vec3(1.0 - Fraction.y, 1.0, Fraction.y)), 0, 1);
     }
 ]]
 _G.ShaderFunction.ShadowPCFFunctionName = "getShadowPCF"

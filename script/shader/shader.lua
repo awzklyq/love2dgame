@@ -266,6 +266,11 @@ function Shader.GetAddTextureHDRShader(tex1, tex2)
 end
 
 function Shader.GetFXAAShader(w, h)
+    if Shader["taa"] then
+        Shader["taa"]:send('w', w)
+        Shader["taa"]:send('h', h)
+        return Shader["taa"]
+    end
     local pixelcode = [[
     uniform float w;
     uniform float h;
@@ -337,6 +342,7 @@ function Shader.GetFXAAShader(w, h)
     assert(shader:hasUniform( "w") and shader:hasUniform( "h"))
     shader:send('w', w)
     shader:send('h', h)
+    Shader["taa"] = shader;
     return shader
 end
 
