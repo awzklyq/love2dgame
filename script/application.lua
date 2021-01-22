@@ -35,6 +35,8 @@ _G.app.keypressed = setmetatable({},  metatab)
 
 _G.app.wheelmoved = setmetatable({},  metatab)
 
+_G.app.resizeWindow = setmetatable({},  metatab)
+
 function love.mousereleased(x, y, button, isTouch)
     _G.UIHelper.mouseUp(x, y, button, isTouch)
     _G.app.mousereleased(x, y, button, isTouch)
@@ -73,16 +75,28 @@ function love.textinput(text)
     end
 end
 
+local screenwidth = love.graphics.getPixelWidth() 
+local screenheight = love.graphics.getPixelHeight()
+
 function love.update(dt)
     _G.UIHelper.update(dt);
     
     _G.CameraManager.update(dt)
     _G.LightManager.update(dt);
 
-    if RenderSet then
-        RenderSet.screenwidth = love.graphics.getPixelWidth() -- love.graphics.getWidth() * 2
-        RenderSet.screenheight = love.graphics.getPixelHeight()--love.graphics.getHeight() * 2
+    local w = love.graphics.getPixelWidth() 
+    local h = love.graphics.getPixelHeight()
+
+    if w ~= screenwidth or h ~= screenheight then
+        screenwidth = w;
+        screenheight = h;
+        if RenderSet then
+            RenderSet.screenwidth =  screenheight
+            RenderSet.screenheight = screenheight
+        end
+        app.resizeWindow(w, h)
     end
+
     _G.app.update(dt);
   end
 

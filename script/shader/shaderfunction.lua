@@ -9,7 +9,7 @@ _G.ShaderFunction.getShadowPCFCode = [[
         vec2 Fraction = fract(suv * shadowmapsize);
 
         float offset = 1 / shadowmapsize;
-        suv = vec2((suvx - Fraction.x)/ shadowmapsize, (suvy - Fraction.y) / shadowmapsize) + vec2(0.5, 0.5); // bias to get reliable texel center content
+        suv = vec2((suvx - Fraction.x + 0.5)/ shadowmapsize, (suvy - Fraction.y + 0.5) / shadowmapsize); // bias to get reliable texel center content
 
         
         float shadow = texture2D(shadowmap, suv).r > depth ? 1 : 0;
@@ -18,7 +18,6 @@ _G.ShaderFunction.getShadowPCFCode = [[
 
         float shadow3 = texture2D(shadowmap, suv + vec2(0, offset)).r > depth ? 1 : 0;
         float shadow4 = texture2D(shadowmap, suv + vec2(0, -offset)).r > depth ? 1 : 0;
-
 
         float shadow5 = texture2D(shadowmap, suv + vec2(offset, offset)).r > depth ? 1 : 0;
         float shadow6 = texture2D(shadowmap, suv + vec2(-offset, -offset)).r > depth ? 1 : 0;
@@ -38,7 +37,7 @@ _G.ShaderFunction.getShadowPCFCode = [[
         Results.y += shadow2 * Fraction.x;
         Results.z += shadow7 * Fraction.x;
     
-        return shadow;//clamp(0.25f * dot(Results, vec3(1.0 - Fraction.y, 1.0, Fraction.y)), 0, 1);
+        return clamp(0.25f * dot(Results, vec3(1.0 - Fraction.y, 1.0, Fraction.y)), 0, 1);
     }
 ]]
 _G.ShaderFunction.ShadowPCFFunctionName = "getShadowPCF"

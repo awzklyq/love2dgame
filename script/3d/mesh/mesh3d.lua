@@ -13,7 +13,7 @@ function Mesh3D.new(file)-- lw :line width
     local mesh = setmetatable({}, Mesh3D);
     mesh.transform3d = Matrix3D.new();
 
-    mesh.verts = Mesh3D.loadObjFile(file)
+    mesh.verts = Mesh3D.loadObjFile(_G.FileManager.findFile(file))
     mesh.shader = Shader.GetBase3DShader()
     mesh:makeNormals()
     mesh.obj = love.graphics.newMesh(vertexFormat, mesh.verts, "triangles")
@@ -27,6 +27,10 @@ function Mesh3D.new(file)-- lw :line width
 
     mesh:setRenderType("normal")
     return mesh;
+end
+
+function Mesh3D:setCanvas(canvas)
+    self:setTexture(canvas.obj)
 end
 
 function Mesh3D:setRenderType(typename)

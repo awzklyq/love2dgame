@@ -449,7 +449,6 @@ function Shader.GetBase3DPSShaderCode()
         end
 
         if needshadow and RenderSet.getshadowReceiver() then
-            -- log('ssssssssssss')
             pixelcode = pixelcode..[[
                 float offset = 1/shadowmapsize;
                 vec2 suv = lightpos.xy;;
@@ -487,8 +486,8 @@ function Shader.GetBase3DShader(color, projectionMatrix, modelMatrix, viewMatrix
         return ShaderObjects["base3dshader".."directionlights"..#directionlights..tostring(needshadow)]
     end
 
-        log(Shader.GetBase3DPSShaderCode())
-    log(Shader.GetBase3DVSShaderCode())
+    -- log(Shader.GetBase3DPSShaderCode())
+    -- log(Shader.GetBase3DVSShaderCode())
     local shader = Shader.new(Shader.GetBase3DPSShaderCode(), Shader.GetBase3DVSShaderCode())
     assert(shader:hasUniform( "projectionMatrix") and shader:hasUniform( "modelMatrix") and shader:hasUniform( "viewMatrix"))
     if projectionMatrix then

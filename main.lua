@@ -16,9 +16,10 @@ dofile 'script/light/lightmanager.lua'
 dofile('script/application.lua')
 dofile('script/render/render.lua')
 dofile('script/render/canvas.lua')
+dofile('script/render/image.lua')
 
 dofile('script/common/color.lua')
-
+dofile('script/common/filepath.lua')
 dofile('script/file/file.lua')
 
 dofile('script/xml/xmlload.lua')
@@ -83,5 +84,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/shadowmap.lua')
+	dofile('script/test/ssao.lua')
 end

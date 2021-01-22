@@ -73,8 +73,21 @@ function Scene3D:removeMesh(mesh)
 end
 
 function Scene3D:update(e)
-    self.screenwidth = RenderSet.screenwidth-- love.graphics.getWidth() * 2
-    self.screenheight = RenderSet.screenheight--love.graphics.getHeight() * 2
+    if self.screenwidth ~= RenderSet.screenwidth or self.screenheight ~= RenderSet.screenheight then
+        self.screenwidth = RenderSet.screenwidth-- love.graphics.getWidth() * 2
+        self.screenheight = RenderSet.screenheight--love.graphics.getHeight() * 2
+        self:reseizeScreen(self.screenwidth, self.screenheight)
+    end
+end
+
+function Scene3D:reseizeScreen(w, h)
+    self.canvascolor.renderWidth = self.screenwidth
+    self.canvascolor.renderHeight = self.screenheight
+    if  self.meshquad.w ~= self.screenwidth or self.meshquad.h ~= self.screenheight then
+        self.meshquad = _G.MeshQuad.new(self.screenwidth, self.screenheight, LColor.new(255, 255, 255, 255))
+        self.meshquad.w = self.screenwidth
+        self.meshquad.h = self.screenheight
+    end
 end
 
 function Scene3D:draw(isdrawCanvaColor)
@@ -134,13 +147,7 @@ end
 
 function Scene3D:drawCanvaColor()
     if self.needFXAA then
-        self.canvascolor.renderWidth = self.screenwidth
-        self.canvascolor.renderHeight = self.screenheight
-        if  self.meshquad.w ~= self.screenwidth or self.meshquad.h ~= self.screenheight then
-            self.meshquad = _G.MeshQuad.new(self.screenwidth, self.screenheight, LColor.new(255, 255, 255, 255))
-            self.meshquad.w = self.screenwidth
-            self.meshquad.h = self.screenheight
-        end
+        
         self.meshquad:setCanvas(self.canvascolor)
         self.meshquad.shader = Shader.GetFXAAShader(self.canvascolor.renderWidth , self.canvascolor.renderHeight)
         self.meshquad:draw()
