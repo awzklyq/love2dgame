@@ -354,7 +354,8 @@ function Shader.GetBase3DVSShaderCode()
         uniform mat4 modelMatrix;
         uniform mat4 viewMatrix; ]];
     
-    if Shader.neednormal > 0 then
+    local normalmap = RenderSet.getNormalMap()
+    if not normalmap and Shader.neednormal > 0 then
         vertexcode = vertexcode .. "varying vec4 vnormal; "
     end
 
@@ -378,7 +379,7 @@ function Shader.GetBase3DVSShaderCode()
         {
             ]];
 
-    if Shader.neednormal > 0 then
+    if not normalmap and Shader.neednormal > 0 then
         vertexcode = vertexcode.."   vnormal = VertexColor; "
     end
 
@@ -416,7 +417,10 @@ function Shader.GetBase3DPSShaderCode()
         end
     end
 
-    if Shader.neednormal > 0 then
+    local normalmap = RenderSet.getNormalMap()
+    if normalmap then
+        pixelcode = pixelcode .. " uniform sampler2D normalmap;  \n";
+    elseif Shader.neednormal > 0 then
         pixelcode = pixelcode.."varying vec4 vnormal; \n"
     end
 
@@ -434,9 +438,11 @@ function Shader.GetBase3DPSShaderCode()
         {
             vec4 texcolor = Texel(tex, texture_coords) * bcolor; ]];
 
-        if Shader.neednormal > 0 then
-            pixelcode = pixelcode.."vec4 normal = normalize(vnormal); ";
-        end
+            if normalmap then
+                pixelcode = pixelcode .. "vec4 normal = (texture2D(normalmap, texture_coords) - vec4(0.5, 0.5, 0.5, 0.5)) * 2;\n";
+            elseif Shader.neednormal > 0 then
+                pixelcode = pixelcode.."vec4 normal = normalize(vnormal);\n";
+            end
 
         if #directionlights > 0 then
             pixelcode = pixelcode .. " float dotn = 0; ";
@@ -482,13 +488,19 @@ function Shader.GetBase3DShader(color, projectionMatrix, modelMatrix, viewMatrix
             end
         end 
     end
-    if ShaderObjects["base3dshader".."directionlights"..#directionlights .. tostring(needshadow)] then
-        return ShaderObjects["base3dshader".."directionlights"..#directionlights..tostring(needshadow)]
+
+    local normalmap = RenderSet.getNormalMap()
+    local shader = ShaderObjects["base3dshader".."directionlights"..#directionlights .. tostring(needshadow) .. (normalmap and "normalmap" or "")]
+    if shader then
+        if shader:hasUniform("normalmap") then
+            shader:send("normalmap", normalmap.obj)
+        end
+        return shader
     end
 
     -- log(Shader.GetBase3DPSShaderCode())
     -- log(Shader.GetBase3DVSShaderCode())
-    local shader = Shader.new(Shader.GetBase3DPSShaderCode(), Shader.GetBase3DVSShaderCode())
+    shader = Shader.new(Shader.GetBase3DPSShaderCode(), Shader.GetBase3DVSShaderCode())
     assert(shader:hasUniform( "projectionMatrix") and shader:hasUniform( "modelMatrix") and shader:hasUniform( "viewMatrix"))
     if projectionMatrix then
         shader:send('projectionMatrix', projectionMatrix)
@@ -551,12 +563,15 @@ function Shader.GetBase3DShader(color, projectionMatrix, modelMatrix, viewMatrix
         end
     end
 
-    ShaderObjects["base3dshader".."directionlights"..#directionlights..tostring(needshadow)] = shader
+    ShaderObjects["base3dshader".."directionlights"..#directionlights..tostring(needshadow).. (normalmap and "normalmap" or "")] = shader
     return  shader
 end
 
 function Shader.GeDepth3DShader(projectionMatrix, modelMatrix, viewMatrix)
    local shader = ShaderObjects["base3dshader_depth"]
+   if shader then
+        return shader
+   end
    if not shader then
         local pixelcode = [[
             varying float depth;
@@ -615,6 +630,104 @@ function Shader.GeDepth3DShader(projectionMatrix, modelMatrix, viewMatrix)
     return  shader
 end
 
+function Shader.GeNormal3DShader(projectionMatrix, modelMatrix, viewMatrix)
+    local normalmap = RenderSet.getNormalMap()
+
+    local shader = ShaderObjects["normalshader" .. (normalmap and "map" or "")]
+    if shader then
+        
+        if normalmap and shader:hasUniform("normalmap") then
+            shader:send("normalmap", normalmap.obj)
+        end
+        return shader
+    end
+
+    local pixelcode = ""
+    if normalmap then
+        pixelcode = pixelcode .. " uniform sampler2D normalmap;  \n";
+    elseif Shader.neednormal > 0 then
+        pixelcode = pixelcode.."varying vec4 vnormal; \n"
+    end
+    
+    pixelcode = pixelcode .. [[
+        vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
+        {
+            ]]
+
+        if normalmap then
+            --pixelcode = pixelcode .. "vec4 normal = (texture2D(normalmap, texture_coords) - vec4(0.5, 0.5, 0.5, 0.5)) * 2;\n";
+            log('bbbbbbbbbbbbbbbbbb')
+            pixelcode = pixelcode .. "vec4 normal = texture2D(normalmap, texture_coords);\n";
+        elseif Shader.neednormal > 0 then
+            pixelcode = pixelcode.."vec4 normal = normalize(vnormal);\n";
+            
+        else
+            pixelcode = pixelcode.."vec4 normal = vec4(0 ,0, 0, 0); \n"
+        end
+    pixelcode = pixelcode .. [[
+        return vec4(normal.x, normal.y, normal.z,1);
+        }
+    ]]
+
+    local vertexcode = [[
+        uniform mat4 projectionMatrix;
+        uniform mat4 modelMatrix;
+        uniform mat4 viewMatrix; ]]
+
+    if not normalmap and Shader.neednormal > 0 then
+        vertexcode = vertexcode .. "varying vec4 vnormal; \n"
+    end
+    vertexcode = vertexcode .. "\n"
+    vertexcode = vertexcode..[[
+        vec4 position(mat4 transform_projection, vec4 vertex_position)
+        {
+            ]]
+    if not normalmap and Shader.neednormal > 0 then
+        vertexcode = vertexcode.."   vnormal = VertexColor;\n"
+    end
+
+    vertexcode = vertexcode..[[
+            vec4 basepos = projectionMatrix * viewMatrix * modelMatrix * VertexPosition;
+            return basepos;
+        }
+    ]]
+
+    log(vertexcode)
+    log(pixelcode)
+    shader = Shader.new(pixelcode, vertexcode)
+
+    shader.setCameraAndMatrix3D = function(obj, modelMatrix, projectionMatrix, viewMatrix)
+        if projectionMatrix then
+            obj:send('projectionMatrix', projectionMatrix)
+        end
+
+        if modelMatrix then
+            obj:send('modelMatrix', modelMatrix)
+        end
+
+        if viewMatrix then
+            obj:send('viewMatrix', viewMatrix)
+        end
+    end
+
+    ShaderObjects["normalshader" .. (normalmap and "map" or "")] = shader
+    
+     
+     assert(shader:hasUniform( "projectionMatrix") and shader:hasUniform( "modelMatrix") and shader:hasUniform( "viewMatrix"))
+     if projectionMatrix then
+         shader:send('projectionMatrix', projectionMatrix)
+     end
+ 
+     if modelMatrix then
+         shader:send('modelMatrix', modelMatrix)
+     end
+ 
+     if viewMatrix then
+         shader:send('viewMatrix', viewMatrix)
+     end
+    
+     return  shader
+ end
 
 function Shader.GetShadowVolumeShader(projectionMatrix, modelMatrix, viewMatrix)
 

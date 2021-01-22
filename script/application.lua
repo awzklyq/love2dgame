@@ -91,10 +91,10 @@ function love.update(dt)
         screenwidth = w;
         screenheight = h;
         if RenderSet then
-            RenderSet.screenwidth =  screenheight
+            RenderSet.screenwidth =  screenwidth
             RenderSet.screenheight = screenheight
         end
-        app.resizeWindow(w, h)
+        _G.app.resizeWindow(w, h)
     end
 
     _G.app.update(dt);

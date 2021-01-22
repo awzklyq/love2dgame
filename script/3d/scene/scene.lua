@@ -11,17 +11,10 @@ function Scene3D.new()
 
     scene.bgColor = LColor.new(0,0,0,0)
 
-    scene.screenwidth = love.graphics.getPixelWidth() -- love.graphics.getWidth() * 2
-    scene.screenheight = love.graphics.getPixelHeight()--love.graphics.getHeight() * 2
-    scene.canvascolor = Canvas.new(scene.screenwidth, scene.screenheight, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
+    scene.screenwidth = love.graphics.getPixelWidth()
+    scene.screenheight = love.graphics.getPixelHeight()
 
-    scene.canvasdepth = Canvas.new(scene.screenwidth, scene.screenheight, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
-
-    scene.depth_buffer = Canvas.new(scene.screenwidth, scene.screenheight, {format = "depth32fstencil8", readable = true, msaa = 0, mipmaps="none"})
-
-    scene.meshquad = _G.MeshQuad.new(scene.screenwidth, scene.screenheight, LColor.new(255, 255, 255, 255))
-    scene.meshquad.w = scene.screenwidth
-    scene.meshquad.h = scene.screenheight
+    scene:reseizeScreen(scene.screenwidth, scene.screenheight)
     scene.needFXAA = false
     return scene
 end
@@ -81,13 +74,23 @@ function Scene3D:update(e)
 end
 
 function Scene3D:reseizeScreen(w, h)
-    self.canvascolor.renderWidth = self.screenwidth
-    self.canvascolor.renderHeight = self.screenheight
-    if  self.meshquad.w ~= self.screenwidth or self.meshquad.h ~= self.screenheight then
-        self.meshquad = _G.MeshQuad.new(self.screenwidth, self.screenheight, LColor.new(255, 255, 255, 255))
-        self.meshquad.w = self.screenwidth
-        self.meshquad.h = self.screenheight
-    end
+    self.canvascolor = Canvas.new(w, h, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
+    self.canvascolor.renderWidth = w
+    self.canvascolor.renderHeight = h
+    self.canvasdepth = Canvas.new(w, h, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
+    self.canvasdepth.renderWidth = w
+    self.canvasdepth.renderHeight = h
+
+    self.canvasnormal = Canvas.new(w, h, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
+    self.canvasnormal.renderWidth = w
+    self.canvasnormal.renderHeight = h
+
+    self.normal_depth_buffer = Canvas.new(w, h, {format = "depth32fstencil8", readable = true, msaa = 0, mipmaps="none"})
+    self.depthmap_depth_buffer = Canvas.new(w, h, {format = "depth32fstencil8", readable = true, msaa = 0, mipmaps="none"})
+    self.normalmap_depth_buffer = Canvas.new(w, h, {format = "depth32fstencil8", readable = true, msaa = 0, mipmaps="none"})
+    self.meshquad = _G.MeshQuad.new(w, h, LColor.new(255, 255, 255, 255))
+    self.meshquad.w = w
+    self.meshquad.h = h
 end
 
 function Scene3D:draw(isdrawCanvaColor)
@@ -98,36 +101,56 @@ function Scene3D:draw(isdrawCanvaColor)
         end
     end
 
-    love.graphics.setCanvas({self.canvascolor.obj, depthstencil = self.depth_buffer.obj})
     love.graphics.setMeshCullMode("front")
     love.graphics.setDepthMode("less", true)
+    love.graphics.setCanvas({self.canvascolor.obj, depthstencil = self.normal_depth_buffer.obj})
     love.graphics.clear(self.bgColor._r, self.bgColor._g, self.bgColor._b, self.bgColor._a)
-
     for i = 1, #self.nodes do
         local node = self.nodes[i]
-        if node.mesh then
-            -- node:drawBoxMesh()
-            -- if node.shadowReceiver then
+        if node.mesh then     
             RenderSet.setshadowReceiver(node.shadowReceiver)
             node.mesh:draw()
             RenderSet.setshadowReceiver(false)
+            
             -- end
         end
     end
-    love.graphics.setMeshCullMode("none")
     love.graphics.setCanvas()
+    love.graphics.setMeshCullMode("none")
 
     for i = 1, #self.lights do
         _G.popLight()
     end
 
+    self:drawNormalmap()
+    self:drawDepth()
     if isdrawCanvaColor then
         self:drawCanvaColor()
     end
 end
 
+function Scene3D:drawNormalmap()
+    love.graphics.setCanvas({self.canvasnormal.obj, depthstencil = self.normalmap_depth_buffer.obj})
+    love.graphics.setMeshCullMode("front")
+    love.graphics.setDepthMode("less", true)
+    love.graphics.clear(0, 0, 0, 0)
+
+    for i = 1, #self.nodes do
+        local node = self.nodes[i]
+        if node.mesh then
+            _G.useNormal()
+            node.mesh:setRenderType("normalmap")
+            node.mesh:draw()
+            node.mesh:setRenderType("normal")
+            _G.unUseNormal()
+        end
+    end
+    love.graphics.setMeshCullMode("none")
+    love.graphics.setCanvas()
+end
+
 function Scene3D:drawDepth()
-    love.graphics.setCanvas({self.canvasdepth.obj, depthstencil = self.depth_buffer.obj})
+    love.graphics.setCanvas({self.canvasdepth.obj, depthstencil = self.depthmap_depth_buffer.obj})
     love.graphics.setMeshCullMode("front")
     love.graphics.setDepthMode("less", true)
     love.graphics.clear(1,1,1,1)
@@ -147,13 +170,16 @@ end
 
 function Scene3D:drawCanvaColor()
     if self.needFXAA then
-        
         self.meshquad:setCanvas(self.canvascolor)
         self.meshquad.shader = Shader.GetFXAAShader(self.canvascolor.renderWidth , self.canvascolor.renderHeight)
         self.meshquad:draw()
     else
         self.canvascolor:draw()
     end
+end
+
+function Scene3D:drawCanvaNormalmap()
+    self.canvasnormal:draw()
 end
 
 function Scene3D:drawDirectionLightShadow(isdebug)

@@ -19,7 +19,16 @@ end
 _G.popLight = function()
     table.remove(Lights, #Lights)
     Shader.neednormal = Shader.neednormal + 1
-    Shader.neednormal = math.max(Shader.neednormal, 0)
+    Shader.neednormal = math.max(Shader.neednormal - 1, 0)
+end
+
+_G.useNormal = function()
+    Shader.neednormal = Shader.neednormal + 1
+end
+
+_G.unUseNormal = function()
+    table.remove(Lights, #Lights)
+    Shader.neednormal = math.max(Shader.neednormal - 1, 0)
 end
 
 _G.Lights.getDirectionLights = function()

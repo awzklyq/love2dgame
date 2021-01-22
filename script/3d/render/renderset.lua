@@ -56,5 +56,14 @@ RenderSet.getshadowReceiver = function()
     return shadowReceiver
 end
 
+local normalmap = nil
+RenderSet.setNormalMap = function(value)
+    normalmap = value
+end
+
+RenderSet.getNormalMap = function()
+    return normalmap
+end
+
 RenderSet.screenwidth = love.graphics.getPixelWidth()
 RenderSet.screenheight = love.graphics.getPixelHeight()

@@ -7,8 +7,6 @@ local vertexFormat = {
     {"ConstantColor", "byte", 4},
 }
 
-Mesh3D.RenderNormal = 1
-Mesh3D.RenderDepth = 2
 function Mesh3D.new(file)-- lw :line width
     local mesh = setmetatable({}, Mesh3D);
     mesh.transform3d = Matrix3D.new();
@@ -21,7 +19,7 @@ function Mesh3D.new(file)-- lw :line width
     mesh.bcolor = LColor.new(255,255,255,255)
     mesh.renderid = Render.Mesh3DId;
 
-    mesh.rendertype = Mesh3D.RenderNormal
+    mesh.rendertype = "normal"
 
     mesh.nolight = false
 
@@ -33,15 +31,28 @@ function Mesh3D:setCanvas(canvas)
     self:setTexture(canvas.obj)
 end
 
+function Mesh3D:setNormalMap(image)
+    if not image then
+        self.normalmap = nil
+        return
+    end
+
+    if type(image) == "string" then
+        self.normalmap = ImageEx.new(image)
+    elseif image.renderid == Render.ImageId then
+        self.normalmap = image
+    end
+end
+
 function Mesh3D:setRenderType(typename)
+    self.rendertype = typename or "normal"
     if typename == "normal" then
-        self.rendertype = Mesh3D.RenderNormal
         self.shader = Shader.GetBase3DShader();
+    elseif typename == "normalmap" then
+        self.shader = Shader.GeNormal3DShader()
     elseif typename == "depth" then
-        self.rendertype = Mesh3D.RenderDepth
         self.shader = Shader.GeDepth3DShader()
     else
-        self.rendertype = Mesh3D.RenderNormal
         self.shader = Shader.GetBase3DShader();
     end
 end
@@ -115,6 +126,12 @@ function Mesh3D:makeNormals()
 end
 
 function Mesh3D:useLights()
+    if self.rendertype == 'normalmap' then
+        local  normalmap = RenderSet.getNormalMap(self.normalmap)
+        self.shader = Shader.GeNormal3DShader();
+        return
+    end
+
     if self.nolight then
         return
     end
@@ -140,6 +157,7 @@ function Mesh3D:draw()
     local camera3d = _G.getGlobalCamera3D()
     --modelMatrix, projectionMatrix, viewMatrix
 
+    RenderSet.setNormalMap(self.normalmap)
     self:useLights()
     self.shader:setCameraAndMatrix3D(self.transform3d, RenderSet.getUseProjectMatrix(), RenderSet.getUseViewMatrix())
 
@@ -147,6 +165,7 @@ function Mesh3D:draw()
         self.shader:send('bcolor',{self.bcolor._r, self.bcolor._g, self.bcolor._b, self.bcolor._a})
     end
     Render.RenderObject(self)
+    RenderSet.setNormalMap()
 end
 
 -- stitch two tables together and return the result
