@@ -45,10 +45,10 @@ app.render(function(dt)
         scene:drawDirectionLightShadow()
         scene:draw(true)
     else
-        -- scene:drawDepth()
-        -- local canvas = scene:getDepthCanvas()
-        -- canvas:draw()
-        scene:drawDirectionLightShadow(true)
+        scene:drawDepth()
+        local canvas = scene:getDepthCanvas()
+        canvas:draw()
+        -- scene:drawDirectionLightShadow(true)
     end
     
     love.graphics.print( "Press Key Space.  scene.needFXAA: "..tostring(scene.needFXAA), 10, 10)

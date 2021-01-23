@@ -432,3 +432,167 @@ Matrix3D.createLookAtRH = function(  eye, lookat, upaxis )
 		xaxis.z, yaxis.z, zaxis.z, 0.0,
 		   xeye,    yeye,    zeye, 1.0 );
 end
+
+
+
+function Matrix3D:getData(i, j)
+    return self[(i - 1) * 4 + j]
+end
+
+function Matrix3D:setData(i, j, v)
+    self[(i - 1) * 4 + j] = v
+end
+
+function Matrix3D.determinant3x3( m00, m01, m02, m10, m11, m12, m20, m21, m22)
+	return m00 * m11 * m22 + m01 * m12 * m20 + m02 * m10 * m21 - m00 * m12 * m21- m01 * m10 * m22 - m02 * m11 * m20;
+end
+
+-- _float Matrix3::Determinant( ) const
+-- {
+-- 	return m[0][0] * m[1][1] * m[2][2] + m[0][1] * m[1][2] * m[2][0] + m[0][2] * m[1][0] * m[2][1]
+-- 		 - m[0][0] * m[1][2] * m[2][1] - m[0][1] * m[1][0] * m[2][2] - m[0][2] * m[1][1] * m[2][0];
+-- }
+
+function Matrix3D:determinant()
+	local d1 = Matrix3D.determinant3x3(self:getData(2,2), self:getData(2,3), self:getData(2,4), self:getData(3,2), self:getData(3,3), self:getData(3,4), self:getData(4,2), self:getData(4,3), self:getData(4,4))
+
+	local d2 = Matrix3D.determinant3x3(self:getData(2,1), self:getData(2,3), self:getData(2,4), self:getData(3,1), self:getData(3,3), self:getData(3,4), self:getData(4,1), self:getData(4,3), self:getData(4,4))
+
+	local d3 = Matrix3D.determinant3x3( self:getData(2,1),  self:getData(2,2),  self:getData(2,4),  self:getData(3,1),  self:getData(3,2),  self:getData(3,4),  self:getData(4,1),  self:getData(4,2),  self:getData(4,4))
+
+	local d4 = Matrix3D.determinant3x3( self:getData(2,1), self:getData(2,2), self:getData(2,3), self:getData(3,1), self:getData(3,2), self:getData(3,3), self:getData(4,1), self:getData(4,2), self:getData(4,3))
+
+	return self:getData(1, 1) * d1 - self:getData(1, 2) * d2 + self:getData(1, 3) * d3 - self:getData(1, 4) * d4;
+
+end
+
+-- return	m[0][0] * Matrix3( m[1][1], m[1][2], m[1][3], m[2][1], m[2][2], m[2][3], m[3][1], m[3][2], m[3][3] ).Determinant( )
+-- 			-	m[0][1] * Matrix3( m[1][0], m[1][2], m[1][3], m[2][0], m[2][2], m[2][3], m[3][0], m[3][2], m[3][3] ).Determinant( )
+-- 			+	m[0][2] * Matrix3( m[1][0], m[1][1], m[1][3], m[2][0], m[2][1], m[2][3], m[3][0], m[3][1], m[3][3] ).Determinant( )
+-- 			-	m[0][3] * Matrix3( m[1][0], m[1][1], m[1][2], m[2][0], m[2][1], m[2][2], m[3][0], m[3][1], m[3][2] ).Determinant( );
+
+function Matrix3D:adjoint( )
+
+	-- _float m00 = m[0][0], m01 = m[0][1], m02 = m[0][2], m03 = m[0][3], m10 = m[1][0], m11 = m[1][1], m12 = m[1][2], m13 = m[1][3],
+	-- 	m20 = m[2][0], m21 = m[2][1], m22 = m[2][2], m23 = m[2][3], m30 = m[3][0], m31 = m[3][1], m32 = m[3][2], m33 = m[3][3];
+
+	local m00 = self:getData(1,1)
+	local m01 = self:getData(1,2)
+	local m02 = self:getData(1,3)
+	local m03 = self:getData(1,4)
+	local m10 = self:getData(2,1)
+	local m11 = self:getData(2,2)
+	local m12 = self:getData(2,3)
+	local m13 = self:getData(2,4)
+	local m20 = self:getData(3,1)
+	local m21 = self:getData(3,2)
+	local m22 = self:getData(3,3)
+	local m23 = self:getData(3,4)
+	local m30 = self:getData(4,1)
+	local m31 = self:getData(4,2)
+	local m32 = self:getData(4,3)
+	local m33 = self:getData(4,4)
+
+	-- m[0][0] =   Matrix3( m11, m12, m13, m21, m22, m23, m31, m32, m33 ).Determinant( );
+	-- m[1][0] = - Matrix3( m10, m12, m13, m20, m22, m23, m30, m32, m33 ).Determinant( );
+	-- m[2][0] =   Matrix3( m10, m11, m13, m20, m21, m23, m30, m31, m33 ).Determinant( );
+	-- m[3][0] = - Matrix3( m10, m11, m12, m20, m21, m22, m30, m31, m32 ).Determinant( );
+
+	-- m[0][1] = - Matrix3( m01, m02, m03, m21, m22, m23, m31, m32, m33 ).Determinant( );
+	-- m[1][1] =   Matrix3( m00, m02, m03, m20, m22, m23, m30, m32, m33 ).Determinant( );
+	-- m[2][1] = - Matrix3( m00, m01, m03, m20, m21, m23, m30, m31, m33 ).Determinant( );
+	-- m[3][1] =   Matrix3( m00, m01, m02, m20, m21, m22, m30, m31, m32 ).Determinant( );
+
+	-- m[0][2] =	Matrix3( m01, m02, m03, m11, m12, m13, m31, m32, m33 ).Determinant( );
+	-- m[1][2] = - Matrix3( m00, m02, m03, m10, m12, m13, m30, m32, m33 ).Determinant( );
+	-- m[2][2] =   Matrix3( m00, m01, m03, m10, m11, m13, m30, m31, m33 ).Determinant( );
+	-- m[3][2] = - Matrix3( m00, m01, m02, m10, m11, m12, m30, m31, m32 ).Determinant( );
+
+	-- m[0][3] = - Matrix3( m01, m02, m03, m11, m12, m13, m21, m22, m23 ).Determinant( );
+	-- m[1][3] =   Matrix3( m00, m02, m03, m10, m12, m13, m20, m22, m23 ).Determinant( );
+	-- m[2][3] = - Matrix3( m00, m01, m03, m10, m11, m13, m20, m21, m23 ).Determinant( );
+	-- m[3][3] =   Matrix3( m00, m01, m02, m10, m11, m12, m20, m21, m22 ).Determinant( );
+	self:setData(1,1,Matrix3D.determinant3x3( m11, m12, m13, m21, m22, m23, m31, m32, m33 ) )
+	self:setData(2,1,-Matrix3D.determinant3x3( m10, m12, m13, m20, m22, m23, m30, m32, m33 ) )
+	self:setData(3,1,Matrix3D.determinant3x3( m10, m11, m13, m20, m21, m23, m30, m31, m33 ) )
+	self:setData(4,1,-Matrix3D.determinant3x3( m10, m11, m12, m20, m21, m22, m30, m31, m32 ) )
+	                                         
+	self:setData(1,2,-Matrix3D.determinant3x3( m01, m02, m03, m21, m22, m23, m31, m32, m33 ) )
+	self:setData(2,2,Matrix3D.determinant3x3( m00, m02, m03, m20, m22, m23, m30, m32, m33 ) )
+	self:setData(3,2,-Matrix3D.determinant3x3( m00, m01, m03, m20, m21, m23, m30, m31, m33 ) )
+	self:setData(4,2,Matrix3D.determinant3x3( m00, m01, m02, m20, m21, m22, m30, m31, m32 ) )
+	                                         
+	self:setData(1,3,Matrix3D.determinant3x3( m01, m02, m03, m11, m12, m13, m31, m32, m33) )
+	self:setData(2,3,-Matrix3D.determinant3x3( m00, m02, m03, m10, m12, m13, m30, m32, m33) )
+	self:setData(3,3,Matrix3D.determinant3x3( m00, m01, m03, m10, m11, m13, m30, m31, m33 ) )
+	self:setData(4,3,-Matrix3D.determinant3x3( m00, m01, m02, m10, m11, m12, m30, m31, m32 ) )
+	                                         
+	self:setData(1,4,-Matrix3D.determinant3x3( m01, m02, m03, m11, m12, m13, m21, m22, m23 ) )
+	self:setData(2,4,Matrix3D.determinant3x3( m00, m02, m03, m10, m12, m13, m20, m22, m23 ) )
+	self:setData(3,4,-Matrix3D.determinant3x3( m00, m01, m03, m10, m11, m13, m20, m21, m23 ) )
+	self:setData(4,4,Matrix3D.determinant3x3( m00, m01, m02, m10, m11, m12, m20, m21, m22 ) )
+	return self
+end
+
+function Matrix3D.copy(mat)
+	local result = Matrix3D.new()
+	for i = 1, 16 do
+		result[i] = mat[i]
+	end
+	return result;
+end
+
+function Matrix3D.inverse(mat)
+	local m = Matrix3D.copy(mat)
+	local d = m:determinant( );
+
+	if d ~= 0 then
+		m:adjoint( );
+		d = 1.0 / d;
+		
+		for i = 1, 16 do
+			
+			m[i] = m[i] * d;
+		end
+		
+		-- m[0][0] *= d; m[0][1] *= d; m[0][2] *= d; m[0][3] *= d;
+		-- m[1][0] *= d; m[1][1] *= d; m[1][2] *= d; m[1][3] *= d;
+		-- m[2][0] *= d; m[2][1] *= d; m[2][2] *= d; m[2][3] *= d;
+		-- m[3][0] *= d; m[3][1] *= d; m[3][2] *= d; m[3][3] *= d;
+		
+	end
+
+	return m;
+end
+
+-- Matrix4& Matrix4::Inverse( )
+-- {
+-- 	_float d = Determinant( );
+
+-- 	if ( d != 0.0f )
+-- 	{
+-- 		Adjoint( );
+
+-- 		if ( ( (_ptr) m ) % 16 == 0 )
+-- 		{
+-- 			_float4 *start = (_float4*) m;
+-- 			_float4 temp = _SSE_LOAD_FLOAT( d );
+
+-- 			*start = _SSE_DIV_FLOAT4( *start, temp );
+-- 			*( start + 1 ) = _SSE_DIV_FLOAT4( *( start + 1 ), temp );
+-- 			*( start + 2 ) = _SSE_DIV_FLOAT4( *( start + 2 ), temp );
+-- 			*( start + 3 ) = _SSE_DIV_FLOAT4( *( start + 3 ), temp );
+-- 		}
+-- 		else
+-- 		{
+-- 			d = 1.0f / d;
+
+-- 			m[0][0] *= d; m[0][1] *= d; m[0][2] *= d; m[0][3] *= d;
+-- 			m[1][0] *= d; m[1][1] *= d; m[1][2] *= d; m[1][3] *= d;
+-- 			m[2][0] *= d; m[2][1] *= d; m[2][2] *= d; m[2][3] *= d;
+-- 			m[3][0] *= d; m[3][1] *= d; m[3][2] *= d; m[3][3] *= d;
+-- 		}
+-- 	}
+
+-- 	return *this;
+-- }

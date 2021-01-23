@@ -14,13 +14,15 @@ app.resizeWindow(function(w, h)
 end)
 
 local scene = Scene3D.new()
+scene.needSSAO = true
 local node = scene:addMesh(mesh3d)
 app.render(function(dt)
     -- image:draw()
     -- mesh3d:draw()
     scene:update(dt)
-    scene:draw()
-    scene:drawCanvaNormalmap()
+    -- scene:draw(true)
+    scene:drawDepth()
+    scene:getDepthCanvas():draw()
     love.graphics.print( "Image name: ".. imagenames[index], 10, 10)
 end)
 

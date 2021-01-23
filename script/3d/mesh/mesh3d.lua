@@ -130,6 +130,9 @@ function Mesh3D:useLights()
         local  normalmap = RenderSet.getNormalMap(self.normalmap)
         self.shader = Shader.GeNormal3DShader();
         return
+    elseif self.rendertype == 'depth' then
+        self.shader = Shader.GeDepth3DShader()
+        return
     end
 
     if self.nolight then

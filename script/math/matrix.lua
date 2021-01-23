@@ -250,3 +250,56 @@ Matrix.useDefault = function()
     love.graphics.replaceTransform(math.defaulttransform);
 end
 
+-- Matrix3& Matrix3::Inverse( )
+-- {
+-- 	_float d = Determinant( );
+
+-- 	if ( d != 0.0f )
+-- 	{
+-- 		Adjoint( );
+
+-- 		d = 1.0f / d;
+
+-- 		m[0][0] *= d; m[0][1] *= d; m[0][2] *= d;
+-- 		m[1][0] *= d; m[1][1] *= d; m[1][2] *= d;
+-- 		m[2][0] *= d; m[2][1] *= d; m[2][2] *= d;
+-- 	}
+
+-- 	return *this;
+-- }
+
+-- function Matrix3D:adjoint( )
+-- 	-- _float m00 = m[0][0], m01 = m[0][1], m02 = m[0][2], m10 = m[1][0], m11 = m[1][1],
+-- 	-- 	m12 = m[1][2], m20 = m[2][0], m21 = m[2][1], m22 = m[2][2];
+
+-- 	-- m[0][0] = m11 * m22 - m12 * m21; m[0][1] = m02 * m21 - m01 * m22; m[0][2] = m01 * m12 - m02 * m11;
+-- 	-- m[1][0] = m12 * m20 - m10 * m22; m[1][1] = m00 * m22 - m02 * m20; m[1][2] = m02 * m10 - m00 * m12;
+-- 	-- m[2][0] = m10 * m21 - m11 * m20; m[2][1] = m01 * m20 - m00 * m21; m[2][2] = m00 * m11 - m01 * m10;
+
+-- 	-- return *this;
+
+-- 	local m00 = self:getData(1,1)
+-- 	local m01 = self:getData(1,2)
+-- 	local m02 = self:getData(1,3)
+-- 	local m10 = self:getData(2,1)
+-- 	local m11 = self:getData(2,2) 
+-- 	local m12 = self:getData(2,3)
+-- 	local m20 = self:getData(3,1)
+-- 	local m21 = self:getData(3,2)
+-- 	local m22 = self:getData(3,3)
+
+-- 	self:setData(1,1, m11 * m22 - m12 * m21)
+-- 	self:setData(1,2, m02 * m21 - m01 * m22)
+-- 	self:setData(1,3, m01 * m12 - m02 * m11)
+
+-- 	self:setData(2,1, m12 * m20 - m10 * m22)
+-- 	self:setData(2,2, m00 * m22 - m02 * m20)
+-- 	self:setData(2,3, m02 * m10 - m00 * m12)
+
+-- 	self:setData(3,1, m10 * m21 - m11 * m20)
+-- 	self:setData(3,2, m01 * m20 - m00 * m21)
+-- 	self:setData(3,3, m00 * m11 - m01 * m10)
+
+-- 	return self
+-- end
+

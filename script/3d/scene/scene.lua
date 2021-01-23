@@ -77,6 +77,11 @@ function Scene3D:reseizeScreen(w, h)
     self.canvascolor = Canvas.new(w, h, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
     self.canvascolor.renderWidth = w
     self.canvascolor.renderHeight = h
+
+    self.canvasPostprocess = Canvas.new(w, h, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
+    self.canvasPostprocess.renderWidth = w
+    self.canvasPostprocess.renderHeight = h
+    
     self.canvasdepth = Canvas.new(w, h, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
     self.canvasdepth.renderWidth = w
     self.canvasdepth.renderHeight = h
@@ -86,14 +91,25 @@ function Scene3D:reseizeScreen(w, h)
     self.canvasnormal.renderHeight = h
 
     self.normal_depth_buffer = Canvas.new(w, h, {format = "depth32fstencil8", readable = true, msaa = 0, mipmaps="none"})
+    self.normal_depth_buffer.renderWidth = w
+    self.normal_depth_buffer.renderHeight = h
+
     self.depthmap_depth_buffer = Canvas.new(w, h, {format = "depth32fstencil8", readable = true, msaa = 0, mipmaps="none"})
+    self.depthmap_depth_buffer.renderWidth = w
+    self.depthmap_depth_buffer.renderHeight = h
+
     self.normalmap_depth_buffer = Canvas.new(w, h, {format = "depth32fstencil8", readable = true, msaa = 0, mipmaps="none"})
+    self.normalmap_depth_buffer.renderWidth = w
+    self.normalmap_depth_buffer.renderHeight = h
+
     self.meshquad = _G.MeshQuad.new(w, h, LColor.new(255, 255, 255, 255))
     self.meshquad.w = w
     self.meshquad.h = h
 end
 
 function Scene3D:draw(isdrawCanvaColor)
+    self:drawDepth()
+
     for i = 1, #self.lights do
         local light = self.lights[i]
         if light.directionLight then            
@@ -123,7 +139,8 @@ function Scene3D:draw(isdrawCanvaColor)
     end
 
     self:drawNormalmap()
-    self:drawDepth()
+
+    
     if isdrawCanvaColor then
         self:drawCanvaColor()
     end
@@ -158,10 +175,9 @@ function Scene3D:drawDepth()
     for i = 1, #self.nodes do
         local node = self.nodes[i]
         if node.mesh then
-            local rendertype = node.mesh:getRenderType()
             node.mesh:setRenderType("depth")
             node.mesh:draw()
-            node.mesh:setRenderType(rendertype)
+            node.mesh:setRenderType('normal')
         end
     end
     love.graphics.setMeshCullMode("none")
@@ -169,12 +185,39 @@ function Scene3D:drawDepth()
 end
 
 function Scene3D:drawCanvaColor()
+    local needbase = true
+    local canvas1 = self.canvascolor
+    local canvas2 = self.canvasPostprocess
     if self.needFXAA then
-        self.meshquad:setCanvas(self.canvascolor)
-        self.meshquad.shader = Shader.GetFXAAShader(self.canvascolor.renderWidth , self.canvascolor.renderHeight)
+        love.graphics.setCanvas(canvas2)
+        self.meshquad:setCanvas(canvas1)
+        self.meshquad.shader = Shader.GetFXAAShader(canvas1.renderWidth , canvas1.renderHeight)
         self.meshquad:draw()
-    else
+        needbase = false
+        love.graphics.setCanvas()
+
+        local temp = canvas1
+        canvas1 = canvas2
+        canvas2 = canvas1
+    end
+
+    if self.needSSAO then
+        love.graphics.setCanvas(canvas2)
+        self.meshquad:setCanvas(canvas1)
+        self.meshquad.shader = Shader.GetSSAOShader(self.canvasnormal, self.canvasdepth)
+        self.meshquad:draw()
+        needbase = false
+        love.graphics.setCanvas()
+
+        local temp = canvas1
+        canvas1 = canvas2
+        canvas2 = canvas1
+    end
+
+    if needbase then
         self.canvascolor:draw()
+    else
+        canvas1:draw()
     end
 end
 
