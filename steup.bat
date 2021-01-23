@@ -1,0 +1,1 @@
+lovec.exe D:\love2d\love2dgame

@@ -138,7 +138,7 @@ function Mesh3D:useLights()
     if self.nolight then
         return
     end
-    if self.rendertype ~=  Mesh3D.RenderNormal then
+    if self.rendertype ~=  "normal" then
         return
     end
     local directionlights = _G.Lights.getDirectionLights()
