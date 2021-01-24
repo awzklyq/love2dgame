@@ -296,13 +296,13 @@ function Scene3D:drawDirectionLightShadow(isdebug)
                0.5,0.5,0.5,1
         )
             texmat:transposeSelf()
-            texmat:mulRight(shadowmapproj)
+            texmat:mulRight(Matrix3D.transpose(shadowmapproj))
             local mat = texmat--Matrix3D.transpose(texmat)
             
             -- mat:mulRight(shadowmapproj)
             -- mat:mulRight(lightmat)
             -- mat:mulRight(Matrix3D.transpose(shadowmapproj))
-            mat:mulRight(lightmat)
+            mat:mulRight(Matrix3D.transpose(lightmat))
             lightnode.directionlightMatrix = mat
 
             if isdebug then

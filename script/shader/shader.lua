@@ -526,7 +526,7 @@ function Shader.GetSSAOShader(screennormalmap, screendepthmap)
         local projectm = RenderSet.getUseProjectMatrix()
         if shader:hasUniform("projectionViewMatrix") then
             local mat = Matrix3D.copy(projectm);
-            mat:mulRight(Matrix3D.transpose(viewm))--Todo..
+            mat:mulRight(Matrix3D.transpose(Matrix3D.transpose(viewm)))--Todo..
             shader:send("projectionViewMatrix", mat)
         end
 
@@ -540,7 +540,7 @@ function Shader.GetSSAOShader(screennormalmap, screendepthmap)
 
         if shader:hasUniform("Inverse_ProjectviewMatrix") then
             local mat = Matrix3D.copy(projectm);
-            mat:mulRight(Matrix3D.transpose(viewm))--Todo..
+            mat:mulRight(Matrix3D.transpose(Matrix3D.transpose(viewm)))--Todo..
             shader:send("Inverse_ProjectviewMatrix",  Matrix3D.inverse(mat))
         end
 
