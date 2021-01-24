@@ -181,6 +181,25 @@ function BoundBox:buildMesh()
     return Mesh3D.createFromPoints(verts)
 end
 
+BoundBox.getIntersectBox = function(box1, box2)
+    local box = BoundBox.new()
+
+    box.min.x = math.max( box1.min.x, box2.min.x );
+	box.min.y = math.max( box1.min.y, box2.min.y );
+	box.min.z = math.max( box1.min.z, box2.min.z );
+
+	box.max.x = math.min( box1.max.x, box2.max.x );
+	box.max.y = math.min( box1.max.y, box2.max.y );
+    box.max.z = math.min( box1.max.z, box2.max.z );
+    
+    if box.min.x > box.max.x or box.min.y > box.max.y or box.min.z > box.max.z then
+        return BoundBox.new()
+    end
+
+    box.center = Vector3.new((box.min.x + box.max.x) * 0.5, (box.min.y + box.max.y) * 0.5, (box.min.z + box.max.z) * 0.5)
+    return box
+end
+
 _G.OrientedBox = {}
 function OrientedBox.new()
     local box = setmetatable({}, {__index = OrientedBox});

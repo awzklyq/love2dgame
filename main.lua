@@ -84,5 +84,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/ssao.lua')
+	dofile('script/test/line3d.lua')
 end

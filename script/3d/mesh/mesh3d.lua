@@ -285,4 +285,77 @@ Mesh3D.loadObjFile = function(path)
     return compiled
 end
 
+_G.MeshLine = {}
 
+function MeshLine.new(startpos, endpos)
+    local mesh = setmetatable({}, MeshLine);
+    mesh.transform3d = Matrix3D.new();
+
+    mesh.shader = Shader.GetLines3DShader()
+    
+    mesh.bcolor = LColor.new(255,255,255,255)
+
+    startpos = startpos or Vector3.new(0,0,0)
+    endpos = endpos or Vector3.new(0,0,0)
+
+    mesh.verts = {{startpos.x, startpos.y, startpos.z, 0, 0, 1,1,1,1}, 
+    {endpos.x, endpos.y, endpos.z, 1, 1, 1,1,1,1}}
+
+    mesh.obj = love.graphics.newMesh(vertexFormat, mesh.verts, "lines")
+
+    mesh.renderid = Render.MeshLineId;
+    return mesh;
+end
+
+function MeshLine:setStart(x, y, z)
+    self:setVertex(0, x, y, z, 0, 0, 1,1,1,1)
+end
+
+function MeshLine:setEnd(x, y, z)
+    self:setVertex(1, x, y, z, 1, 1, 1,1,1,1)
+end
+
+function MeshLine:setStartVector(v)
+    self:setVertex(0, v.x, v.y, v.z, 0, 0, 1,1,1,1)
+end
+
+function MeshLine:setEndVector(v)
+    self:setVertex(1, v.x, v.y, v.z, 1, 1, 1,1,1,1)
+end
+
+
+MeshLine.__index = function(tab, key, ...)
+    local value = rawget(tab, key);
+    if value then
+        return value;
+    end
+
+    if MeshLine[key] then
+        return MeshLine[key];
+    end
+    
+    if tab["obj"] and tab["obj"][key] then
+        if type(tab["obj"][key]) == "function" then
+            tab[key] = function(tab, ...)
+                return tab["obj"][key](tab["obj"], ...);--todo..
+            end
+            return  tab[key]
+        end
+        return tab["obj"][key];
+    end
+
+    return nil;
+end
+
+MeshLine.__newindex = function(tab, key, value)
+    rawset(tab, key, value);
+end
+
+function MeshLine:draw()
+    self.shader:setCameraAndMatrix3D(self.transform3d, RenderSet.getUseProjectMatrix(), RenderSet.getUseViewMatrix())
+
+    if self.shader:hasUniform( "bcolor") and self.bcolor then
+        self.shader:send('bcolor',{self.bcolor._r, self.bcolor._g, self.bcolor._b, self.bcolor._a})
+    end
+    Render.RenderObject(self);
+end

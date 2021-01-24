@@ -239,14 +239,23 @@ function Scene3D:drawDirectionLightShadow(isdebug)
             local camera3d = _G.getGlobalCamera3D()
             local lightmat = Matrix3D.createLookAtLH( Vector3.negative(directionLight.dir), Vector3.cOrigin, camera3d.up )
 
-            local shadowprojectbox = BoundBox.new()
+            local casterbox = BoundBox.new()
+            local receiverbox = BoundBox.new()
+            
             for j = 1, #self.nodes do
                 local node = self.nodes[j]
                 if node.shadowCaster then--node.shadowReceiver
                     local box = node.mesh.transform3d:mulBoundBox(node.box)
-                    shadowprojectbox:addSelf(box)
+                    casterbox:addSelf(box)
+                end
+
+                if node.shadowReceiver then--node.shadowReceiver
+                    local box = node.mesh.transform3d:mulBoundBox(node.box)
+                    receiverbox:addSelf(box)
                 end
             end
+
+            local shadowprojectbox = BoundBox.getIntersectBox(casterbox, receiverbox)
 
             shadowprojectbox = lightmat:mulBoundBox(shadowprojectbox)
             shadowprojectbox.max.z = math.max(shadowprojectbox.max.z, camera3d.farClip) + 10000000--TODO

@@ -41,6 +41,8 @@ Render.SceneNode3DId = 20
 
 Render.ImageId = 21
 
+Render.MeshLineId = 22
+
 Render.getRenderIdName = function(id)
     if Render.CircleId == id then
         return "Circle"
@@ -78,6 +80,8 @@ Render.getRenderIdName = function(id)
         return "SceneNode3D"
     elseif Render.ImageId == id then
         return "image"
+    elseif Render.MeshLineId == id then
+        return "Line3D"
     end
 
     return "Null"
@@ -207,6 +211,8 @@ Render.RenderObject = function(obj)
         elseif obj.renderid == Render.MeshId then
             love.graphics.draw( obj.obj )
         elseif obj.renderid == Render.Mesh3DId then
+            love.graphics.draw( obj.obj )
+        elseif obj.renderid == Render.MeshLineId then
             love.graphics.draw( obj.obj )
         elseif obj.renderid == Render.CanvasId then
             love.graphics.draw( obj.obj, obj.x, obj.y, 0, obj.renderWidth / obj:getWidth(), obj.renderHeight / obj:getHeight())
