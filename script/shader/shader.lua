@@ -388,18 +388,18 @@ function Shader.GetSSAOShader(screennormalmap, screendepthmap)
        vec4 normal = texture2D(screennormalmap, texture_coords);
        normal = normalize((normal - vec4(0.5, 0.5, 0.5, 0.5)) * 2);
 
-       vec4 rpos1 = vec4(0.7809, 0.6247, 0.0601, 1);
-        vec4 rpos2 = vec4(-2.0382, 2.2013, 1.7936, 1);
-        vec4 rpos3 = vec4(-1.1427, -1.6414, 1.0596, 1);
-        vec4 rpos4 = vec4(1.2039, -1.5970, 0.5897, 1);
-        vec4 rpos5 = vec4(0.9876, 0.1571, -1.0212, 1);
-        vec4 rpos6 = vec4(1.5114, 1.3099, -1.9144, 1);
-        vec4 rpos7 = vec4(2.6913, 1.3255, -2.8519, 1);
-        vec4 rpos8 = vec4(-1.8763, -0.6924, 1.7423, 1);
-        vec4 rpos9 = vec4(1.7483, -0.9713, -2.5253, 1);
-        vec4 rpos10 = vec4(-1.4573, 1.3698, -0.7432, 1);
-        vec4 rpos11 = vec4(-0.3909, -0.9204, -0.7061, 1);
-        vec4 rpos12 = vec4(-2.9158, 0.7059, 3.0078, 1);
+       vec4 rpos1 = vec4(2.8700, 0.8735, -2.2461, 1);
+        vec4 rpos2 = vec4(-0.9971, -0.0767, 2.6844, 1);
+        vec4 rpos3 = vec4(-1.7354, 0.9942, 0.6508, 1);
+        vec4 rpos4 = vec4(1.7282, 1.0066, -1.2724, 1);
+        vec4 rpos5 = vec4(-0.9985, -0.0555, -1.4700, 1);
+        vec4 rpos6 = vec4(0.4876, -0.8731, 1.1225, 1);
+        vec4 rpos7 = vec4(-0.9574, 0.2887, 1.2917, 1);
+        vec4 rpos8 = vec4(-2.4360, -1.7509, 2.3980, 1);
+        vec4 rpos9 = vec4(-0.8183, -0.5748, -0.0390, 1);
+        vec4 rpos10 = vec4(-2.7717, 1.1479, 0.2520, 1);
+        vec4 rpos11 = vec4(2.1213, 2.1213, -1.0145, 1);
+        vec4 rpos12 = vec4(0.3280, 2.9820, -2.0278, 1);
 
         vec2 screenpos0 = vpos.xy + vec2(1 * (1/viewsizew), 0.0);
         vec2 uv0 = vec2((screenpos0.x + 1) * 0.5, 1 - (screenpos0.y + 1) * 0.5);
