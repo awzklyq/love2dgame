@@ -60,7 +60,7 @@ Matrix3D.getViewMatrix = function(eye, look, up)
 end
 
 
-function Matrix3D:mul(tab2)
+function Matrix3D:mulVector(tab2)
 	local xx, yy, zz = tab2.x, tab2.y, tab2.z
 	local mat = self
 	-- local w = xx * mat[4] + yy * mat[8] + zz * mat[12] + mat[16]
@@ -75,8 +75,8 @@ end
 function Matrix3D:mulBoundBox(boundbox)
 
 	local mat = Matrix3D.transpose(self)
-	local min = mat:mul(boundbox.min)
-	local max = mat:mul(boundbox.max)
+	local min = mat:mulVector(boundbox.min)
+	local max = mat:mulVector(boundbox.max)
 	return BoundBox.buildFromMinMax(min, max)
 end
 		

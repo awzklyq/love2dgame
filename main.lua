@@ -63,6 +63,7 @@ dofile 'script/3d/render/renderset.lua'
 
 dofile 'script/3d/scene/scene.lua'
 dofile 'script/3d/scene/scenenode.lua'
+dofile 'script/3d/scene/octree.lua'
 
 dofile 'script/3d/math/box.lua'
 
