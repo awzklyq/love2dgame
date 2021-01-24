@@ -65,5 +65,14 @@ RenderSet.getNormalMap = function()
     return normalmap
 end
 
+local ssao = 0.0001
+RenderSet.setSSAOValue = function(value)
+    ssao = math.max(0, value)
+end
+
+RenderSet.getSSAOValue = function()
+    return ssao
+end
+
 RenderSet.screenwidth = love.graphics.getPixelWidth()
 RenderSet.screenheight = love.graphics.getPixelHeight()

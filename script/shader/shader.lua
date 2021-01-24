@@ -363,6 +363,7 @@ function Shader.GetSSAOShader(screennormalmap, screendepthmap)
 
     uniform float viewsizew;
     uniform float viewsizeh;
+    uniform float ssaooffset;
     // Maps standard viewport UV to screen position.
     vec2 ViewportUVToScreenPos(vec2 ViewportUV)
     {
@@ -387,12 +388,18 @@ function Shader.GetSSAOShader(screennormalmap, screendepthmap)
        vec4 normal = texture2D(screennormalmap, texture_coords);
        normal = normalize((normal - vec4(0.5, 0.5, 0.5, 0.5)) * 2);
 
-       vec4 rpos1 = vec4(2.4831, 1.6835, 0.7576, 1);
-        vec4 rpos2 = vec4(-2.8035, 1.0680, -1.0680, 1);
-        vec4 rpos3 = vec4(-0.7311, 0.6823, -3.7528, 1);
-        vec4 rpos4 = vec4(2.7544, 1.1888, -1.8846, 1);
-        vec4 rpos5 = vec4(-2.5217, -1.6251, -0.3362, 1);
-        vec4 rpos6 = vec4(0.2425, 0.9701, -0.1617, 1);
+       vec4 rpos1 = vec4(0.7809, 0.6247, 0.0601, 1);
+        vec4 rpos2 = vec4(-2.0382, 2.2013, 1.7936, 1);
+        vec4 rpos3 = vec4(-1.1427, -1.6414, 1.0596, 1);
+        vec4 rpos4 = vec4(1.2039, -1.5970, 0.5897, 1);
+        vec4 rpos5 = vec4(0.9876, 0.1571, -1.0212, 1);
+        vec4 rpos6 = vec4(1.5114, 1.3099, -1.9144, 1);
+        vec4 rpos7 = vec4(2.6913, 1.3255, -2.8519, 1);
+        vec4 rpos8 = vec4(-1.8763, -0.6924, 1.7423, 1);
+        vec4 rpos9 = vec4(1.7483, -0.9713, -2.5253, 1);
+        vec4 rpos10 = vec4(-1.4573, 1.3698, -0.7432, 1);
+        vec4 rpos11 = vec4(-0.3909, -0.9204, -0.7061, 1);
+        vec4 rpos12 = vec4(-2.9158, 0.7059, 3.0078, 1);
 
         vec2 screenpos0 = vpos.xy + vec2(1 * (1/viewsizew), 0.0);
         vec2 uv0 = vec2((screenpos0.x + 1) * 0.5, 1 - (screenpos0.y + 1) * 0.5);
@@ -421,6 +428,18 @@ function Shader.GetSSAOShader(screennormalmap, screendepthmap)
 
         rpos6.xyz = faceforward(rpos6.xyz, normal.xyz, rpos6.xyz) * offset + spos.xyz;
 
+        rpos7.xyz = faceforward(rpos7.xyz, normal.xyz, rpos7.xyz) * offset + spos.xyz;
+
+        rpos8.xyz = faceforward(rpos8.xyz, normal.xyz, rpos8.xyz)  * offset+ spos.xyz;
+
+        rpos9.xyz = faceforward(rpos9.xyz, normal.xyz, rpos9.xyz) * offset + spos.xyz;
+
+        rpos10.xyz = faceforward(rpos10.xyz, normal.xyz, rpos10.xyz) * offset + spos.xyz;
+
+        rpos11.xyz = faceforward(rpos11.xyz, normal.xyz, rpos11.xyz)  * offset+ spos.xyz;
+
+        rpos12.xyz = faceforward(rpos12.xyz, normal.xyz, rpos12.xyz) * offset + spos.xyz;
+
         vec4 vpos1 = projectionViewMatrix *  rpos1;
         vpos1 /= vpos1.w;
         vec4 vpos2 = projectionViewMatrix *  rpos2;
@@ -434,6 +453,19 @@ function Shader.GetSSAOShader(screennormalmap, screendepthmap)
         vec4 vpos6 = projectionViewMatrix *  rpos6;
         vpos6 /= vpos6.w;
 
+        vec4 vpos7 = projectionViewMatrix *  rpos7;
+        rpos7 /= vpos1.w;
+        vec4 vpos8 = projectionViewMatrix *  rpos8;
+        vpos8 /= vpos8.w;
+        vec4 vpos9 = projectionViewMatrix *  rpos9;
+        vpos9 /= vpos9.w;
+        vec4 vpos10 = projectionViewMatrix *  rpos10;
+        vpos10 /= vpos10.w;
+        vec4 vpos11 = projectionViewMatrix *  rpos11;
+        vpos11 /= vpos11.w;
+        vec4 vpos12 = projectionViewMatrix *  rpos12;
+        vpos12 /= vpos12.w;
+
         float depth1 = texture2D(screendepthmap, ScreenPosToViewportUV(vpos1.xy)).r;
         float depth2 = texture2D(screendepthmap, ScreenPosToViewportUV(vpos2.xy)).r;
         float depth3 = texture2D(screendepthmap, ScreenPosToViewportUV(vpos3.xy)).r;
@@ -441,16 +473,30 @@ function Shader.GetSSAOShader(screennormalmap, screendepthmap)
         float depth5 = texture2D(screendepthmap, ScreenPosToViewportUV(vpos5.xy)).r;
         float depth6 = texture2D(screendepthmap, ScreenPosToViewportUV(vpos6.xy)).r;
 
-		float value1 = step(vpos1.z, depth1);
-		float value2 = step(vpos2.z, depth2);
-        float value3 = step(vpos3.z, depth3);
-        float value4 = step(vpos4.z, depth4);
-        float value5 = step(vpos5.z, depth5);
-        float value6 = step(vpos6.z, depth6);
+        float depth7 = texture2D(screendepthmap, ScreenPosToViewportUV(vpos7.xy)).r;
+        float depth8 = texture2D(screendepthmap, ScreenPosToViewportUV(vpos8.xy)).r;
+        float depth9 = texture2D(screendepthmap, ScreenPosToViewportUV(vpos9.xy)).r;
+        float depth10 = texture2D(screendepthmap, ScreenPosToViewportUV(vpos10.xy)).r;
+        float depth11 = texture2D(screendepthmap, ScreenPosToViewportUV(vpos11.xy)).r;
+        float depth12 = texture2D(screendepthmap, ScreenPosToViewportUV(vpos12.xy)).r;
+
+		float value1 = vpos1.z -  depth1 > ssaooffset ? 0 : 1;
+		float value2 = vpos2.z -  depth2 > ssaooffset ? 0 : 1;
+        float value3 = vpos3.z -  depth3 > ssaooffset ? 0 : 1;
+        float value4 = vpos4.z -  depth4 > ssaooffset ? 0 : 1;
+        float value5 = vpos5.z -  depth5 > ssaooffset ? 0 : 1;
+        float value6 = vpos6.z -  depth6 > ssaooffset ? 0 : 1;
+
+        float value7 = vpos7.z -  depth7 > ssaooffset ? 0 : 1;
+		float value8 = vpos8.z -  depth8 > ssaooffset ? 0 : 1;
+        float value9 = vpos9.z -  depth9 > ssaooffset ? 0 : 1;
+        float value10 = vpos10.z -  depth10 > ssaooffset ? 0 : 1;
+        float value11 = vpos11.z -  depth11 > ssaooffset ? 0 : 1;
+        float value12 = vpos12.z -  depth12 > ssaooffset ? 0 : 1;
 
        vec4 basecolor = texture2D(tex, texture_coords);
-       float value = value1 + value2 + value3 + value4 + value5 + value6;
-       basecolor.xyz *=  value / 6;
+       float value = value1 + value2 + value3 + value4 + value5 + value6 + value7 + value8 + value9 + value10 + value11 + value12;
+       basecolor.xyz *=  value / 12;
 
        return basecolor;
     }
@@ -496,6 +542,10 @@ function Shader.GetSSAOShader(screennormalmap, screendepthmap)
             local mat = Matrix3D.copy(projectm);
             mat:mulRight(Matrix3D.transpose(viewm))--Todo..
             shader:send("Inverse_ProjectviewMatrix",  Matrix3D.inverse(mat))
+        end
+
+        if shader:hasUniform("ssaooffset") then
+            shader:send("ssaooffset", RenderSet.getSSAOValue())
         end
         
     end
