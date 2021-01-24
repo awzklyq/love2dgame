@@ -356,67 +356,102 @@ function Shader.GetSSAOShader(screennormalmap, screendepthmap)
     uniform sampler2D screennormalmap;
     uniform sampler2D screendepthmap;
     //uniform sampler2D screencolormap;
-   
-    uniform mat4 Inverse_projectionMatrix;
-    uniform mat4 Inverse_viewMatrix;
 
     uniform mat4 projectionViewMatrix;
+
+    uniform mat4 Inverse_ProjectviewMatrix;
+
+    uniform float viewsizew;
+    uniform float viewsizeh;
+    // Maps standard viewport UV to screen position.
+    vec2 ViewportUVToScreenPos(vec2 ViewportUV)
+    {
+        return vec2(2 * ViewportUV.x - 1, 1 - 2 * ViewportUV.y);
+    }
+
+    vec2 ScreenPosToViewportUV(vec2 ScreenPos)
+    {
+        return vec2(0.5 + 0.5 * ScreenPos.x, 0.5 - 0.5 * ScreenPos.y);
+    }
 
     vec4 effect( vec4 color, sampler2D tex, vec2 texture_coords, vec2 screen_coords )
     {
        float depth = texture2D(screendepthmap, texture_coords).r;
-       vec4 vpos = vec4(texture_coords.x, texture_coords.y, depth, 1.0);
+       vec2 uv = ViewportUVToScreenPos(texture_coords);
+       vec4 vpos = vec4(uv.x, uv.y, depth, 1.0);
 
-       vec4 spos = Inverse_projectionMatrix * Inverse_viewMatrix * vpos;
-       spos.xyz *= spos.w;
+     vec4 spos = Inverse_ProjectviewMatrix * vpos;
+     //vec4 spos =  vpos * Inverse_ProjectviewMatrix;
+       spos /= spos.w;
 
        vec4 normal = texture2D(screennormalmap, texture_coords);
-       normal = (normal - vec4(0.5, 0.5, 0.5, 0.5)) * 2;
+       normal = normalize((normal - vec4(0.5, 0.5, 0.5, 0.5)) * 2);
 
-        vec4 rpos1 = normalize(vec4(   59      ,       40      ,       18      ,       51      ));
-        vec4 rpos2 = normalize(vec4(   -84     ,       32      ,       -32     ,       47      ));
-        vec4 rpos3 = normalize(vec4(   -15     ,       14      ,       -77     ,       -89     ));
-        vec4 rpos4 = normalize(vec4(   95      ,       41      ,       -65     ,       95      ));
-        vec4 rpos5 = normalize(vec4(   -45     ,       -29     ,       -6      ,       36      ));
-        vec4 rpos6 = normalize(vec4(   15      ,       60      ,       -10     ,       -64     ));
+       vec4 rpos1 = vec4(2.4831, 1.6835, 0.7576, 1);
+        vec4 rpos2 = vec4(-2.8035, 1.0680, -1.0680, 1);
+        vec4 rpos3 = vec4(-0.7311, 0.6823, -3.7528, 1);
+        vec4 rpos4 = vec4(2.7544, 1.1888, -1.8846, 1);
+        vec4 rpos5 = vec4(-2.5217, -1.6251, -0.3362, 1);
+        vec4 rpos6 = vec4(0.2425, 0.9701, -0.1617, 1);
 
-        rpos1.xyz = faceforward(rpos1.xyz, normal.xyz, rpos1.xyz) + spos.xyz;
-        rpos2.xyz = faceforward(rpos2.xyz, normal.xyz, rpos2.xyz) + spos.xyz;
-        rpos3.xyz = faceforward(rpos3.xyz, normal.xyz, rpos3.xyz) + spos.xyz;
-        rpos4.xyz = faceforward(rpos4.xyz, normal.xyz, rpos4.xyz) + spos.xyz;
-        rpos5.xyz = faceforward(rpos5.xyz, normal.xyz, rpos5.xyz) + spos.xyz;
-        rpos6.xyz = faceforward(rpos6.xyz, normal.xyz, rpos6.xyz) + spos.xyz;
+        vec2 screenpos0 = vpos.xy + vec2(1 * (1/viewsizew), 0.0);
+        vec2 uv0 = vec2((screenpos0.x + 1) * 0.5, 1 - (screenpos0.y + 1) * 0.5);
+        vec4 ScenePosition0 = Inverse_ProjectviewMatrix * vec4(screenpos0.x, screenpos0.y, texture2D(screendepthmap, uv0).r, 1);
+
+        ScenePosition0 /= ScenePosition0.w;
+
+        vec2 screenpos1 = vpos.xy - vec2( 0.0, 1 * (1/viewsizeh) );  
+        vec2 uv1 = vec2((screenpos1.x + 1) * 0.5, 1 - (screenpos1.y + 1) * 0.5);
+        vec4 ScenePosition1 = Inverse_ProjectviewMatrix * vec4(screenpos1.x, screenpos1.y, texture2D(screendepthmap, uv1).r, 1);
+
+        ScenePosition1 /= ScenePosition1.w;
+
+        float offset = 1;
+        normal.xyz = normalize(cross(ScenePosition0.xyz - spos.xyz, ScenePosition1.xyz - spos.xyz));
+        
+        rpos1.xyz = faceforward(rpos1.xyz, normal.xyz, rpos1.xyz) * offset + spos.xyz;
+
+        rpos2.xyz = faceforward(rpos2.xyz, normal.xyz, rpos2.xyz)  * offset+ spos.xyz;
+
+        rpos3.xyz = faceforward(rpos3.xyz, normal.xyz, rpos3.xyz) * offset + spos.xyz;
+
+        rpos4.xyz = faceforward(rpos4.xyz, normal.xyz, rpos4.xyz) * offset + spos.xyz;
+
+        rpos5.xyz = faceforward(rpos5.xyz, normal.xyz, rpos5.xyz)  * offset+ spos.xyz;
+
+        rpos6.xyz = faceforward(rpos6.xyz, normal.xyz, rpos6.xyz) * offset + spos.xyz;
 
         vec4 vpos1 = projectionViewMatrix *  rpos1;
-        vpos1.xyz /= vpos1.w;
+        vpos1 /= vpos1.w;
         vec4 vpos2 = projectionViewMatrix *  rpos2;
-        vpos2.xyz /= vpos2.w;
+        vpos2 /= vpos2.w;
         vec4 vpos3 = projectionViewMatrix *  rpos3;
-        vpos3.xyz /= vpos3.w;
+        vpos3 /= vpos3.w;
         vec4 vpos4 = projectionViewMatrix *  rpos4;
-        vpos4.xyz /= vpos4.w;
+        vpos4 /= vpos4.w;
         vec4 vpos5 = projectionViewMatrix *  rpos5;
-        vpos5.xyz /= vpos5.w;
+        vpos5 /= vpos5.w;
         vec4 vpos6 = projectionViewMatrix *  rpos6;
-        vpos6.xyz /= vpos6.w;
+        vpos6 /= vpos6.w;
 
-        float depth1 = texture2D(screendepthmap, vpos1.xy).r;
-        float depth2 = texture2D(screendepthmap, vpos2.xy).r;
-        float depth3 = texture2D(screendepthmap, vpos3.xy).r;
-        float depth4 = texture2D(screendepthmap, vpos4.xy).r;
-        float depth5 = texture2D(screendepthmap, vpos5.xy).r;
-        float depth6 = texture2D(screendepthmap, vpos6.xy).r;
+        float depth1 = texture2D(screendepthmap, ScreenPosToViewportUV(vpos1.xy)).r;
+        float depth2 = texture2D(screendepthmap, ScreenPosToViewportUV(vpos2.xy)).r;
+        float depth3 = texture2D(screendepthmap, ScreenPosToViewportUV(vpos3.xy)).r;
+        float depth4 = texture2D(screendepthmap, ScreenPosToViewportUV(vpos4.xy)).r;
+        float depth5 = texture2D(screendepthmap, ScreenPosToViewportUV(vpos5.xy)).r;
+        float depth6 = texture2D(screendepthmap, ScreenPosToViewportUV(vpos6.xy)).r;
 
-        float value1 = step(depth1, vpos1.z) * (vpos1.z - depth1);
-        float value2 = step(depth2, vpos2.z) * (vpos2.z - depth2);
-        float value3 = step(depth3, vpos3.z) * (vpos3.z - depth3);
-        float value4 = step(depth4, vpos4.z) * (vpos4.z - depth4);
-        float value5 = step(depth5, vpos5.z) * (vpos5.z - depth5);
-        float value6 = step(depth6, vpos6.z) * (vpos6.z - depth6);
+		float value1 = step(vpos1.z, depth1);
+		float value2 = step(vpos2.z, depth2);
+        float value3 = step(vpos3.z, depth3);
+        float value4 = step(vpos4.z, depth4);
+        float value5 = step(vpos5.z, depth5);
+        float value6 = step(vpos6.z, depth6);
 
        vec4 basecolor = texture2D(tex, texture_coords);
        float value = value1 + value2 + value3 + value4 + value5 + value6;
-       basecolor.xyz *= value == 0 ? 1 : value / 6;
+       basecolor.xyz *=  value / 6;
+
        return basecolor;
     }
 ]]
@@ -428,8 +463,8 @@ function Shader.GetSSAOShader(screennormalmap, screendepthmap)
     }
 ]]
 
-log(vertexcode)
-log(pixelcode)
+-- log(vertexcode)
+-- log(pixelcode)
     local shader =   Shader.new(pixelcode, vertexcode)
     Shader["ssao"] = shader;
     shader.setValue = function (shader, screennormalmap, screendepthmap)
@@ -449,12 +484,18 @@ log(pixelcode)
             shader:send("projectionViewMatrix", mat)
         end
 
-        if shader:hasUniform("Inverse_projectionMatrix") then
-            shader:send("Inverse_projectionMatrix", Matrix3D.inverse(projectm))
+        if shader:hasUniform("viewsizew") then
+            shader:send("viewsizew", RenderSet.screenwidth)
         end
 
-        if shader:hasUniform("Inverse_viewMatrix") then
-            shader:send("Inverse_viewMatrix",  Matrix3D.inverse(viewm))
+        if shader:hasUniform("viewsizeh") then
+            shader:send("viewsizeh", RenderSet.screenheight)
+        end
+
+        if shader:hasUniform("Inverse_ProjectviewMatrix") then
+            local mat = Matrix3D.copy(projectm);
+            mat:mulRight(Matrix3D.transpose(viewm))--Todo..
+            shader:send("Inverse_ProjectviewMatrix",  Matrix3D.inverse(mat))
         end
         
     end
@@ -707,7 +748,7 @@ function Shader.GeDepth3DShader(projectionMatrix, modelMatrix, viewMatrix)
             vec4 position(mat4 transform_projection, vec4 vertex_position)
             {
                 vec4 basepos = projectionMatrix * viewMatrix * modelMatrix * VertexPosition;
-                depth = basepos.z *0.5 + 0.5;
+                depth = basepos.z / basepos.w;
                 return basepos;
             }
     ]]

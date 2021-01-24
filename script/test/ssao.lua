@@ -4,6 +4,12 @@ local mesh3d = Mesh3D.new("SM_RailingStairs_Internal.OBJ")
 mesh3d:setNormalMap("T_Railing_N.TGA")
 currentCamera3D.eye = Vector3.new( 33.386304308313, 363.36230638215, 232.64515424476)
 currentCamera3D.look = Vector3.new( 22.558604721495, -61.107337559643, 5.2498110475302)
+for i = 1, 6 do
+    local v = Vector3.new(math.random(-100, 100), math.random(-100, 100), math.random(-100, 100))
+    v:normalize()
+    v:mulSelf(math.random(1, 3))
+    log("vec4 rpos"..tostring(i).." = vec4("..string.format("%0.4f", v.x)..', '..string.format("%0.4f", v.y)..', '..string.format("%0.4f", v.z).. ', 1);')
+end
 
 local imagenames = {'T_Railing_M.TGA', "T_FloorMarble_D.TGA"}
 index = 1
@@ -20,9 +26,9 @@ app.render(function(dt)
     -- image:draw()
     -- mesh3d:draw()
     scene:update(dt)
-    -- scene:draw(true)
-    scene:drawDepth()
-    scene:getDepthCanvas():draw()
+    scene:draw(true)
+    -- scene:drawDepth()
+    -- scene:getDepthCanvas():draw()
     love.graphics.print( "Image name: ".. imagenames[index], 10, 10)
 end)
 

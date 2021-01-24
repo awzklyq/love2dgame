@@ -26,7 +26,7 @@ function Vector3:normalize()
     return self
 end
 
-function Vector3:mul(value)
+function Vector3:mulSelf(value)
     self.x = self.x  * value;
     self.y = self.y  * value;
     self.z = self.z  * value

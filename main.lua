@@ -84,5 +84,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/shadowmap.lua')
+	dofile('script/test/ssao.lua')
 end
