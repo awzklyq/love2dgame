@@ -14,6 +14,8 @@ function Scene3D.new()
     scene.screenwidth = love.graphics.getPixelWidth()
     scene.screenheight = love.graphics.getPixelHeight()
 
+    scene.frustum = Frustum.new()
+
     scene:reseizeScreen(scene.screenwidth, scene.screenheight)
     scene.needFXAA = false
     return scene
@@ -71,6 +73,8 @@ function Scene3D:update(e)
         self.screenheight = RenderSet.screenheight--love.graphics.getHeight() * 2
         self:reseizeScreen(self.screenwidth, self.screenheight)
     end
+
+    self.frustum:buildFromViewAndProject(RenderSet.getDefaultViewMatrix(), RenderSet.getDefaultProjectMatrix())
 end
 
 function Scene3D:reseizeScreen(w, h)
@@ -123,11 +127,13 @@ function Scene3D:draw(isdrawCanvaColor)
     love.graphics.clear(self.bgColor._r, self.bgColor._g, self.bgColor._b, self.bgColor._a)
     for i = 1, #self.nodes do
         local node = self.nodes[i]
-        if node.mesh then     
+        if node.mesh and self.frustum:insideBox(node:getClipBox()) then     
             RenderSet.setshadowReceiver(node.shadowReceiver)
             node.mesh:draw()
             RenderSet.setshadowReceiver(false)
-            
+            if  self.isDrawBox then
+                node:drawBoxMesh()
+            end
             -- end
         end
     end
@@ -154,7 +160,7 @@ function Scene3D:drawNormalmap()
 
     for i = 1, #self.nodes do
         local node = self.nodes[i]
-        if node.mesh then
+        if node.mesh and self.frustum:insideBox(node:getWorldBox()) then
             _G.useNormal()
             node.mesh:setRenderType("normalmap")
             node.mesh:draw()
@@ -174,7 +180,7 @@ function Scene3D:drawDepth()
 
     for i = 1, #self.nodes do
         local node = self.nodes[i]
-        if node.mesh then
+        if node.mesh and self.frustum:insideBox(node:getWorldBox()) then
             node.mesh:setRenderType("depth")
             node.mesh:draw()
             node.mesh:setRenderType('normal')
@@ -244,14 +250,8 @@ function Scene3D:drawDirectionLightShadow(isdebug)
             
             for j = 1, #self.nodes do
                 local node = self.nodes[j]
-                if node.shadowCaster then--node.shadowReceiver
-                    local box = node.mesh.transform3d:mulBoundBox(node.box)
-                    casterbox:addSelf(box)
-                end
-
-                if node.shadowReceiver then--node.shadowReceiver
-                    local box = node.mesh.transform3d:mulBoundBox(node.box)
-                    receiverbox:addSelf(box)
+                if node.shadowReceiver and self.frustum:insideBox(node:getWorldBox()) then--node.shadowReceiver
+                    casterbox:addSelf(node:getWorldBox())
                 end
             end
 
@@ -268,7 +268,7 @@ function Scene3D:drawDirectionLightShadow(isdebug)
             
             for j = 1, #self.nodes do
                 local node = self.nodes[j]
-                if node.shadowCaster then
+                if node.shadowCaster and self.frustum:insideBox(node:getWorldBox()) then
                     local rendertype = node.mesh:getRenderType()
                     node.mesh:setRenderType("depth")
                     node.mesh:draw()

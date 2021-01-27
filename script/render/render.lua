@@ -43,6 +43,8 @@ Render.ImageId = 21
 
 Render.MeshLineId = 22
 
+Render.FrustumId = 23
+
 Render.getRenderIdName = function(id)
     if Render.CircleId == id then
         return "Circle"
@@ -82,6 +84,8 @@ Render.getRenderIdName = function(id)
         return "image"
     elseif Render.MeshLineId == id then
         return "Line3D"
+    elseif Render.FrustumId == id then
+        return "Frustum"
     end
 
     return "Null"
@@ -214,6 +218,8 @@ Render.RenderObject = function(obj)
             love.graphics.draw( obj.obj )
         elseif obj.renderid == Render.MeshLineId then
             love.graphics.draw( obj.obj )
+        -- elseif obj.renderid == Render.FrustumId then
+        --     love.graphics.draw( obj.obj )
         elseif obj.renderid == Render.CanvasId then
             love.graphics.draw( obj.obj, obj.x, obj.y, 0, obj.renderWidth / obj:getWidth(), obj.renderHeight / obj:getHeight())
         elseif obj.renderid == Render.ImageId then

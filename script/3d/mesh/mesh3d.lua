@@ -308,11 +308,11 @@ function MeshLine.new(startpos, endpos)
 end
 
 function MeshLine:setStart(x, y, z)
-    self:setVertex(0, x, y, z, 0, 0, 1,1,1,1)
+    self:setVertex(1, x, y, z, 0, 0, 1,1,1,1)
 end
 
 function MeshLine:setEnd(x, y, z)
-    self:setVertex(1, x, y, z, 1, 1, 1,1,1,1)
+    self:setVertex(2, x, y, z, 1, 1, 1,1,1,1)
 end
 
 function MeshLine:setStartVector(v)

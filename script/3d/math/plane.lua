@@ -23,6 +23,21 @@ function Plane.buildFromPoints( v1, v2, v3 )
     return plane
 end
 
+
+function Plane:distance( v )
+    return self.a * v.x + self.b * v.y + self.c * v.z + self.d
+end
+
+function Plane:buildFromThreePoints( v1, v2, v3 )
+    local n = Vector3.cross( Vector3.sub(v2, v1), Vector3.sub(v3, v1) );
+    n:normalize( );
+
+    self.a = n.x;
+    self.b = n.y;
+    self.c = n.z;
+    self.d = - Vector3.dot( v1, n );
+end
+
 function Plane.mulMatrix( plane, mat )
     local aa = mat:getData( 1, 1 ) * plane.a + mat:getData( 1, 2 ) * plane.b + mat:getData( 1, 3 ) * plane.c;
     local bb = mat:getData( 2, 1 ) * plane.a + mat:getData( 2, 2 ) * plane.b + mat:getData( 2, 3 ) * plane.c;

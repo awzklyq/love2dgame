@@ -38,6 +38,16 @@ RenderSet.getUseProjectMatrix = function()
     return projectmatrixs[#projectmatrixs]
 end
 
+RenderSet.getDefaultViewMatrix = function()
+    local camera3d = _G.getGlobalCamera3D()
+    return Matrix3D.getViewMatrix(camera3d.eye, camera3d.look, camera3d.up)
+end
+
+RenderSet.getDefaultProjectMatrix = function()
+    local camera3d = _G.getGlobalCamera3D()
+    return  Matrix3D.getProjectionMatrix(camera3d.fov, camera3d.nearClip, camera3d.farClip, camera3d.aspectRatio)
+end
+
 local shadowMapSize = 1024
 RenderSet.setShadowMapSize = function(size)
     shadowMapSize = size

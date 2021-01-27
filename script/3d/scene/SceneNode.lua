@@ -23,6 +23,24 @@ function SceneNode3D:bindMesh(mesh)
     self.shadowReceiver = false
 end
 
+function SceneNode3D:getWorldBox()
+    if self.mesh then
+        return self.mesh.transform3d:mulBoundBox(self.box)
+    end
+    return BoundBox.new()
+end
+
+function SceneNode3D:getClipBox()
+    if self.mesh then
+        local mat = Matrix3D.copy(RenderSet.getDefaultProjectMatrix())
+        mat:mulRight(RenderSet.getDefaultViewMatrix())
+        mat:mulRight(self.mesh.transform3d)
+        return mat:mulBoundBox(self.box)
+    end
+    return BoundBox.new()
+end
+
+
 function SceneNode3D:bindDirectionLight(light)
     assert(light.renderid and light.renderid == Render.DirectionLightId)
     self.directionLight = light

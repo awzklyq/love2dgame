@@ -3,6 +3,7 @@ math.randomseed(os.time()%10000)
 local width = love.graphics.getPixelWidth() * 1.5 -- love.graphics.getWidth() * 2
 local height = love.graphics.getPixelHeight()  * 1.5--love.graphics.getHeight() * 2
 local scene = Scene3D.new()
+scene.isDrawBox = true
 local plane = Mesh3D.new("assert/obj/plane.obj")
 plane:setBaseColor(LColor.new(125,125,125, 255))
 -- mesh3d:setTexture(love.graphics.newImage("assert/obj/earth.png"))
@@ -39,6 +40,8 @@ local rendertype = 1
 local canvas = Canvas.new(love.graphics.getPixelWidth(), love.graphics.getPixelHeight(), settings)
 local meshquad = _G.MeshQuad.new(love.graphics.getWidth(), love.graphics.getHeight(), LColor.new(255, 255, 255, 255), canvas)
 meshquad.shader = Shader.GetFXAAShader(canvas:getWidth(), canvas:getHeight())
+
+local frustum
 app.render(function(dt)
     scene:update(dt)
     if rendertype == 1 then
@@ -51,6 +54,9 @@ app.render(function(dt)
         -- scene:drawDirectionLightShadow(true)
     end
     
+    if frustum then
+        frustum:draw()
+    end
     love.graphics.print( "Press Key Space.  scene.needFXAA: "..tostring(scene.needFXAA), 10, 10)
 end)
 
@@ -62,6 +68,12 @@ app.keypressed(function(key, scancode, isrepeat)
     elseif key == "a" then
         scene.needFXAA = not scene.needFXAA
     end
+
+    
+    if key == "z" then
+        frustum = Frustum.copy(scene.frustum)
+    end
+
 
     -- if key == "up" then
     --     plane.transform3d:mulTranslationRight(0,-10,0)
