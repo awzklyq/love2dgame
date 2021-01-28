@@ -45,6 +45,8 @@ Render.MeshLineId = 22
 
 Render.FrustumId = 23
 
+Render.MeshLinesId = 24
+
 Render.getRenderIdName = function(id)
     if Render.CircleId == id then
         return "Circle"
@@ -86,6 +88,8 @@ Render.getRenderIdName = function(id)
         return "Line3D"
     elseif Render.FrustumId == id then
         return "Frustum"
+    elseif Render.MeshLinesId == id then
+        return "MeshLines"
     end
 
     return "Null"

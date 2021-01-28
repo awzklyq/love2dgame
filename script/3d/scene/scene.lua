@@ -127,7 +127,7 @@ function Scene3D:draw(isdrawCanvaColor)
     love.graphics.clear(self.bgColor._r, self.bgColor._g, self.bgColor._b, self.bgColor._a)
     for i = 1, #self.nodes do
         local node = self.nodes[i]
-        if node.mesh and self.frustum:insideBox(node:getClipBox()) then     
+        if node.mesh  then--and self.frustum:insideBox(node:getClipBox())     
             RenderSet.setshadowReceiver(node.shadowReceiver)
             node.mesh:draw()
             RenderSet.setshadowReceiver(false)

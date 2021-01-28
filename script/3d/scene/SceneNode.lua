@@ -15,8 +15,8 @@ function SceneNode3D:bindMesh(mesh)
     self.mesh = mesh
 
     self.box = BoundBox.buildFromMesh3D(mesh)
-    self.boxmesh = self.box:buildMesh()
-    self.boxmesh.transform3d = mesh.transform3d
+    self.boxmesh = self.box:buildMeshLines()
+    self.boxmesh:setTransform(mesh.transform3d)
     
     self.shadowCaster = false
 
@@ -59,9 +59,9 @@ function SceneNode3D:drawBoxMesh()
     if self.isDrawBox and self.boxmesh then
         local cullmode = love.graphics.getMeshCullMode()
         love.graphics.setMeshCullMode("none")
-        love.graphics.setWireframe( true )
+        -- love.graphics.setWireframe( true )
         self.boxmesh:draw()
-        love.graphics.setWireframe( false )
+        -- love.graphics.setWireframe( false )
         love.graphics.setMeshCullMode(cullmode)
     end
 end

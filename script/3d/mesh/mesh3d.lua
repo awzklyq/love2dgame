@@ -359,3 +359,27 @@ function MeshLine:draw()
     end
     Render.RenderObject(self);
 end
+
+_G.MeshLines = {}
+function MeshLines.new(points)
+    local mesh = setmetatable({}, {__index = MeshLines});
+    -- mesh.transform3d = Matrix3D.new();
+    mesh.lines = {}
+    for i = 1, #points, 2 do
+        table.insert(mesh.lines, MeshLine.new(points[i], points[i + 1]))
+    end
+    mesh.renderid = Render.MeshLinesId
+    return mesh;
+end
+
+function MeshLines:setTransform(transform)
+    for i = 1, #self.lines do
+        self.lines[i].transform3d = Matrix3D.copy(transform)
+    end
+end
+
+function MeshLines:draw()
+    for i = 1, #self.lines do
+        self.lines[i]:draw()
+    end
+end

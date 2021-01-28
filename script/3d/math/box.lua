@@ -62,6 +62,51 @@ BoundBox.buildFromMinMax = function(min, max)
     return box
 end
 
+function BoundBox:buildMeshLines()
+    local xsize = self.max.x - self.min.x
+    local ysize = self.max.y - self.min.y
+    local zsize = self.max.z - self.min.z
+
+    local points = {}
+    points[#points + 1] = Vector3.new(self.min.x, self.min.y, self.min.z)
+    points[#points + 1] = Vector3.new(self.min.x + xsize, self.min.y, self.min.z)
+
+    points[#points + 1] = Vector3.new(self.min.x, self.min.y, self.min.z)
+    points[#points + 1] = Vector3.new(self.min.x, self.min.y + ysize, self.min.z)
+
+    points[#points + 1] = Vector3.new(self.min.x + xsize, self.min.y, self.min.z)
+    points[#points + 1] = Vector3.new(self.min.x + xsize, self.min.y + ysize, self.min.z)
+
+    points[#points + 1] = Vector3.new(self.min.x, self.min.y + ysize, self.min.z)
+    points[#points + 1] = Vector3.new(self.min.x+ xsize, self.min.y + ysize, self.min.z)
+
+    points[#points + 1] = Vector3.new(self.min.x, self.min.y, self.min.z)
+    points[#points + 1] = Vector3.new(self.min.x, self.min.y, self.min.z + zsize)
+
+    points[#points + 1] = Vector3.new(self.min.x + xsize, self.min.y, self.min.z)
+    points[#points + 1] = Vector3.new(self.min.x + xsize, self.min.y, self.min.z+ zsize)
+
+    points[#points + 1] = Vector3.new(self.min.x, self.min.y + ysize, self.min.z)
+    points[#points + 1] = Vector3.new(self.min.x, self.min.y + ysize, self.min.z+ zsize)
+
+    points[#points + 1] = Vector3.new(self.min.x+ xsize, self.min.y + ysize, self.min.z)
+    points[#points + 1] = Vector3.new(self.min.x+ xsize, self.min.y + ysize, self.min.z+ zsize)
+
+    points[#points + 1] = Vector3.new(self.min.x, self.min.y, self.min.z+ zsize)
+    points[#points + 1] = Vector3.new(self.min.x + xsize, self.min.y, self.min.z+ zsize)
+
+    points[#points + 1] = Vector3.new(self.min.x, self.min.y, self.min.z+ zsize)
+    points[#points + 1] = Vector3.new(self.min.x, self.min.y + ysize, self.min.z+ zsize)
+
+    points[#points + 1] = Vector3.new(self.min.x + xsize, self.min.y, self.min.z+ zsize)
+    points[#points + 1] = Vector3.new(self.min.x+ xsize, self.min.y + ysize, self.min.z+ zsize)
+
+    points[#points + 1] = Vector3.new(self.min.x, self.min.y + ysize, self.min.z+ zsize)
+    points[#points + 1] = Vector3.new(self.min.x+ xsize, self.min.y + ysize, self.min.z+ zsize)
+
+    return MeshLines.new(points)
+end
+
 function BoundBox:buildMesh()
     local verts = {}
     local center = Vector3.new(self.center.x, self.center.y, self.center.z)
