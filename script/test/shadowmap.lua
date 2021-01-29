@@ -41,7 +41,7 @@ local canvas = Canvas.new(love.graphics.getPixelWidth(), love.graphics.getPixelH
 local meshquad = _G.MeshQuad.new(love.graphics.getWidth(), love.graphics.getHeight(), LColor.new(255, 255, 255, 255), canvas)
 meshquad.shader = Shader.GetFXAAShader(canvas:getWidth(), canvas:getHeight())
 
-local frustum
+local frustummeshlines
 app.render(function(dt)
     scene:update(dt)
     if rendertype == 1 then
@@ -54,8 +54,8 @@ app.render(function(dt)
         -- scene:drawDirectionLightShadow(true)
     end
     
-    if frustum then
-        frustum:draw()
+    if frustummeshlines then
+        frustummeshlines:draw()
     end
     love.graphics.print( "Press Key Space.  scene.needFXAA: "..tostring(scene.needFXAA), 10, 10)
 end)
@@ -71,7 +71,8 @@ app.keypressed(function(key, scancode, isrepeat)
 
     
     if key == "z" then
-        frustum = Frustum.copy(scene.frustum)
+        local camera3d = _G.getGlobalCamera3D()
+        frustummeshlines = Frustum.buildDrawLines( camera3d)
     end
 
 

@@ -160,7 +160,7 @@ function Scene3D:drawNormalmap()
 
     for i = 1, #self.nodes do
         local node = self.nodes[i]
-        if node.mesh and self.frustum:insideBox(node:getWorldBox()) then
+        if node.mesh  then
             _G.useNormal()
             node.mesh:setRenderType("normalmap")
             node.mesh:draw()
@@ -180,7 +180,7 @@ function Scene3D:drawDepth()
 
     for i = 1, #self.nodes do
         local node = self.nodes[i]
-        if node.mesh and self.frustum:insideBox(node:getWorldBox()) then
+        if node.mesh then
             node.mesh:setRenderType("depth")
             node.mesh:draw()
             node.mesh:setRenderType('normal')
@@ -250,8 +250,13 @@ function Scene3D:drawDirectionLightShadow(isdebug)
             
             for j = 1, #self.nodes do
                 local node = self.nodes[j]
-                if node.shadowReceiver and self.frustum:insideBox(node:getWorldBox()) then--node.shadowReceiver
+                if node.shadowCaster then--node.shadowReceiver
                     casterbox:addSelf(node:getWorldBox())
+                end
+
+                if node.shadowReceiver then--node.shadowReceiver
+                    local box = node.mesh.transform3d:mulBoundBox(node.box)
+                    receiverbox:addSelf(box)
                 end
             end
 
@@ -268,7 +273,7 @@ function Scene3D:drawDirectionLightShadow(isdebug)
             
             for j = 1, #self.nodes do
                 local node = self.nodes[j]
-                if node.shadowCaster and self.frustum:insideBox(node:getWorldBox()) then
+                if node.shadowCaster then
                     local rendertype = node.mesh:getRenderType()
                     node.mesh:setRenderType("depth")
                     node.mesh:draw()

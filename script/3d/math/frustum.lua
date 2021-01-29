@@ -58,7 +58,107 @@ function Frustum:draw()
 
 end
 
+function Frustum.buildDrawLines(camera3d)
 
+	local FrustumAngle = camera3d.fov
+	local FrustumAspectRatio = camera3d.aspectRatio
+	local FrustumStartDist = camera3d.nearClip
+	local FrustumEndDist = camera3d.farClip
+
+	local Direction = Vector3.sub(camera3d.look, camera3d.eye):normalize()--Vector3.new(1,0,0);--Vector3.sub(camera3d.look,camera3d.eye):normalize()
+	
+	local UpVector = Vector3.new(-camera3d.up.x, -camera3d.up.y, -camera3d.up.z):normalize()--Vector3.new(0,0,1);--camera3d.up
+	local LeftVector = Vector3.cross(Direction, UpVector):normalize();
+
+	local Verts = {}
+	for i = 1, 8 do
+		Verts[i] = Vector3.new()
+	end
+	
+	-- FOVAngle controls the horizontal angle.
+	local HozHalfAngleInRadians = FrustumAngle * 0.5--math.rad(FrustumAngle * 0.5);
+
+	local HozLength = 0.0;
+	local VertLength = 0.0;
+		
+	if (FrustumAngle > 0.0) then
+		HozLength = FrustumStartDist * math.tan(HozHalfAngleInRadians);
+		VertLength = HozLength / FrustumAspectRatio;
+	else
+		local OrthoWidth = (FrustumAngle == 0.0) and 1000.0 or -FrustumAngle;
+		HozLength = OrthoWidth * 0.5;
+		VertLength = HozLength / FrustumAspectRatio;
+	end
+
+	-- near plane verts
+	Verts[1] = Vector3.add(Vector3.add(Vector3.mul(Direction, FrustumStartDist), Vector3.mul(UpVector, VertLength)) ,Vector3.mul(LeftVector ,HozLength));
+	Verts[2] = Vector3.sub(Vector3.add(Vector3.mul(Direction, FrustumStartDist) , Vector3.mul(UpVector, VertLength)) , Vector3.mul(LeftVector , HozLength));
+	Verts[3] = Vector3.sub(Vector3.sub(Vector3.mul(Direction, FrustumStartDist), Vector3.mul(UpVector, VertLength)) , Vector3.mul(LeftVector , HozLength));
+	Verts[4] =   Vector3.add(Vector3.sub(Vector3.mul(Direction, FrustumStartDist) , Vector3.mul(UpVector, VertLength)) , Vector3.mul(LeftVector , HozLength));
+
+	-- // near plane verts
+	-- Verts[0] = (Direction * FrustumStartDist) + (UpVector * VertLength) + (LeftVector * HozLength);
+	-- Verts[1] = (Direction * FrustumStartDist) + (UpVector * VertLength) - (LeftVector * HozLength);
+	-- Verts[2] = (Direction * FrustumStartDist) - (UpVector * VertLength) - (LeftVector * HozLength);
+	-- Verts[3] = (Direction * FrustumStartDist) - (UpVector * VertLength) + (LeftVector * HozLength);
+
+	if FrustumAngle > 0.0 then
+		HozLength = FrustumEndDist * math.tan(HozHalfAngleInRadians);
+		VertLength = HozLength / FrustumAspectRatio;
+	end
+
+	-- far plane verts
+	Verts[5] = Vector3.add(Vector3.add(Vector3.mul(Direction , FrustumEndDist) , Vector3.mul(UpVector , VertLength)) ,Vector3.mul(LeftVector , HozLength));
+	Verts[6] = Vector3.sub(Vector3.add(Vector3.mul(Direction , FrustumEndDist), Vector3.mul(UpVector , VertLength)) , Vector3.mul(LeftVector , HozLength));
+	Verts[7] = Vector3.sub(Vector3.sub(Vector3.mul(Direction , FrustumEndDist), Vector3.mul(UpVector , VertLength)), Vector3.mul(LeftVector , HozLength))
+	Verts[8] =Vector3.add(Vector3.sub( Vector3.mul(Direction , FrustumEndDist), Vector3.mul(UpVector , VertLength)), Vector3.mul(LeftVector , HozLength))
+
+	-- local mat = Matrix3D.createLookAtLH( camera3d.eye, camera3d.look, Vector3.negative(camera3d.up) )
+	-- mat = Matrix3D.transpose(mat)
+	for i = 1, 8 do
+		-- Verts[i] = mat:mulVector(Verts[i])
+		Verts[i] = Vector3.add(Verts[i], camera3d.eye)
+	end
+
+	local lines = {}
+	lines[#lines +1] = Verts[1]
+	lines[#lines +1] = Verts[2]
+
+	lines[#lines +1] = Verts[1]
+	lines[#lines +1] = Verts[4]
+
+	lines[#lines +1] = Verts[3]
+	lines[#lines +1] = Verts[4]
+
+	lines[#lines +1] = Verts[3]
+	lines[#lines +1] = Verts[2]
+
+	lines[#lines +1] = Verts[1]
+	lines[#lines +1] = Verts[5]
+
+	lines[#lines +1] = Verts[2]
+	lines[#lines +1] = Verts[6]
+
+	lines[#lines +1] = Verts[7]
+	lines[#lines +1] = Verts[2]
+
+	lines[#lines +1] = Verts[4]
+	lines[#lines +1] = Verts[8]
+
+	lines[#lines +1] = Verts[5]
+	lines[#lines +1] = Verts[6]
+
+	lines[#lines +1] = Verts[5]
+	lines[#lines +1] = Verts[8]
+
+	lines[#lines +1] = Verts[7]
+	lines[#lines +1] = Verts[6]
+
+	lines[#lines +1] = Verts[7]
+	lines[#lines +1] = Verts[8]
+
+	return MeshLines.new(lines)
+end
 
 function Frustum:insideBox( box )
 

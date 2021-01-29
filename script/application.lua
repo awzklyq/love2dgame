@@ -94,6 +94,12 @@ function love.update(dt)
             RenderSet.screenwidth =  screenwidth
             RenderSet.screenheight = screenheight
         end
+
+        
+        local camera3d = _G.getGlobalCamera3D()
+        if camera3d then
+            camera3d.aspectRatio = w/h
+        end
         _G.app.resizeWindow(w, h)
     end
 
