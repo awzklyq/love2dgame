@@ -132,9 +132,26 @@ function OrientedBox.new()
 
     box.vs = {}
     for i = 1, 8 do
-        vs[i] = Vector3.new()
+        box.vs[i] = Vector3.new()
     end
     return box
+end
+
+function OrientedBox:getBoundBox()
+    local min = Vector3.new(self.vs[1].x, self.vs[1].y, self.vs[1].z)
+    local max = Vector3.new(self.vs[1].x, self.vs[1].y, self.vs[1].z)
+
+    for i = 1, 8 do
+        min.x = math.min(self.vs[i].x, min.x)
+        min.y = math.min(self.vs[i].y, min.y)
+        min.z = math.min(self.vs[i].z, min.z)
+
+        max.x = math.max(self.vs[i].x, max.x)
+        max.y = math.max(self.vs[i].y, max.y)
+        max.z = math.max(self.vs[i].z, max.z)
+    end
+
+    return BoundBox.buildFromMinMax(min, max)
 end
 
 OrientedBox.buildFormMinMax = function( vmin, vmax )

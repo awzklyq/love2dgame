@@ -47,6 +47,8 @@ Render.FrustumId = 23
 
 Render.MeshLinesId = 24
 
+Render.Vector4Id = 25
+
 Render.getRenderIdName = function(id)
     if Render.CircleId == id then
         return "Circle"

@@ -127,7 +127,7 @@ function Scene3D:draw(isdrawCanvaColor)
     love.graphics.clear(self.bgColor._r, self.bgColor._g, self.bgColor._b, self.bgColor._a)
     for i = 1, #self.nodes do
         local node = self.nodes[i]
-        if node.mesh  then--and self.frustum:insideBox(node:getClipBox())     
+        if node.mesh then--and self.frustum:insideBox(node:getWorldBox())     
             RenderSet.setshadowReceiver(node.shadowReceiver)
             node.mesh:draw()
             RenderSet.setshadowReceiver(false)
@@ -250,7 +250,7 @@ function Scene3D:drawDirectionLightShadow(isdebug)
             
             for j = 1, #self.nodes do
                 local node = self.nodes[j]
-                if node.shadowCaster then--node.shadowReceiver
+                if node.shadowCaster then--node.shadowCaster
                     casterbox:addSelf(node:getWorldBox())
                 end
 
@@ -260,7 +260,7 @@ function Scene3D:drawDirectionLightShadow(isdebug)
                 end
             end
 
-            local shadowprojectbox = BoundBox.getIntersectBox(casterbox, receiverbox)
+            local shadowprojectbox = receiverbox--BoundBox.getIntersectBox(casterbox, receiverbox)
 
             shadowprojectbox = lightmat:mulBoundBox(shadowprojectbox)
             shadowprojectbox.max.z = math.max(shadowprojectbox.max.z, camera3d.farClip) + 10000000--TODO

@@ -1,7 +1,22 @@
 _G.Vector3 = {}
 
+local metatable_vector3 = {}
+metatable_vector3.__index = Vector3
+
+metatable_vector3.__add = function(myvalue, value)
+    return Vector3.new(myvalue.x + value.x, myvalue.y + value.y, myvalue.z + value.z)
+end
+
+metatable_vector3.__sub = function(myvalue, value)
+    return Vector3.new(myvalue.x - value.x, myvalue.y - value.y, myvalue.z - value.z)
+end
+
+metatable_vector3.__mul = function(myvalue, value)
+    return Vector3.new(myvalue.x * value, myvalue.y * value, myvalue.z * value)
+end
+
 function Vector3.new(x ,y, z)
-    local v = setmetatable({}, {__index = Vector3});
+    local v = setmetatable({}, metatable_vector3);
     v.x = x or 0;
     v.y = y or 0;
     v.z = z or 0;

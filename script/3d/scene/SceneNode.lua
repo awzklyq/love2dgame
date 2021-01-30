@@ -32,8 +32,8 @@ end
 
 function SceneNode3D:getClipBox()
     if self.mesh then
-        local mat = Matrix3D.copy(RenderSet.getDefaultProjectMatrix())
-        mat:mulRight(RenderSet.getDefaultViewMatrix())
+        local mat = Matrix3D.copy(RenderSet.getUseProjectMatrix())
+        mat:mulRight(RenderSet.getUseViewMatrix())
         mat:mulRight(self.mesh.transform3d)
         return mat:mulBoundBox(self.box)
     end

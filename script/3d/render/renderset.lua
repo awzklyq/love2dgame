@@ -32,7 +32,8 @@ end
 RenderSet.getUseProjectMatrix = function()
     if  #projectmatrixs == 0 then
         local camera3d = _G.getGlobalCamera3D()
-        return  Matrix3D.getProjectionMatrix(camera3d.fov, camera3d.nearClip, camera3d.farClip, camera3d.aspectRatio)
+        return Matrix3D.createPerspectiveFovRH( camera3d.fov, camera3d.aspectRatio, camera3d.nearClip, camera3d.farClip )
+        -- return  Matrix3D.getProjectionMatrix(camera3d.fov, camera3d.nearClip, camera3d.farClip, camera3d.aspectRatio)
     end
 
     return projectmatrixs[#projectmatrixs]
@@ -45,7 +46,8 @@ end
 
 RenderSet.getDefaultProjectMatrix = function()
     local camera3d = _G.getGlobalCamera3D()
-    return  Matrix3D.getProjectionMatrix(camera3d.fov, camera3d.nearClip, camera3d.farClip, camera3d.aspectRatio)
+    -- return  Matrix3D.getProjectionMatrix(camera3d.fov, camera3d.nearClip, camera3d.farClip, camera3d.aspectRatio)
+    return Matrix3D.createPerspectiveFovRH( camera3d.fov, camera3d.aspectRatio, camera3d.nearClip, camera3d.farClip )
 end
 
 local shadowMapSize = 1024

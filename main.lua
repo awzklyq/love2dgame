@@ -41,6 +41,7 @@ dofile('script/math/math.lua')
 dofile('script/math/vector.lua')
 dofile('script/math/matrix.lua')
 dofile('script/3d/math/vector3.lua')
+dofile('script/3d/math/vector4.lua')
 dofile('script/3d/math/matrix3d.lua')
 
 dofile('script/groupmanager.lua')
