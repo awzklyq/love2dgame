@@ -8,7 +8,9 @@ _G.lovedebug.logtab = function(tab)
     end
 end
 
-_G.log = print
+_G.log = function(...)
+    print(RenderSet.frameToken, ...)
+end
 
 _G._warn = function(...)
     log("waring: ", ...)

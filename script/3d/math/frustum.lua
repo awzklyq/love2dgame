@@ -226,9 +226,12 @@ end
 
 function Frustum:insideBox( box )
 
+	if RenderSet.isNeedFrustum == false then
+		return true
+	end
 	box = self.pv:mulBoundBox(box)
-	local center = box.center;
-    local extent = box.max - box.center;
+	local center = (box.max + box.min) * 0.5;
+    local extent = (box.max - box.min) * 0.5;
 
     -- This is a vertical dot-product on three vectors at once.
     local d0  = self.planeNormX[1] * center.x 
@@ -236,10 +239,12 @@ function Frustum:insideBox( box )
                 + self.planeNormZ[1] * center.z
                 - self.planeNormAbsX[1] * extent.x 
                 - self.planeNormAbsY[1] * extent.y 
-                - self.planeNormAbsZ[1] * extent.z 
+				- self.planeNormAbsZ[1] * extent.z 
+				-- - extent
                 - self.planeOffsetVec[1];
 
 	if d0.x >= 0 or d0.y >= 0 or d0.z >= 0 then
+		log('aaaaaaaaaaaaaaa')
 		return false;
 	end
 
@@ -248,10 +253,12 @@ function Frustum:insideBox( box )
                 + self.planeNormZ[2] * center.z
                 - self.planeNormAbsX[2] * extent.x 
                 - self.planeNormAbsY[2] * extent.y 
-                - self.planeNormAbsZ[2] * extent.z 
+				- self.planeNormAbsZ[2] * extent.z 
+				-- -extent
                 - self.planeOffsetVec[2];
 
-    if d1.x >= 0 or d1.y >= 0 or d1.z >= 0 then
+	if d1.x >= 0 or d1.y >= 0 or d1.z >= 0 then
+		log('bbbbbbbbbbbbbbbbbb')
 		return false;
 	end
 
@@ -336,59 +343,87 @@ end
 function Frustum:buildFromViewAndProject( view, proj )
 
 	--TODO..
-	self.pv = Matrix3D.copy(proj)
-	self.pv:mulRight(view);
+	-- local M = RenderSet.getCameraFrustumViewMatrix()
+	-- local P = RenderSet.getCameraFrustumProjectMatrix()
+	local M = RenderSet.getDefaultViewMatrix()
+	local P = RenderSet.getDefaultProjectMatrix()
+
+	self.pv = Matrix3D.copy(P)--getCameraFrustumProjectMatrix
+	self.pv:mulRight(M);
 
 	-- -- TODO, use sse.
 	-- local viewcopy = Matrix3D.copy(view)
 	-- viewcopy:mulRight(proj);
-	-- vp = Matrix3D.inverse( viewcopy );
+	local vp = Matrix3D.inverse( self.pv );
 	-- -- vp:transposeSelf()
-	-- self.vs[1] = vp:mulVector(Vector3.new( -1.0, -1.0, 0.0 ));
-	-- self.vs[2] = vp:mulVector(Vector3.new( -1.0,  1.0, 0.0 ));
-	-- self.vs[3] = vp:mulVector(Vector3.new(  1.0,  1.0, 0.0 ));
-	-- self.vs[4] = vp:mulVector(Vector3.new(  1.0, -1.0, 0.0 ));
-	-- self.vs[5] = vp:mulVector(Vector3.new( -1.0, -1.0, 1.0 ));
-	-- self.vs[6] = vp:mulVector(Vector3.new( -1.0,  1.0, 1.0 ));
-	-- self.vs[7] = vp:mulVector(Vector3.new(  1.0,  1.0, 1.0 ));
-	-- self.vs[8] = vp:mulVector(Vector3.new(  1.0, -1.0, 1.0 ));
+	self.vs[1] = vp:mulVector(Vector3.new( -1.0, -1.0, 0.0 ));
+	self.vs[2] = vp:mulVector(Vector3.new( -1.0,  1.0, 0.0 ));
+	self.vs[3] = vp:mulVector(Vector3.new(  1.0,  1.0, 0.0 ));
+	self.vs[4] = vp:mulVector(Vector3.new(  1.0, -1.0, 0.0 ));
+	self.vs[5] = vp:mulVector(Vector3.new( -1.0, -1.0, 1.0 ));
+	self.vs[6] = vp:mulVector(Vector3.new( -1.0,  1.0, 1.0 ));
+	self.vs[7] = vp:mulVector(Vector3.new(  1.0,  1.0, 1.0 ));
+	self.vs[8] = vp:mulVector(Vector3.new(  1.0, -1.0, 1.0 ));
 
-	-- self.ps[1]:buildFromThreePoints( self.vs[2], self.vs[6], self.vs[3] ); -- Top
-	-- self.ps[2]:buildFromThreePoints( self.vs[7], self.vs[8], self.vs[3] ); -- Right
-	-- self.ps[3]:buildFromThreePoints( self.vs[4], self.vs[5], self.vs[1] ); -- Bottom
+	self.ps[1]:buildFromThreePoints( self.vs[2], self.vs[6], self.vs[3] ); -- Top
+	self.ps[2]:buildFromThreePoints( self.vs[7], self.vs[8], self.vs[3] ); -- Right
+	self.ps[3]:buildFromThreePoints( self.vs[4], self.vs[5], self.vs[1] ); -- Bottom
 
-	-- self.ps[4]:buildFromThreePoints( self.vs[2], self.vs[5], self.vs[6] ); -- Left
-	-- self.ps[5]:buildFromThreePoints( self.vs[1], self.vs[2], self.vs[3] ); -- Near
-	-- self.ps[6]:buildFromThreePoints( self.vs[6], self.vs[8], self.vs[7] ); -- Far
+	self.ps[4]:buildFromThreePoints( self.vs[2], self.vs[5], self.vs[6] ); -- Left
+	self.ps[5]:buildFromThreePoints( self.vs[1], self.vs[2], self.vs[3] ); -- Near
+	self.ps[6]:buildFromThreePoints( self.vs[6], self.vs[8], self.vs[7] ); -- Far
 
-	local two = 2;
-	local camera3d = _G.getGlobalCamera3D()
+	-- local two = 2;
+	-- local camera3d = _G.getGlobalCamera3D()
 
-	local fovx = camera3d.fov
-	local aspect = camera3d.aspectRatio
-	local nearPlane = camera3d.nearClip
-	local farPlane = camera3d.farClip
+	-- local fovx = camera3d.fov
+	-- local aspect = camera3d.aspectRatio
+	-- local nearPlane = camera3d.nearClip
+	-- local farPlane = camera3d.farClip
 
-    local _right    = nearPlane * math.tan(fovx / two);
-	local _left     = -_right;
-	local _top      = ((_right - _left) / aspect) / two;
-	local _bottom   = -_top;
+    -- local _right    = nearPlane * math.tan(fovx / two);
+	-- local _left     = -_right;
+	-- local _top      = ((_right - _left) / aspect) / two;
+	-- local _bottom   = -_top;
    
-    local _nearPlane    = nearPlane;
-	local _farPlane     = farPlane;
-	
-	local a = Vector3.new( _left,  _bottom, -_nearPlane);
-	local b = Vector3.new( _left,  _top,    -_nearPlane);
-	local c = Vector3.new( _right, _top,    -_nearPlane);
-	local d = Vector3.new( _right, _bottom, -_nearPlane);
-	local o = Vector3.new(0,0,0);
+    -- local _nearPlane    = nearPlane;
+	-- local _farPlane     = farPlane;
 
-	self.ps[1] = Plane.buildFromPoints( o, c, b );
-	self.ps[2] = Plane.buildFromPoints( o, d, c );
-	self.ps[3] = Plane.buildFromPoints( o, a, d );
-	self.ps[4] = Plane.buildFromPoints( o, b, a );
-	self.ps[5] = Plane.new( 0, 0, 1, -_nearPlane );
-	self.ps[6] = Plane.new( 0, 0,-1, _farPlane );
+	
+	-- local a = M:mulVector(Vector3.new( _left,  _bottom, -_nearPlane));
+    -- local b = M:mulVector(Vector3.new( _left,  _top,    -_nearPlane));
+    -- local c = M:mulVector(Vector3.new( _right, _top,    -_nearPlane));
+	-- local d = M:mulVector(Vector3.new( _right, _bottom, -_nearPlane));
+	
+	
+	-- local s    = _farPlane / _nearPlane
+	-- local farLeft   = s * _left
+	-- local farRight  = s * _right
+	-- local farTop    = s * _top
+	-- local farBottom = s * _bottom
+	-- local e   = M:mulVector(Vector3.new( farLeft,  farBottom, -_farPlane));
+	-- local f   = M:mulVector(Vector3.new( farLeft,  farTop,    -_farPlane));
+	-- local g   = M:mulVector(Vector3.new( farRight, farTop,    -_farPlane));
+	-- local o   = M:mulVector(Vector3.new(0,0,0));
+	-- self.ps[1]:buildFromThreePoints( o, c, b );
+	-- self.ps[2]:buildFromThreePoints( o, d, c );
+	-- self.ps[3]:buildFromThreePoints( o, a, d );
+	-- self.ps[4]:buildFromThreePoints( o, b, a );
+	-- self.ps[5]:buildFromThreePoints( a, d, c );
+	-- self.ps[6]:buildFromThreePoints( e, f, g );
+	
+	-- local a = Vector3.new( _left,  _bottom, -_nearPlane);
+	-- local b = Vector3.new( _left,  _top,    -_nearPlane);
+	-- local c = Vector3.new( _right, _top,    -_nearPlane);
+	-- local d = Vector3.new( _right, _bottom, -_nearPlane);
+	-- local o = Vector3.new(0,0,0);
+
+	-- self.ps[1] = Plane.buildFromPoints( o, c, b );
+	-- self.ps[2] = Plane.buildFromPoints( o, d, c );
+	-- self.ps[3] = Plane.buildFromPoints( o, a, d );
+	-- self.ps[4] = Plane.buildFromPoints( o, b, a );
+	-- self.ps[5] = Plane.new( 0, 0, 1, -_nearPlane );
+	-- self.ps[6] = Plane.new( 0, 0,-1, _farPlane );
 
 	for i = 1, 2 do
 		local index = (i - 1) * 3 + 1

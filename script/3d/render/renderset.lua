@@ -23,7 +23,8 @@ end
 RenderSet.getUseViewMatrix = function()
     if  #viewmatrixs == 0 then
         local camera3d = _G.getGlobalCamera3D()
-        return Matrix3D.getViewMatrix(camera3d.eye, camera3d.look, camera3d.up)
+        -- return Matrix3D.getViewMatrix(camera3d.eye, camera3d.look, camera3d.up)
+        return Matrix3D.transpose(Matrix3D.createLookAtRH(camera3d.eye, (camera3d.eye - camera3d.look):normalize(), -camera3d.up))--transpose
     end
 
     return viewmatrixs[#viewmatrixs]
@@ -41,7 +42,8 @@ end
 
 RenderSet.getDefaultViewMatrix = function()
     local camera3d = _G.getGlobalCamera3D()
-    return Matrix3D.getViewMatrix(camera3d.eye, camera3d.look, camera3d.up)
+    return  Matrix3D.transpose(Matrix3D.createLookAtRH(camera3d.eye, (camera3d.eye - camera3d.look):normalize(), -camera3d.up))
+    -- return Matrix3D.getViewMatrix(camera3d.eye, camera3d.look, camera3d.up)
 end
 
 RenderSet.getDefaultProjectMatrix = function()
@@ -49,6 +51,18 @@ RenderSet.getDefaultProjectMatrix = function()
     -- return  Matrix3D.getProjectionMatrix(camera3d.fov, camera3d.nearClip, camera3d.farClip, camera3d.aspectRatio)
     return Matrix3D.createPerspectiveFovRH( camera3d.fov, camera3d.aspectRatio, camera3d.nearClip, camera3d.farClip )
 end
+
+RenderSet.getCameraFrustumViewMatrix = function()
+    local camera3d = _G.getGlobalCamera3D()
+    return Matrix3D.createLookAtLH(camera3d.eye, (camera3d.look - camera3d.eye):normalize(), camera3d.up)
+end
+
+RenderSet.getCameraFrustumProjectMatrix = function()
+    local camera3d = _G.getGlobalCamera3D()
+    -- return  Matrix3D.getProjectionMatrix(camera3d.fov, camera3d.nearClip, camera3d.farClip, camera3d.aspectRatio)
+    return Matrix3D.createPerspectiveFovLH( camera3d.fov, camera3d.aspectRatio, camera3d.nearClip, camera3d.farClip )
+end
+
 
 local shadowMapSize = 1024
 RenderSet.setShadowMapSize = function(size)
@@ -88,3 +102,6 @@ end
 
 RenderSet.screenwidth = love.graphics.getPixelWidth()
 RenderSet.screenheight = love.graphics.getPixelHeight()
+RenderSet.isNeedFrustum = false
+
+RenderSet.frameToken = 1

@@ -79,6 +79,9 @@ local screenwidth = love.graphics.getPixelWidth()
 local screenheight = love.graphics.getPixelHeight()
 
 function love.update(dt)
+    if RenderSet then
+        RenderSet.frameToken = RenderSet.frameToken + 1
+    end
     _G.UIHelper.update(dt);
     
     _G.CameraManager.update(dt)

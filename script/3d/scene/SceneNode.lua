@@ -15,8 +15,9 @@ function SceneNode3D:bindMesh(mesh)
     self.mesh = mesh
 
     self.box = BoundBox.buildFromMesh3D(mesh)
+    self.box = mesh.transform3d:mulBoundBox(self.box)
     self.boxmesh = self.box:buildMeshLines()
-    self.boxmesh:setTransform(mesh.transform3d)
+    -- self.boxmesh:setTransform(mesh.transform3d)
     
     self.shadowCaster = false
 
@@ -25,7 +26,8 @@ end
 
 function SceneNode3D:getWorldBox()
     if self.mesh then
-        return self.mesh.transform3d:mulBoundBox(self.box)
+        -- return self.mesh.transform3d:mulBoundBox(self.box)
+        return self.box
     end
     return BoundBox.new()
 end

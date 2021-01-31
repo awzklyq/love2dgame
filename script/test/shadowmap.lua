@@ -1,4 +1,4 @@
-math.randomseed(os.time()%10000)
+-- math.randomseed(os.time()%10000)
 
 local width = love.graphics.getPixelWidth() * 1.5 -- love.graphics.getWidth() * 2
 local height = love.graphics.getPixelHeight()  * 1.5--love.graphics.getHeight() * 2
@@ -8,10 +8,10 @@ local plane = Mesh3D.new("assert/obj/plane.obj")
 plane:setBaseColor(LColor.new(125,125,125, 255))
 -- mesh3d:setTexture(love.graphics.newImage("assert/obj/earth.png"))
 -- mesh3d.transform3d = Matrix3D.getTransformationMatrix(Vector3.new(0,0,-20), Vector3.new(), Vector3.new(1,1,1))
-local cubenum = 8
+local cubenum = 10
 for i = 1, cubenum do
     local mesh3d = Mesh3D.new("assert/obj/bbb.obj")
-    mesh3d.transform3d:mulTranslationRight(math.random(-700, 700), math.random(-200, 400), math.random(-500, 500))
+    mesh3d.transform3d:mulTranslationRight(math.random(-1000, 1000), math.random(-500, 900), math.random(-500, 500))
     mesh3d.transform3d:mulScalingLeft(0.5, 0.5, 0.5)
     mesh3d:setBaseColor(LColor.new(math.random(1, 255), math.random(1, 255), math.random(1, 255), 255))
 
@@ -30,7 +30,7 @@ local baseshader = Shader.GetBase3DShader()
 plane:setBaseColor(LColor.new(125, 125,255, 255))
 -- plane.nolight = true
 local planenode = scene:addMesh(plane)
-planenode.shadowReceiver = true
+-- planenode.shadowReceiver = true
 
 local directionlight = DirectionLight.new(Vector3.new(0, 0.5, 1), LColor.new(255,255,255,255))
 local lightnode = scene:addLight(directionlight)
@@ -57,7 +57,7 @@ app.render(function(dt)
     if frustummeshlines then
         frustummeshlines:draw()
     end
-    love.graphics.print( "Press Key Space.  scene.needFXAA: "..tostring(scene.needFXAA), 10, 10)
+    love.graphics.print( "Press Key Space.  scene.needFXAA: "..tostring(scene.needFXAA) .. " Frustum Cull: "..tostring(RenderSet.isNeedFrustum) .. " Culled Number: "..tostring(scene.cullednumber), 10, 10)
 end)
 
 app.keypressed(function(key, scancode, isrepeat)
@@ -73,6 +73,10 @@ app.keypressed(function(key, scancode, isrepeat)
     if key == "z" then
         local camera3d = _G.getGlobalCamera3D()
         frustummeshlines = Frustum.buildDrawLines( camera3d)
+    end
+
+    if key == 'x' then
+        RenderSet.isNeedFrustum = not RenderSet.isNeedFrustum
     end
 
 

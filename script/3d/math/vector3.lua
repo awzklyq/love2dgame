@@ -15,6 +15,10 @@ metatable_vector3.__mul = function(myvalue, value)
     return Vector3.new(myvalue.x * value, myvalue.y * value, myvalue.z * value)
 end
 
+metatable_vector3.__unm = function(myvalue)
+    return Vector3.new( -myvalue.x, -myvalue.y, -myvalue.z)
+end
+
 function Vector3.new(x ,y, z)
     local v = setmetatable({}, metatable_vector3);
     v.x = x or 0;

@@ -596,6 +596,7 @@ function Shader.GetBase3DVSShaderCode()
     end
 
     vertexcode = vertexcode..[[
+        
         return projectionMatrix * viewMatrix * modelMatrix * VertexPosition;
     }
 

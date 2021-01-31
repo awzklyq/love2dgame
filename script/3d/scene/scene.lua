@@ -9,7 +9,7 @@ function Scene3D.new()
 
     scene.lights = {}
 
-    scene.bgColor = LColor.new(0,0,0,0)
+    scene.bgColor = LColor.new(0.2,0.2,0.2,0)
 
     scene.screenwidth = love.graphics.getPixelWidth()
     scene.screenheight = love.graphics.getPixelHeight()
@@ -18,6 +18,8 @@ function Scene3D.new()
 
     scene:reseizeScreen(scene.screenwidth, scene.screenheight)
     scene.needFXAA = false
+
+    scene.cullednumber = 0
     return scene
 end
 
@@ -68,6 +70,7 @@ function Scene3D:removeMesh(mesh)
 end
 
 function Scene3D:update(e)
+    self.cullednumber = 0
     if self.screenwidth ~= RenderSet.screenwidth or self.screenheight ~= RenderSet.screenheight then
         self.screenwidth = RenderSet.screenwidth-- love.graphics.getWidth() * 2
         self.screenheight = RenderSet.screenheight--love.graphics.getHeight() * 2
@@ -127,14 +130,18 @@ function Scene3D:draw(isdrawCanvaColor)
     love.graphics.clear(self.bgColor._r, self.bgColor._g, self.bgColor._b, self.bgColor._a)
     for i = 1, #self.nodes do
         local node = self.nodes[i]
-        if node.mesh then--and self.frustum:insideBox(node:getWorldBox())     
-            RenderSet.setshadowReceiver(node.shadowReceiver)
-            node.mesh:draw()
-            RenderSet.setshadowReceiver(false)
-            if  self.isDrawBox then
-                node:drawBoxMesh()
+        if node.mesh  then--and self.frustum:insideBox(node:getWorldBox())     
+            if self.frustum:insideBox(node:getWorldBox()) then
+                RenderSet.setshadowReceiver(node.shadowReceiver)
+                node.mesh:draw()
+                RenderSet.setshadowReceiver(false)
+                if  self.isDrawBox then
+                    node:drawBoxMesh()
+                end
+                -- end
+            else
+                self.cullednumber = self.cullednumber + 1
             end
-            -- end
         end
     end
     love.graphics.setCanvas()
