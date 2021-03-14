@@ -378,6 +378,12 @@ function MeshLines:setTransform(transform)
     end
 end
 
+function MeshLines:setBGColor(color)
+    for i = 1, #self.lines do
+        self.lines[i].bcolor = color
+    end
+end
+
 function MeshLines:draw()
     for i = 1, #self.lines do
         self.lines[i]:draw()

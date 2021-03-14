@@ -30,7 +30,7 @@ function Vector3.new(x ,y, z)
 end
 
 function Vector3:length()
-    return math.sqrt(math.pow(self.x, 2) + math.pow(self.y, 2), math.pow(self.z, 2));
+    return math.sqrt(math.pow(self.x, 2) + math.pow(self.y, 2) + math.pow(self.z, 2));
 end
 function Vector3:normalize()
     local w =  self:length()--math.sqrt(math.pow(self.x, 2) + math.pow(self.y, 2), math.pow(self.z, 2));
@@ -41,7 +41,6 @@ function Vector3:normalize()
     self.x = self.x  / w;
     self.y = self.y  / w;
     self.z = self.z  / w;
-
     return self
 end
 
