@@ -35,7 +35,7 @@ end
 function Vector3:normalize()
     local w =  self:length()--math.sqrt(math.pow(self.x, 2) + math.pow(self.y, 2), math.pow(self.z, 2));
     if not w or w == 0 then
-        return;
+        return self;
     end
 
     self.x = self.x  / w;

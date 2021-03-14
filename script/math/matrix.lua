@@ -7,6 +7,7 @@ function Matrix.new(lmat)
 
     mat.parenttransform = love.math.newTransform( );
 
+    mat.renderid = Render.MatrixId
     mat:reset();
     return mat;
 end

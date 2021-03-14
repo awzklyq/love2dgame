@@ -114,18 +114,18 @@ function Frustum.buildDrawLines(camera3d)
 		HozLength = OrthoWidth * 0.5;
 		VertLength = HozLength / FrustumAspectRatio;
 	end
-
+ 
 	-- near plane verts
-	Verts[1] = Vector3.add(Vector3.add(Vector3.mul(Direction, FrustumStartDist), Vector3.mul(UpVector, VertLength)) ,Vector3.mul(LeftVector ,HozLength));
-	Verts[2] = Vector3.sub(Vector3.add(Vector3.mul(Direction, FrustumStartDist) , Vector3.mul(UpVector, VertLength)) , Vector3.mul(LeftVector , HozLength));
-	Verts[3] = Vector3.sub(Vector3.sub(Vector3.mul(Direction, FrustumStartDist), Vector3.mul(UpVector, VertLength)) , Vector3.mul(LeftVector , HozLength));
-	Verts[4] =   Vector3.add(Vector3.sub(Vector3.mul(Direction, FrustumStartDist) , Vector3.mul(UpVector, VertLength)) , Vector3.mul(LeftVector , HozLength));
+	-- Verts[1] = Vector3.add(Vector3.add(Vector3.mul(Direction, FrustumStartDist), Vector3.mul(UpVector, VertLength)) ,Vector3.mul(LeftVector ,HozLength));
+	-- Verts[2] = Vector3.sub(Vector3.add(Vector3.mul(Direction, FrustumStartDist) , Vector3.mul(UpVector, VertLength)) , Vector3.mul(LeftVector , HozLength));
+	-- Verts[3] = Vector3.sub(Vector3.sub(Vector3.mul(Direction, FrustumStartDist), Vector3.mul(UpVector, VertLength)) , Vector3.mul(LeftVector , HozLength));
+	-- Verts[4] =   Vector3.add(Vector3.sub(Vector3.mul(Direction, FrustumStartDist) , Vector3.mul(UpVector, VertLength)) , Vector3.mul(LeftVector , HozLength));
 
 	-- // near plane verts
-	-- Verts[0] = (Direction * FrustumStartDist) + (UpVector * VertLength) + (LeftVector * HozLength);
-	-- Verts[1] = (Direction * FrustumStartDist) + (UpVector * VertLength) - (LeftVector * HozLength);
-	-- Verts[2] = (Direction * FrustumStartDist) - (UpVector * VertLength) - (LeftVector * HozLength);
-	-- Verts[3] = (Direction * FrustumStartDist) - (UpVector * VertLength) + (LeftVector * HozLength);
+	Verts[1] = (Direction * FrustumStartDist) + (UpVector * VertLength) + (LeftVector * HozLength);
+	Verts[2] = (Direction * FrustumStartDist) + (UpVector * VertLength) - (LeftVector * HozLength);
+	Verts[3] = (Direction * FrustumStartDist) - (UpVector * VertLength) - (LeftVector * HozLength);
+	Verts[4] = (Direction * FrustumStartDist) - (UpVector * VertLength) + (LeftVector * HozLength);
 
 	if FrustumAngle > 0.0 then
 		HozLength = FrustumEndDist * math.tan(HozHalfAngleInRadians);
@@ -133,10 +133,16 @@ function Frustum.buildDrawLines(camera3d)
 	end
 
 	-- far plane verts
-	Verts[5] = Vector3.add(Vector3.add(Vector3.mul(Direction , FrustumEndDist) , Vector3.mul(UpVector , VertLength)) ,Vector3.mul(LeftVector , HozLength));
-	Verts[6] = Vector3.sub(Vector3.add(Vector3.mul(Direction , FrustumEndDist), Vector3.mul(UpVector , VertLength)) , Vector3.mul(LeftVector , HozLength));
-	Verts[7] = Vector3.sub(Vector3.sub(Vector3.mul(Direction , FrustumEndDist), Vector3.mul(UpVector , VertLength)), Vector3.mul(LeftVector , HozLength))
-	Verts[8] =Vector3.add(Vector3.sub( Vector3.mul(Direction , FrustumEndDist), Vector3.mul(UpVector , VertLength)), Vector3.mul(LeftVector , HozLength))
+	-- Verts[5] = Vector3.add(Vector3.add(Vector3.mul(Direction , FrustumEndDist) , Vector3.mul(UpVector , VertLength)) ,Vector3.mul(LeftVector , HozLength));
+	-- Verts[6] = Vector3.sub(Vector3.add(Vector3.mul(Direction , FrustumEndDist), Vector3.mul(UpVector , VertLength)) , Vector3.mul(LeftVector , HozLength));
+	-- Verts[7] = Vector3.sub(Vector3.sub(Vector3.mul(Direction , FrustumEndDist), Vector3.mul(UpVector , VertLength)), Vector3.mul(LeftVector , HozLength))
+	-- Verts[8] =Vector3.add(Vector3.sub( Vector3.mul(Direction , FrustumEndDist), Vector3.mul(UpVector , VertLength)), Vector3.mul(LeftVector , HozLength))
+
+	-- far plane verts
+	Verts[5] = (Direction * FrustumEndDist) + (UpVector * VertLength) + (LeftVector * HozLength);
+	Verts[6] = (Direction * FrustumEndDist) + (UpVector * VertLength) - (LeftVector * HozLength);
+	Verts[7] = (Direction * FrustumEndDist) - (UpVector * VertLength) - (LeftVector * HozLength);
+	Verts[8] = (Direction * FrustumEndDist) - (UpVector * VertLength) + (LeftVector * HozLength);
 
 	-- local mat = Matrix3D.createLookAtLH( camera3d.eye, camera3d.look, Vector3.negative(camera3d.up) )
 	-- mat = Matrix3D.transpose(mat)
@@ -165,7 +171,7 @@ function Frustum.buildDrawLines(camera3d)
 	lines[#lines +1] = Verts[6]
 
 	lines[#lines +1] = Verts[7]
-	lines[#lines +1] = Verts[2]
+	lines[#lines +1] = Verts[3]
 
 	lines[#lines +1] = Verts[4]
 	lines[#lines +1] = Verts[8]
@@ -244,7 +250,6 @@ function Frustum:insideBox( box )
                 - self.planeOffsetVec[1];
 
 	if d0.x >= 0 or d0.y >= 0 or d0.z >= 0 then
-		log('aaaaaaaaaaaaaaa')
 		return false;
 	end
 
@@ -258,7 +263,6 @@ function Frustum:insideBox( box )
                 - self.planeOffsetVec[2];
 
 	if d1.x >= 0 or d1.y >= 0 or d1.z >= 0 then
-		log('bbbbbbbbbbbbbbbbbb')
 		return false;
 	end
 
@@ -343,10 +347,10 @@ end
 function Frustum:buildFromViewAndProject( view, proj )
 
 	--TODO..
-	-- local M = RenderSet.getCameraFrustumViewMatrix()
-	-- local P = RenderSet.getCameraFrustumProjectMatrix()
-	local M = RenderSet.getDefaultViewMatrix()
-	local P = RenderSet.getDefaultProjectMatrix()
+	local M = RenderSet.getCameraFrustumViewMatrix()
+	local P = RenderSet.getCameraFrustumProjectMatrix()
+	-- local M = RenderSet.getDefaultViewMatrix()
+	-- local P = RenderSet.getDefaultProjectMatrix()
 
 	self.pv = Matrix3D.copy(P)--getCameraFrustumProjectMatrix
 	self.pv:mulRight(M);
@@ -354,7 +358,7 @@ function Frustum:buildFromViewAndProject( view, proj )
 	-- -- TODO, use sse.
 	-- local viewcopy = Matrix3D.copy(view)
 	-- viewcopy:mulRight(proj);
-	local vp = Matrix3D.inverse( self.pv );
+	local vp = self.pv--Matrix3D.inverse( self.pv );
 	-- -- vp:transposeSelf()
 	self.vs[1] = vp:mulVector(Vector3.new( -1.0, -1.0, 0.0 ));
 	self.vs[2] = vp:mulVector(Vector3.new( -1.0,  1.0, 0.0 ));

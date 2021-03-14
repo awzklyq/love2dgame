@@ -32,6 +32,7 @@ dofile('script/polygon/line.lua')
 dofile('script/polygon/box.lua')
 dofile('script/polygon/mesh.lua')
 dofile('script/3d/mesh/mesh3d.lua')
+dofile('script/3d/mesh/aixs.lua')
 dofile('script/polygon/polygon.lua')
 
 dofile('script/uisystem/uisystem.lua')
@@ -88,5 +89,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/shadowmap.lua')
+	dofile('script/test/test_frustum.lua')--test_frustum
 end

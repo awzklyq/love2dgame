@@ -22,9 +22,7 @@ end
 
 RenderSet.getUseViewMatrix = function()
     if  #viewmatrixs == 0 then
-        local camera3d = _G.getGlobalCamera3D()
-        -- return Matrix3D.getViewMatrix(camera3d.eye, camera3d.look, camera3d.up)
-        return Matrix3D.transpose(Matrix3D.createLookAtRH(camera3d.eye, (camera3d.eye - camera3d.look):normalize(), -camera3d.up))--transpose
+        return RenderSet.getDefaultViewMatrix()
     end
 
     return viewmatrixs[#viewmatrixs]
@@ -32,9 +30,7 @@ end
 
 RenderSet.getUseProjectMatrix = function()
     if  #projectmatrixs == 0 then
-        local camera3d = _G.getGlobalCamera3D()
-        return Matrix3D.createPerspectiveFovRH( camera3d.fov, camera3d.aspectRatio, camera3d.nearClip, camera3d.farClip )
-        -- return  Matrix3D.getProjectionMatrix(camera3d.fov, camera3d.nearClip, camera3d.farClip, camera3d.aspectRatio)
+        return RenderSet.getDefaultProjectMatrix()
     end
 
     return projectmatrixs[#projectmatrixs]
@@ -42,8 +38,8 @@ end
 
 RenderSet.getDefaultViewMatrix = function()
     local camera3d = _G.getGlobalCamera3D()
-    return  Matrix3D.transpose(Matrix3D.createLookAtRH(camera3d.eye, (camera3d.eye - camera3d.look):normalize(), -camera3d.up))
-    -- return Matrix3D.getViewMatrix(camera3d.eye, camera3d.look, camera3d.up)
+    return  Matrix3D.transpose(Matrix3D.createLookAtRH(camera3d.eye, camera3d.look, -camera3d.up))
+    -- return Matrix3D.getViewMatrix(camera3d.eye, camera3d.look, -camera3d.up)
 end
 
 RenderSet.getDefaultProjectMatrix = function()
@@ -54,7 +50,7 @@ end
 
 RenderSet.getCameraFrustumViewMatrix = function()
     local camera3d = _G.getGlobalCamera3D()
-    return Matrix3D.createLookAtLH(camera3d.eye, (camera3d.look - camera3d.eye):normalize(), camera3d.up)
+    return Matrix3D.createLookAtLH(camera3d.eye, camera3d.look, camera3d.up)
 end
 
 RenderSet.getCameraFrustumProjectMatrix = function()

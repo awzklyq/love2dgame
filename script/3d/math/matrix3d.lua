@@ -9,6 +9,9 @@ Matrix3D.new = function()
     mat.translation = Vector3.new();
     mat.rotation = Vector3.new();
     mat.scale = Vector3.new(1,1,1);
+
+	mat.renderid = Render.Matrix3DId
+
     return mat;
 end
 
@@ -57,6 +60,24 @@ Matrix3D.getViewMatrix = function(eye, look, up)
         z.x, z.y, z.z, -1*Vector3.dot(z, eye),
         0, 0, 0, 1
 )
+end
+
+
+Matrix3D.createLookAtRH = function(  eye, lookat, upaxis )
+
+	local zaxis = Vector3.sub( eye, lookat ):normalize( );
+	local xaxis = Vector3.cross( upaxis, zaxis ):normalize( );
+	local yaxis = Vector3.cross( zaxis, xaxis );
+
+	local xeye = - Vector3.dot( xaxis, eye );
+	local yeye = - Vector3.dot( yaxis, eye );
+	local zeye = - Vector3.dot( zaxis, eye );
+
+	return Matrix3D.createFromNumbers(
+		xaxis.x, yaxis.x, zaxis.x, 0.0,
+		xaxis.y, yaxis.y, zaxis.y, 0.0,
+		xaxis.z, yaxis.z, zaxis.z, 0.0,
+		   xeye,    yeye,    zeye, 1.0 );
 end
 
 
@@ -422,26 +443,6 @@ Matrix3D.createLookAtLH = function(eye, lookat, upaxis )
 		xaxis.z, yaxis.z, zaxis.z, 0.0,
 		   xeye,    yeye,    zeye, 1.0 );
 end
-
-
-Matrix3D.createLookAtRH = function(  eye, lookat, upaxis )
-
-	local zaxis = Vector3.sub( eye, lookat ):normalize( );
-	local xaxis = Vector3.cross( upaxis, zaxis ):normalize( );
-	local yaxis = Vector3.cross( zaxis, xaxis );
-
-	local xeye = - Vector3.dot( xaxis, eye );
-	local yeye = - Vector3.dot( yaxis, eye );
-	local zeye = - Vector3.dot( zaxis, eye );
-
-	return Matrix3D.createFromNumbers(
-		xaxis.x, yaxis.x, zaxis.x, 0.0,
-		xaxis.y, yaxis.y, zaxis.y, 0.0,
-		xaxis.z, yaxis.z, zaxis.z, 0.0,
-		   xeye,    yeye,    zeye, 1.0 );
-end
-
-
 
 function Matrix3D:getData(i, j)
     return self[(i - 1) * 4 + j]

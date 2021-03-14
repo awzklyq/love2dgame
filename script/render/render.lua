@@ -49,6 +49,10 @@ Render.MeshLinesId = 24
 
 Render.Vector4Id = 25
 
+Render.MatrixId = 26
+
+Render.Matrix3DId = 27
+
 Render.getRenderIdName = function(id)
     if Render.CircleId == id then
         return "Circle"
@@ -101,7 +105,7 @@ Render.RenderObject = function(obj)
     
     if not _G.lovedebug.renderobject then return end
     love.graphics.push();
-    if obj.transform and obj.renderid ~= Render.EntityBodyId then
+    if obj.transform and obj.transform.renderid == Render.MatrixId and obj.renderid ~= Render.EntityBodyId then
         obj.transform:use(obj);
     end
 

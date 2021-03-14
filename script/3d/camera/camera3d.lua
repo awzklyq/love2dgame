@@ -143,7 +143,6 @@ app.mousemoved(function(x, y, dx, dy, istouch)
 		if love.keyboard.isDown("lalt") then
 			_G.currentCamera3D:movePhi(-(mouse.mousex - x) * 0.005)
             _G.currentCamera3D:moveTheta((mouse.mousey - y) * 0.005)
-            
         else
             local dir = Vector3.sub(_G.currentCamera3D.look, _G.currentCamera3D.eye)
             local vx = Vector3.cross(dir, _G.currentCamera3D.up)
@@ -158,7 +157,6 @@ app.mousemoved(function(x, y, dx, dy, istouch)
 			_G.currentCamera3D.eye = Vector3.new(_G.currentCamera3D.eye.x + move.x, _G.currentCamera3D.eye.y + move.y, _G.currentCamera3D.eye.z + move.z)
             _G.currentCamera3D.look = Vector3.new(_G.currentCamera3D.look.x + move.x, _G.currentCamera3D.look.y + move.y, _G.currentCamera3D.look.z + move.z)
         end
-        
 	end
 	mouse.mousex = x
 	mouse.mousey = y
