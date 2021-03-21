@@ -83,6 +83,51 @@ function Frustum:draw()
 
 end
 
+function Frustum:buildDrawLinesFromFrustum()
+
+	local lines = {}
+	lines[#lines +1] = self.vs[1]
+	lines[#lines +1] = self.vs[2]
+
+	lines[#lines +1] = self.vs[1]
+	lines[#lines +1] = self.vs[4]
+
+	lines[#lines +1] = self.vs[3]
+	lines[#lines +1] = self.vs[4]
+
+	lines[#lines +1] = self.vs[3]
+	lines[#lines +1] = self.vs[2]
+
+	lines[#lines +1] = self.vs[1]
+	lines[#lines +1] = self.vs[5]
+
+	lines[#lines +1] = self.vs[2]
+	lines[#lines +1] = self.vs[6]
+
+	lines[#lines +1] = self.vs[7]
+	lines[#lines +1] = self.vs[3]
+
+	lines[#lines +1] = self.vs[4]
+	lines[#lines +1] = self.vs[8]
+
+	lines[#lines +1] = self.vs[5]
+	lines[#lines +1] = self.vs[6]
+
+	lines[#lines +1] = self.vs[5]
+	lines[#lines +1] = self.vs[8]
+
+	lines[#lines +1] = self.vs[7]
+	lines[#lines +1] = self.vs[6]
+
+	lines[#lines +1] = self.vs[7]
+	lines[#lines +1] = self.vs[8]
+	
+
+	local meshlines = MeshLines.new(lines);
+	meshlines:setBGColor(LColor.new(255, 0, 0, 255))
+	return meshlines
+end
+
 function Frustum.buildDrawLines(camera3d)
 
 	local FrustumAngle = camera3d.fov
@@ -187,8 +232,50 @@ function Frustum.buildDrawLines(camera3d)
 
 	lines[#lines +1] = Verts[7]
 	lines[#lines +1] = Verts[8]
+	
 
-	return MeshLines.new(lines)
+	local meshlines = MeshLines.new(lines);
+	meshlines:setBGColor(LColor.new(255, 0, 0, 255))
+	return meshlines
+end
+
+function Frustum:insidePosition(pos)
+	local pp = Vector4.new(pos.x, pos.y, pos.z, 1)
+	pp:mulMatrix(self.pv)
+
+	local resuilt = {0,0,0,0,0,0}
+	local needcull = false
+	if pp.x < -pp.w then
+		resuilt[1] = 1
+		needcull = true
+	end
+
+	if pp.x > pp.w then
+		resuilt[2] = 1
+		needcull = true
+	end
+
+	if pp.y < -pp.w then
+		resuilt[3] = 1
+		needcull = true
+	end
+
+	if pp.y > pp.w then
+		resuilt[4] = 1
+		needcull = true
+	end
+
+	if pp.z < -pp.w then
+		resuilt[5] = 1
+		needcull = true
+	end
+
+	if pp.z > pp.w then
+		resuilt[6] = 1
+		needcull = true
+	end
+
+	return needcull, resuilt
 end
 
 function Frustum:insidePoint(pp)
@@ -235,131 +322,78 @@ function Frustum:insideBox( box )
 	if RenderSet.isNeedFrustum == false then
 		return true
 	end
-	box = self.pv:mulBoundBox(box)
+	-- box = self.pv:mulBoundBox(box)
 	local center = (box.max + box.min) * 0.5;
     local extent = (box.max - box.min) * 0.5;
 
-    -- This is a vertical dot-product on three vectors at once.
-    local d0  = self.planeNormX[1] * center.x 
-                + self.planeNormY[1] * center.y 
-                + self.planeNormZ[1] * center.z
-                - self.planeNormAbsX[1] * extent.x 
-                - self.planeNormAbsY[1] * extent.y 
-				- self.planeNormAbsZ[1] * extent.z 
-				-- - extent
-                - self.planeOffsetVec[1];
-
-	if d0.x >= 0 or d0.y >= 0 or d0.z >= 0 then
-		return false;
-	end
-
-    local d1  = self.planeNormX[2] * center.x 
-                + self.planeNormY[2] * center.y 
-                + self.planeNormZ[2] * center.z
-                - self.planeNormAbsX[2] * extent.x 
-                - self.planeNormAbsY[2] * extent.y 
-				- self.planeNormAbsZ[2] * extent.z 
-				-- -extent
-                - self.planeOffsetVec[2];
-
-	if d1.x >= 0 or d1.y >= 0 or d1.z >= 0 then
-		return false;
-	end
-
-	return true;
-	
 	-- TODO, use sse.
-	-- box = self.pv:mulBoundBox(box)
+	local vmin = Vector3.new();
 
-	-- local vmin = Vector3.new();
+	for i = 1, 6 do
+		-- X axis.
+		vmin.x = self.ps[i].a > 0.0 and  box.min.x or box.max.x;
 
-	-- for i = 1, 6 do
-	-- 	-- X axis.
-	-- 	vmin.x = self.ps[i].a > 0.0 and  box.min.x or box.max.x;
+		-- Y axis.
+		vmin.y = self.ps[i].b > 0.0 and box.min.y or box.max.y;
 
-	-- 	-- Y axis.
-	-- 	vmin.y = self.ps[i].b > 0.0 and box.min.y or box.max.y;
+		-- Z axis.
+		vmin.z = self.ps[i].c > 0.0 and box.min.z or box.max.z;
 
-	-- 	-- Z axis.
-	-- 	vmin.z = self.ps[i].c > 0.0 and box.min.z or box.max.z;
+		if ( self.ps[i]:distance( vmin ) > 0 ) then
+			return false;
+		end
+	end
 
-	-- 	if ( self.ps[i]:distance( vmin ) > 0 ) then
-	-- 		return false;
-	-- 	end
-	-- end
+	return  true
+end
 
-	-- return  true
+function Frustum:insideOrientedBox(box )
+	local result = {0, 0, 0, 0, 0, 0, 0, 0}
 
-	-- local vmin = Vector4.new(box.min.x, box.min.y, box.min.z, 1)
-	-- local vmax = Vector4.new(box.max.x, box.max.y, box.max.z, 1)
+	for i = 1, 8 do
+		local isinside = true
+		for j = 1, 6 do
+			
+			if ( self.ps[j]:distance( box.vs[i] ) > 0.0 ) then
 
-	-- vmin = vmin:mulMatrix(self.pv)
-	-- vmax = vmax:mulMatrix(self.pv)
+			log('aaaaaaaaaaaaaaaaa', i, self.ps[j]:getName(), self.ps[j]:distance( box.vs[i] ) > 0.0 ,self.ps[j]:distance( box.vs[i] ), self.ps[j].d)
+				log('bbbbbbbbbbbbb', "plane", self.ps[j].a, self.ps[j].b, self.ps[j].c)
+				log('ccccccccccccccc', box.vs[i].x, box.vs[i].y, box.vs[i].z )
+				result[i] = result[i] + 1;
+				isinside = false
+			end
+		
+		end
 
-	-- local obox = OrientedBox.buildFormBoundBox(box)
-	-- local rs = {}
-	-- local needcull = false
-	-- needcull, rs[1] = self:insidePoint(vmin)
-	-- if needcull == false then
-	-- 	return false
-	-- end
+		if isinside then
+			return true
+		end
+	end
 
-	-- needcull, rs[2] = self:insidePoint(vmin)
-	-- if needcull == false then
-	-- 	return false
-	-- end
-
-	-- if rs[1] == 1 or  rs[2] == 1 
-
-	-- local vs = {}
-	-- for i = 1, 8 do
-	-- 	vs[i] = Vector4.new(obox.vs[i].x, obox.vs[i].y, obox.vs[i].z, 1)	
-	-- 	vs[i] = vs[i]:mulMatrix(self.pv)
-	-- 	needcull, rs[i] = self:insidePoint(vs[i])
-	-- 	if needcull == false then
-	-- 		return false
-	-- 	end
-	-- end
-
-
-    -- return true;
-    
-    -- Vector3 vmin;
-
-	-- for ( _dword i = 0; i < 6; i ++ )
-	-- {
-	-- 	-- X axis.
-	-- 	vmin.x = ps[i].a > 0.0f ? box.vmin.x : box.vmax.x;
-
-	-- 	-- Y axis.
-	-- 	vmin.y = ps[i].b > 0.0f ? box.vmin.y : box.vmax.y;
-
-	-- 	-- Z axis.
-	-- 	vmin.z = ps[i].c > 0.0f ? box.vmin.z : box.vmax.z;
-
-	-- 	if ( ps[i].Distance( vmin ) > 0.0f )
-	-- 		return _false;
-	-- }
-
-	-- return _true;
+	for i = 1, 8 do
+		if result[i]  == 6 then
+			return false
+		end
+	end
+	return true
 end
 
 function Frustum:buildFromViewAndProject( view, proj )
 
 	--TODO..
-	local M = RenderSet.getCameraFrustumViewMatrix()
+	local V = RenderSet.getCameraFrustumViewMatrix()
 	local P = RenderSet.getCameraFrustumProjectMatrix()
-	-- local M = RenderSet.getDefaultViewMatrix()
+	-- local V = RenderSet.getDefaultViewMatrix()
 	-- local P = RenderSet.getDefaultProjectMatrix()
 
-	self.pv = Matrix3D.copy(P)--getCameraFrustumProjectMatrix
-	self.pv:mulRight(M);
+	self.pv = Matrix3D.copy(V)--getCameraFrustumProjectMatrix
+	self.pv:mulRight(P);
 
 	-- -- TODO, use sse.
 	-- local viewcopy = Matrix3D.copy(view)
 	-- viewcopy:mulRight(proj);
-	local vp = self.pv--Matrix3D.inverse( self.pv );
-	-- -- vp:transposeSelf()
+	local vp = Matrix3D.inverse( self.pv );
+	-- vp:transposeSelf()
 	self.vs[1] = vp:mulVector(Vector3.new( -1.0, -1.0, 0.0 ));
 	self.vs[2] = vp:mulVector(Vector3.new( -1.0,  1.0, 0.0 ));
 	self.vs[3] = vp:mulVector(Vector3.new(  1.0,  1.0, 0.0 ));
@@ -369,76 +403,71 @@ function Frustum:buildFromViewAndProject( view, proj )
 	self.vs[7] = vp:mulVector(Vector3.new(  1.0,  1.0, 1.0 ));
 	self.vs[8] = vp:mulVector(Vector3.new(  1.0, -1.0, 1.0 ));
 
-	self.ps[1]:buildFromThreePoints( self.vs[2], self.vs[6], self.vs[3] ); -- Top
-	self.ps[2]:buildFromThreePoints( self.vs[7], self.vs[8], self.vs[3] ); -- Right
-	self.ps[3]:buildFromThreePoints( self.vs[4], self.vs[5], self.vs[1] ); -- Bottom
-
-	self.ps[4]:buildFromThreePoints( self.vs[2], self.vs[5], self.vs[6] ); -- Left
-	self.ps[5]:buildFromThreePoints( self.vs[1], self.vs[2], self.vs[3] ); -- Near
-	self.ps[6]:buildFromThreePoints( self.vs[6], self.vs[8], self.vs[7] ); -- Far
-
-	-- local two = 2;
-	-- local camera3d = _G.getGlobalCamera3D()
-
-	-- local fovx = camera3d.fov
-	-- local aspect = camera3d.aspectRatio
-	-- local nearPlane = camera3d.nearClip
-	-- local farPlane = camera3d.farClip
-
-    -- local _right    = nearPlane * math.tan(fovx / two);
-	-- local _left     = -_right;
-	-- local _top      = ((_right - _left) / aspect) / two;
-	-- local _bottom   = -_top;
-   
-    -- local _nearPlane    = nearPlane;
-	-- local _farPlane     = farPlane;
-
-	
-	-- local a = M:mulVector(Vector3.new( _left,  _bottom, -_nearPlane));
-    -- local b = M:mulVector(Vector3.new( _left,  _top,    -_nearPlane));
-    -- local c = M:mulVector(Vector3.new( _right, _top,    -_nearPlane));
-	-- local d = M:mulVector(Vector3.new( _right, _bottom, -_nearPlane));
-	
-	
-	-- local s    = _farPlane / _nearPlane
-	-- local farLeft   = s * _left
-	-- local farRight  = s * _right
-	-- local farTop    = s * _top
-	-- local farBottom = s * _bottom
-	-- local e   = M:mulVector(Vector3.new( farLeft,  farBottom, -_farPlane));
-	-- local f   = M:mulVector(Vector3.new( farLeft,  farTop,    -_farPlane));
-	-- local g   = M:mulVector(Vector3.new( farRight, farTop,    -_farPlane));
-	-- local o   = M:mulVector(Vector3.new(0,0,0));
-	-- self.ps[1]:buildFromThreePoints( o, c, b );
-	-- self.ps[2]:buildFromThreePoints( o, d, c );
-	-- self.ps[3]:buildFromThreePoints( o, a, d );
-	-- self.ps[4]:buildFromThreePoints( o, b, a );
-	-- self.ps[5]:buildFromThreePoints( a, d, c );
-	-- self.ps[6]:buildFromThreePoints( e, f, g );
-	
-	-- local a = Vector3.new( _left,  _bottom, -_nearPlane);
-	-- local b = Vector3.new( _left,  _top,    -_nearPlane);
-	-- local c = Vector3.new( _right, _top,    -_nearPlane);
-	-- local d = Vector3.new( _right, _bottom, -_nearPlane);
-	-- local o = Vector3.new(0,0,0);
-
-	-- self.ps[1] = Plane.buildFromPoints( o, c, b );
-	-- self.ps[2] = Plane.buildFromPoints( o, d, c );
-	-- self.ps[3] = Plane.buildFromPoints( o, a, d );
-	-- self.ps[4] = Plane.buildFromPoints( o, b, a );
-	-- self.ps[5] = Plane.new( 0, 0, 1, -_nearPlane );
-	-- self.ps[6] = Plane.new( 0, 0,-1, _farPlane );
-
-	for i = 1, 2 do
-		local index = (i - 1) * 3 + 1
-		self.planeNormX[i] = Vector3.new(self.ps[index].a, self.ps[index + 1].a, self.ps[index + 2].a)
-		self.planeNormY[i] = Vector3.new(self.ps[index].b, self.ps[index + 1].b, self.ps[index + 2].b)
-		self.planeNormZ[i] = Vector3.new(self.ps[index].c, self.ps[index + 1].c, self.ps[index + 2].c)
-
-		self.planeNormAbsX[i] = Vector3.new(math.abs(self.ps[index].a), math.abs(self.ps[index + 1].a), math.abs(self.ps[index + 2].a))
-		self.planeNormAbsY[i] = Vector3.new(math.abs(self.ps[index].b), math.abs(self.ps[index + 1].b), math.abs(self.ps[index + 2].b))
-		self.planeNormAbsZ[i] = Vector3.new(math.abs(self.ps[index].c), math.abs(self.ps[index + 1].c), math.abs(self.ps[index + 2].c))
-
-		self.planeOffsetVec[i] = Vector3.new(math.abs(self.ps[index].d), math.abs(self.ps[index + 1].d), math.abs(self.ps[index + 2].d))
+	for i = 1, 8 do
+		log('box i', i, self.vs[i].x, self.vs[i].y, self.vs[i].z)
 	end
+
+	log("box 1-4 distance", Vector3.distance(self.vs[1], self.vs[2]), Vector3.distance(self.vs[1], self.vs[3]), Vector3.distance(self.vs[1], self.vs[4]))
+
+	log("box 5-6 distance", Vector3.distance(self.vs[5], self.vs[6]), Vector3.distance(self.vs[5], self.vs[7]), Vector3.distance(self.vs[5], self.vs[8]))
+
+	log("box 1-5 distance", Vector3.distance((self.vs[1] + self.vs[2] +self.vs[3] + self.vs[4]) / 4, (self.vs[5] + self.vs[6] + self.vs[7] + self.vs[8]) / 4), Vector3.distance(self.vs[1], self.vs[5]))
+
+	local camera3d = _G.getGlobalCamera3D()
+	log("eye:", camera3d.eye.x, camera3d.eye.y, camera3d.eye.z)
+	log("look:", camera3d.look.x, camera3d.look.y, camera3d.look.z)
+	log("fov: ", camera3d.fov, "aspectRatio:",camera3d.aspectRatio, "nearClip", camera3d.nearClip, "farClip:", camera3d.farClip)
+
+	-- self.vs[1] = (Vector3.new( -300.0, -300.0, -300.0 ));
+	-- self.vs[2] = (Vector3.new( 300.0,  -300.0, -300.0 ));
+	-- self.vs[3] = (Vector3.new(  300.0,  300.0, -300.0 ));
+	-- self.vs[4] = (Vector3.new(  -300.0, 300.0, -300.0 ));
+	-- self.vs[5] = (Vector3.new( -300.0, -300.0, 300.0 ));
+	-- self.vs[6] = (Vector3.new( 300.0,  -300.0, 300.0 ));
+	-- self.vs[7] = (Vector3.new(  300.0,  300.0, 300.0 ));
+	-- self.vs[8] = (Vector3.new(  -300.0, 300.0, 300.0 ));
+
+	self.ps[1].name = 'Near'
+	self.ps[2].name = 'Far'
+	self.ps[3].name = 'Left'
+	self.ps[4].name = 'Right'
+	self.ps[5].name = 'Top'
+	self.ps[6].name = 'Bottom'
+
+	self.ps[1]:buildFromThreePoints( self.vs[1], self.vs[2], self.vs[3] ); -- Near
+	self.ps[2]:buildFromThreePoints( self.vs[6], self.vs[8], self.vs[7] ); -- Far
+	self.ps[3]:buildFromThreePoints( self.vs[2], self.vs[5], self.vs[6] ); -- Left
+
+	self.ps[4]:buildFromThreePoints( self.vs[7], self.vs[8], self.vs[3] ); -- Right	
+	self.ps[5]:buildFromThreePoints( self.vs[2], self.vs[6], self.vs[3] ); -- Top
+	self.ps[6]:buildFromThreePoints( self.vs[4], self.vs[5], self.vs[1] ); -- Bottom
+
+
+end
+
+function Frustum:buildFromOrientedBox(box )
+	for  i = 1, 8 do
+		self.vs[i] = box.vs[i];
+		log("box i :", i, self.vs[i].x, self.vs[i].y, self.vs[i].z)
+	end
+
+	self.ps[1].name = 'Near'
+	self.ps[2].name = 'Far'
+	self.ps[3].name = 'Left'
+	self.ps[4].name = 'Right'
+	self.ps[5].name = 'Top'
+	self.ps[6].name = 'Bottom'
+
+	self.ps[1]:buildFromThreePoints( self.vs[1], self.vs[2], self.vs[3] ); -- Near
+
+	self.ps[2]:buildFromThreePoints( self.vs[6], self.vs[8], self.vs[7] ); -- Far
+
+	self.ps[3]:buildFromThreePoints( self.vs[2], self.vs[5], self.vs[6] ); -- Left
+
+	self.ps[4]:buildFromThreePoints( self.vs[7], self.vs[8], self.vs[3] ); -- Right	
+
+	self.ps[5]:buildFromThreePoints( self.vs[2], self.vs[6], self.vs[3] ); -- Top
+	self.ps[6]:buildFromThreePoints( self.vs[4], self.vs[5], self.vs[1] ); -- Bottom
+
+	return self;
 end

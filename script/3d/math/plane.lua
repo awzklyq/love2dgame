@@ -8,6 +8,8 @@ function Plane.new(a, b, c, d)
     plane.c = c or 0
     plane.d = d or 0
 
+    plane.name = 'plane'
+
     return plane
 end
 
@@ -63,4 +65,8 @@ function Plane.mulMatrix( plane, mat )
 	-- 	b = bb;
 	-- 	c = cc;
 	-- 	d = - Vector3::Dot( v, Vector3( aa, bb, cc ) );
+end
+
+function Plane:getName( )
+    return self.name
 end

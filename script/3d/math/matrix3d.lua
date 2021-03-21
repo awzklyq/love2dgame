@@ -65,7 +65,7 @@ end
 
 Matrix3D.createLookAtRH = function(  eye, lookat, upaxis )
 
-	local zaxis = Vector3.sub( eye, lookat ):normalize( );
+	local zaxis = ( eye - lookat):normalize( );
 	local xaxis = Vector3.cross( upaxis, zaxis ):normalize( );
 	local yaxis = Vector3.cross( zaxis, xaxis );
 
@@ -84,12 +84,18 @@ end
 function Matrix3D:mulVector(tab2)
 	local xx, yy, zz = tab2.x, tab2.y, tab2.z
 	local mat = self
-	-- local w = xx * mat[4] + yy * mat[8] + zz * mat[12] + mat[16]
+	local w = xx * mat:getData(1,4) + yy * mat:getData(2,4) + zz * mat:getData(3,4) + mat:getData(4,4)
 	local rsult = Vector3.new()
-	rsult.x = xx * mat[1] + yy * mat[5] + zz * mat[9] + mat[13]
-	rsult.y = xx * mat[2] + yy * mat[6] + zz * mat[10] + mat[14]
-	rsult.z = xx * mat[3] + yy * mat[7] + zz * mat[11] + mat[15]
+	rsult.x = xx * mat:getData(1,1) + yy * mat:getData(2,1) + zz * mat:getData(3,1) + mat:getData(4,1)
+	rsult.y = xx * mat:getData(1,2) + yy * mat:getData(2,2) + zz * mat:getData(3,2) + mat:getData(4,2)
+	rsult.z = xx * mat:getData(1,3) + yy * mat:getData(2,3) + zz * mat:getData(3,3) + mat:getData(4,3)
 
+	if  w ~= 0.0 then
+		local winv = 1.0 / w;
+		rsult.x = rsult.x * winv;
+		rsult.y = rsult.y * winv;
+		rsult.z = rsult.z * winv;
+	end
 	return rsult
 end
 
@@ -98,11 +104,14 @@ function Matrix3D:mulBoundBox(boundbox)
 	local mat = Matrix3D.transpose(self)
 
 	local box = OrientedBox.buildFormBoundBox(boundbox)
+
 	for i = 1, 8 do
 		box.vs[i] = mat:mulVector(box.vs[i])
 	end
-
-	return box:getBoundBox()
+	-- box:logValue()
+	-- box:logMaxMin()
+	-- return box:getBoundBox()
+	return box
 
 	-- local min = mat:mulVector(boundbox.min)
 	-- local max = mat:mulVector(boundbox.max)
@@ -426,12 +435,9 @@ Matrix3D.createOrthoOffCenterRH = function( left, right, bottom, top, znear, zfa
 end
 
 Matrix3D.createLookAtLH = function(eye, lookat, upaxis )
-	local zaxis = Vector3.sub( lookat, eye );
-	zaxis:normalize( )
-	local xaxis = Vector3.cross( upaxis, zaxis );
-	xaxis:normalize( )
+	local zaxis = ( lookat - eye ):normalize( );
+	local xaxis = Vector3.cross( upaxis, zaxis ):normalize( );
 	local yaxis = Vector3.cross( zaxis, xaxis );
-	yaxis:normalize()
 
 	local xeye = - Vector3.dot( xaxis, eye );
 	local yeye = - Vector3.dot( yaxis, eye );

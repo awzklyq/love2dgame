@@ -154,20 +154,136 @@ function OrientedBox:getBoundBox()
     return BoundBox.buildFromMinMax(min, max)
 end
 
+function OrientedBox:logCenter(info)
+    local center = Vector3.new()
+	for i = 1, 8 do
+		center.x = center.x +  self.vs[i].x
+
+		center.y = center.y +  self.vs[i].y
+
+		center.z = center.z +  self.vs[i].z
+	end
+	
+	center.x = center.x / 8
+
+	center.y = center.y / 8
+
+	center.z = center.z / 8
+
+	log('OrientedBox center: ' .. tostring(info), center.x, center.y, center.z)
+end
+
+function OrientedBox:logValue(info)
+    local center = Vector3.new()
+	for i = 1, 8 do
+		center.x = center.x +  self.vs[i].x
+
+		center.y = center.y +  self.vs[i].y
+
+		center.z = center.z +  self.vs[i].z
+        log('OrientedBox value: '.. tostring(i) .. " " .. tostring(info), self.vs[i].x, self.vs[i].y, self.vs[i].z)
+	end
+	
+	center.x = center.x / 8
+
+	center.y = center.y / 8
+
+	center.z = center.z / 8
+
+	log('OrientedBox center: ' .. tostring(info), center.x, center.y, center.z)
+end
+
+function OrientedBox:logMaxMin(info)
+    local min = self:getMin()
+    local max = self:getMax()
+
+    log('OrientedBox max: ' .. tostring(info), max.x, max.y, max.z)
+    log('OrientedBox min: ' .. tostring(info), min.x, min.y, min.z)
+end
+
 OrientedBox.buildFormMinMax = function( vmin, vmax )
     local box = OrientedBox.new()
 	box.vs[1] = Vector3.new( vmin.x, vmin.y, vmin.z );
 	box.vs[2] = Vector3.new( vmax.x, vmin.y, vmin.z );
-	box.vs[3] = Vector3.new( vmin.x, vmax.y, vmin.z );
-	box.vs[4] = Vector3.new( vmax.x, vmax.y, vmin.z );
+	box.vs[3] = Vector3.new( vmax.x, vmax.y, vmin.z );
+	box.vs[4] = Vector3.new( vmin.x, vmax.y, vmin.z  );
 	box.vs[5] = Vector3.new( vmin.x, vmin.y, vmax.z );
 	box.vs[6] = Vector3.new( vmax.x, vmin.y, vmax.z );
-	box.vs[7] = Vector3.new( vmin.x, vmax.y, vmax.z );
-	box.vs[8] = Vector3.new( vmax.x, vmax.y, vmax.z );
+	box.vs[7] = Vector3.new( vmax.x, vmax.y, vmax.z );
+	box.vs[8] = Vector3.new( vmin.x, vmax.y, vmax.z );
 
 	return box;
 end
 
 OrientedBox.buildFormBoundBox = function( box )
     return OrientedBox.buildFormMinMax(box.min, box.max)
+end
+
+function OrientedBox:getMin()
+    local value = Vector3.new(self.vs[1].x, self.vs[1].y, self.vs[1].z)
+    for i = 1, 8 do
+        value.x = math.min(value.x, self.vs[i].x)
+        value.y = math.min(value.y, self.vs[i].y)
+        value.z = math.min(value.z, self.vs[i].z)
+    end
+    return value
+end
+
+function OrientedBox:getMax()
+    local value = Vector3.new(self.vs[1].x, self.vs[1].y, self.vs[1].z)
+    for i = 1, 8 do
+        value.x = math.max(value.x, self.vs[i].x)
+        value.y = math.max(value.y, self.vs[i].y)
+        value.z = math.max(value.z, self.vs[i].z)
+    end
+    return value
+end
+
+function OrientedBox:buildMeshLines()
+
+    local min = self:getMin()
+    local max = self:getMax()
+
+    local xsize = max.x - min.x
+    local ysize = max.y - min.y
+    local zsize = max.z - min.z
+
+    local points = {}
+    points[#points + 1] = Vector3.new(min.x, min.y, min.z)
+    points[#points + 1] = Vector3.new(min.x + xsize, min.y, min.z)
+
+    points[#points + 1] = Vector3.new(min.x, min.y, min.z)
+    points[#points + 1] = Vector3.new(min.x, min.y + ysize, min.z)
+
+    points[#points + 1] = Vector3.new(min.x + xsize, min.y, min.z)
+    points[#points + 1] = Vector3.new(min.x + xsize, min.y + ysize, min.z)
+
+    points[#points + 1] = Vector3.new(min.x, min.y + ysize, min.z)
+    points[#points + 1] = Vector3.new(min.x+ xsize, min.y + ysize, min.z)
+
+    points[#points + 1] = Vector3.new(min.x, min.y, min.z)
+    points[#points + 1] = Vector3.new(min.x, min.y, min.z + zsize)
+
+    points[#points + 1] = Vector3.new(min.x + xsize, min.y, min.z)
+    points[#points + 1] = Vector3.new(min.x + xsize, min.y, min.z+ zsize)
+
+    points[#points + 1] = Vector3.new(min.x, min.y + ysize, min.z)
+    points[#points + 1] = Vector3.new(min.x, min.y + ysize, min.z+ zsize)
+
+    points[#points + 1] = Vector3.new(min.x+ xsize, min.y + ysize, min.z)
+    points[#points + 1] = Vector3.new(min.x+ xsize, min.y + ysize, min.z+ zsize)
+
+    points[#points + 1] = Vector3.new(min.x, min.y, min.z+ zsize)
+    points[#points + 1] = Vector3.new(min.x + xsize, min.y, min.z+ zsize)
+
+    points[#points + 1] = Vector3.new(min.x, min.y, min.z+ zsize)
+    points[#points + 1] = Vector3.new(min.x, min.y + ysize, min.z+ zsize)
+
+    points[#points + 1] = Vector3.new(min.x + xsize, min.y, min.z+ zsize)
+    points[#points + 1] = Vector3.new(min.x+ xsize, min.y + ysize, min.z+ zsize)
+
+    points[#points + 1] = Vector3.new(min.x, min.y + ysize, min.z+ zsize)
+    points[#points + 1] = Vector3.new(min.x+ xsize, min.y + ysize, min.z+ zsize)
+
+    return MeshLines.new(points)
 end
