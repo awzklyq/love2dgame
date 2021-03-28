@@ -56,8 +56,8 @@ end
 
 BoundBox.buildFromMinMax = function(min, max)
     local box = BoundBox.new()
-    box.min = min
-    box.max = max
+    box.min = Vector3.copy(min)
+    box.max = Vector3.copy(max)
     box.center = Vector3.new((box.min.x + box.max.x) * 0.5, (box.min.y + box.max.y) * 0.5, (box.min.z + box.max.z) * 0.5)
     return box
 end
@@ -124,6 +124,14 @@ BoundBox.getIntersectBox = function(box1, box2)
 
     box.center = Vector3.new((box.min.x + box.max.x) * 0.5, (box.min.y + box.max.y) * 0.5, (box.min.z + box.max.z) * 0.5)
     return box
+end
+
+BoundBox.copy = function(data)
+    local result = BoundBox.new()
+    result.min = Vector3.copy(data.min)
+    result.max = Vector3.copy(data.max)
+    result.center = Vector3.copy(data.center)
+    return result
 end
 
 _G.OrientedBox = {}

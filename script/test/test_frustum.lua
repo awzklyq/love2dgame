@@ -54,7 +54,8 @@ app.keypressed(function(key, scancode, isrepeat)
         box = mesh.transform3d:mulBoundBox(box)
 
         -- log(tostring(frustum:insideOrientedBox(box)))
-        log(tostring(frustum:insideBox(box:getBoundBox())))
+        -- log(tostring(frustum:insideBox(box:getBoundBox())))
+        log(tostring(frustum:insideBox(box)))
     elseif key == "x" then
         local pos = Vector3.new(mesh.transform3d:getData(1,4), mesh.transform3d:getData(2,4), mesh.transform3d:getData(3,4))
         log('pos: ', pos.x, pos.y, pos.z)

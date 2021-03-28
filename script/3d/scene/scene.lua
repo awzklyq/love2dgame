@@ -9,6 +9,10 @@ function Scene3D.new()
 
     scene.lights = {}
 
+    scene.isDrawOctrees = false;
+    scene.needcreateoctrees = false;
+    scene.octrees = Octree.new()
+
     scene.bgColor = LColor.new(0.2,0.2,0.2,0)
 
     scene.screenwidth = love.graphics.getPixelWidth()
@@ -25,6 +29,22 @@ end
 
 function Scene3D:getDepthCanvas()
     return self.canvasdepth
+end
+
+function Scene3D:createOctrees()
+    if not self.needcreateoctrees then 
+        return
+    end
+    local box = BoundBox.new()
+    for i ,v in pairs(self.nodes) do
+        if v.mesh and v.box then
+            box:addSelf(v.box)
+        end
+    end
+
+    self.octrees:createOctreesNode(box, _G.GConfig.octreesize)
+
+    self.needcreateoctrees = false
 end
 
 function Scene3D:addLight(light)
@@ -51,6 +71,8 @@ function Scene3D:addMesh(mesh)
     mesh.node = node -- warning..
     
     table.insert(self.nodes, node)
+
+    self.needcreateoctrees = true
     return node
 end
 
@@ -76,6 +98,8 @@ function Scene3D:update(e)
         self.screenheight = RenderSet.screenheight--love.graphics.getHeight() * 2
         self:reseizeScreen(self.screenwidth, self.screenheight)
     end
+
+    self:createOctrees()
 
     self.frustum:buildFromViewAndProject(RenderSet.getDefaultViewMatrix(), RenderSet.getDefaultProjectMatrix())
 end
@@ -144,6 +168,11 @@ function Scene3D:draw(isdrawCanvaColor)
             end
         end
     end
+
+    if self.isDrawOctrees then
+        self.octrees:draw()
+    end
+    
     love.graphics.setCanvas()
     love.graphics.setMeshCullMode("none")
 
