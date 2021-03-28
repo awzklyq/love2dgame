@@ -39,7 +39,7 @@ end
 RenderSet.getDefaultViewMatrix = function()
     local camera3d = _G.getGlobalCamera3D()
     -- return  Matrix3D.transpose(Matrix3D.createLookAtRH(camera3d.eye, camera3d.look, -camera3d.up))
-    return Matrix3D.getViewMatrix(camera3d.eye, camera3d.look, -camera3d.up)
+    return Matrix3D.getViewMatrix(camera3d.eye, camera3d.look, camera3d.up)
 end
 
 RenderSet.getDefaultProjectMatrix = function()

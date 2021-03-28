@@ -89,5 +89,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_frustum.lua')--test_frustum
+	dofile('script/test/shadowmap.lua')--test_frustum
 end

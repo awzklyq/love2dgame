@@ -666,8 +666,8 @@ function Shader.GetBase3DPSShaderCode()
         if needshadow and RenderSet.getshadowReceiver() then
             pixelcode = pixelcode..[[
                 float offset = 1/shadowmapsize;
-                vec2 suv = lightpos.xy;;
-                float shadowdepth = lightpos.z * 0.5 + 0.5;
+                vec2 suv = lightpos.xy * 0.5 + vec2(0.5, 0.5);
+                float shadowdepth = lightpos.z;// * 0.5 + 0.5;
                 float shadow = getShadowPCF(suv, directionlightShadowMap, shadowdepth, shadowmapsize);
                
                 texcolor.xyz *= shadow;
@@ -799,7 +799,7 @@ function Shader.GeDepth3DShader(projectionMatrix, modelMatrix, viewMatrix)
             vec4 position(mat4 transform_projection, vec4 vertex_position)
             {
                 vec4 basepos = projectionMatrix * viewMatrix * modelMatrix * VertexPosition;
-                depth = basepos.z / basepos.w;
+                depth = basepos.z;// / basepos.w * 0.5 + 0.5;
                 return basepos;
             }
     ]]

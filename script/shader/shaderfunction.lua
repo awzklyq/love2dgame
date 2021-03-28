@@ -13,6 +13,7 @@ _G.ShaderFunction.getShadowPCFCode = [[
 
         
         float shadow = texture2D(shadowmap, suv).r > depth ? 1 : 0;
+
         float shadow1 = texture2D(shadowmap, suv + vec2(offset, 0)).r > depth ? 1 : 0;
         float shadow2 = texture2D(shadowmap, suv + vec2(-offset, 0)).r > depth ? 1 : 0;
 

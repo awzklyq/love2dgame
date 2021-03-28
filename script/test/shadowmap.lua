@@ -8,7 +8,7 @@ local plane = Mesh3D.new("assert/obj/plane.obj")
 plane:setBaseColor(LColor.new(125,125,125, 255))
 -- mesh3d:setTexture(love.graphics.newImage("assert/obj/earth.png"))
 -- mesh3d.transform3d = Matrix3D.getTransformationMatrix(Vector3.new(0,0,-20), Vector3.new(), Vector3.new(1,1,1))
-local cubenum = 10
+local cubenum = 3
 for i = 1, cubenum do
     local mesh3d = Mesh3D.new("assert/obj/bbb.obj")
     mesh3d.transform3d:mulTranslationRight(math.random(-1000, 1000), math.random(-500, 900), math.random(-500, 500))
@@ -30,9 +30,9 @@ local baseshader = Shader.GetBase3DShader()
 plane:setBaseColor(LColor.new(125, 125,255, 255))
 -- plane.nolight = true
 local planenode = scene:addMesh(plane)
--- planenode.shadowReceiver = true
+planenode.shadowReceiver = true
 
-local directionlight = DirectionLight.new(Vector3.new(0, 0.5, 1), LColor.new(255,255,255,255))
+local directionlight = DirectionLight.new((currentCamera3D.eye - currentCamera3D.look):normalize(), LColor.new(125,125,125,255))
 local lightnode = scene:addLight(directionlight)
 lightnode.needshadow = true
 local rendertype = 1
@@ -48,10 +48,10 @@ app.render(function(dt)
         scene:drawDirectionLightShadow()
         scene:draw(true)
     else
-        scene:drawDepth()
-        local canvas = scene:getDepthCanvas()
-        canvas:draw()
-        -- scene:drawDirectionLightShadow(true)
+        -- scene:drawDepth()
+        -- local canvas = scene:getDepthCanvas()
+        -- canvas:draw()
+        scene:drawDirectionLightShadow(true)
     end
     
     if frustummeshlines then
@@ -69,22 +69,7 @@ app.keypressed(function(key, scancode, isrepeat)
         scene.needFXAA = not scene.needFXAA
     end
 
-    
-    if key == "z" then
-        local camera3d = _G.getGlobalCamera3D()
-        frustummeshlines = Frustum.buildDrawLines( camera3d)
-    end
-
     if key == 'x' then
         RenderSet.isNeedFrustum = not RenderSet.isNeedFrustum
     end
-
-
-    -- if key == "up" then
-    --     plane.transform3d:mulTranslationRight(0,-10,0)
-    -- end
-
-    -- if key == "down" then
-    --     plane.transform3d:mulTranslationRight(0,0,-10)
-    -- end
 end)

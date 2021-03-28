@@ -243,7 +243,6 @@ function Scene3D:drawDirectionLightShadow(isdebug)
         local lightnode = self.lights[i]
         local directionLight = lightnode.directionLight
         if directionLight and lightnode.needshadow then
-
             love.graphics.setCanvas({lightnode.shadowmap.obj, depthstencil = lightnode.depth_buffer.obj})
             love.graphics.setMeshCullMode("front")
             love.graphics.setDepthMode("less", true)
@@ -262,20 +261,20 @@ function Scene3D:drawDirectionLightShadow(isdebug)
                 end
 
                 if node.shadowReceiver then--node.shadowReceiver
-                    local box = node.mesh.transform3d:mulBoundBox(node.box)
+                    local box = node.mesh.transform3d:mulBoundBox(node.box, true)
                     receiverbox:addSelf(box)
                 end
             end
 
             local shadowprojectbox = receiverbox--BoundBox.getIntersectBox(casterbox, receiverbox)
 
-            shadowprojectbox = lightmat:mulBoundBox(shadowprojectbox)
+            shadowprojectbox = lightmat:mulBoundBox(casterbox, true)
             shadowprojectbox.max.z = math.max(shadowprojectbox.max.z, camera3d.farClip) + 10000000--TODO
             
             local shadowmapproj = Matrix3D.createOrthoOffCenterLH(
                 shadowprojectbox.min.x, shadowprojectbox.max.x, shadowprojectbox.min.y, shadowprojectbox.max.y, shadowprojectbox.min.z, shadowprojectbox.max.z);
             
-            RenderSet.pushViewMatrix(Matrix3D.transpose(lightmat))
+            RenderSet.pushViewMatrix(Matrix3D.transpose(lightmat))--Matrix3D.transpose
             RenderSet.pushProjectMatrix(Matrix3D.transpose(shadowmapproj))
             
             for j = 1, #self.nodes do
@@ -301,19 +300,24 @@ function Scene3D:drawDirectionLightShadow(isdebug)
             -- texmat[13] = 0.5;
             -- texmat[14] = 0.5;
             -- texmat:transposeSelf()
-            local texmat = Matrix3D.createFromNumbers( -- FOr uv
-               0.5, 0,0,0,
-               0,0.5,0,0,
-               0,0,0.5,0,
-               0.5,0.5,0.5,1
-        )
+        --     local texmat = Matrix3D.createFromNumbers( -- FOr uv
+        --        0.5, 0,0,0,
+        --        0,0.5,0,0,
+        --        0,0,0.5,0,
+        --        0.5,0.5,0.5,1
+        -- )
+
+        local texmat = Matrix3D.createFromNumbers( -- FOr uv
+        1, 0,0,0,
+        0,1,0,0,
+        0,0,1,0,
+        0,0,0,1
+ )
+        
             texmat:transposeSelf()
             texmat:mulRight(Matrix3D.transpose(shadowmapproj))
             local mat = texmat--Matrix3D.transpose(texmat)
             
-            -- mat:mulRight(shadowmapproj)
-            -- mat:mulRight(lightmat)
-            -- mat:mulRight(Matrix3D.transpose(shadowmapproj))
             mat:mulRight(Matrix3D.transpose(lightmat))
             lightnode.directionlightMatrix = mat
 

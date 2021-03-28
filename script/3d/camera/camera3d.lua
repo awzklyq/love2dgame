@@ -46,30 +46,30 @@ function Camera3D:movePhi( phi )
         phi = math.MaxNumber - curPhi;
     end
                 
-    -- local temp = curPhi + phi;
-	-- while ( temp > math.c2pi ) do
-    --     temp = temp - math.c2pi;
-    -- end
+    local temp = curPhi + phi;
+	while ( temp > math.c2pi ) do
+        temp = temp - math.c2pi;
+    end
 
-    -- while ( temp < 0 ) do
-    --     temp = temp + math.c2pi;
-    -- end
+    while ( temp < 0 ) do
+        temp = temp + math.c2pi;
+    end
 
-    -- if  temp < math.MinNumber and temp > math.MaxNumber then
+    if  temp < math.MinNumber and temp > math.MaxNumber then
     
-    --     if  math.abs( curPhi - math.MinNumber ) < math.abs( curPhi - math.MaxNumber ) then
-    --         phi = mPhiLimit.x - curPhi;
-    --     else
-    --         phi = mPhiLimit.y - curPhi;
-    --     end
-    -- end
+        if  math.abs( curPhi - math.MinNumber ) < math.abs( curPhi - math.MaxNumber ) then
+            phi = math.MinNumber - curPhi;--mPhiLimit.x
+        else
+            phi = math.MaxNumber - curPhi;--mPhiLimit.y
+        end
+    end
 
     local mat = Matrix3D.new()
     mat:mulTranslationRight(-self.look.x, -self.look.y, -self.look.z)
     mat:mulRotationRight(self.up.x, self.up.y, self.up.z, phi)
     mat:mulTranslationRight(self.look.x, self.look.y, self.look.z)
 
-    self.eye = mat:mulVector(self.eye)
+    self.eye = mat:mulVector(self.eye, true)
 end
 
 function Camera3D:moveTheta( theta)
@@ -95,7 +95,7 @@ function Camera3D:moveTheta( theta)
     mat:mulRotationRight(right.x, right.y, right.z, theta)
     mat:mulTranslationRight(self.look.x, self.look.y, self.look.z)
 
-    local eye = mat:mulVector(self.eye);
+    local eye = mat:mulVector(self.eye, true);
 	local vec2 = Vector3.cross( Vector3.sub(self.eye, self.look), right );
 
 	if ( Vector3.dot( vec1, self.up ) * Vector3.dot( vec2, self.up ) < 0.0 ) then

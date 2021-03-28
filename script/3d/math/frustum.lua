@@ -356,9 +356,9 @@ function Frustum:insideOrientedBox(box )
 			
 			if ( self.ps[j]:distance( box.vs[i] ) > 0.0 ) then
 
-			log('aaaaaaaaaaaaaaaaa', i, self.ps[j]:getName(), self.ps[j]:distance( box.vs[i] ) > 0.0 ,self.ps[j]:distance( box.vs[i] ), self.ps[j].d)
-				log('bbbbbbbbbbbbb', "plane", self.ps[j].a, self.ps[j].b, self.ps[j].c)
-				log('ccccccccccccccc', box.vs[i].x, box.vs[i].y, box.vs[i].z )
+			-- log('aaaaaaaaaaaaaaaaa', i, self.ps[j]:getName(), self.ps[j]:distance( box.vs[i] ) > 0.0 ,self.ps[j]:distance( box.vs[i] ), self.ps[j].d)
+			-- 	log('bbbbbbbbbbbbb', "plane", self.ps[j].a, self.ps[j].b, self.ps[j].c)
+			-- 	log('ccccccccccccccc', box.vs[i].x, box.vs[i].y, box.vs[i].z )
 				result[i] = result[i] + 1;
 				isinside = false
 			end
@@ -403,20 +403,20 @@ function Frustum:buildFromViewAndProject( view, proj )
 	self.vs[7] = vp:mulVector(Vector3.new(  1.0,  1.0, 1.0 ));
 	self.vs[8] = vp:mulVector(Vector3.new(  1.0, -1.0, 1.0 ));
 
-	for i = 1, 8 do
-		log('box i', i, self.vs[i].x, self.vs[i].y, self.vs[i].z)
-	end
+	-- for i = 1, 8 do
+	-- 	log('box i', i, self.vs[i].x, self.vs[i].y, self.vs[i].z)
+	-- end
 
-	log("box 1-4 distance", Vector3.distance(self.vs[1], self.vs[2]), Vector3.distance(self.vs[1], self.vs[3]), Vector3.distance(self.vs[1], self.vs[4]))
+	-- log("box 1-4 distance", Vector3.distance(self.vs[1], self.vs[2]), Vector3.distance(self.vs[1], self.vs[3]), Vector3.distance(self.vs[1], self.vs[4]))
 
-	log("box 5-6 distance", Vector3.distance(self.vs[5], self.vs[6]), Vector3.distance(self.vs[5], self.vs[7]), Vector3.distance(self.vs[5], self.vs[8]))
+	-- log("box 5-6 distance", Vector3.distance(self.vs[5], self.vs[6]), Vector3.distance(self.vs[5], self.vs[7]), Vector3.distance(self.vs[5], self.vs[8]))
 
-	log("box 1-5 distance", Vector3.distance((self.vs[1] + self.vs[2] +self.vs[3] + self.vs[4]) / 4, (self.vs[5] + self.vs[6] + self.vs[7] + self.vs[8]) / 4), Vector3.distance(self.vs[1], self.vs[5]))
+	-- log("box 1-5 distance", Vector3.distance((self.vs[1] + self.vs[2] +self.vs[3] + self.vs[4]) / 4, (self.vs[5] + self.vs[6] + self.vs[7] + self.vs[8]) / 4), Vector3.distance(self.vs[1], self.vs[5]))
 
-	local camera3d = _G.getGlobalCamera3D()
-	log("eye:", camera3d.eye.x, camera3d.eye.y, camera3d.eye.z)
-	log("look:", camera3d.look.x, camera3d.look.y, camera3d.look.z)
-	log("fov: ", camera3d.fov, "aspectRatio:",camera3d.aspectRatio, "nearClip", camera3d.nearClip, "farClip:", camera3d.farClip)
+	-- local camera3d = _G.getGlobalCamera3D()
+	-- log("eye:", camera3d.eye.x, camera3d.eye.y, camera3d.eye.z)
+	-- log("look:", camera3d.look.x, camera3d.look.y, camera3d.look.z)
+	-- log("fov: ", camera3d.fov, "aspectRatio:",camera3d.aspectRatio, "nearClip", camera3d.nearClip, "farClip:", camera3d.farClip)
 
 	-- self.vs[1] = (Vector3.new( -300.0, -300.0, -300.0 ));
 	-- self.vs[2] = (Vector3.new( 300.0,  -300.0, -300.0 ));
