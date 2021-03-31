@@ -23,6 +23,8 @@ function Mesh3D.new(file)-- lw :line width
 
     mesh.nolight = false
 
+    mesh.visible = true
+
     mesh:setRenderType("normal")
     return mesh;
 end
@@ -157,6 +159,7 @@ function Mesh3D:useLights()
 end
 
 function Mesh3D:draw()
+    if not self.visible then return end
     local camera3d = _G.getGlobalCamera3D()
     --modelMatrix, projectionMatrix, viewMatrix
 

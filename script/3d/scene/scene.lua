@@ -45,6 +45,12 @@ function Scene3D:createOctrees()
     self.octrees:createOctreesNode(box, _G.GConfig.octreesize)
 
     self.needcreateoctrees = false
+
+    for i, v in pairs(self.nodes) do
+        if v.mesh then
+            self.octrees:updateMeshNode(v)
+        end
+    end
 end
 
 function Scene3D:addLight(light)
@@ -73,6 +79,8 @@ function Scene3D:addMesh(mesh)
     table.insert(self.nodes, node)
 
     self.needcreateoctrees = true
+
+    -- self.octrees:updateMeshNode(node)
     return node
 end
 

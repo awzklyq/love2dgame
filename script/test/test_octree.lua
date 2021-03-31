@@ -9,6 +9,7 @@ plane:setBaseColor(LColor.new(125,125,125, 255))
 -- mesh3d:setTexture(love.graphics.newImage("assert/obj/earth.png"))
 -- mesh3d.transform3d = Matrix3D.getTransformationMatrix(Vector3.new(0,0,-20), Vector3.new(), Vector3.new(1,1,1))
 local cubenum = 100
+local nodes = {}
 for i = 1, cubenum do
     local mesh3d = Mesh3D.new("assert/obj/bbb.obj")
     mesh3d.transform3d:mulTranslationRight(math.random(-2000, 2000), math.random(-1000, 1000), math.random(-1000, 1000))
@@ -16,6 +17,7 @@ for i = 1, cubenum do
     mesh3d:setBaseColor(LColor.new(math.random(1, 255), math.random(1, 255), math.random(1, 255), 255))
 
     local node = scene:addMesh(mesh3d)
+    table.insert(nodes, node)
 end
 
 currentCamera3D.eye = Vector3.new( 33.386304308313, 363.36230638215, 232.64515424476)
@@ -39,5 +41,21 @@ end)
 app.keypressed(function(key, scancode, isrepeat)
     if key == "space" then
         scene.isDrawOctrees = not scene.isDrawOctrees
+    elseif key == 'w' then
+        for i, v in pairs(nodes) do
+            log('wwwwww')
+            if v.octreenode then
+                v.octreenode.visible = true
+            end
+        end
+
+    elseif key == 'a' then
+        for i, v in pairs(nodes) do
+            -- if not v.octreenode then
+                v.visible = true
+            -- end
+        end
+
+        log('aaaaaa')
     end
 end)

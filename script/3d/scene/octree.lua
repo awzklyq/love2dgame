@@ -18,6 +18,16 @@ function Octree:createOctreesNode(box, size)
     self.rootnode:createChildNodes(size);
 end
 
+function Octree:updateMeshNode(node)
+    if node.octreenode then
+        node.octreenode:removeMeshNode(node)
+    end
+    local result = self.rootnode:checkMeshNodeIn(node)
+    if result then
+        result:addMeshNode(node)
+    end
+end
+
 function Octree:draw()
         local cullmode = love.graphics.getMeshCullMode()
         love.graphics.setMeshCullMode("none")
@@ -37,7 +47,60 @@ function OctreeNode.new()
     node.layer = 1;
 
     node.index = 0;
+
+    node.meshnodes = {}
+
+    node.numberMeshNodes = 0
+
+    node.visible = true
     return node;
+end
+
+function OctreeNode:addMeshNode(node)
+    if self.meshnodes[node] then
+        return
+    end
+
+    self.meshnodes[node] = node
+    node.octreenode = self
+    self.numberMeshNodes = self.numberMeshNodes + 1
+end
+
+function OctreeNode:checkIn(pos)
+    local max = self.box.max
+    local min = self.box.min
+    return pos.x >= min.x and pos.x <= max.x and pos.y >= min.y and pos.y <= max.y and pos.z >= min.z and pos.z <= max.z
+end
+
+function OctreeNode:checkMeshNodeIn(node)
+   if self:checkIn(node.mesh.transform3d:getTranslation()) == false then
+       return nil
+   end
+
+   if self.isLeaf then
+        return self
+   else
+        local result
+        for i = 1, 8 do
+            result = self.childs[i]:checkMeshNodeIn(node);
+            if result then
+                return result;
+            end
+        end
+   end
+
+   return nil
+end
+
+function OctreeNode:removeMeshNode(node)
+    if node.octreenode ~= self then
+        return
+    end
+
+    self.meshnodes[node] = nil
+    node.octreenode = nil
+
+    self.numberMeshNodes = self.numberMeshNodes - 1
 end
 
 function OctreeNode:createChildNodes(size)
@@ -84,20 +147,17 @@ function OctreeNode:createChildNodes(size)
         self.childs[i].index = i
         self.childs[i]:createChildNodes(size)
     end
-
-    -- log('cccccccccccccc', self.layer, self.index, self)
-    if(self.layer == 6 and  self.index == 1) then
-        log('cccccccccccccc', self.layer, self.index, debug.traceback())
-    
-    end
 end
 
 function OctreeNode:draw()
-    if not self.boxmesh then
-        self.boxmesh = self.box:buildMeshLines()
+    if self.isLeaf and self.numberMeshNodes > 0 and self.visible then
+        if not self.boxmesh then
+            self.boxmesh = self.box:buildMeshLines()
+            self.boxmesh:setBGColor(LColor.new(255,0,0,255))
+        end
+    
+        self.boxmesh:draw() 
     end
-
-    self.boxmesh:draw()
 
     if not self.isLeaf then
         for i = 1, 8 do

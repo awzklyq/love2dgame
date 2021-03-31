@@ -204,6 +204,10 @@ function Matrix3D:mulScalingLeft(x, y, z)
 	self:mulRight(Matrix3D.transpose(mm))
 end
 
+function Matrix3D:getTranslation()
+	return Vector3.new(self[4], self[8], self[12])
+end
+
 
 function Matrix3D:mulRight(tab)
     -- self:transposeSelf()
