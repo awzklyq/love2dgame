@@ -4,4 +4,4 @@
 
 _G.GConfig = {}
 
-_G.GConfig.octreesize = 2000
+_G.GConfig.octreesize = 150

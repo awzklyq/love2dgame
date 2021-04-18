@@ -126,6 +126,25 @@ BoundBox.getIntersectBox = function(box1, box2)
     return box
 end
 
+BoundBox.checkIntersectBox = function(box1, box2)
+    local box = BoundBox.new()
+
+    box.min.x = math.max( box1.min.x, box2.min.x );
+	box.min.y = math.max( box1.min.y, box2.min.y );
+	box.min.z = math.max( box1.min.z, box2.min.z );
+
+	box.max.x = math.min( box1.max.x, box2.max.x );
+	box.max.y = math.min( box1.max.y, box2.max.y );
+    box.max.z = math.min( box1.max.z, box2.max.z );
+    
+    if box.min.x > box.max.x or box.min.y > box.max.y or box.min.z > box.max.z then
+
+       return false
+    end
+
+    return true
+end
+
 BoundBox.copy = function(data)
     local result = BoundBox.new()
     result.min = Vector3.copy(data.min)

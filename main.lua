@@ -89,5 +89,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_octree.lua')--test_frustum
+	dofile('script/test/test_scene_frustum.lua')--test_frustum
 end

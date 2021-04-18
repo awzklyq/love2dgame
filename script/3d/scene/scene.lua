@@ -23,6 +23,7 @@ function Scene3D.new()
     scene:reseizeScreen(scene.screenwidth, scene.screenheight)
     scene.needFXAA = false
 
+    scene.visiblenodes = {}
     scene.cullednumber = 0
     return scene
 end
@@ -37,8 +38,8 @@ function Scene3D:createOctrees()
     end
     local box = BoundBox.new()
     for i ,v in pairs(self.nodes) do
-        if v.mesh and v.box then
-            box:addSelf(v.box)
+        if v.mesh then
+            box:addSelf(v:getWorldBox())
         end
     end
 
@@ -99,8 +100,29 @@ function Scene3D:removeMesh(mesh)
     end
 end
 
-function Scene3D:update(e)
+function Scene3D:getMeshNodesNumber()
+    return #self.nodes
+end
+
+function Scene3D:getFrusumCulledNumber()
+    return self.cullednumber
+end
+
+function Scene3D:getFrustumResultNodes()
     self.cullednumber = 0
+    -- for i = 1, #self.nodes do
+    --     local node = self.nodes[i]
+    --     if self.frustum:insideBox(node:getWorldBox()) then
+    --         table.insert(self.visiblenodes, node)
+    --     end
+    -- end
+
+    self.octrees:getFrustumResultNodes(self.frustum, self.visiblenodes)
+
+    self.cullednumber = #self.nodes - #self.visiblenodes
+end
+
+function Scene3D:update(e)
     if self.screenwidth ~= RenderSet.screenwidth or self.screenheight ~= RenderSet.screenheight then
         self.screenwidth = RenderSet.screenwidth-- love.graphics.getWidth() * 2
         self.screenheight = RenderSet.screenheight--love.graphics.getHeight() * 2
@@ -109,7 +131,9 @@ function Scene3D:update(e)
 
     self:createOctrees()
 
-    self.frustum:buildFromViewAndProject(RenderSet.getDefaultViewMatrix(), RenderSet.getDefaultProjectMatrix())
+    self.frustum:buildFromViewAndProject(RenderSet.getCameraFrustumViewMatrix(), RenderSet.getCameraFrustumProjectMatrix())
+
+    self:getFrustumResultNodes()
 end
 
 function Scene3D:reseizeScreen(w, h)
@@ -160,21 +184,18 @@ function Scene3D:draw(isdrawCanvaColor)
     love.graphics.setDepthMode("less", true)
     love.graphics.setCanvas({self.canvascolor.obj, depthstencil = self.normal_depth_buffer.obj})
     love.graphics.clear(self.bgColor._r, self.bgColor._g, self.bgColor._b, self.bgColor._a)
-    for i = 1, #self.nodes do
-        local node = self.nodes[i]
-        if node.mesh  then--and self.frustum:insideBox(node:getWorldBox())     
-            if self.frustum:insideBox(node:getWorldBox()) then
-                RenderSet.setshadowReceiver(node.shadowReceiver)
-                node.mesh:draw()
-                RenderSet.setshadowReceiver(false)
-                if  self.isDrawBox then
-                    node:drawBoxMesh()
-                end
-                -- end
-            else
-                self.cullednumber = self.cullednumber + 1
+    for i = 1, #self.visiblenodes do
+        local node = self.visiblenodes[i]
+        if node.mesh  then--     
+            RenderSet.setshadowReceiver(node.shadowReceiver)
+            node.mesh:draw()
+            RenderSet.setshadowReceiver(false)
+            if  self.isDrawBox then
+                node:drawBoxMesh()
             end
+            -- end
         end
+        node.isFrustumChecked = false
     end
 
     if self.isDrawOctrees then
@@ -194,6 +215,9 @@ function Scene3D:draw(isdrawCanvaColor)
     if isdrawCanvaColor then
         self:drawCanvaColor()
     end
+
+    -- must be last
+    self.visiblenodes = {}
 end
 
 function Scene3D:drawNormalmap()
@@ -202,8 +226,8 @@ function Scene3D:drawNormalmap()
     love.graphics.setDepthMode("less", true)
     love.graphics.clear(0, 0, 0, 0)
 
-    for i = 1, #self.nodes do
-        local node = self.nodes[i]
+    for i = 1, #self.visiblenodes do
+        local node = self.visiblenodes[i]
         if node.mesh  then
             _G.useNormal()
             node.mesh:setRenderType("normalmap")
@@ -222,7 +246,7 @@ function Scene3D:drawDepth()
     love.graphics.setDepthMode("less", true)
     love.graphics.clear(1,1,1,1)
 
-    for i = 1, #self.nodes do
+    for i = 1, #self.visiblenodes do
         local node = self.nodes[i]
         if node.mesh then
             node.mesh:setRenderType("depth")

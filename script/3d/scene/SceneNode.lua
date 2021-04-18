@@ -7,6 +7,8 @@ function SceneNode3D.new()
 
     node.isDrawBox = false
 
+    node.isFrustumChecked = false
+
     return node
 end
 
@@ -15,8 +17,8 @@ function SceneNode3D:bindMesh(mesh)
     self.mesh = mesh
 
     self.box = BoundBox.buildFromMesh3D(mesh)
-    self.box = mesh.transform3d:mulBoundBox(self.box)
-    self.boxmesh = self.box:buildMeshLines()
+    -- self.box = mesh.transform3d:mulBoundBox(self.box)
+    self.boxmesh = self:getWorldBox():buildMeshLines()
     -- self.boxmesh:setTransform(mesh.transform3d)
     
     self.shadowCaster = false
@@ -26,8 +28,8 @@ end
 
 function SceneNode3D:getWorldBox()
     if self.mesh then
-        -- return self.mesh.transform3d:mulBoundBox(self.box)
-        return self.box
+        return self.mesh.transform3d:mulBoundBox(self.box)
+        --return self.box
     end
     return BoundBox.new()
 end
@@ -55,6 +57,12 @@ function SceneNode3D:bindDirectionLight(light)
     self.shadowmap:setWrap("clampone", "clampone")
     self.depth_buffer = Canvas.new(width, height, {format = "depth32fstencil8", readable = true, msaa = 0, mipmaps="none"})
 
+end
+
+function SceneNode3D:createOctreenodes()
+    if self.mesh and not self.octreenodes then
+        self.octreenodes = setmetatable({}, {__mode = "kv"});
+    end
 end
 
 function SceneNode3D:drawBoxMesh()

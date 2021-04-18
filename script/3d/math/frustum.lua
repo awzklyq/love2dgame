@@ -378,7 +378,7 @@ function Frustum:insideOrientedBox(box )
 	return true
 end
 
-function Frustum:buildFromViewAndProject( view, proj )
+function Frustum:buildFromViewAndProject( )
 
 	--TODO..
 	local V = RenderSet.getCameraFrustumViewMatrix()

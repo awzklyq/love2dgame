@@ -14,18 +14,27 @@ function Octree:createOctreesNode(box, size)
     local max = math.max(vsize.z, math.max(vsize.x ,vsize.y));
 
     self.rootnode.box = BoundBox.buildFromMinMax(copybox.min, copybox.min + Vector3.new(max, max, max))
+
     self.rootnode.isLeaf = false;
     self.rootnode:createChildNodes(size);
 end
 
 function Octree:updateMeshNode(node)
-    if node.octreenode then
-        node.octreenode:removeMeshNode(node)
+    if node.octreenodes then
+        for i, v in pairs(node.octreenodes) do
+            if v then
+                v:removeMeshNode(node)   
+            end 
+        end
+        
     end
-    local result = self.rootnode:checkMeshNodeIn(node)
-    if result then
-        result:addMeshNode(node)
-    end
+
+    self.rootnode:checkMeshNodeInAndAdd(node, true)
+ 
+end
+
+function Octree:getFrustumResultNodes(frustum, visiblenodes)
+    self.rootnode:getFrustumResultNodes(frustum, visiblenodes)
 end
 
 function Octree:draw()
@@ -56,36 +65,60 @@ function OctreeNode.new()
     return node;
 end
 
+function OctreeNode:getFrustumResultNodes(frustum, visiblenodes) 
+    if self.isLeaf then
+        
+        for i, v in pairs(self.meshnodes) do
+            if v and v.isFrustumChecked == false then
+                if frustum:insideBox(v:getWorldBox()) then
+                    table.insert(visiblenodes, v)
+                    
+                end
+                v.isFrustumChecked = true
+            end
+        end
+    else
+        if frustum:insideBox(self.box) then
+            
+            for i = 1, 8 do
+                self.childs[i]:getFrustumResultNodes(frustum, visiblenodes)
+            end
+        else
+            -- log('test frustum cull....')
+        end
+    end
+ 
+    return nil
+end
+
 function OctreeNode:addMeshNode(node)
     if self.meshnodes[node] then
         return
     end
 
+    if not node.octreenodes then
+        node:createOctreenodes()
+        
+    end
     self.meshnodes[node] = node
-    node.octreenode = self
+    node.octreenodes[self] = self
     self.numberMeshNodes = self.numberMeshNodes + 1
 end
 
-function OctreeNode:checkIn(pos)
-    local max = self.box.max
-    local min = self.box.min
-    return pos.x >= min.x and pos.x <= max.x and pos.y >= min.y and pos.y <= max.y and pos.z >= min.z and pos.z <= max.z
+function OctreeNode:checkIn(node)
+    return BoundBox.checkIntersectBox(self.box, node:getWorldBox())
 end
 
-function OctreeNode:checkMeshNodeIn(node)
-   if self:checkIn(node.mesh.transform3d:getTranslation()) == false then
+function OctreeNode:checkMeshNodeInAndAdd(node, isadd)
+    if self:checkIn(node) == false then
        return nil
-   end
+    end
 
    if self.isLeaf then
-        return self
+        self:addMeshNode(node)
    else
-        local result
         for i = 1, 8 do
-            result = self.childs[i]:checkMeshNodeIn(node);
-            if result then
-                return result;
-            end
+            self.childs[i]:checkMeshNodeInAndAdd(node);
         end
    end
 
@@ -98,7 +131,7 @@ function OctreeNode:removeMeshNode(node)
     end
 
     self.meshnodes[node] = nil
-    node.octreenode = nil
+    node.octreenodes[self] = nil
 
     self.numberMeshNodes = self.numberMeshNodes - 1
 end
@@ -141,7 +174,6 @@ function OctreeNode:createChildNodes(size)
 
     self.childs[8] = OctreeNode.new()
     self.childs[8].box = BoundBox.buildFromMinMax(Vector3.new(min.x + vsize.x , min.y + vsize.y, min.z + vsize.z), Vector3.new(min.x + vsize.x, min.y + vsize.y, min.z + vsize.z) + vsize)
-    
     for i = 1, 8 do
         self.childs[i].layer = self.layer + 1
         self.childs[i].index = i
