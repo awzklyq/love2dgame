@@ -575,7 +575,7 @@ function Shader.GetBase3DVSShaderCode()
             local light = directionlights[i]
             if light.node and light.node.needshadow then
                 vertexcode = vertexcode .. " uniform mat4 directionlightMatrix;\n";
-                vertexcode = vertexcode .. "varying vec4 lightpos; \n"
+                vertexcode = vertexcode .. "varying highp  vec4 lightpos; \n"
                 needshadow = true
                 break
             end
@@ -634,7 +634,7 @@ function Shader.GetBase3DPSShaderCode()
     end
 
     if needshadow  and RenderSet.getshadowReceiver() then
-        pixelcode = pixelcode .. "varying vec4 lightpos;\n"
+        pixelcode = pixelcode .. "varying highp  vec4 lightpos;\n"
     end
 
     if needshadow  and RenderSet.getshadowReceiver() then
@@ -667,7 +667,7 @@ function Shader.GetBase3DPSShaderCode()
             pixelcode = pixelcode..[[
                 float offset = 1/shadowmapsize;
                 vec2 suv = lightpos.xy * 0.5 + vec2(0.5, 0.5);
-                float shadowdepth = lightpos.z;// * 0.5 + 0.5;
+                float shadowdepth = lightpos.z * 0.5 + 0.5;
                 float shadow = getShadowPCF(suv, directionlightShadowMap, shadowdepth, shadowmapsize);
                
                 texcolor.xyz *= shadow;
@@ -783,7 +783,7 @@ function Shader.GeDepth3DShader(projectionMatrix, modelMatrix, viewMatrix)
    end
    if not shader then
         local pixelcode = [[
-            varying float depth;
+            varying highp  float depth;
             vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
             {
                 return vec4(depth, depth, depth, 1);
@@ -794,12 +794,12 @@ function Shader.GeDepth3DShader(projectionMatrix, modelMatrix, viewMatrix)
             uniform mat4 projectionMatrix;
             uniform mat4 modelMatrix;
             uniform mat4 viewMatrix;
-            varying float depth;
+            varying highp  float depth;
 
             vec4 position(mat4 transform_projection, vec4 vertex_position)
             {
                 vec4 basepos = projectionMatrix * viewMatrix * modelMatrix * VertexPosition;
-                depth = basepos.z;// / basepos.w * 0.5 + 0.5;
+                depth = basepos.z * 0.5 + 0.5;
                 return basepos;
             }
     ]]
