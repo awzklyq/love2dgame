@@ -53,6 +53,8 @@ Render.MatrixId = 26
 
 Render.Matrix3DId = 27
 
+Render.BoundBoxId = 28
+
 Render.getRenderIdName = function(id)
     if Render.CircleId == id then
         return "Circle"

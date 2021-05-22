@@ -166,7 +166,7 @@ function Frustum.buildDrawLines(camera3d)
 	-- Verts[3] = Vector3.sub(Vector3.sub(Vector3.mul(Direction, FrustumStartDist), Vector3.mul(UpVector, VertLength)) , Vector3.mul(LeftVector , HozLength));
 	-- Verts[4] =   Vector3.add(Vector3.sub(Vector3.mul(Direction, FrustumStartDist) , Vector3.mul(UpVector, VertLength)) , Vector3.mul(LeftVector , HozLength));
 
-	-- // near plane verts
+	-- -- near plane verts
 	Verts[1] = (Direction * FrustumStartDist) + (UpVector * VertLength) + (LeftVector * HozLength);
 	Verts[2] = (Direction * FrustumStartDist) + (UpVector * VertLength) - (LeftVector * HozLength);
 	Verts[3] = (Direction * FrustumStartDist) - (UpVector * VertLength) - (LeftVector * HozLength);
@@ -470,4 +470,104 @@ function Frustum:buildFromOrientedBox(box )
 	self.ps[6]:buildFromThreePoints( self.vs[4], self.vs[5], self.vs[1] ); -- Bottom
 
 	return self;
+end
+
+
+function Frustum:intersectBox( box )
+	local box2 = BoundBox.copy(box);
+
+	local rayinbox = true;
+
+	-- Build rays.
+	local rays = {}
+
+	for i = 1, 4 do
+		rays[i] = Ray.new( self.vs[i], (self.vs[i + 4] - self.vs[i] ):normalize( ) );
+		if ( box:vectorInBox( self.vs[i] ) == false ) then
+			rayinbox = false;
+		end
+	end
+
+	-- Build planes of bound box.
+	local obox = OrientedBox.buildFormMinMax( box.min, box.max );
+
+	local planes = {
+		Plane.buildFromPoints( obox.vs[1], obox.vs[2], obox.vs[3] ),
+		Plane.buildFromPoints( obox.vs[5], obox.vs[7], obox.vs[6] ),
+		Plane.buildFromPoints( obox.vs[5], obox.vs[6], obox.vs[1] ),
+		Plane.buildFromPoints( obox.vs[3], obox.vs[4], obox.vs[7] ),
+		Plane.buildFromPoints( obox.vs[6], obox.vs[8], obox.vs[2] ),
+		Plane.buildFromPoints( obox.vs[5], obox.vs[1], obox.vs[7] ),
+	};
+	
+	
+	local pts1 = {};--Vector3
+	local pts2 = {}
+
+	-- Pick planes by rays, and intersect with current box.
+	for i = 1, 3 do
+		local p1 = planes[i * 2 - 1];
+		local p2 = planes[i * 2];
+
+		-- Pick plane 1.
+		local pick1 = 0;
+		for j = 1, 4 do
+			local r = rays[j];
+
+			local dist = r:isIntersectPlane(p1);
+			if ( dist > 0 ) then
+				-- pick1 += 1 << j;
+				pick1 = pick1 + math.pow(2, j - 1);
+				pts1[j] = r:vectorOnRay( dist );
+			end
+		end
+
+		-- Pick plane 2.
+		local pick2 = 0;
+		for j = 1, 4 do
+			local r = rays[j];
+
+			local dist = r:isIntersectPlane(p2);
+			if  dist > 0 then
+				-- pick2 += 1 << j;
+				pick2 = pick2 + math.pow(2, j - 1);
+				pts2[j] = r:vectorOnRay( dist );
+			end
+		end
+
+		local allpicked = false;
+
+		-- Both plane picked.
+		if  pick1 == 15 and pick2 == 15 then
+
+			allpicked = true;
+		
+		-- Plane 1 picked, and ray inside box.
+		elseif  pick1 == 15 and rayinbox then
+		
+			for  j = 1, 4 do
+				pts2[j] = rays[j].orig;
+			end
+			allpicked = true;
+		-- Plane 2 picked, and ray inside box.
+		elseif pick2 == 15 and rayinbox then
+			for j = 1, 4 do
+				pts1[j] = rays[j].orig;
+			end
+			allpicked = true;
+		end
+
+		-- Build intersect bound box.
+		if allpicked then
+			local temp = BoundBox.buildFromMinMax(Vector3.new(math.maxFloat, math.maxFloat, math.maxFloat), Vector3.new(math.minFloat, math.minFloat, math.minFloat));
+			for j = 1, 4 do
+				temp = temp + pts1[j];
+				temp = temp + pts2[j];
+			end
+
+			box2 = BoundBox.getIntersectBox( temp, box2 );
+		end
+	end
+
+	return box2;
 end

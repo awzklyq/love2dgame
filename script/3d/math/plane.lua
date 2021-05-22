@@ -40,6 +40,10 @@ function Plane:buildFromThreePoints( v1, v2, v3 )
     self.d = - Vector3.dot( v1, n );
 end
 
+function Plane:normal( )
+    return Vector3.new( self.a, self.b, self.c ); 
+end
+
 function Plane.mulMatrix( plane, mat )
     local aa = mat:getData( 1, 1 ) * plane.a + mat:getData( 1, 2 ) * plane.b + mat:getData( 1, 3 ) * plane.c;
     local bb = mat:getData( 2, 1 ) * plane.a + mat:getData( 2, 2 ) * plane.b + mat:getData( 2, 3 ) * plane.c;

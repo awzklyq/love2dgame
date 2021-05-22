@@ -1,11 +1,35 @@
 _G.BoundBox = {}
+
+local metatable_BoundBox = {}
+metatable_BoundBox.__index = BoundBox
+
+metatable_BoundBox.__add = function(myvalue, v)
+    if v.renderid then
+        if v.renderid == Render.Vector3Id then
+            local box = BoundBox.new()
+            box.min.x = math.min( myvalue.min.x, v.x );
+            box.min.y = math.min( myvalue.min.y, v.y );
+            box.min.z = math.min( myvalue.min.z, v.z );
+            box.max.x = math.max( myvalue.max.x, v.x );
+            box.max.y = math.max( myvalue.max.y, v.y );
+            box.max.z = math.max( myvalue.max.z, v.z );
+            box.center = Vector3.new((box.min.x + box.max.x) * 0.5, (box.min.y + box.max.y) * 0.5, (box.min.z + box.max.z) * 0.5)
+            return box
+        end
+    end
+    return  BoundBox.add(myvalue, v)
+end
+
+
 function BoundBox.new()
-    local box = setmetatable({}, {__index = BoundBox});
+    local box = setmetatable({}, metatable_BoundBox);
 
     box.min = Vector3.new(0,0,0)
     box.max = Vector3.new(1,1,1)
 
     box.center = Vector3.new(0.5, 0.5, 0.5)
+
+    BoundBox.renderid = Render.BoundBoxId
     return box
 end
 
@@ -107,6 +131,10 @@ function BoundBox:buildMeshLines()
     return MeshLines.new(points)
 end
 
+function BoundBox:vectorInBox(v )
+    return v.x >= self.min.x and v.x <= self.max.x and v.y >= self.min.y and v.y <= self.max.y and v.z >= self.min.z and v.z <= self.max.z;
+end
+
 BoundBox.getIntersectBox = function(box1, box2)
     local box = BoundBox.new()
 
@@ -117,7 +145,7 @@ BoundBox.getIntersectBox = function(box1, box2)
 	box.max.x = math.min( box1.max.x, box2.max.x );
 	box.max.y = math.min( box1.max.y, box2.max.y );
     box.max.z = math.min( box1.max.z, box2.max.z );
-    
+
     if box.min.x > box.max.x or box.min.y > box.max.y or box.min.z > box.max.z then
         return BoundBox.new()
     end
@@ -151,6 +179,14 @@ BoundBox.copy = function(data)
     result.max = Vector3.copy(data.max)
     result.center = Vector3.copy(data.center)
     return result
+end
+
+function BoundBox:logValueMin(info)
+	log('BoundBox min: ' .. tostring(info), self.min.x, self.min.y, self.min.z)
+end
+
+function BoundBox:logValueMax(info)
+	log('BoundBox max: ' .. tostring(info), self.max.x, self.max.y, self.max.z)
 end
 
 _G.OrientedBox = {}

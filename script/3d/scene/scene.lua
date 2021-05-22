@@ -327,7 +327,7 @@ function Scene3D:drawDirectionLightShadow(isdebug)
                 end
             end
 
-            local shadowprojectbox = receiverbox--BoundBox.getIntersectBox(casterbox, receiverbox)
+            local shadowprojectbox = self.frustum:intersectBox(receiverbox)--BoundBox.getIntersectBox(casterbox, receiverbox)
 
             shadowprojectbox = lightmat:mulBoundBox(shadowprojectbox, true)
             shadowprojectbox.max.z = math.max(shadowprojectbox.max.z, camera3d.farClip) + 10000000--TODO

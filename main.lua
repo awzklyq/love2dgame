@@ -70,6 +70,7 @@ dofile 'script/3d/scene/octree.lua'
 dofile 'script/3d/math/plane.lua'
 dofile 'script/3d/math/frustum.lua'
 dofile 'script/3d/math/box.lua'
+dofile 'script/3d/math/ray.lua'
 
 _G.mlib = require 'script/mlib' 
 
@@ -89,5 +90,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_scene_frustum.lua')--test_frustum
+	dofile('script/test/test_csm.lua')--test_frustum
 end

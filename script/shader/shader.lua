@@ -593,6 +593,8 @@ function Shader.GetBase3DVSShaderCode()
 
     if needshadow and RenderSet.getshadowReceiver() then
         vertexcode = vertexcode.."   lightpos = directionlightMatrix * modelMatrix * VertexPosition; \n"
+        vertexcode = vertexcode.."   lightpos.z = lightpos.z * 0.5 + 0.5; \n"
+    
     end
 
     vertexcode = vertexcode..[[
@@ -667,7 +669,7 @@ function Shader.GetBase3DPSShaderCode()
             pixelcode = pixelcode..[[
                 float offset = 1/shadowmapsize;
                 vec2 suv = lightpos.xy * 0.5 + vec2(0.5, 0.5);
-                float shadowdepth = lightpos.z * 0.5 + 0.5;
+                float shadowdepth = lightpos.z;// * 0.5 + 0.5;
                 float shadow = getShadowPCF(suv, directionlightShadowMap, shadowdepth, shadowmapsize);
                
                 texcolor.xyz *= shadow;

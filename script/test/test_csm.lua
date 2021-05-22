@@ -8,11 +8,10 @@ local plane = Mesh3D.new("assert/obj/plane.obj")
 plane:setBaseColor(LColor.new(125,125,125, 255))
 -- mesh3d:setTexture(love.graphics.newImage("assert/obj/earth.png"))
 -- mesh3d.transform3d = Matrix3D.getTransformationMatrix(Vector3.new(0,0,-20), Vector3.new(), Vector3.new(1,1,1))
-local cubenum = 1
-local mesh
+local cubenum = 30
 for i = 1, cubenum do
     local mesh3d = Mesh3D.new("assert/obj/bbb.obj")
-    mesh3d.transform3d:mulTranslationRight(math.random(-1000, 1000), math.random(-500, 900), math.random(-500, 500))
+    mesh3d.transform3d:mulTranslationRight(math.random(-1000, 1000), math.random(-500, 900), math.random(30, 600))
     mesh3d.transform3d:mulScalingLeft(0.5, 0.5, 0.5)
     mesh3d:setBaseColor(LColor.new(math.random(1, 255), math.random(1, 255), math.random(1, 255), 255))
 
@@ -20,7 +19,6 @@ for i = 1, cubenum do
     node.isDrawBox = true
     node.shadowCaster = true
 
-    mesh = mesh3d
 end
 
 currentCamera3D.eye = Vector3.new( 33.386304308313, 363.36230638215, 232.64515424476)
@@ -46,19 +44,7 @@ meshquad.shader = Shader.GetFXAAShader(canvas:getWidth(), canvas:getHeight())
 
 local frustummeshlines
 app.render(function(dt)
-    if love.keyboard.isDown"up" then
-        mesh.transform3d:mulTranslationRight(0,0,20)
-    elseif love.keyboard.isDown"down" then
-        mesh.transform3d:mulTranslationRight(0,0,-20)
-    elseif love.keyboard.isDown"left" then
-        mesh.transform3d:mulTranslationRight(0,20,0)
-    elseif love.keyboard.isDown"right" then
-        mesh.transform3d:mulTranslationRight(0,-20,0)
-    elseif love.keyboard.isDown"z" then
-        mesh.transform3d:mulTranslationRight(20, 0,0)
-    elseif love.keyboard.isDown"c" then
-        mesh.transform3d:mulTranslationRight(-20, 0,0)
-    end
+
     scene:update(dt)
     if rendertype == 1 then
         scene:drawDirectionLightShadow()

@@ -28,5 +28,8 @@ math.MinNumber = 0.000001;
 math.MaxNumber = 999999.0;
 math.cEpsilon = 0.000001;
 
+math.maxFloat	=  3.402823466e+38;
+math.minFloat	= -3.402823466e+38;
+
 math.c2pi = math.pi * 2
 -- math.ARC = math.PI * 2;
