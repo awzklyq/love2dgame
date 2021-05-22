@@ -315,8 +315,8 @@ function Scene3D:drawDirectionLightShadow(isdebug)
             local casterbox = BoundBox.new()
             local receiverbox = BoundBox.new()
             
-            for j = 1, #self.nodes do
-                local node = self.nodes[j]
+            for j = 1, #self.visiblenodes do
+                local node = self.visiblenodes[j]
                 if node.shadowCaster then--node.shadowCaster
                     casterbox:addSelf(node:getWorldBox())
                 end
@@ -338,8 +338,8 @@ function Scene3D:drawDirectionLightShadow(isdebug)
             RenderSet.pushViewMatrix(Matrix3D.transpose(lightmat))--Matrix3D.transpose
             RenderSet.pushProjectMatrix(Matrix3D.transpose(shadowmapproj))
             
-            for j = 1, #self.nodes do
-                local node = self.nodes[j]
+            for j = 1, #self.visiblenodes do
+                local node = self.visiblenodes[j]
                 if node.shadowCaster then
                     local rendertype = node.mesh:getRenderType()
                     node.mesh:setRenderType("depth")

@@ -61,6 +61,8 @@ function OctreeNode.new()
 
     node.numberMeshNodes = 0
 
+    node.frameToken = 0
+
     node.visible = true
     return node;
 end
@@ -69,12 +71,12 @@ function OctreeNode:getFrustumResultNodes(frustum, visiblenodes)
     if self.isLeaf then
         
         for i, v in pairs(self.meshnodes) do
-            if v and v.isFrustumChecked == false then
+            if v and v.frameToken ~= RenderSet.frameToken then
                 if frustum:insideBox(v:getWorldBox()) then
                     table.insert(visiblenodes, v)
                     
                 end
-                v.isFrustumChecked = true
+                v.frameToken = RenderSet.frameToken
             end
         end
     else

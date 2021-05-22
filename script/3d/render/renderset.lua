@@ -98,6 +98,6 @@ end
 
 RenderSet.screenwidth = love.graphics.getPixelWidth()
 RenderSet.screenheight = love.graphics.getPixelHeight()
-RenderSet.isNeedFrustum = false
+RenderSet.isNeedFrustum = true
 
 RenderSet.frameToken = 1
