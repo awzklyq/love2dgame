@@ -317,9 +317,9 @@ function Frustum:insidePoint(pp)
 	return needcull, resuilt
 end
 
-function Frustum:insideBox( box )
+function Frustum:insideBox( box, force )
 
-	if RenderSet.isNeedFrustum == false then
+	if RenderSet.isNeedFrustum == false and not force then
 		return true
 	end
 	-- box = self.pv:mulBoundBox(box)
@@ -356,9 +356,6 @@ function Frustum:insideOrientedBox(box )
 			
 			if ( self.ps[j]:distance( box.vs[i] ) > 0.0 ) then
 
-			-- log('aaaaaaaaaaaaaaaaa', i, self.ps[j]:getName(), self.ps[j]:distance( box.vs[i] ) > 0.0 ,self.ps[j]:distance( box.vs[i] ), self.ps[j].d)
-			-- 	log('bbbbbbbbbbbbb', "plane", self.ps[j].a, self.ps[j].b, self.ps[j].c)
-			-- 	log('ccccccccccccccc', box.vs[i].x, box.vs[i].y, box.vs[i].z )
 				result[i] = result[i] + 1;
 				isinside = false
 			end
@@ -378,13 +375,11 @@ function Frustum:insideOrientedBox(box )
 	return true
 end
 
-function Frustum:buildFromViewAndProject( )
+function Frustum:buildFromViewAndProject(V, P )
 
 	--TODO..
-	local V = RenderSet.getCameraFrustumViewMatrix()
-	local P = RenderSet.getCameraFrustumProjectMatrix()
-	-- local V = RenderSet.getDefaultViewMatrix()
-	-- local P = RenderSet.getDefaultProjectMatrix()
+	-- local V = RenderSet.getCameraFrustumViewMatrix()
+	-- local P = RenderSet.getCameraFrustumProjectMatrix()
 
 	self.pv = Matrix3D.copy(V)--getCameraFrustumProjectMatrix
 	self.pv:mulRight(P);
