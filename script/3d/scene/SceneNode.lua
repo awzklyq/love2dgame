@@ -56,6 +56,9 @@ function SceneNode3D:bindDirectionLight(light)
     self.shadowmap = Canvas.new(width * _G.GConfig.CSMNumber, height, {format = "rgba32f", readable = true, msaa = 0, mipmaps="none"})
     self.shadowmap:setWrap("clampone", "clampone")
     self.depth_buffer = Canvas.new(width * _G.GConfig.CSMNumber, height, {format = "depth32fstencil8", readable = true, msaa = 0, mipmaps="none"})
+
+    self.CSMMatrix = {}
+    self.CSMDistance = {}
 end
 
 function SceneNode3D:createOctreenodes()

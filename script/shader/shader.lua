@@ -574,8 +574,37 @@ function Shader.GetBase3DVSShaderCode()
         for i = 1, #directionlights do
             local light = directionlights[i]
             if light.node and light.node.needshadow then
-                vertexcode = vertexcode .. " uniform mat4 directionlightMatrix;\n";
+                if GConfig.CSMNumber <= 1 then
+                    vertexcode = vertexcode .. " uniform mat4 directionlightMatrix;\n";
+                elseif  GConfig.CSMNumber == 2 then
+                    vertexcode = vertexcode .. " uniform mat4 CSMMatrix1;\n";
+                    vertexcode = vertexcode .. " uniform mat4 CSMMatrix2;\n";
+
+                    vertexcode = vertexcode .. " uniform float CSMDistance1;\n";
+                    vertexcode = vertexcode .. " uniform float CSMDistance2;\n";
+                elseif  GConfig.CSMNumber == 3 then
+                    vertexcode = vertexcode .. " uniform mat4 CSMMatrix1;\n";
+                    vertexcode = vertexcode .. " uniform mat4 CSMMatrix2;\n";
+                    vertexcode = vertexcode .. " uniform mat4 CSMMatrix3;\n";
+
+                    vertexcode = vertexcode .. " uniform float CSMDistance1;\n";
+                    vertexcode = vertexcode .. " uniform float CSMDistance2;\n";
+                    vertexcode = vertexcode .. " uniform float CSMDistance3;\n";
+                elseif  GConfig.CSMNumber == 4 then
+                    vertexcode = vertexcode .. " uniform mat4 CSMMatrix1;\n";
+                    vertexcode = vertexcode .. " uniform mat4 CSMMatrix2;\n";
+                    vertexcode = vertexcode .. " uniform mat4 CSMMatrix3;\n";
+                    vertexcode = vertexcode .. " uniform mat4 CSMMatrix4;\n";
+
+                    vertexcode = vertexcode .. " uniform float CSMDistance1;\n";
+                    vertexcode = vertexcode .. " uniform float CSMDistance2;\n";
+                    vertexcode = vertexcode .. " uniform float CSMDistance3;\n";
+                    vertexcode = vertexcode .. " uniform float CSMDistance4;\n";
+                end
+
+                
                 vertexcode = vertexcode .. "varying highp  vec4 lightpos; \n"
+                vertexcode = vertexcode .. "varying highp  vec4 vpos; \n"
                 needshadow = true
                 break
             end
@@ -592,7 +621,63 @@ function Shader.GetBase3DVSShaderCode()
     end
 
     if needshadow and RenderSet.getshadowReceiver() then
-        vertexcode = vertexcode.."   lightpos = directionlightMatrix * modelMatrix * VertexPosition; \n"
+        if GConfig.CSMNumber <= 1 then
+         vertexcode = vertexcode.."   lightpos = directionlightMatrix * modelMatrix * VertexPosition; \n"
+        else
+            if  GConfig.CSMNumber >= 2 then
+                vertexcode = vertexcode.."  vpos = projectionMatrix * viewMatrix * modelMatrix * VertexPosition; \n"
+            end
+            
+            if  GConfig.CSMNumber == 2 then
+                vertexcode = vertexcode..[[    
+                    if(vpos.z <= CSMDistance1 + 10 )
+                    {
+                        lightpos = CSMMatrix1 * modelMatrix * VertexPosition; 
+                    }
+                    else
+                    {
+                        lightpos = CSMMatrix2 * modelMatrix * VertexPosition; 
+                    }
+                        ]];
+            elseif  GConfig.CSMNumber == 3 then
+                vertexcode = vertexcode..[[    
+                    if(vpos.z <= CSMDistance1 )
+                    {
+                        lightpos = CSMMatrix1 * modelMatrix * VertexPosition; 
+                    }
+                    else if(vpos.z <= CSMDistance2)
+                    {
+                        lightpos = CSMMatrix2 * modelMatrix * VertexPosition; 
+                    }
+                    else
+                    {
+                        lightpos = CSMMatrix3 * modelMatrix * VertexPosition; 
+                    }
+             
+                        ]];
+            elseif  GConfig.CSMNumber == 4 then
+                vertexcode = vertexcode..[[    
+                    if(vpos.z <= CSMDistance1 )
+                    {
+                        lightpos = CSMMatrix1 * modelMatrix * VertexPosition; 
+                    }
+                    else if(vpos.z <= CSMDistance2)
+                    {
+                        lightpos = CSMMatrix2 * modelMatrix * VertexPosition; 
+                    }
+                    else if(vpos.z <= CSMDistance3)
+                    {
+                        lightpos = CSMMatrix3 * modelMatrix * VertexPosition; 
+                    }
+                    else
+                    {
+                        lightpos = CSMMatrix4 * modelMatrix * VertexPosition; 
+                    }
+                        ]];
+            end
+           
+                
+        end
         -- vertexcode = vertexcode.."   lightpos.z = lightpos.z * 0.5 + 0.5; \n"
     
     end
@@ -637,6 +722,7 @@ function Shader.GetBase3DPSShaderCode()
 
     if needshadow  and RenderSet.getshadowReceiver() then
         pixelcode = pixelcode .. "varying highp  vec4 lightpos;\n"
+        pixelcode = pixelcode .. "varying highp  vec4 vpos; \n"
     end
 
     if needshadow  and RenderSet.getshadowReceiver() then
@@ -758,7 +844,7 @@ function Shader.GetBase3DShader(color, projectionMatrix, modelMatrix, viewMatrix
             end
         end
 
-        if needshadow and node.directionlightMatrix then
+        if needshadow and (node.directionlightMatrix or #node.CSMMatrix > 0)then
             if shader:hasUniform( "shadowmapsize") then
                 obj:send('shadowmapsize', RenderSet.getShadowMapSize())
             end
@@ -767,9 +853,85 @@ function Shader.GetBase3DShader(color, projectionMatrix, modelMatrix, viewMatrix
                 obj:send('directionlightShadowMap',  node.shadowmap.obj)
             end
 
-            if shader:hasUniform( "directionlightMatrix") then
-                obj:send('directionlightMatrix', node.directionlightMatrix)
+            if _G.GConfig.CSMNumber == 1 then
+                if shader:hasUniform( "directionlightMatrix") then
+                    obj:send('directionlightMatrix', node.directionlightMatrix)
+                end
+            elseif   _G.GConfig.CSMNumber == 2 then
+                if shader:hasUniform( "CSMMatrix1") then
+                   
+                    obj:send('CSMMatrix1', node.CSMMatrix[1])
+                end
+
+                if shader:hasUniform( "CSMMatrix2") then
+                    obj:send('CSMMatrix2', node.CSMMatrix[2])
+                end
+
+                if shader:hasUniform( "CSMDistance1") then
+                    obj:send('CSMDistance1', node.CSMDistance[1])
+                end
+
+                if shader:hasUniform( "CSMDistance2") then
+                    obj:send('CSMDistance2', node.CSMDistance[2])
+                end
+            elseif   _G.GConfig.CSMNumber == 3 then
+                if shader:hasUniform( "CSMMatrix1") then
+                    obj:send('CSMMatrix1', node.CSMMatrix[1])
+                end
+
+                if shader:hasUniform( "CSMMatrix2") then
+                    obj:send('CSMMatrix2', node.CSMMatrix[2])
+                end
+
+                if shader:hasUniform( "CSMMatrix3") then
+                    obj:send('CSMMatrix3', node.CSMMatrix[3])
+                end
+
+                if shader:hasUniform( "CSMDistance1") then
+                    obj:send('CSMDistance1', node.CSMDistance[1])
+                end
+
+                if shader:hasUniform( "CSMDistance2") then
+                    obj:send('CSMDistance2', node.CSMDistance[2])
+                end
+
+                if shader:hasUniform( "CSMDistance3") then
+                    obj:send('CSMDistance3', node.CSMDistance[3])
+                end
+            elseif   _G.GConfig.CSMNumber == 4 then
+                if shader:hasUniform( "CSMMatrix1") then
+                    obj:send('CSMMatrix1', node.CSMMatrix[1])
+                end
+
+                if shader:hasUniform( "CSMMatrix2") then
+                    obj:send('CSMMatrix2', node.CSMMatrix[2])
+                end
+
+                if shader:hasUniform( "CSMMatrix3") then
+                    obj:send('CSMMatrix3', node.CSMMatrix[3])
+                end
+
+                if shader:hasUniform( "CSMMatrix4") then
+                    obj:send('CSMMatrix4', node.CSMMatrix[4])
+                end
+
+                if shader:hasUniform( "CSMDistance1") then
+                    obj:send('CSMDistance1', node.CSMDistance[1])
+                end
+
+                if shader:hasUniform( "CSMDistance2") then
+                    obj:send('CSMDistance2', node.CSMDistance[2])
+                end
+
+                if shader:hasUniform( "CSMDistance3") then
+                    obj:send('CSMDistance3', node.CSMDistance[3])
+                end
+
+                if shader:hasUniform( "CSMDistance4") then
+                    obj:send('CSMDistance4', node.CSMDistance[4])
+                end
             end
+            
             
         end
     end

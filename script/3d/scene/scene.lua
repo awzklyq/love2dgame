@@ -451,6 +451,7 @@ function Scene3D:drawDirectionLightCSM(isdebug)
             end
 
             for CSMIndex = 1, CSMNumber do
+                log('aaaaaaaa', CSMIndex, #shadownodes[CSMIndex])
                 local shadowprojectbox = self.frustum:intersectBox(receiverboxs[CSMIndex])--BoundBox.getIntersectBox(casterbox, receiverbox)
 
                 shadowprojectbox = lightmat:mulBoundBox(shadowprojectbox, true)
@@ -485,20 +486,29 @@ function Scene3D:drawDirectionLightCSM(isdebug)
                 love.graphics.setCanvas()
                 love.graphics.setMeshCullMode("none")
     
-            local texmat = Matrix3D.createFromNumbers( -- FOr uv
-            1, 0,0,0,
-            0,1,0,0,
-            0,0,1,0,
-            0,0,0,1
-     )
+                local uvoffset = 1 / CSMNumber * 0.5
+                -- local texmat = Matrix3D.createFromNumbers( -- FOr uv
+                -- 0.5 / CSMNumber, 0,0,0,
+                -- 0,0.5,0,0,
+                -- 0,0,0.5,0,
+                -- uvoffset + (CSMIndex - 1) * uvoffset * 2,0.5,0.5,1
+                -- )
+
+                local texmat = Matrix3D.createFromNumbers( -- FOr uv
+                0.5 / CSMNumber, 0,0,0,
+                0,0.5,0,0,
+                0,0,0.5,0,
+                uvoffset + (CSMIndex - 1) * uvoffset * 2,0.5,0.5,1
+                )
             
-                texmat:transposeSelf()
-                texmat:mulRight(Matrix3D.transpose(shadowmapproj))
-                local mat = texmat--Matrix3D.transpose(texmat)
-                
-                mat:mulRight(Matrix3D.transpose(lightmat))
-                lightnode.directionlightMatrix = mat
+            texmat:transposeSelf()
+            texmat:mulRight(Matrix3D.transpose(shadowmapproj))
+            local mat = texmat--Matrix3D.transpose(shadowmapproj);--texmat--Matrix3D.transpose(texmat)
+
+            texmat:mulRight(Matrix3D.transpose(lightmat))
     
+            lightnode.CSMMatrix[CSMIndex] = texmat
+            lightnode.CSMDistance[CSMIndex] = startnearclip + offset
                 if isdebug then
                     lightnode.shadowmap:draw()
                     -- lightnode.depth_buffer:draw()
