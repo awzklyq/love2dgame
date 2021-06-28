@@ -8,10 +8,10 @@ local plane = Mesh3D.new("assert/obj/plane.obj")
 plane:setBaseColor(LColor.new(125,125,125, 255))
 -- mesh3d:setTexture(love.graphics.newImage("assert/obj/earth.png"))
 -- mesh3d.transform3d = Matrix3D.getTransformationMatrix(Vector3.new(0,0,-20), Vector3.new(), Vector3.new(1,1,1))
-local cubenum = 15
+local cubenum = 50
 for i = 1, cubenum do
     local mesh3d = Mesh3D.new("assert/obj/bbb.obj")
-    mesh3d.transform3d:mulTranslationRight(math.random(-2000, 2000), math.random(-2000, 2000), math.random(30, 2000))
+    mesh3d.transform3d:mulTranslationRight(math.random(-2500, 2500), math.random(-2500, 2500), math.random(30, 2500))
     local scale = math.random(0.5, 2)
     mesh3d.transform3d:mulScalingLeft(scale ,scale, scale)
     mesh3d:setBaseColor(LColor.new(math.random(1, 255), math.random(1, 255), math.random(1, 255), 255))

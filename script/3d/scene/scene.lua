@@ -266,6 +266,7 @@ function Scene3D:drawCanvaColor()
     local needbase = true
     local canvas1 = self.canvascolor
     local canvas2 = self.canvasPostprocess
+    local rendercolor = self.canvascolor
     if self.needFXAA then
         love.graphics.setCanvas(canvas2)
         self.meshquad:setCanvas(canvas1)
@@ -274,9 +275,9 @@ function Scene3D:drawCanvaColor()
         needbase = false
         love.graphics.setCanvas()
 
-        local temp = canvas1
-        canvas1 = canvas2
+        rendercolor = canvas2
         canvas2 = canvas1
+        canvas1 = rendercolor
     end
 
     if self.needSSAO then
@@ -284,19 +285,14 @@ function Scene3D:drawCanvaColor()
         self.meshquad:setCanvas(canvas1)
         self.meshquad.shader = Shader.GetSSAOShader(self.canvasnormal, self.canvasdepth)
         self.meshquad:draw()
-        needbase = false
         love.graphics.setCanvas()
 
-        local temp = canvas1
-        canvas1 = canvas2
+        rendercolor = canvas2
         canvas2 = canvas1
+        canvas1 = rendercolor
     end
 
-    if needbase then
-        self.canvascolor:draw()
-    else
-        canvas1:draw()
-    end
+    rendercolor:draw()
 end
 
 function Scene3D:drawCanvaNormalmap()
