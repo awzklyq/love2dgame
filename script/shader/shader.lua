@@ -378,6 +378,7 @@ function Shader.GetSSAOShader(screennormalmap, screendepthmap)
     vec4 effect( vec4 color, sampler2D tex, vec2 texture_coords, vec2 screen_coords )
     {
        float depth = texture2D(screendepthmap, texture_coords).r;
+       //depth = (depth - 0.5) *2;
        vec2 uv = ViewportUVToScreenPos(texture_coords);
        vec4 vpos = vec4(uv.x, uv.y, depth, 1.0);
 
@@ -594,6 +595,7 @@ function Shader.GetBase3DVSShaderCode()
 
     vertexcode = vertexcode.." vec4 wpos = projectionMatrix * viewMatrix * modelMatrix * VertexPosition; \n"
     vertexcode = vertexcode.." modelpos =  modelMatrix * VertexPosition; \n"
+    vertexcode = vertexcode.." modelpos.z =  modelpos.z / modelpos.w; \n"
     if needshadow and RenderSet.getshadowReceiver() then
         if  GConfig.CSMNumber >= 2 then
             vertexcode = vertexcode.." CameraDistance = wpos.z; \n"
@@ -708,6 +710,7 @@ function Shader.GetBase3DPSShaderCode()
 
         if needshadow and RenderSet.getshadowReceiver() then
             pixelcode = pixelcode .. "vec4 lightpos;\n"
+            
             if  GConfig.CSMNumber <= 1 then
                 pixelcode = pixelcode..[[    
                     lightpos = directionlightMatrix * modelpos; 
@@ -966,11 +969,10 @@ function Shader.GeDepth3DShader(projectionMatrix, modelMatrix, viewMatrix)
             uniform mat4 modelMatrix;
             uniform mat4 viewMatrix;
             varying float depth;
-
             vec4 position(mat4 transform_projection, vec4 vertex_position)
             {
                 vec4 basepos = projectionMatrix * viewMatrix * modelMatrix * VertexPosition;
-                depth = basepos.z * 0.5 + 0.5;
+                depth = basepos.z / basepos.w * 0.5 + 0.5;
                 return basepos;
             }
     ]]
