@@ -566,7 +566,7 @@ function Shader.GetBase3DVSShaderCode()
     if not normalmap and Shader.neednormal > 0 then
         vertexcode = vertexcode .. "varying vec4 vnormal;\n"
     end
-
+    vertexcode = vertexcode .. "varying vec4 modelpos; \n"
     local directionlights = Lights.getDirectionLights()
 
     local needshadow = false
@@ -574,37 +574,9 @@ function Shader.GetBase3DVSShaderCode()
         for i = 1, #directionlights do
             local light = directionlights[i]
             if light.node and light.node.needshadow then
-                if GConfig.CSMNumber <= 1 then
-                    vertexcode = vertexcode .. " uniform mat4 directionlightMatrix;\n";
-                elseif  GConfig.CSMNumber == 2 then
-                    vertexcode = vertexcode .. " uniform mat4 CSMMatrix1;\n";
-                    vertexcode = vertexcode .. " uniform mat4 CSMMatrix2;\n";
-
-                    vertexcode = vertexcode .. " uniform float CSMDistance1;\n";
-                    vertexcode = vertexcode .. " uniform float CSMDistance2;\n";
-                elseif  GConfig.CSMNumber == 3 then
-                    vertexcode = vertexcode .. " uniform mat4 CSMMatrix1;\n";
-                    vertexcode = vertexcode .. " uniform mat4 CSMMatrix2;\n";
-                    vertexcode = vertexcode .. " uniform mat4 CSMMatrix3;\n";
-
-                    vertexcode = vertexcode .. " uniform float CSMDistance1;\n";
-                    vertexcode = vertexcode .. " uniform float CSMDistance2;\n";
-                    vertexcode = vertexcode .. " uniform float CSMDistance3;\n";
-                elseif  GConfig.CSMNumber == 4 then
-                    vertexcode = vertexcode .. " uniform mat4 CSMMatrix1;\n";
-                    vertexcode = vertexcode .. " uniform mat4 CSMMatrix2;\n";
-                    vertexcode = vertexcode .. " uniform mat4 CSMMatrix3;\n";
-                    vertexcode = vertexcode .. " uniform mat4 CSMMatrix4;\n";
-
-                    vertexcode = vertexcode .. " uniform float CSMDistance1;\n";
-                    vertexcode = vertexcode .. " uniform float CSMDistance2;\n";
-                    vertexcode = vertexcode .. " uniform float CSMDistance3;\n";
-                    vertexcode = vertexcode .. " uniform float CSMDistance4;\n";
+                if  GConfig.CSMNumber > 1 then
+                    vertexcode = vertexcode .. "varying float CameraDistance; \n"
                 end
-
-                
-                vertexcode = vertexcode .. "varying highp  vec4 lightpos; \n"
-                vertexcode = vertexcode .. "varying highp  vec4 vpos; \n"
                 needshadow = true
                 break
             end
@@ -620,71 +592,18 @@ function Shader.GetBase3DVSShaderCode()
         vertexcode = vertexcode.."   vnormal = VertexColor;\n "
     end
 
+    vertexcode = vertexcode.." vec4 wpos = projectionMatrix * viewMatrix * modelMatrix * VertexPosition; \n"
+    vertexcode = vertexcode.." modelpos =  modelMatrix * VertexPosition; \n"
     if needshadow and RenderSet.getshadowReceiver() then
-        if GConfig.CSMNumber <= 1 then
-         vertexcode = vertexcode.."   lightpos = directionlightMatrix * modelMatrix * VertexPosition; \n"
-        else
-            if  GConfig.CSMNumber >= 2 then
-                vertexcode = vertexcode.."  vpos = projectionMatrix * viewMatrix * modelMatrix * VertexPosition; \n"
-            end
-            
-            if  GConfig.CSMNumber == 2 then
-                vertexcode = vertexcode..[[    
-                    if(vpos.z <= CSMDistance1 + 10 )
-                    {
-                        lightpos = CSMMatrix1 * modelMatrix * VertexPosition; 
-                    }
-                    else
-                    {
-                        lightpos = CSMMatrix2 * modelMatrix * VertexPosition; 
-                    }
-                        ]];
-            elseif  GConfig.CSMNumber == 3 then
-                vertexcode = vertexcode..[[    
-                    if(vpos.z <= CSMDistance1 )
-                    {
-                        lightpos = CSMMatrix1 * modelMatrix * VertexPosition; 
-                    }
-                    else if(vpos.z <= CSMDistance2)
-                    {
-                        lightpos = CSMMatrix2 * modelMatrix * VertexPosition; 
-                    }
-                    else
-                    {
-                        lightpos = CSMMatrix3 * modelMatrix * VertexPosition; 
-                    }
-             
-                        ]];
-            elseif  GConfig.CSMNumber == 4 then
-                vertexcode = vertexcode..[[    
-                    if(vpos.z <= CSMDistance1 )
-                    {
-                        lightpos = CSMMatrix1 * modelMatrix * VertexPosition; 
-                    }
-                    else if(vpos.z <= CSMDistance2)
-                    {
-                        lightpos = CSMMatrix2 * modelMatrix * VertexPosition; 
-                    }
-                    else if(vpos.z <= CSMDistance3)
-                    {
-                        lightpos = CSMMatrix3 * modelMatrix * VertexPosition; 
-                    }
-                    else
-                    {
-                        lightpos = CSMMatrix4 * modelMatrix * VertexPosition; 
-                    }
-                        ]];
-            end
-           
-                
+        if  GConfig.CSMNumber >= 2 then
+            vertexcode = vertexcode.." CameraDistance = wpos.z; \n"
         end
-        -- vertexcode = vertexcode.."   lightpos.z = lightpos.z * 0.5 + 0.5; \n"
     
     end
 
     vertexcode = vertexcode..[[
         
-        return projectionMatrix * viewMatrix * modelMatrix * VertexPosition;
+        return wpos;
     }
 
 
@@ -701,6 +620,7 @@ function Shader.GetBase3DPSShaderCode()
     local directionlights = Lights.getDirectionLights()
 
     local needshadow = false
+    local IsHasShadow = false
     for i = 1, #directionlights do
         local light = directionlights[i]
         pixelcode = pixelcode .. " uniform vec4 directionlight"..i..";  \n";
@@ -710,6 +630,41 @@ function Shader.GetBase3DPSShaderCode()
             pixelcode = pixelcode .. " uniform sampler2D directionlightShadowMap;  \n";
             pixelcode = pixelcode .. " uniform float shadowmapsize;  \n";
             needshadow = true
+        end
+
+        if needshadow and IsHasShadow == false then
+            if GConfig.CSMNumber <= 1 then
+                pixelcode = pixelcode .. " uniform mat4 directionlightMatrix;\n";
+            elseif  GConfig.CSMNumber == 2 then
+                pixelcode = pixelcode .. " uniform mat4 CSMMatrix1;\n";
+                pixelcode = pixelcode .. " uniform mat4 CSMMatrix2;\n";
+
+                pixelcode = pixelcode .. " uniform float CSMDistance1;\n";
+                pixelcode = pixelcode .. " uniform float CSMDistance2;\n";
+            elseif  GConfig.CSMNumber == 3 then
+                pixelcode = pixelcode .. " uniform mat4 CSMMatrix1;\n";
+                pixelcode = pixelcode .. " uniform mat4 CSMMatrix2;\n";
+                pixelcode = pixelcode .. " uniform mat4 CSMMatrix3;\n";
+
+                pixelcode = pixelcode .. " uniform float CSMDistance1;\n";
+                pixelcode = pixelcode .. " uniform float CSMDistance2;\n";
+                pixelcode = pixelcode .. " uniform float CSMDistance3;\n";
+            elseif  GConfig.CSMNumber == 4 then
+                pixelcode = pixelcode .. " uniform mat4 CSMMatrix1;\n";
+                pixelcode = pixelcode .. " uniform mat4 CSMMatrix2;\n";
+                pixelcode = pixelcode .. " uniform mat4 CSMMatrix3;\n";
+                pixelcode = pixelcode .. " uniform mat4 CSMMatrix4;\n";
+
+                pixelcode = pixelcode .. " uniform float CSMDistance1;\n";
+                pixelcode = pixelcode .. " uniform float CSMDistance2;\n";
+                pixelcode = pixelcode .. " uniform float CSMDistance3;\n";
+                pixelcode = pixelcode .. " uniform float CSMDistance4;\n";
+            end
+
+            if  GConfig.CSMNumber > 1 then 
+                pixelcode = pixelcode .. "varying float CameraDistance; \n"
+            end
+            IsHasShadow = true
         end
     end
 
@@ -721,8 +676,8 @@ function Shader.GetBase3DPSShaderCode()
     end
 
     if needshadow  and RenderSet.getshadowReceiver() then
-        pixelcode = pixelcode .. "varying highp  vec4 lightpos;\n"
-        pixelcode = pixelcode .. "varying highp  vec4 vpos; \n"
+        pixelcode = pixelcode .. "varying  vec4 lightpos;\n"
+        pixelcode = pixelcode .. "varying  vec4 modelpos; \n"
     end
 
     if needshadow  and RenderSet.getshadowReceiver() then
@@ -752,6 +707,58 @@ function Shader.GetBase3DPSShaderCode()
         end
 
         if needshadow and RenderSet.getshadowReceiver() then
+            pixelcode = pixelcode .. "vec4 lightpos;\n"
+            if  GConfig.CSMNumber <= 1 then
+                pixelcode = pixelcode..[[    
+                    lightpos = directionlightMatrix * modelpos; 
+                        ]];
+            elseif  GConfig.CSMNumber == 2 then
+                pixelcode = pixelcode..[[    
+                    if(CameraDistance <= CSMDistance1)
+                    {
+                        lightpos = CSMMatrix1 * modelpos; 
+                    }
+                    else
+                    {
+                        lightpos = CSMMatrix2 * modelpos; 
+                    }
+                        ]];
+            elseif  GConfig.CSMNumber == 3 then
+                pixelcode = pixelcode..[[    
+                    if(CameraDistance <= CSMDistance1 )
+                    {
+                        lightpos = CSMMatrix1 * modelpos; 
+                    }
+                    else if(CameraDistance <= CSMDistance2)
+                    {
+                        lightpos = CSMMatrix2 * modelpos; 
+                    }
+                    else
+                    {
+                        lightpos = CSMMatrix3 * modelpos; 
+                    }
+                
+                        ]];
+            elseif  GConfig.CSMNumber == 4 then
+                pixelcode = pixelcode..[[    
+                    if(CameraDistance <= CSMDistance1 )
+                    {
+                        lightpos = CSMMatrix1 * modelpos; 
+                    }
+                    else if(CameraDistance <= CSMDistance2)
+                    {
+                        lightpos = CSMMatrix2 * modelpos; 
+                    }
+                    else if(CameraDistance <= CSMDistance3)
+                    {
+                        lightpos = CSMMatrix3 * modelpos; 
+                    }
+                    else
+                    {
+                        lightpos = CSMMatrix4 * modelpos; 
+                    }
+                        ]];
+            end
             pixelcode = pixelcode..[[
                 float offset = 1/shadowmapsize;
                 vec2 suv = lightpos.xy;// * 0.5 + vec2(0.5, 0.5);
@@ -853,7 +860,7 @@ function Shader.GetBase3DShader(color, projectionMatrix, modelMatrix, viewMatrix
                 obj:send('directionlightShadowMap',  node.shadowmap.obj)
             end
 
-            if _G.GConfig.CSMNumber == 1 then
+            if _G.GConfig.CSMNumber <= 1 then
                 if shader:hasUniform( "directionlightMatrix") then
                     obj:send('directionlightMatrix', node.directionlightMatrix)
                 end
@@ -947,7 +954,7 @@ function Shader.GeDepth3DShader(projectionMatrix, modelMatrix, viewMatrix)
    end
    if not shader then
         local pixelcode = [[
-            varying highp  float depth;
+            varying float depth;
             vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
             {
                 return vec4(depth, depth, depth, 1);
@@ -958,7 +965,7 @@ function Shader.GeDepth3DShader(projectionMatrix, modelMatrix, viewMatrix)
             uniform mat4 projectionMatrix;
             uniform mat4 modelMatrix;
             uniform mat4 viewMatrix;
-            varying highp  float depth;
+            varying float depth;
 
             vec4 position(mat4 transform_projection, vec4 vertex_position)
             {

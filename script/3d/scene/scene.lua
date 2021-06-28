@@ -402,6 +402,7 @@ function Scene3D:drawDirectionLightCSM(isdebug)
     local CSMNumber = _G.GConfig.CSMNumber
     if CSMNumber == 1 then
         self:drawDirectionLightShadow()
+        return;
     end
     for i = 1, #self.lights do
         local lightnode = self.lights[i]
@@ -422,7 +423,7 @@ function Scene3D:drawDirectionLightCSM(isdebug)
             for CSMIndex = 1, CSMNumber do
                 local viewmatrix = Matrix3D.createLookAtLH(camera3d.eye, camera3d.look, camera3d.up);
                 local startnearclip = camera3d.nearClip + (offset * (CSMIndex - 1));
-                local projectmatrix = Matrix3D.createPerspectiveFovLH( camera3d.fov, camera3d.aspectRatio, startnearclip, startnearclip + offset)
+                local projectmatrix = Matrix3D.createPerspectiveFovLH( camera3d.fov, camera3d.aspectRatio, camera3d.nearClip, startnearclip + offset)--startnearclip, startnearclip + offset + 100
                 self.frustums[CSMIndex]:buildFromViewAndProject(viewmatrix, projectmatrix)
 
                 shadownodes[CSMIndex] = {}
@@ -451,7 +452,7 @@ function Scene3D:drawDirectionLightCSM(isdebug)
             end
 
             for CSMIndex = 1, CSMNumber do
-                log('aaaaaaaa', CSMIndex, #shadownodes[CSMIndex])
+                -- log('aaaaaaaa', CSMIndex, #shadownodes[CSMIndex])
                 local shadowprojectbox = self.frustum:intersectBox(receiverboxs[CSMIndex])--BoundBox.getIntersectBox(casterbox, receiverbox)
 
                 shadowprojectbox = lightmat:mulBoundBox(shadowprojectbox, true)

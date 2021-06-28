@@ -4,7 +4,7 @@ function Camera3D.new(x1, y1, x2, y2, lw)-- lw :line width
 
     camera.fov = math.pi/2
     camera.nearClip = 1
-    camera.farClip = 10000
+    camera.farClip = 5000
     camera.aspectRatio = love.graphics.getWidth()/love.graphics.getHeight()
 
     camera.eye = Vector3.new(0,0,0)
