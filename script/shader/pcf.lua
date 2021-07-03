@@ -1,5 +1,3 @@
-_G.ShaderFunction = {}
-
 _G.ShaderFunction.getShadowPCFCode = [[
     float getShadowPCF(vec2 suv, sampler2D shadowmap, float depth, float shadowmapsize)
     {

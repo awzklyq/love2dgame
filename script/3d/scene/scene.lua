@@ -192,8 +192,10 @@ function Scene3D:draw(isdrawCanvaColor)
         local node = self.visiblenodes[i]
         if node.mesh  then--     
             RenderSet.setshadowReceiver(node.shadowReceiver)
+            RenderSet.SetPBR(node.PBR)
             node.mesh:draw()
             RenderSet.setshadowReceiver(false)
+            RenderSet.SetPBR(false)
             if  self.isDrawBox then
                 node:drawBoxMesh()
             end

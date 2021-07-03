@@ -152,8 +152,12 @@ function Mesh3D:useLights()
     self.shader = Shader.GetBase3DShader();
     for i = 1, #directionlights do
         local light = directionlights[i]
-        self.shader:send("directionlight"..i, {light.dir.x, light.dir.y, light.dir.z, 1})
-        self.shader:send("directionlightcolor"..i, {light.color._r, light.color._g, light.color._b, light.color._a})
+        if self.shader:hasUniform( "directionlight"..i) then
+            self.shader:send("directionlight"..i, {light.dir.x, light.dir.y, light.dir.z, 1})
+        end
+        if self.shader:hasUniform( "directionlightcolor"..i) then
+            self.shader:send("directionlightcolor"..i, {light.color._r, light.color._g, light.color._b, light.color._a})
+        end
         self.shader:setShadowParam()
     end
 end
@@ -165,7 +169,7 @@ function Mesh3D:draw()
 
     RenderSet.setNormalMap(self.normalmap)
     self:useLights()
-    self.shader:setCameraAndMatrix3D(self.transform3d, RenderSet.getUseProjectMatrix(), RenderSet.getUseViewMatrix())
+    self.shader:setCameraAndMatrix3D(self.transform3d, RenderSet.getUseProjectMatrix(), RenderSet.getUseViewMatrix(), camera3d.eye)
 
     if self.shader:hasUniform( "bcolor") and self.bcolor then
         self.shader:send('bcolor',{self.bcolor._r, self.bcolor._g, self.bcolor._b, self.bcolor._a})

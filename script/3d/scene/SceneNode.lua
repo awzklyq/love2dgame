@@ -24,6 +24,8 @@ function SceneNode3D:bindMesh(mesh)
     self.shadowCaster = false
 
     self.shadowReceiver = false
+
+    self.PBR = false
 end
 
 function SceneNode3D:getWorldBox()

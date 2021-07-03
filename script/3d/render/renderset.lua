@@ -78,6 +78,15 @@ RenderSet.getshadowReceiver = function()
     return shadowReceiver
 end
 
+local pbr = false
+RenderSet.SetPBR = function(value)
+    pbr = value
+end
+
+RenderSet.GetPBR = function()
+    return pbr
+end
+
 local normalmap = nil
 RenderSet.setNormalMap = function(value)
     normalmap = value
