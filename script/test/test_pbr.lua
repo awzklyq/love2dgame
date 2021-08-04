@@ -8,11 +8,11 @@ scene.bgColor = LColor.new(100,100,100,255)
 -- mesh3d.transform3d = Matrix3D.getTransformationMatrix(Vector3.new(0,0,-20), Vector3.new(), Vector3.new(1,1,1))
 local cubenum = 10
 for i = 1, cubenum do
-    local mesh3d = Mesh3D.new("assert/obj/bbb.obj")
+    local mesh3d = Mesh3D.new("assert/obj/taiyang/Sphere.OBJ")
     mesh3d.transform3d:mulTranslationRight(-3000 + 400 * i, -3000 + 400 * i, 800)
     local scale = 3--math.random(0.5, 2)
     mesh3d.transform3d:mulScalingLeft(scale ,scale, scale)
-    mesh3d:setBaseColor(LColor.new(0,0,0, 255))
+    mesh3d:setBaseColor(LColor.new(10,10,10, 255))
 
     local node = scene:addMesh(mesh3d)
     node.PBR = true

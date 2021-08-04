@@ -204,6 +204,7 @@ Mesh3D.loadObjFile = function(path)
     local uvs = {}
     local normals = {}
 
+    local NeedCreateNormal = true
     -- go line by line through the file
     for line in love.filesystem.lines(path) do
         local words = {}
@@ -226,6 +227,7 @@ Mesh3D.loadObjFile = function(path)
         -- if the first word in this line is a "vn", then this defines a vertex normal
         if words[1] == "vn" then
             normals[#normals+1] = {tonumber(words[2]), tonumber(words[3]), tonumber(words[4])}
+            NeedCreateNormal = false
         end
 
         -- if the first word in this line is a "f", then this is a face
@@ -281,12 +283,35 @@ Mesh3D.loadObjFile = function(path)
         end
     end
 
+    if NeedCreateNormal then
+        assert(#verts %3 == 0, "verts number is error : " .. tostring(#verts))
+        for i = 1, #verts, 3 do
+            local v1 = Vector3.new(verts[i][1], verts[i][2], verts[i][3])
+            local v2 = Vector3.new(verts[i + 1][1], verts[i + 1][2], verts[i + 1][3])
+            local v3 = Vector3.new(verts[i + 2][1], verts[i + 2][2], verts[i + 2][3])
+
+            local v11 = v2 - v1
+            local v22 = v3 - v1
+            local result = Vector3.cross(v11, v22)
+
+            normals[#normals+1] = {tonumber(result.x), tonumber(result.y), tonumber(result.z)}
+            normals[#normals+1] = {tonumber(result.x), tonumber(result.y), tonumber(result.z)}
+            normals[#normals+1] = {tonumber(result.x), tonumber(result.y), tonumber(result.z)}
+        end
+    end
     -- put it all together in the right order
     local compiled = {}
     for i,face in pairs(faces) do
-        compiled[#compiled +1] = concatTables(verts[face[1]], uvs[face[2]], normals[face[3]])
-        compiled[#compiled +1] = concatTables(verts[face[4]], uvs[face[5]], normals[face[6]])
-        compiled[#compiled +1] = concatTables(verts[face[7]], uvs[face[8]], normals[face[9]])
+        if NeedCreateNormal then
+            compiled[#compiled +1] = concatTables(verts[face[1]], uvs[face[2]], normals[i])
+            compiled[#compiled +1] = concatTables(verts[face[3]], uvs[face[4]], normals[i])
+            compiled[#compiled +1] = concatTables(verts[face[5]], uvs[face[6]], normals[i])
+        else
+            compiled[#compiled +1] = concatTables(verts[face[1]], uvs[face[2]], normals[face[3]])
+            compiled[#compiled +1] = concatTables(verts[face[4]], uvs[face[5]], normals[face[6]])
+            compiled[#compiled +1] = concatTables(verts[face[7]], uvs[face[8]], normals[face[9]])
+        end
+        
     end
 
     return compiled
