@@ -2,13 +2,23 @@ _G.Line = {}
 
 function Line.new(x1, y1, x2, y2, lw)-- lw :line width
     local line = setmetatable({}, {__index = Line});
-    line.x1 = x1 or 0;
-    line.y1 = y1 or 0;
-    line.x2 = x2 or 1;
-    line.y2 = y2 or 1;
+    if type(x1) == "table" and type(y1) == "table" then
+        line.x1 = x1.x
+        line.y1 = x1.y
 
-    line.lw = lw or 2;
+        line.x2 = y1.x
+        line.y2 = y1.y
 
+        line.lw = x2 or 2;
+    else
+        line.x1 = x1 or 0;
+        line.y1 = y1 or 0;
+        line.x2 = x2 or 1;
+        line.y2 = y2 or 1;
+    
+        line.lw = lw or 2;
+    end
+    
     line.color = LColor.new(255,255,255,255)
 
     line.renderid = Render.LineId ;
@@ -28,6 +38,43 @@ function Line:draw()
     -- love.graphics.setColor(r, g, b, a );
 end
 
+_G.Lines = {}
+
+function Lines.new( )-- lw :line width
+    local lines = setmetatable({}, {__index = Lines});
+    
+    lines.color = LColor.new(255,255,255,255)
+
+    lines.renderid = Render.LinesId ;
+    lines.lw = 2;
+    lines.values = {}
+    return lines;
+end
+
+function Lines:addValue(x, y)
+    self.values[#self.values + 1] = {x = x, y = y}
+end
+
+function Lines:clearValues()
+    self.values = {}
+end
+
+function Lines:removeValueFromIndex(i)
+    table.remove(self.values, i)
+end
+
+function Lines:setColor(r, g, b, a)
+    self.color.r = r;
+    self.color.g = g;
+    self.color.b = b;
+    self.color.a = a;
+end
+
+function Lines:draw()
+    -- local r, g, b, a = love.graphics.getColor( );
+    Render.RenderObject(self);
+    -- love.graphics.setColor(r, g, b, a );
+end
 -- function Rect:update(e)
     
 --  end

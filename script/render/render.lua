@@ -55,6 +55,8 @@ Render.Matrix3DId = 27
 
 Render.BoundBoxId = 28
 
+Render.LinesId = 29;
+
 Render.getRenderIdName = function(id)
     if Render.CircleId == id then
         return "Circle"
@@ -98,6 +100,8 @@ Render.getRenderIdName = function(id)
         return "Frustum"
     elseif Render.MeshLinesId == id then
         return "MeshLines"
+    elseif Render.LinesId == id then
+        return "Lines"
     end
 
     return "Null"
@@ -184,6 +188,17 @@ Render.RenderObject = function(obj)
             love.graphics.setLineWidth( obj.lw);
             love.graphics.setColor(obj.color.r, obj.color.g, obj.color.b, obj.color.a);
             love.graphics.line( obj.x1, obj.y1, obj.x2, obj.y2)
+            love.graphics.setLineWidth(lw);
+        elseif obj.renderid == Render.LinesId then
+            local lw = love.graphics.getLineWidth();
+            love.graphics.setLineWidth( obj.lw);
+            love.graphics.setColor(obj.color.r, obj.color.g, obj.color.b, obj.color.a);
+            if #obj.values > 1 then
+                for i = 2, #obj.values do
+                    love.graphics.line( obj.values[i - 1].x, obj.values[i - 1].y, obj.values[i].x, obj.values[i].y)
+                end
+            end
+            
             love.graphics.setLineWidth(lw);
         elseif obj.renderid == Render.CrossLineId then
             local lw = love.graphics.getLineWidth();
