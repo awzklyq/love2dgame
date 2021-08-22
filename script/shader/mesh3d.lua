@@ -254,7 +254,7 @@ function Shader.GetBase3DShader(color, projectionMatrix, modelMatrix, viewMatrix
     end
 
     local normalmap = RenderSet.getNormalMap()
-    local shader = ShaderObjects["base3dshader".."directionlights"..#directionlights .. tostring(needshadow) .. (normalmap and "normalmap" or "")]
+    local shader = ShaderObjects["base3dshader".."directionlights"..#directionlights..tostring(needshadow).. (normalmap and "normalmap" or "") ..  (RenderSet.GetPBR() and "PBR" or "")]
     if shader then
         if shader:hasUniform("normalmap") then
             shader:send("normalmap", normalmap.obj)

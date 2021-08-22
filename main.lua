@@ -40,6 +40,7 @@ dofile('script/uisystem/button.lua')
 
 dofile('script/math/math.lua')
 dofile('script/math/vector.lua')
+dofile('script/math/complex.lua')
 dofile('script/math/matrix.lua')
 dofile('script/3d/math/vector3.lua')
 dofile('script/3d/math/vector4.lua')
@@ -56,6 +57,7 @@ dofile('script/entity/powerbar.lua')
 
 dofile('script/grid/grid.lua')
 dofile('script/shader/shader.lua')
+dofile('script/shader/shaderfunction.lua')
 dofile 'script/3d/camera/camera3d.lua'
 dofile 'script/render/shadow.lua'
 
@@ -71,6 +73,9 @@ dofile 'script/3d/math/plane.lua'
 dofile 'script/3d/math/frustum.lua'
 dofile 'script/3d/math/box.lua'
 dofile 'script/3d/math/ray.lua'
+
+dofile 'script/3d/water/MeshWater.lua'
+dofile 'script/3d/water/watershader.lua'
 
 _G.mlib = require 'script/mlib' 
 
@@ -90,5 +95,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_csm.lua')--test_frustum
+	dofile('script/test/test_water.lua')--test_frustum
 end

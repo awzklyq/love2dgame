@@ -83,7 +83,6 @@ function love.update(dt)
         RenderSet.frameToken = RenderSet.frameToken + 1
     end
     _G.UIHelper.update(dt);
-    
     _G.CameraManager.update(dt)
     _G.LightManager.update(dt);
 

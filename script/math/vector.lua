@@ -1,7 +1,30 @@
 _G.Vector = {}
 
+local metatable_vector = {}
+metatable_vector.__index = Vector
+
+metatable_vector.__add = function(myvalue, value)
+    return Vector.new(myvalue.x + value.x, myvalue.y + value.y)
+end
+
+metatable_vector.__sub = function(myvalue, value)
+    return Vector.new(myvalue.x - value.x, myvalue.y - value.y)
+end
+
+metatable_vector.__mul = function(myvalue, value)
+    return Vector.new(myvalue.x * value, myvalue.y * value)
+end
+
+metatable_vector.__unm = function(myvalue)
+    return Vector.new( -myvalue.x, -myvalue.y)
+end
+
+metatable_vector.__div = function(myvalue, value)
+    return Vector.new(myvalue.x / value, myvalue.y / value)
+end
+
 function Vector.new(x ,y)
-    local v = setmetatable({}, {__index = Vector});
+    local v = setmetatable({}, metatable_vector);
     v.x = x or 0;
     v.y = y or 0;
     return v;
@@ -42,6 +65,10 @@ Vector.angle = function(v1, v2)
     local dot = Vector.dot(v11, v22);
 
     return math.acos(dot);
+end
+
+Vector.copy = function(v)
+    return Vector.new(v.x, v.y)
 end
 
 

@@ -55,7 +55,9 @@ Render.Matrix3DId = 27
 
 Render.BoundBoxId = 28
 
-Render.LinesId = 29;
+Render.LinesId = 29
+
+Render.MeshWaterId = 30
 
 Render.getRenderIdName = function(id)
     if Render.CircleId == id then
@@ -102,6 +104,8 @@ Render.getRenderIdName = function(id)
         return "MeshLines"
     elseif Render.LinesId == id then
         return "Lines"
+    elseif Render.MeshWaterId == id then
+        return "MeshWater"
     end
 
     return "Null"
@@ -241,6 +245,11 @@ Render.RenderObject = function(obj)
             love.graphics.setColor(r, g, b, a);
         elseif obj.renderid == Render.MeshId then
             love.graphics.draw( obj.obj )
+        elseif obj.renderid == Render.MeshWaterId then
+            if obj.obj then
+                love.graphics.draw( obj.obj )
+            end
+            
         elseif obj.renderid == Render.Mesh3DId then
             love.graphics.draw( obj.obj )
         elseif obj.renderid == Render.MeshLineId then

@@ -105,6 +105,25 @@ RenderSet.getSSAOValue = function()
     return ssao
 end
 
+-- local normal_depth_buffer = Canvas.new(w, h, {format = "depth32fstencil8", readable = true, msaa = 0, mipmaps="none"})
+-- local normal_depth_buffer.renderWidth = w
+-- local normal_depth_buffer.renderHeight = h
+
+-- local canvascolor = Canvas.new(w, h, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
+-- local canvascolor.renderWidth = w
+-- local canvascolor.renderHeight = h
+
+-- RenderSet.SetRenderMethond = function(type)
+--     if type == "normal" then
+--         love.graphics.setMeshCullMode("front")
+--         love.graphics.setDepthMode("less", true)
+--         love.graphics.setCanvas({canvascolor.obj, depthstencil = normal_depth_buffer.obj})
+--     elseif type == 'none' or not type then
+--         love.graphics.setMeshCullMode("none")
+--         love.graphics.setCanvas()
+--     end
+-- end
+
 RenderSet.screenwidth = love.graphics.getPixelWidth()
 RenderSet.screenheight = love.graphics.getPixelHeight()
 RenderSet.isNeedFrustum = true

@@ -22,7 +22,7 @@ end)
 local scene = Scene3D.new()
 scene.needSSAO = true
 local node = scene:addMesh(mesh3d)
-mesh3d:setCanvas(image)
+-- mesh3d:setCanvas(image)
 app.render(function(dt)
     -- image:draw()
     -- mesh3d:draw()
