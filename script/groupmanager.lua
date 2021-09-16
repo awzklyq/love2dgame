@@ -5,8 +5,13 @@ _G.GroupManager.groups = {};
 
 _G.GroupManager.loadGroup = function(name)
     if not _G[name..'Group'] then
-        dofile("script/"..name..'Group.lua');
+        if love.filesystem.exists("script/"..name..'Group.lua') then
+            dofile("script/"..name..'Group.lua');
+        else
+            dofile("script/groups/"..name..'Group.lua');
+        end
     end
+
     local group = _G[name..'Group'].new();
     
     _G.GroupManager.groups[group] = group;
@@ -50,6 +55,22 @@ app.afterrender(function(dt)
     for i, v in pairs(_G.GroupManager.groups) do
         if v.afterdraw then
             v:afterdraw(dt);
+        end
+    end
+end)
+
+app.mousepressed(function(x, y, button, istouch)
+    for i, v in pairs(_G.GroupManager.groups) do
+        if v.mousepressed then
+            v:mousepressed(x, y, button, istouch);
+        end
+    end
+end)
+
+app.keypressed(function(key, scancode, isrepeat)
+    for i, v in pairs(_G.GroupManager.groups) do
+        if v.keypressed then
+            v:keypressed(key, scancode, isrepeat);
         end
     end
 end)

@@ -1,9 +1,10 @@
 _G.lovefile = {}
 
 lovefile.read = function(filename)
-    local file = love.filesystem.newFile(filename)
+    local file = love.filesystem.newFile(_G.FileManager.findFile(filename))
     file:open("r")
     local data = file:read()
+	log('aaaaaaaaa', filename, data)
     file:close()
     return data
 end
@@ -33,4 +34,53 @@ end
 --获取扩展名
 lovefile.getextension = function(filename)
 	return filename:match(".+%.(%w+)$")
+end
+
+function Split(szFullString, szSeparator)
+	local nFindStartIndex = 1
+	local nSplitIndex = 1
+	local nSplitArray = {}
+	while true do
+	   local nFindLastIndex = string.find(szFullString, szSeparator, nFindStartIndex)
+	   if not nFindLastIndex then
+		nSplitArray[nSplitIndex] = string.sub(szFullString, nFindStartIndex, string.len(szFullString))
+		break
+	   end
+	   nSplitArray[nSplitIndex] = string.sub(szFullString, nFindStartIndex, nFindLastIndex - 1)
+	   nFindStartIndex = nFindLastIndex + string.len(szSeparator)
+	   nSplitIndex = nSplitIndex + 1
+	end
+	return nSplitArray
+end
+
+lovefile.loadCSV = function(filename)
+    local iterator  = love.filesystem.lines(_G.FileManager.findFile(filename))
+	local indexs = Split(iterator(1), ",")
+	local num = #indexs
+
+	local datas = {}
+	
+	local dataindex = 2
+	local data = iterator(dataindex)
+	while data do
+		local sdata = Split(data, ",")
+		local temp = {}
+		for i = 1, num do
+			local d = sdata[i]
+			if tonumber(d) then
+				d = tonumber(d)
+			elseif d == "" then
+				d = nil
+			end
+
+			temp[indexs[i]] = d
+		end
+		
+		datas[#datas + 1] = temp
+
+		dataindex = dataindex + 1
+		data = iterator(dataindex)
+	end
+
+	return datas
 end

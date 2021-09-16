@@ -59,6 +59,8 @@ Render.LinesId = 29
 
 Render.MeshWaterId = 30
 
+Render.LoveScreenTextId = 31
+
 Render.getRenderIdName = function(id)
     if Render.CircleId == id then
         return "Circle"
@@ -106,13 +108,14 @@ Render.getRenderIdName = function(id)
         return "Lines"
     elseif Render.MeshWaterId == id then
         return "MeshWater"
+    elseif Render.LoveScreenTextId == id then
+        return "LoveScreenText"
     end
 
     return "Null"
 end
 
 Render.RenderObject = function(obj)
-    
     if not _G.lovedebug.renderobject then return end
     love.graphics.push();
     if obj.transform and obj.transform.renderid == Render.MatrixId and obj.renderid ~= Render.EntityBodyId then
@@ -260,6 +263,12 @@ Render.RenderObject = function(obj)
             love.graphics.draw( obj.obj, obj.x, obj.y, 0, obj.renderWidth / obj:getWidth(), obj.renderHeight / obj:getHeight())
         elseif obj.renderid == Render.ImageId then
             love.graphics.draw( obj.obj, obj.x, obj.y, 0, obj.renderWidth / obj:getWidth(), obj.renderHeight / obj:getHeight())
+        elseif obj.renderid == Render.LoveScreenTextId then
+            local r, g, b, a = love.graphics.getColor( );
+            love.graphics.setColor(obj.color._r, obj.color._g, obj.color._b);
+            love.graphics.print(tostring(obj.text), obj.x, obj.y, obj.r, obj.sx, obj.sy, obj.ox, obj.oy, obj.kx, obj.ky)
+
+            love.graphics.setColor(r, g, b, a);
         end
 
         

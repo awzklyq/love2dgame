@@ -8,11 +8,11 @@ local ynumbers = {}
 local xaix = Line.new(startx1, starty1, endx1, endy1) 
 local yaix = Line.new(startx2, starty2, endx2, endy2)
 
-local IsTime = true
-local scalex = 30
-local scaley = 30
-local startv = -100
-local endv = 100
+local IsTime = false
+local scalex = 1
+local scaley = 1
+local startv = -1000
+local endv = 1000
 local offset = 2
 
 local speed = 300
@@ -21,9 +21,15 @@ local starttemp = endv
 local endtemp = endv
 local dttemp = 0;
 local k = 5
+-- function GetFunction(x)
+--     local f = (math.sin(x) + 1) * 0.5
+--     return math.pow(f, k) * 2
+-- end
+
 function GetFunction(x)
-    local f = (math.sin(x) + 1) * 0.5
-    return math.pow(f, k) * 2
+    x = x * 0.05
+    local f = (1/3) * (math.pi / 2) * math.pow(x, 2) * math.sqrt(100- math.pow(x, 2))
+    return f
 end
 
 local values = {}
