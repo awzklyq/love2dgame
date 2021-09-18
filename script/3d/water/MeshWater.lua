@@ -219,7 +219,6 @@ function MeshWater:updateMeshObj(dt)
     local b = {}
     self:FFT(complex_hs, b, #self.vertexs, -1)
 
-    log('aaaaaaaa',#b, #complex_hs)
     for i = 1, #self.vertexs do
         if b[i] then
             local sign = 1
@@ -251,7 +250,6 @@ function MeshWater:updateMeshObj(dt)
             vert[#vert + 1] =  v.normal.y
             vert[#vert + 1] =  v.normal.z
 
-            -- log("aaaaaaaaaa",  v.content[1],  v.content[2],  v.content[3],  v.content[4])
             verts[#verts + 1] = vert
         end
 

@@ -32,7 +32,7 @@ _G.UIHelper.draw = function()
 end
 
 _G.UIHelper.mouseDown = function(x, y, button, istouch)
-    mgr:mouseDown(x, y, button, isTouch);
+    mgr:mouseDown(x, y, button, isTouch)
 end
 
 _G.UIHelper.mousemoved = function(x, y, dx, dy, istouch)

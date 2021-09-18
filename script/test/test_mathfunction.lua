@@ -103,7 +103,6 @@ end)
 app.keypressed(function(key, scancode, isrepeat)
     if key == "space" then
         for i = 1, #linevalues.values do
-            log('aaaaaaaa',  i, #linevalues.values, values[i].x, linevalues.values[i].x, linevalues.values[i].y)
         end
     end
 end)

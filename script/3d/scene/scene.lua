@@ -450,7 +450,6 @@ function Scene3D:drawDirectionLightCSM(isdebug)
             end
 
             for CSMIndex = 1, CSMNumber do
-                -- log('aaaaaaaa', CSMIndex, #shadownodes[CSMIndex])
                 local shadowprojectbox = self.frustum:intersectBox(receiverboxs[CSMIndex])--BoundBox.getIntersectBox(casterbox, receiverbox)
 
                 shadowprojectbox = lightmat:mulBoundBox(shadowprojectbox, true)

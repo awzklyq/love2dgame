@@ -4,7 +4,6 @@ lovefile.read = function(filename)
     local file = love.filesystem.newFile(_G.FileManager.findFile(filename))
     file:open("r")
     local data = file:read()
-	log('aaaaaaaaa', filename, data)
     file:close()
     return data
 end

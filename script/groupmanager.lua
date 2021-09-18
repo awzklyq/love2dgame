@@ -74,3 +74,20 @@ app.keypressed(function(key, scancode, isrepeat)
         end
     end
 end)
+
+app.resizeWindow(function(w, h)
+    for i, v in pairs(_G.GroupManager.groups) do
+        if v.resizeWindow then
+            v:resizeWindow(w, h);
+        end
+    end
+end)
+
+app.mousereleased(function(x, y, button, isTouch)
+    for i, v in pairs(_G.GroupManager.groups) do
+        if v.mousereleased then
+            v:mousereleased(x, y, button, isTouch);
+        end
+    end
+end)
+

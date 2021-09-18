@@ -10,8 +10,8 @@ function ImageEx.new(name, ...)
 
     image.renderid = Render.ImageId;
 
-    image.renderWidth = image:getWidth()
-    image.renderHeight = image:getHeight()
+    image.w = image:getWidth()
+    image.h = image:getHeight()
 
     image.x = 0
     image.y = 0

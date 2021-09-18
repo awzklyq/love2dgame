@@ -55,7 +55,5 @@ app.keypressed(function(key, scancode, isrepeat)
                 v.visible = true
             -- end
         end
-
-        log('aaaaaa')
     end
 end)

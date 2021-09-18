@@ -77,6 +77,12 @@ dofile 'script/3d/math/ray.lua'
 dofile 'script/3d/water/MeshWater.lua'
 dofile 'script/3d/water/watershader.lua'
 
+dofile 'script/text/lovescreentext.lua'
+
+dofile 'script/render/font.lua'
+
+FileManager.addAllPath("assert")
+
 _G.mlib = require 'script/mlib' 
 
 --游戏全局函数
@@ -89,11 +95,12 @@ _G.getMe = function(obj)
 	return me
 end
 
+_G.TEST = true
 if _G.TEST then
 app.load(function()
 	_G.GroupManager.loadGroup("Login");
 end)
 
 else
-	dofile('script/test/test_water.lua')--test_frustum
+	dofile('script/test/test_print.lua')--test_frustum
 end
