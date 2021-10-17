@@ -29,7 +29,9 @@ function Shader.GetBase3DVSShaderCode(AlphaTest)
     end
 
     if AlphaTest then
-        vertexcode = vertexcode .. " varying float VDepth;  \n";
+        if RenderSet.AlphaTestMode == 1 then
+            vertexcode = vertexcode .. " varying float VDepth;  \n";
+        end
         -- pixelcode = pixelcode .. " const float Bias = 0.000001; \n"--1e-4
     end
      vertexcode = vertexcode..[[    
@@ -52,7 +54,9 @@ function Shader.GetBase3DVSShaderCode(AlphaTest)
     end
 
     if AlphaTest then
-        vertexcode = vertexcode .. " VDepth = wpos.z / wpos.w * 0.5 + 0.5; \n";
+        if RenderSet.AlphaTestMode == 1 then
+            vertexcode = vertexcode .. " VDepth = wpos.z / wpos.w * 0.5 + 0.5; \n";
+        end
         -- pixelcode = pixelcode .. " const float Bias = 0.000001; \n"--1e-4
     end
     vertexcode = vertexcode..[[
@@ -71,7 +75,10 @@ function Shader.GetBase3DPSShaderCode(AlphaTest)
     pixelcode = pixelcode .. " uniform vec3 camerapos;  \n";
 
     if AlphaTest then
-        pixelcode = pixelcode .. " uniform sampler2D DepthTexture;  \n"
+        if RenderSet.AlphaTestMode == 1 then
+            pixelcode = pixelcode .. " uniform sampler2D DepthTexture;  \n"
+        end
+
         pixelcode = pixelcode .. " uniform sampler2D AlphaColorTexture;  \n"
         pixelcode = pixelcode .. " uniform float BlendCoef; \n"
         -- pixelcode = pixelcode .. " const float Bias = 0.000001; \n"--1e-4
@@ -142,8 +149,10 @@ function Shader.GetBase3DPSShaderCode(AlphaTest)
     end
 
     if AlphaTest then
-        pixelcode = pixelcode .. " varying float VDepth;  \n";
-        -- pixelcode = pixelcode .. " const float Bias = 0.000001; \n"--1e-4
+        if RenderSet.AlphaTestMode == 1 then
+            pixelcode = pixelcode .. " varying float VDepth;  \n";
+            -- pixelcode = pixelcode .. " const float Bias = 0.000001; \n"--1e-4
+        end
     end
 
     if needshadow  and RenderSet.getshadowReceiver() then
@@ -162,16 +171,18 @@ function Shader.GetBase3DPSShaderCode(AlphaTest)
             ]];
 
             if AlphaTest then
-                pixelcode = pixelcode ..[[
-                    float Bias = 0.00000001;//1e-4
-                    vec2 scoords = vec2(gl_FragCoord.x / love_ScreenSize.x, gl_FragCoord.y / love_ScreenSize.y );
-                    if(VDepth <=Texel(DepthTexture,scoords).r+Bias)
-                    {
-                        discard;
-                        //texcolor.xyzw = vec4(1,1,1,1); 
-                    }
-                        
-                ]]
+                if RenderSet.AlphaTestMode == 1 then
+                    pixelcode = pixelcode ..[[
+                        float Bias = 0.00000001;//1e-4
+                        vec2 scoords = vec2(gl_FragCoord.x / love_ScreenSize.x, gl_FragCoord.y / love_ScreenSize.y );
+                        if(VDepth <=Texel(DepthTexture,scoords).r+Bias)
+                        {
+                            discard;
+                            //texcolor.xyzw = vec4(1,1,1,1); 
+                        }
+                            
+                    ]]
+                end
             end
             if normalmap then
                 pixelcode = pixelcode .. "vec4 normal = (texture2D(normalmap, texture_coords) - vec4(0.5, 0.5, 0.5, 0.5)) * 2;\n";
@@ -262,9 +273,17 @@ function Shader.GetBase3DPSShaderCode(AlphaTest)
             
         end
         if AlphaTest then
-            pixelcode = pixelcode .. [[
-                texcolor = vec4(texcolor.xyz*(1.0-BlendCoef)+Texel(AlphaColorTexture, texture_coords).rgb*BlendCoef, BlendCoef);
-            ]]
+            if RenderSet.AlphaTestMode == 1 then
+                pixelcode = pixelcode .. [[
+                    //texcolor = vec4(texcolor.xyz*BlendCoef+Texel(AlphaColorTexture, texture_coords).rgb*( 1.0 - BlendCoef), BlendCoef);
+                    texcolor = vec4(texcolor.xyz*(texcolor.w)+Texel(AlphaColorTexture, texture_coords).rgb*(1.0 - texcolor.w), texcolor.w);
+                ]]
+            elseif RenderSet.AlphaTestMode == 2 then
+                pixelcode = pixelcode .. [[
+                    //texcolor = vec4(texcolor.xyz*(1.0-BlendCoef)+Texel(AlphaColorTexture, texture_coords).rgb*BlendCoef, BlendCoef);
+                    texcolor = vec4(texcolor.xyz*(texcolor.w)+Texel(AlphaColorTexture, texture_coords).rgb*(1.0 - texcolor.w), texcolor.w);
+                ]]
+            end
         end
 
     pixelcode = pixelcode ..[[
@@ -292,7 +311,7 @@ function Shader.GetBase3DShader(color, projectionMatrix, modelMatrix, viewMatrix
 
     local normalmap = RenderSet.getNormalMap()
 
-    local shader = ShaderObjects["base3dshader".."directionlights"..#directionlights..tostring(needshadow).. (normalmap and "normalmap" or "") ..  (RenderSet.GetPBR() and "PBR" or "") .. (AlphaTest and "AlphaTest" or "nil")]
+    local shader = ShaderObjects["base3dshader".."directionlights"..#directionlights..tostring(needshadow).. (normalmap and "normalmap" or "") ..  (RenderSet.GetPBR() and "PBR" or "") .. (AlphaTest and "AlphaTest" or "nil") .. tostring(RenderSet.AlphaTestMode)]
     if shader then
         if shader:hasUniform("normalmap") then
             shader:send("normalmap", normalmap.obj)
@@ -458,6 +477,6 @@ function Shader.GetBase3DShader(color, projectionMatrix, modelMatrix, viewMatrix
         end
     end
 
-    ShaderObjects["base3dshader".."directionlights"..#directionlights..tostring(needshadow).. (normalmap and "normalmap" or "") ..  (RenderSet.GetPBR() and "PBR" or "").. (AlphaTest and "AlphaTest" or "nil")] = shader
+    ShaderObjects["base3dshader".."directionlights"..#directionlights..tostring(needshadow).. (normalmap and "normalmap" or "") ..  (RenderSet.GetPBR() and "PBR" or "").. (AlphaTest and "AlphaTest" or "nil").. tostring(RenderSet.AlphaTestMode)] = shader
     return  shader
 end

@@ -229,7 +229,11 @@ function Scene3D:draw(isdrawCanvaColor)
     love.graphics.setMeshCullMode("none")
 
 
-    self:DrawAlphaTest(AlphaTestNodes)
+    if RenderSet.AlphaTestMode == 1 then
+        self:DrawAlphaTest(AlphaTestNodes)
+    elseif RenderSet.AlphaTestMode == 2 then
+        self:DrawAlphaTest2(AlphaTestNodes)
+    end
 
     for i = 1, #self.lights do
         _G.popLight()
@@ -287,7 +291,7 @@ function Scene3D:DrawAlphaTest(AlphaTestNodes)
 
     -------------------------------------------
     love.graphics.setMeshCullMode("none")
-    love.graphics.setDepthMode("never", false)
+    love.graphics.setDepthMode("less", false)
     love.graphics.setCanvas({self.CanvasColor.obj})
     -- love.graphics.clear(self.bgColor._r, self.bgColor._g, self.bgColor._b, self.bgColor._a)
 
@@ -299,6 +303,28 @@ function Scene3D:DrawAlphaTest(AlphaTestNodes)
     end
     love.graphics.setCanvas()
     love.graphics.setMeshCullMode("none") 
+end
+
+function Scene3D:DrawAlphaTest2(AlphaTestNodes)
+    if #AlphaTestNodes == 0 then return end
+
+    love.graphics.setMeshCullMode("none")
+    love.graphics.setDepthMode("less", false)
+    love.graphics.setCanvas({self.CanvasColor.obj, depthstencil = self.normal_depth_buffer.obj})
+    -- love.graphics.clear(self.bgColor._r, self.bgColor._g, self.bgColor._b, self.bgColor._a)
+    for i = 1, #AlphaTestNodes do
+        local node = AlphaTestNodes[i]
+        if node.mesh then--  
+            RenderSet.setshadowReceiver(node.shadowReceiver)
+            RenderSet.SetPBR(node.PBR)
+            node.mesh:DrawAlphaTest2(self.CanvasColor, RenderSet.AlphaTestBlend)
+            RenderSet.setshadowReceiver(false)
+            RenderSet.SetPBR(false)
+        end
+    end
+    
+    love.graphics.setCanvas()
+    love.graphics.setMeshCullMode("none")
 end
 
 function Scene3D:drawNormalmap()

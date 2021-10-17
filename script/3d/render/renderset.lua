@@ -128,4 +128,5 @@ RenderSet.screenwidth = love.graphics.getPixelWidth()
 RenderSet.screenheight = love.graphics.getPixelHeight()
 RenderSet.isNeedFrustum = true
 RenderSet.AlphaTestBlend = 0.5
+RenderSet.AlphaTestMode = 2
 RenderSet.frameToken = 1

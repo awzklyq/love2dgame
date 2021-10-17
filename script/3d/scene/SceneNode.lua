@@ -26,7 +26,7 @@ function SceneNode3D:bindMesh(mesh)
     self.shadowReceiver = false
 
     self.AlphaTest = false
-
+    self.AlphaTest2 = false
     self.PBR = false
 end
 

@@ -196,6 +196,23 @@ function Mesh3D:DrawAlphaTest(DepthTexture, ColorTexture, BlendCoef)
     RenderSet.setNormalMap()
 end
 
+function Mesh3D:DrawAlphaTest2(ColorTexture, BlendCoef)
+    if not self.visible then return end
+    local camera3d = _G.getGlobalCamera3D()
+    --modelMatrix, projectionMatrix, viewMatrix
+
+    RenderSet.setNormalMap(self.normalmap)
+    self:useLights(true)
+    self.shader:setCameraAndMatrix3D(self.transform3d, RenderSet.getUseProjectMatrix(), RenderSet.getUseViewMatrix(), camera3d.eye)
+
+    self.shader:SetAlpahTestValue(nil, ColorTexture, BlendCoef)
+    if self.shader:hasUniform( "bcolor") and self.bcolor then
+        self.shader:send('bcolor',{self.bcolor._r, self.bcolor._g, self.bcolor._b, self.bcolor._a})
+    end
+    Render.RenderObject(self)
+    RenderSet.setNormalMap()
+end
+
 -- stitch two tables together and return the result
 -- useful for use in the LoadObjFile function
 local concatTables = function(t1,t2,t3)

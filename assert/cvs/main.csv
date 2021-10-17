@@ -1,4 +1,5 @@
-Event,TiZhong,ShenGao,XinQing,select1,select2,select3,triggerselect1,triggerselect2,triggerselect3
-出生,6.5,0.6,10,,,,,,
-一岁过了,6.5,0.6,10,,,,,,
-来个事件试试,6.5,0.6,10,选我,爱你,来事,2,,
+Event,TiZhong,ShenGao,XinQing,select1,select2,select3,triggerselect1,triggerselect2,triggerselect3,,bgimage,colorr,colorg,colorb
+今天你来到深圳，决定开始新的人生旅程,70,176,8,,,,,,,,shenzhenjichang.jpg,0,0,0
+停了下，歇息一下，买瓶北冰洋喝,,,,,,,,,,,beibingyang.png,,,
+你看了看地图，想想先去哪,,,,,,,,,,,shenzhenditu.jpg,,,
+想好了，去南山区，你想去找一份IT工作，gogogo...,,,,,,,,,,,itgongzuo.jpg,,,
