@@ -1,5 +1,5 @@
 
-function Shader.GetBase3DVSShaderCode()
+function Shader.GetBase3DVSShaderCode(AlphaTest)
     local vertexcode = ""
     
     vertexcode = vertexcode..[[
@@ -28,6 +28,10 @@ function Shader.GetBase3DVSShaderCode()
         end
     end
 
+    if AlphaTest then
+        vertexcode = vertexcode .. " varying float VDepth;  \n";
+        -- pixelcode = pixelcode .. " const float Bias = 0.000001; \n"--1e-4
+    end
      vertexcode = vertexcode..[[    
         vec4 position(mat4 transform_projection, vec4 vertex_position)
         {
@@ -47,6 +51,10 @@ function Shader.GetBase3DVSShaderCode()
     
     end
 
+    if AlphaTest then
+        vertexcode = vertexcode .. " VDepth = wpos.z / wpos.w * 0.5 + 0.5; \n";
+        -- pixelcode = pixelcode .. " const float Bias = 0.000001; \n"--1e-4
+    end
     vertexcode = vertexcode..[[
         
         return wpos;
@@ -58,10 +66,16 @@ function Shader.GetBase3DVSShaderCode()
     return vertexcode
 end
 
-function Shader.GetBase3DPSShaderCode()
+function Shader.GetBase3DPSShaderCode(AlphaTest)
     local pixelcode = "uniform vec4 bcolor;\n"
     pixelcode = pixelcode .. " uniform vec3 camerapos;  \n";
 
+    if AlphaTest then
+        pixelcode = pixelcode .. " uniform sampler2D DepthTexture;  \n"
+        pixelcode = pixelcode .. " uniform sampler2D AlphaColorTexture;  \n"
+        pixelcode = pixelcode .. " uniform float BlendCoef; \n"
+        -- pixelcode = pixelcode .. " const float Bias = 0.000001; \n"--1e-4
+    end
     --collect direction lights
     local directionlights = Lights.getDirectionLights()
 
@@ -127,6 +141,11 @@ function Shader.GetBase3DPSShaderCode()
         pixelcode = pixelcode .. "varying  vec4 lightpos;\n"
     end
 
+    if AlphaTest then
+        pixelcode = pixelcode .. " varying float VDepth;  \n";
+        -- pixelcode = pixelcode .. " const float Bias = 0.000001; \n"--1e-4
+    end
+
     if needshadow  and RenderSet.getshadowReceiver() then
         pixelcode = pixelcode .. _G.ShaderFunction.getShadowPCFCode
     end
@@ -142,6 +161,18 @@ function Shader.GetBase3DPSShaderCode()
             vec3 viewdir = normalize( camerapos.xyz - modelpos.xyz);
             ]];
 
+            if AlphaTest then
+                pixelcode = pixelcode ..[[
+                    float Bias = 0.00000001;//1e-4
+                    vec2 scoords = vec2(gl_FragCoord.x / love_ScreenSize.x, gl_FragCoord.y / love_ScreenSize.y );
+                    if(VDepth <=Texel(DepthTexture,scoords).r+Bias)
+                    {
+                        discard;
+                        //texcolor.xyzw = vec4(1,1,1,1); 
+                    }
+                        
+                ]]
+            end
             if normalmap then
                 pixelcode = pixelcode .. "vec4 normal = (texture2D(normalmap, texture_coords) - vec4(0.5, 0.5, 0.5, 0.5)) * 2;\n";
             elseif Shader.neednormal > 0 then
@@ -227,8 +258,14 @@ function Shader.GetBase3DPSShaderCode()
                
                 texcolor.xyz *= shadow;
             ]]
+
+            
         end
-    
+        if AlphaTest then
+            pixelcode = pixelcode .. [[
+                texcolor = vec4(texcolor.xyz*(1.0-BlendCoef)+Texel(AlphaColorTexture, texture_coords).rgb*BlendCoef, BlendCoef);
+            ]]
+        end
 
     pixelcode = pixelcode ..[[
             return texcolor;
@@ -238,7 +275,7 @@ function Shader.GetBase3DPSShaderCode()
     return pixelcode
 end
 
-function Shader.GetBase3DShader(color, projectionMatrix, modelMatrix, viewMatrix)
+function Shader.GetBase3DShader(color, projectionMatrix, modelMatrix, viewMatrix, AlphaTest)
     local directionlights = Lights.getDirectionLights()
     local needshadow = false
     if RenderSet.getshadowReceiver() then
@@ -254,7 +291,8 @@ function Shader.GetBase3DShader(color, projectionMatrix, modelMatrix, viewMatrix
     end
 
     local normalmap = RenderSet.getNormalMap()
-    local shader = ShaderObjects["base3dshader".."directionlights"..#directionlights..tostring(needshadow).. (normalmap and "normalmap" or "") ..  (RenderSet.GetPBR() and "PBR" or "")]
+
+    local shader = ShaderObjects["base3dshader".."directionlights"..#directionlights..tostring(needshadow).. (normalmap and "normalmap" or "") ..  (RenderSet.GetPBR() and "PBR" or "") .. (AlphaTest and "AlphaTest" or "nil")]
     if shader then
         if shader:hasUniform("normalmap") then
             shader:send("normalmap", normalmap.obj)
@@ -263,7 +301,7 @@ function Shader.GetBase3DShader(color, projectionMatrix, modelMatrix, viewMatrix
     end
 
     -- log(Shader.GetBase3DPSShaderCode())
-    shader = Shader.new(Shader.GetBase3DPSShaderCode(), Shader.GetBase3DVSShaderCode())
+    shader = Shader.new(Shader.GetBase3DPSShaderCode(AlphaTest), Shader.GetBase3DVSShaderCode(AlphaTest))
     assert(shader:hasUniform( "projectionMatrix") and shader:hasUniform( "modelMatrix") and shader:hasUniform( "viewMatrix"))
     if projectionMatrix then
         shader:send('projectionMatrix', projectionMatrix)
@@ -406,6 +444,20 @@ function Shader.GetBase3DShader(color, projectionMatrix, modelMatrix, viewMatrix
         end
     end
 
-    ShaderObjects["base3dshader".."directionlights"..#directionlights..tostring(needshadow).. (normalmap and "normalmap" or "") ..  (RenderSet.GetPBR() and "PBR" or "")] = shader
+    shader.SetAlpahTestValue = function(obj, DepthTexture, ColorTexture, BlendCoef)
+        if DepthTexture and DepthTexture.obj and obj:hasUniform( "DepthTexture") then
+            obj:send('DepthTexture', DepthTexture.obj)
+        end
+
+        if ColorTexture and ColorTexture.obj and obj:hasUniform("AlphaColorTexture") then
+            obj:send('AlphaColorTexture', ColorTexture.obj)
+        end
+
+        if BlendCoef and obj:hasUniform("BlendCoef") then
+            obj:send("BlendCoef", BlendCoef)
+        end
+    end
+
+    ShaderObjects["base3dshader".."directionlights"..#directionlights..tostring(needshadow).. (normalmap and "normalmap" or "") ..  (RenderSet.GetPBR() and "PBR" or "").. (AlphaTest and "AlphaTest" or "nil")] = shader
     return  shader
 end

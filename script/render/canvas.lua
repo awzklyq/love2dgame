@@ -67,6 +67,6 @@ _G.pushCanvas = function(canvas)
     end
 end
 
-_G.popCanvas = function(canvas)
+_G.popCanvas = function( )
     love.graphics.setCanvas()
 end

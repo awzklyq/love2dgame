@@ -16,6 +16,7 @@ function ImageEx.new(name, ...)
     image.x = 0
     image.y = 0
 
+    image.alpha = 1
     return image;
 end
 

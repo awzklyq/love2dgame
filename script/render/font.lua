@@ -2,7 +2,7 @@ _G.Font = {}
 
 function Font.new(name)-- lw :line width
     local font = setmetatable({}, Font);
-    font.obj = love.graphics.newFont(_G.FileManager.findFile(name), 20)
+    font.obj = love.graphics.newFont(_G.FileManager.findFile(name), 45, "normal", 10)
     return font
 end
 

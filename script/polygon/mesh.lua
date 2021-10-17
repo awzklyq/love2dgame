@@ -51,6 +51,9 @@ end
 
 
 function Mesh:draw()
+    if self.UpdateShaderValue then
+        self:UpdateShaderValue()
+    end
     Render.RenderObject(self);
 end
 
@@ -96,7 +99,7 @@ _G.MeshQuad.new = function(w, h, color, img)
 
     local mesh = Mesh.CreteMeshFormSimpleConcavePolygon(vertices, color);
     if img then
-        if img.renderid == Render.CanvasId then
+        if img.obj then
             mesh:setTexture(img.obj)
         else
             mesh:setTexture(img)
@@ -105,6 +108,43 @@ _G.MeshQuad.new = function(w, h, color, img)
     end
 
     mesh.shader = Shader.GetBaseShader()
+
+    return mesh;
+end
+
+_G.MeshQuadBlur = {}
+
+_G.MeshQuadBlur.new = function(w, h, color)
+    -- local vertices = {-w * 0.5, -h * 0.5, 
+    -- w * 0.5, -h * 0.5,
+    -- w * 0.5, h * 0.5,
+    -- -w * 0.5, h * 0.5};
+
+    local vertices = {0 , 0 , 
+    0 , h ,
+    w , h ,
+    w , 0 };
+
+    local mesh = Mesh.CreteMeshFormSimpleConcavePolygon(vertices, color);
+
+    mesh.shader = Shader.GetImageBlurShader()
+
+    mesh.BindImage = function(obj, img, imgw, imgh)
+        obj.image = img
+        obj.imgw = imgw or  obj.image.w
+        obj.imgh = imgh or  obj.image.h   
+    end
+
+    mesh.UpdateShaderValue = function(obj)
+        obj.shader:SetImageBlurShader(obj.image.obj, obj.imgw, obj.imgh, obj.BlurSizeX / obj.imgw ,  obj.BlurSizeY / obj.imgh ,  (obj.BlurSizeX + obj.BlurSizeW) / obj.imgw, (obj.BlurSizeY + obj.BlurSizeH) / obj.imgh, obj.offset, obj.blurnum, obj.power)
+    end
+
+    mesh.BlurSize = function(obj, x, y, w, h)
+        obj.BlurSizeX = x or 0
+        obj.BlurSizeY = y or 0
+        obj.BlurSizeW = w or obj.imgw
+        obj.BlurSizeH = h or obj.imgh
+    end
 
     return mesh;
 end

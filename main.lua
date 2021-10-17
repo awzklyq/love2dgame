@@ -26,6 +26,9 @@ dofile('script/xml/xmlload.lua')
 
 dofile('script/map/terrain/tiled.lua')
 
+dofile('script/shader/shader.lua')
+dofile('script/shader/shaderfunction.lua')
+
 dofile('script/polygon/rect.lua')
 dofile('script/polygon/circle.lua')
 dofile('script/polygon/line.lua')
@@ -56,8 +59,6 @@ dofile('script/entity/me.lua')
 dofile('script/entity/powerbar.lua')
 
 dofile('script/grid/grid.lua')
-dofile('script/shader/shader.lua')
-dofile('script/shader/shaderfunction.lua')
 dofile 'script/3d/camera/camera3d.lua'
 dofile 'script/render/shadow.lua'
 
@@ -81,6 +82,9 @@ dofile 'script/text/lovescreentext.lua'
 
 dofile 'script/render/font.lua'
 
+dofile 'script/common/timer.lua'
+
+
 FileManager.addAllPath("assert")
 
 _G.mlib = require 'script/mlib' 
@@ -96,11 +100,11 @@ _G.getMe = function(obj)
 end
 
 _G.TEST = true
-if _G.TEST then
+if not _G.TEST then
 app.load(function()
 	_G.GroupManager.loadGroup("Login");
 end)
 
 else
-	dofile('script/test/test_print.lua')--test_frustum
+	dofile('script/test/test_alphatest.lua')--test_frustum
 end

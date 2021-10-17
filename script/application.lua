@@ -105,11 +105,15 @@ function love.update(dt)
         _G.app.resizeWindow(w, h)
     end
 
+    if TimerManager then
+        TimerManager.Tick(dt)
+    end
+
     _G.app.update(dt);
   end
 
 function love.draw()
-    -- love.graphics.clear(0.5,0.5,0.5)
+    -- \
     -- _G.UIHelper.update(dt);
     -- _G.app.update(dt);
     _G.app.beforrender();
@@ -130,7 +134,7 @@ function love.draw()
     _G.UIHelper.draw()
     if _G.lovedebug.showstat then
     -- Stats
-    local stats = love.graphics.getStats()
+local stats = love.graphics.getStats()
     love.graphics.print(tostring(love.timer.getFPS()) .. " FPS | " .. tostring(math.floor(love.timer.getDelta() * 100000) / 100) .. " ms", 10, 10)
     love.graphics.print("Draw calls: " .. tostring(stats.drawcalls), 10, 30)
     love.graphics.print("Canvas switches: " .. tostring(stats.canvasswitches), 10, 50)

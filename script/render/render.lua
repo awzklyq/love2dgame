@@ -262,7 +262,10 @@ Render.RenderObject = function(obj)
         elseif obj.renderid == Render.CanvasId then
             love.graphics.draw( obj.obj, obj.x, obj.y, 0, obj.renderWidth / obj:getWidth(), obj.renderHeight / obj:getHeight())
         elseif obj.renderid == Render.ImageId then
+            local r, g, b, a = love.graphics.getColor( );
+            love.graphics.setColor(r * 0.9, g * 0.9, b * 0.9, obj.alpha);
             love.graphics.draw( obj.obj, obj.x, obj.y, 0, obj.w / obj:getWidth(), obj.h / obj:getHeight())
+            love.graphics.setColor(r, g, b, a);
         elseif obj.renderid == Render.LoveScreenTextId then
             local r, g, b, a = love.graphics.getColor( );
             love.graphics.setColor(obj.color._r, obj.color._g, obj.color._b);

@@ -127,7 +127,9 @@ function Mesh3D:makeNormals()
     end
 end
 
-function Mesh3D:useLights()
+function Mesh3D:useLights(alphatest)
+    self.shader = Shader.GetBase3DShader(nil, nil, nil, nil, alphatest);
+
     if self.rendertype == 'normalmap' then
         local  normalmap = RenderSet.getNormalMap(self.normalmap)
         self.shader = Shader.GeNormal3DShader();
@@ -149,7 +151,6 @@ function Mesh3D:useLights()
         return
     end
 
-    self.shader = Shader.GetBase3DShader();
     for i = 1, #directionlights do
         local light = directionlights[i]
         if self.shader:hasUniform( "directionlight"..i) then
@@ -171,6 +172,23 @@ function Mesh3D:draw()
     self:useLights()
     self.shader:setCameraAndMatrix3D(self.transform3d, RenderSet.getUseProjectMatrix(), RenderSet.getUseViewMatrix(), camera3d.eye)
 
+    if self.shader:hasUniform( "bcolor") and self.bcolor then
+        self.shader:send('bcolor',{self.bcolor._r, self.bcolor._g, self.bcolor._b, self.bcolor._a})
+    end
+    Render.RenderObject(self)
+    RenderSet.setNormalMap()
+end
+
+function Mesh3D:DrawAlphaTest(DepthTexture, ColorTexture, BlendCoef)
+    if not self.visible then return end
+    local camera3d = _G.getGlobalCamera3D()
+    --modelMatrix, projectionMatrix, viewMatrix
+
+    RenderSet.setNormalMap(self.normalmap)
+    self:useLights(true)
+    self.shader:setCameraAndMatrix3D(self.transform3d, RenderSet.getUseProjectMatrix(), RenderSet.getUseViewMatrix(), camera3d.eye)
+
+    self.shader:SetAlpahTestValue(DepthTexture, ColorTexture, BlendCoef)
     if self.shader:hasUniform( "bcolor") and self.bcolor then
         self.shader:send('bcolor',{self.bcolor._r, self.bcolor._g, self.bcolor._b, self.bcolor._a})
     end
