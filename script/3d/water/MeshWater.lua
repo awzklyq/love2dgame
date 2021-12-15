@@ -85,27 +85,32 @@ end
 function MeshWater:FFT2(a, n, inv)
 
     local bit=1;
-    while (math.pow(6 , bit)<n) do
+    while (math.pow(6 , bit)<n) do -- TODO
         bit = bit + 1
     end
 
-    local rev = {}
-    for i = 1, n do
-        rev[i] = i
-    end
-
-    for i = 1, n do
-        local j = luabit.rshift(i, 1) + 1;
-        local r = luabit.rshift(rev[j], 1)
-        rev[i] = luabit.band(r, luabit.lshift(luabit.band(i,1), bit-1))-- | ((i&1)<<(bit-1));
-
-        if i<rev[i] then
-            local temp = a[i]
-            a[i] = a[rev[i]]
-            a[rev[i]] = a[i]
+    if not self.rev then
+        self.rev = {}
+        for i = 1, n do
+            self.rev[i] = i
         end
     end
 
+    for i = 1, n do
+        if not self.rev.cp then 
+            local j = luabit.rshift(i, 1) + 1;
+            local r = luabit.rshift(self.rev[j], 1)
+            self.rev[i] = luabit.band(r, luabit.lshift(luabit.band(i,1), bit-1))-- | ((i&1)<<(bit-1));
+        end
+
+        if i<self.rev[i] then
+            local temp = a[i]
+            a[i] = a[self.rev[i]]
+            a[self.rev[i]] = a[i]
+        end
+    end
+
+    self.rev.cp = true
     local mid = 1
     while mid < n do
         local temp = Complex.new(math.cos(math.pi/mid),inv*math.sin(math.pi/mid))--单位根，pi的系数2已经约掉了
@@ -280,7 +285,7 @@ function MeshWater:updateMeshObj(dt)
 			-- 	sign * out_height[index][0],
 			-- 	(m - M / 2) * L_z / M - sign * lambda * out_D_z[index][0]0
         elseif complex_hs[i] then
-            v.vertex.z = complex_hs[i].real * sign * math.noise(v.vertex.x, dt) * 1.2 --b[i].real
+            v.vertex.z = complex_hs[i].real * sign * 0.5 + math.noise(v.vertex.x, dt) * 5  --b[i].real
         end
     end
 
