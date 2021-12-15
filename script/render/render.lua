@@ -81,7 +81,7 @@ Render.getRenderIdName = function(id)
     elseif Render.GridDebugViewId == id then
         return "GridDebugView"
     elseif Render.BoxBoundId == id then
-        return "Box"
+        return "Box2D"
     elseif Render.MeshId == id then
         return "Mesh"
     elseif Render.CanvasId == id then

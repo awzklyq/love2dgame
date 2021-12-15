@@ -1,3 +1,6 @@
+--https://www.imooc.com/wenda/detail/524261
+_G.luabit = require"bit"
+
 --config
 dofile('script/config.lua')
 
@@ -106,5 +109,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_alphatest.lua')--test_frustum
+	dofile('script/test/test_water.lua')--test_frustum
 end

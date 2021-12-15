@@ -1,18 +1,28 @@
 
-_G.Box = {}
+_G.Box2D = {}
 
-function Box.new(x1,y1,x2,y2)
-    local box = setmetatable({}, {__index = Box});
-    box.x1 = x1 or 0;
-    box.y1 = y1 or 0;
-    box.x2 = x2 or 1;
-    box.y2 = y2 or 1;
+function Box2D.new(x1,y1,x2,y2)
+    local box = setmetatable({}, {__index = Box2D});
+    
+    x1 = x1 or 0
+    y1 = y1 or 0
+
+    x2 = x2 or 1
+    y2 = y2 or 1
+
+    box.x1 = math.min(x1, x2)
+    box.y1 = math.min(y1, y2)
+    box.x2 = math.max(x1, x2);
+    box.y2 = math.max(y1, y2);
+
+    box.min = Vector.new(box.x1, box.y1)
+    box.max = Vector.new(box.x2, box.y2)
 
     box.renderid = Render.BoxBoundId;
     return box;
 end
 
-function Box:getBoxValueFromObj()
+function Box2D:getBoxValueFromObj()
     assert(self.obj)
     local pos = self.obj.transform:getPosition()
    
@@ -23,8 +33,12 @@ function Box:getBoxValueFromObj()
     return x1, y1, x2, y2
 end
 
-function Box:draw()
+function Box2D:draw()
     if _G.lovedebug.showBox then
     Render.RenderObject(self)
     end
+end
+
+Box2D.Copy = function(box)
+    return Box2D.new(box.x1, box.y1, box.x2, box.y2)
 end

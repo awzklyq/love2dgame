@@ -1,15 +1,15 @@
 FileManager.addAllPath("assert")
 
 math.randomseed(os.time()%10000)
-
+-- love.graphics.setWireframe( true )
 local aixs = Aixs.new(0,0,0, 150)
 local directionlight = DirectionLight.new((currentCamera3D.eye - currentCamera3D.look):normalize(), LColor.new(255,255,255,255))
 _G.useLight(directionlight)
 
-local water = MeshWater.new(1000, 1000, 20)
+local water = MeshWater.new(1000, 1000, 40)
 water.amplitude = 200
 water.kvalue = 1
-water.speed = 0.5
+water.speed = 0.4
 water.invWaveLength = 30
 
 water:setWaterMap('water.jpg')
@@ -26,7 +26,7 @@ app.update(function(dt)
     water:update(dt)
 end)
 
-app.keypressed(function(key, scancode, 、)
+app.keypressed(function(key, scancode)
     if key == "w" then
         log(currentCamera3D.eye.x,currentCamera3D.eye.y,currentCamera3D.eye.z)
         log(currentCamera3D.look.x,currentCamera3D.look.y,currentCamera3D.look.z)

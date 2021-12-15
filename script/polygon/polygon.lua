@@ -24,7 +24,7 @@ function Polygon.new(x ,y)
 
     polygon.transform.obj = polygon;
 
-    polygon.box = Box.new()
+    polygon.box = Box2D.new()
 
     -- polygon.revisexy = Vector.new() --TODO for triangles box2d position..
 

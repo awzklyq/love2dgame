@@ -62,7 +62,7 @@ end
 function Body:setPolygon(polygon)
     polygon.body = self;
 
-    local box = Box.new()
+    local box = Box2D.new()
     box.x1 = polygon.vertices[1];
     box.y1 = polygon.vertices[2];
 

@@ -14,7 +14,7 @@ function Grid.new(x, y, w, h, size)
         end
     end
     grid.neednotCheckForNoiseLine = setmetatable({}, {__mode = "kv"});
-    grid.box = Box.new(x, y, x + w, y +h)
+    grid.box = Box2D.new(x, y, x + w, y +h)
 
     grid.w = w
     grid.h = h

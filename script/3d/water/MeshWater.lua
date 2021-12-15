@@ -66,7 +66,6 @@ function MeshWater:func_h_twiddle_0_test(v)--vec_k
 
     local dd = Complex.new(xi_r, xi_i) * math.sqrt(0.5)
     local ddd = math.sqrt(self:func_P_h(v))
-    log('ddddd', xi_r, xi_i, dd.real, dd.imag, ddd, self:func_P_h(v))
 	return Complex.new(xi_r, xi_i) * math.sqrt(0.5) * math.sqrt(self:func_P_h(v));
 end
 
@@ -81,23 +80,71 @@ function MeshWater:twiddle(kn, km, twiddlev, twiddleconj, t, g)
     return term1 + term2;
 end
 
+
+--：https://blog.csdn.net/enjoy_pascal/article/details/81478582/
+function MeshWater:FFT2(a, n, inv)
+
+    local bit=1;
+    while (math.pow(6 , bit)<n) do
+        bit = bit + 1
+    end
+
+    local rev = {}
+    for i = 1, n do
+        rev[i] = i
+    end
+
+    for i = 1, n do
+        local j = luabit.rshift(i, 1) + 1;
+        local r = luabit.rshift(rev[j], 1)
+        rev[i] = luabit.band(r, luabit.lshift(luabit.band(i,1), bit-1))-- | ((i&1)<<(bit-1));
+
+        if i<rev[i] then
+            local temp = a[i]
+            a[i] = a[rev[i]]
+            a[rev[i]] = a[i]
+        end
+    end
+
+    local mid = 1
+    while mid < n do
+        local temp = Complex.new(math.cos(math.pi/mid),inv*math.sin(math.pi/mid))--单位根，pi的系数2已经约掉了
+        for i=1, n, mid*2 do--mid*2是准备合并序列的长度，i是合并到了哪一位
+            local  omega = Complex.new(1,0);
+            for j=1, mid  do--只扫左半部分，得到右半部分的答案
+                if not a[i+j] or not a[i+j+mid] then
+                    -- log('aaaa', mid, i, j, i+j, a[i+j], i+j+mid,  a[i+j+mid] )
+                end
+                if i+j+mid <= n then
+                    omega= omega * temp
+                    local x=a[i+j]
+                    local y=omega*a[i+j+mid];
+                    a[i+j]=x+y
+                    a[i+j+mid]=x-y--这个就是蝴蝶变换什么的
+                end
+            end
+        end
+
+        mid= mid * 2
+    end
+end
+
+
 function MeshWater:FFT(a, b, n, inv)--inv为虚部符号，inv为1时FFT，inv为-1时IFFT
-    if n<= 1 then
+    if n<= 4 then
     	return;
     end
 
     local A1 = {} -- mid+1
     local A2 = {} -- mid+1
 
-
     for i = 2, n, 2 do
         A1[i / 2] = a[i - 1]
         A2[i / 2] = a[i]
     end
-
     local mid= math.floor(n / 2);
-    self:FFT(A1,mid,inv);--递归分治
-    self:FFT(A2,mid,inv);
+    self:FFT(A1, b, mid,inv);--递归分治
+    self:FFT(A2, b, mid,inv);
 
     local w0 = Complex.new(1,0)
     local wn = Complex.new(math.cos(2* math.pi/n), inv*math.sin(2* math.pi/n))
@@ -211,25 +258,29 @@ function MeshWater:updateMeshObj(dt)
     local complex_hs = {}
     for i = 1, #self.vertexs do
         local v = self.vertexs[i]
-        local g = 9.8
+        local g = 9.8 / 2--9.8
         local complex_h = self:twiddle(v.normal.x, v.normal.y, v.twiddle, v.twiddle_conj, dt, g)
         complex_hs[#complex_hs + 1] = complex_h
     end
 
     local b = {}
-    self:FFT(complex_hs, b, #self.vertexs, -1)
-
+    -- self:FFT(complex_hs, b, #self.vertexs, -1)
+    self:FFT2(complex_hs, #self.vertexs, -1)
+    
     for i = 1, #self.vertexs do
+        local sign = 1
+        if i % 2 == 1 then  
+            sign = -1
+        end
+        local v = self.vertexs[i]
         if b[i] then
-            local sign = 1
-            if i % 2 == 1 then  
-                sign = -1
-            end
-            local v = self.vertexs[i]
-            v.vertex.z = b[i].real * sign * 20 --b[i].real
+            
+            v.vertex.z = b[i].real * sign * 10 --b[i].real
             -- (n - N / 2) * L_x / N - sign * lambda * out_D_x[index][0],
 			-- 	sign * out_height[index][0],
-			-- 	(m - M / 2) * L_z / M - sign * lambda * out_D_z[index][0]
+			-- 	(m - M / 2) * L_z / M - sign * lambda * out_D_z[index][0]0
+        elseif complex_hs[i] then
+            v.vertex.z = complex_hs[i].real * sign * math.noise(v.vertex.x, dt) * 1.2 --b[i].real
         end
     end
 
