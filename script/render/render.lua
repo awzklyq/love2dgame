@@ -61,6 +61,8 @@ Render.MeshWaterId = 30
 
 Render.LoveScreenTextId = 31
 
+Render.Tile3DId = 32
+
 Render.getRenderIdName = function(id)
     if Render.CircleId == id then
         return "Circle"
@@ -110,6 +112,8 @@ Render.getRenderIdName = function(id)
         return "MeshWater"
     elseif Render.LoveScreenTextId == id then
         return "LoveScreenText"
+    elseif Render.Tile3DId == id then
+        return "Tile3DId"
     end
 
     return "Null"
@@ -272,6 +276,8 @@ Render.RenderObject = function(obj)
             love.graphics.print(tostring(obj.text), obj.x, obj.y, obj.r, obj.sx, obj.sy, obj.ox, obj.oy, obj.kx, obj.ky)
 
             love.graphics.setColor(r, g, b, a);
+        elseif obj.renderid == Render.Tile3DId then
+            love.graphics.draw( obj.obj )
         end
 
         

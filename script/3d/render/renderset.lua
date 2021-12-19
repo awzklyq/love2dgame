@@ -130,3 +130,10 @@ RenderSet.isNeedFrustum = true
 RenderSet.AlphaTestBlend = 0.5
 RenderSet.AlphaTestMode = 2
 RenderSet.frameToken = 1
+
+RenderSet.EnableCDLOD = true
+
+
+RenderSet.LOD1Distance = 300
+RenderSet.LOD2Distance = 500
+RenderSet.LOD3Distance = 800

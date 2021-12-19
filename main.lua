@@ -39,6 +39,10 @@ dofile('script/polygon/box.lua')
 dofile('script/polygon/mesh.lua')
 dofile('script/3d/mesh/mesh3d.lua')
 dofile('script/3d/mesh/aixs.lua')
+
+dofile('script/3d/terrain/tile.lua')
+dofile 'script/3d/terrain/tileshader.lua'
+
 dofile('script/polygon/polygon.lua')
 
 dofile('script/uisystem/uisystem.lua')
@@ -72,6 +76,7 @@ dofile 'script/3d/render/renderset.lua'
 dofile 'script/3d/scene/scene.lua'
 dofile 'script/3d/scene/scenenode.lua'
 dofile 'script/3d/scene/octree.lua'
+dofile 'script/3d/scene/quadtree.lua'
 
 dofile 'script/3d/math/plane.lua'
 dofile 'script/3d/math/frustum.lua'
@@ -109,5 +114,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_water.lua')--test_frustum
+	dofile('script/test/test_tile.lua')--test_frustum
 end
