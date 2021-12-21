@@ -259,14 +259,27 @@ function Tile3D:UpdateForLOD(dt)
                 if self.CurrentLod < self.T_LOD or self.CurrentLod < self.B_LOD then --or self.CurrentLod < self.B_LOD
                     if ix % 2 == 0 and ix > 1 and ix < #TempOrigLodVertexs then
                         local lerp = (iy -1) / (#TempOrigLodVertexs - 1)
-                        OrigLodVertex[iy].x = math.lerp (OrigLodVertex[iy].x, TempOrigLodVertexs[ix + 1][iy].x, self.CurrentLod < self.B_LOD and lerp or 1 - lerp)
+
+                        if self.CurrentLod < self.B_LOD and iy >= #TempOrigLodVertexs[ix] * 0.5 then   
+                            OrigLodVertex[iy].x = math.lerp (OrigLodVertex[iy].x, TempOrigLodVertexs[ix + 1][iy].x, lerp)
+                        end
+
+                        if self.CurrentLod < self.T_LOD and iy < #TempOrigLodVertexs[ix] * 0.5 then   
+                            OrigLodVertex[iy].x = math.lerp (OrigLodVertex[iy].x, TempOrigLodVertexs[ix + 1][iy].x, 1 - lerp)
+                        end
                     end
                 end
 
                 if self.CurrentLod < self.R_LOD or self.CurrentLod < self.L_LOD then --or self.CurrentLod < self.R_LOD
                     if iy % 2 == 0 and iy > 1 and iy < #TempOrigLodVertexs[ix] then
                         local lerp =  (ix - 1) / (#TempOrigLodVertexs[ix] - 1)
-                        OrigLodVertex[iy].y = math.lerp (OrigLodVertex[iy].y, TempOrigLodVertexs[ix][iy + 1].y, self.CurrentLod < self.R_LOD and lerp or 1 - lerp )
+                        if self.CurrentLod < self.R_LOD and ix >= #TempOrigLodVertexs * 0.5 then
+                            OrigLodVertex[iy].y = math.lerp (OrigLodVertex[iy].y, TempOrigLodVertexs[ix][iy + 1].y, lerp)
+                        end
+
+                        if self.CurrentLod < self.L_LOD and ix < #TempOrigLodVertexs * 0.5 then
+                            OrigLodVertex[iy].y = math.lerp (OrigLodVertex[iy].y, TempOrigLodVertexs[ix][iy + 1].y, 1 - lerp)
+                        end
                     end 
                 end
             end
