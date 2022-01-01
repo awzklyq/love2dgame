@@ -36,7 +36,7 @@ end
 function QuadTreeNode.new(x1, y1, x2, y2)
     local node = setmetatable({}, {__index = QuadTreeNode});
     -- node.Box = Box2D.new(x1, y1, x2, y2)
-    node.Box = BoundBox.buildFromMinMax(Vector3.new(x1, y1, -100), Vector3.new(x2, y2, 100))
+    node.Box = BoundBox.buildFromMinMax(Vector3.new(x1, y1, -10), Vector3.new(x2, y2, 10))
     node.IsLeaf = false;
 
     node.Layer = 1;

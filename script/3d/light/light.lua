@@ -10,6 +10,19 @@ function DirectionLight.new(dir, color)-- lw :line width
     return light
 end
 
+_G.PointLight = {}
+
+function PointLight.new(Position, Color, Distance, Power)-- lw :line width
+    local light = setmetatable({}, {__index = PointLight});
+    light.Position =Position
+    light.Color = Color
+    light.Distance = Distance
+    light.Power = Power
+
+    light.renderid = Render.PointLightId;
+    return light
+end
+
 _G.Lights = {}
 _G.useLight = function(light)
     table.insert(Lights, light)
@@ -46,4 +59,21 @@ _G.Lights.getDirectionLights = function()
     end
    
     return directionlights
+end
+
+_G.Lights.GetPointLights = function()
+    local pointlights = {}
+    for i = 1, #Lights do
+        local light = Lights[i]
+       
+        if  light.renderid == Render.PointLightId then
+            table.insert(pointlights, light)
+         
+        end
+        if  #pointlights == 4 then
+            break
+        end
+    end
+   
+    return pointlights
 end

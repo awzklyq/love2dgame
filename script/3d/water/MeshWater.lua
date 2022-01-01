@@ -181,6 +181,9 @@ function MeshWater:createVertexs(w, h, distanceOffset)
     local N = math.ceil(w / distanceOffset)
     local M = math.ceil(h / distanceOffset)
 
+    self.W = w
+    self.H = h
+
     for ix = startx, endx, distanceOffset do
         -- xx = xx + 1
         xx = math.floor((ix - startx) / distanceOffset)
@@ -285,7 +288,8 @@ function MeshWater:updateMeshObj(dt)
 			-- 	sign * out_height[index][0],
 			-- 	(m - M / 2) * L_z / M - sign * lambda * out_D_z[index][0]0
         elseif complex_hs[i] then
-            v.vertex.z = complex_hs[i].real * sign * 0.5 + math.noise(v.vertex.x, dt) * 5  --b[i].real
+            v.vertex.z = complex_hs[i].real * sign * 0.5
+            -- v.vertex.z =  math.noise(v.vertex.x / (self.W * 0.05), v.vertex.y / (self.H * 0.05), dt * 2) * 50  --b[i].real
         end
     end
 

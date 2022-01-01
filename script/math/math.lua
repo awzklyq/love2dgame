@@ -20,7 +20,7 @@ end
 
 math.noise = function(...)
     local value = love.math.noise( ... )
-    return 2 * value - 1
+    return value--2 * value - 1
 end
 
 math.defaulttransform =  love.math.newTransform( );

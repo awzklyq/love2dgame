@@ -63,6 +63,8 @@ Render.LoveScreenTextId = 31
 
 Render.Tile3DId = 32
 
+Render.PointLightId = 33
+
 Render.getRenderIdName = function(id)
     if Render.CircleId == id then
         return "Circle"
@@ -114,6 +116,8 @@ Render.getRenderIdName = function(id)
         return "LoveScreenText"
     elseif Render.Tile3DId == id then
         return "Tile3DId"
+    elseif Render.PointLightId == id then
+        return "PointLightId"
     end
 
     return "Null"

@@ -1,10 +1,12 @@
 FileManager.addAllPath("assert")
 
-math.randomseed(os.time()%10000)
-love.graphics.setWireframe( true )
+-- local font = Font.new"minijtls.TTF"
+-- font:Use()
+
+-- math.randomseed(os.time()%10000)
+-- love.graphics.setWireframe( true )
 local aixs = Aixs.new(0,0,0, 150)
-local directionlight = DirectionLight.new((currentCamera3D.eye - currentCamera3D.look):normalize(), LColor.new(255,255,255,255))
-_G.useLight(directionlight)
+local IsUseLight = false
 
 local QTree = QuadTree.new()
 local TileAlts = {}
@@ -12,10 +14,12 @@ local CallBackFunc = function(QNode)
     TileAlts[#TileAlts + 1] = Tile3D.new(QNode.Box.min, QNode.Box.max,  16, 3)
     QNode.Tile = TileAlts[#TileAlts]
     TileCached.AddCached(QNode.Tile)
+
+    QNode.Tile:SetBaseColor(LColor.new(math.random(20,180),math.random(20,200),math.random(20,100)))
 end
 
-local QSize = 1600
-local TileSize = 400
+local QSize = 3200
+local TileSize = 800
 TileCached.SetBoundSize(-QSize * 0.5, -QSize * 0.5, QSize * 0.5, QSize * 0.5, TileSize, TileSize)
 QTree:CreateOctreesNode(TileSize, QSize, CallBackFunc)
 
@@ -54,17 +58,21 @@ app.keypressed(function(key, scancode)
     if key == "w" then
         log(currentCamera3D.eye.x,currentCamera3D.eye.y,currentCamera3D.eye.z)
         log(currentCamera3D.look.x,currentCamera3D.look.y,currentCamera3D.look.z)
-    elseif key == 'space' then
-        -- tile.CurrentLod = tile.CurrentLod + 1
-        -- if tile.CurrentLod > tile.LodLevel then tile.CurrentLod  = 1 end
-        -- tile:ChangeLod(tile.CurrentLod)
-        -- log("tile.CurrentLod", tile.CurrentLod)
     elseif key == 'a' then
         love.graphics.setWireframe( true )
     elseif key == 'z' then
         love.graphics.setWireframe( false )
     elseif key == "x" then
         RenderSet.EnableCDLOD = not RenderSet.EnableCDLOD
+    elseif key == "space" then
+        IsUseLight = not IsUseLight
+        if IsUseLight then
+            local currentCamera3D = getGlobalCamera3D()
+            local directionlight = DirectionLight.new((currentCamera3D.eye - currentCamera3D.look):normalize(), LColor.new(255,255,255,255))
+            _G.useLight(directionlight)
+        else
+            _G.popLight()
+        end
     end
 end)
 

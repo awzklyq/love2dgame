@@ -24,7 +24,7 @@ end
 _G.lovedebug.renderbox2d = true;   
 _G.lovedebug.renderobject = true;
 
-_G.lovedebug.showstat = false
+_G.lovedebug.showstat = true
 
 
 _G.lovedebug.showgridinfo = false

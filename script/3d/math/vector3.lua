@@ -183,5 +183,15 @@ Vector3.cross = function(a,b)
     return result
 end
 
+Vector3.lerp = function(a,b, lerp)
+    local result = Vector3.new(
+        math.lerp(a.x, b.x, math.clamp(lerp, 0, 1)),
+        math.lerp(a.y, b.y, math.clamp(lerp, 0, 1)),
+        math.lerp(a.z, b.z, math.clamp(lerp, 0, 1))
+)
+    return result
+end
+
+
 
 Vector3.cOrigin = Vector3.new(0, 0, 0)

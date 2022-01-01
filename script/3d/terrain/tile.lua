@@ -51,12 +51,15 @@ local CopyVertex = function(v)
     return result
 end
 
-
+Tile3D.TestCo = 0.001;
+Tile3D.TestH = 2000;
+Tile3D.TestRandom  = 100--math.random(1,100)
 function Tile3D:CreateVertexLod(StartPos, EndPos, BlockNum, LodLevel)
     self.LodVertexs = {}
     local Vertrxs = {}
     local EdgeLengthX = (EndPos.x - StartPos.x) / BlockNum
     local EdgeLengthY = (EndPos.y - StartPos.y) / BlockNum
+    
     for level = 1, LodLevel do
         if level == 1 then
             local UVs = {}
@@ -67,7 +70,8 @@ function Tile3D:CreateVertexLod(StartPos, EndPos, BlockNum, LodLevel)
 
                 Vertrxs[xi] = {}
                 for iy = StartPos.y, EndPos.y, EdgeLengthY do
-                    local Vertex = Vector3.new(ix, iy,  0 * 20 * math.noise((ix + iy) / 20, 100)) -- test
+                    -- log(math.noise(ix * Tile3D.TestCo, iy * Tile3D.TestCo, Tile3D.TestRandom))
+                    local Vertex = Vector3.new(ix, iy, Tile3D.TestH * math.noise(ix * Tile3D.TestCo, iy * Tile3D.TestCo, Tile3D.TestRandom)) -- test
                     Vertex.UV = Vector.new((ix - StartPos.x) / (EndPos.x - StartPos.x), (iy - StartPos.y) / (EndPos.y - StartPos.y))
                     Vertex.Normal = Vector3.new(0, 0, 1)
                     Vertrxs[xi][yi] = Vertex
@@ -119,6 +123,23 @@ function Tile3D:CreateVertexLod(StartPos, EndPos, BlockNum, LodLevel)
         end
 
         local LodVertexs = {}
+
+        -- Compute normal..
+        for i = 1, #Faces do
+            local Face  = Faces[i]
+            local v1 = Vector3.new(Face[1].x - Face[2].x, Face[1].y - Face[2].y, Face[1].z - Face[2].z)
+            local v2 = Vector3.new(Face[1].x - Face[3].x, Face[1].y - Face[3].y, Face[1].z - Face[3].z)
+            local cross = Vector3.cross(v1, v2)
+            cross:normalize()
+
+            for fi = 1, 3 do
+                Face[fi].Normal.x = Face[fi].Normal.x + cross.x
+                Face[fi].Normal.y = Face[fi].Normal.y + cross.y
+                Face[fi].Normal.z = Face[fi].Normal.z + cross.z
+                Face[fi].Normal:normalize()
+            end
+        end
+
         for i = 1, #Faces do
             local Face  = Faces[i]
             for fi = 1, 3 do
@@ -135,6 +156,7 @@ end
 
 function Tile3D:ChangeLod(LodLevel)
     if LodLevel <= self.LodLevel then
+        self.Old_LodLevel = self.CurrentLod
         self.CurrentLod = LodLevel
         self.obj = self.objs[self.CurrentLod]
     end
@@ -200,6 +222,9 @@ function Tile3D:draw()
 end
 
 function Tile3D:IsNeedCDLOD()
+    if self.Old_LodLevel == self.CurrentLod and self.Old_L_LOD == self.L_LOD and self.R_LOD == self.Old_R_LOD and self.B_LOD == self.Old_B_LOD and  self.T_LOD == self.Old_T_LOD then
+        return false
+    end
     if self.CurrentLod < self.L_LOD or self.CurrentLod < self.R_LOD or self.CurrentLod < self.T_LOD or self.CurrentLod < self.B_LOD then
         return true
     end
@@ -219,25 +244,25 @@ function Tile3D:SelectLod()
     if Distance <= RenderSet.LOD1Distance then
         -- log('aaaaaaa')
         self:ChangeLod(1)
-        self:SetBaseColor(LColor.new(255,255,255))
+        -- self:SetBaseColor(LColor.new(255,255,255))
     elseif Distance <= RenderSet.LOD2Distance and self.LodLevel >= 2 then
         -- log('bbbbbbb')
         self:ChangeLod(2)
-        self:SetBaseColor(LColor.new(255,50,50))
+        -- self:SetBaseColor(LColor.new(255,50,50))
     elseif Distance <= RenderSet.LOD3Distance and self.LodLevel >= 3 then
         self:ChangeLod(3)
-        self:SetBaseColor(LColor.new(50,255,50))
+        -- self:SetBaseColor(LColor.new(50,255,50))
     else
         self:ChangeLod(self.LodLevel)
-        self:SetBaseColor(LColor.new(50,255,50))
+        -- self:SetBaseColor(LColor.new(50,255,50))
     end
 end
 
 function Tile3D:UpdateForLOD(dt)
-    if self.CurrentLod == self.LodLevel then
-        return
-    end
-
+    -- if self.CurrentLod == self.LodLevel then
+    --     return
+    -- end
+    
     TileCached.GetAroundLODCached(self)
 
     if not self:IsNeedCDLOD() then return end
@@ -260,12 +285,20 @@ function Tile3D:UpdateForLOD(dt)
                     if ix % 2 == 0 and ix > 1 and ix < #TempOrigLodVertexs then
                         local lerp = (iy -1) / (#TempOrigLodVertexs - 1)
 
-                        if self.CurrentLod < self.B_LOD and iy >= #TempOrigLodVertexs[ix] * 0.5 then   
+                        if self.CurrentLod < self.B_LOD and iy >= #TempOrigLodVertexs[ix] * 0.5 then  
+                            local lerp = math.clamp((iy -#TempOrigLodVertexs[ix] * 0.5) / (#TempOrigLodVertexs - 1 - #TempOrigLodVertexs[ix] * 0.5), 0, 1)
                             OrigLodVertex[iy].x = math.lerp (OrigLodVertex[iy].x, TempOrigLodVertexs[ix + 1][iy].x, lerp)
+                            OrigLodVertex[iy].z = Tile3D.TestH * math.noise(OrigLodVertex[iy].x * Tile3D.TestCo, OrigLodVertex[iy].y * Tile3D.TestCo, Tile3D.TestRandom)
+
+                            OrigLodVertex[iy].Normal =  Vector3.lerp(OrigLodVertex[iy].Normal, TempOrigLodVertexs[ix + 1][iy].Normal, lerp)
                         end
 
                         if self.CurrentLod < self.T_LOD and iy < #TempOrigLodVertexs[ix] * 0.5 then   
+                            local lerp = math.clamp((iy -1) / (#TempOrigLodVertexs[ix] * 0.5),0,1)
                             OrigLodVertex[iy].x = math.lerp (OrigLodVertex[iy].x, TempOrigLodVertexs[ix + 1][iy].x, 1 - lerp)
+                            OrigLodVertex[iy].z = Tile3D.TestH * math.noise(OrigLodVertex[iy].x * Tile3D.TestCo, OrigLodVertex[iy].y * Tile3D.TestCo, Tile3D.TestRandom)
+
+                            OrigLodVertex[iy].Normal = Vector3.lerp (OrigLodVertex[iy].Normal, TempOrigLodVertexs[ix + 1][iy].Normal, 1 - lerp)
                         end
                     end
                 end
@@ -274,11 +307,19 @@ function Tile3D:UpdateForLOD(dt)
                     if iy % 2 == 0 and iy > 1 and iy < #TempOrigLodVertexs[ix] then
                         local lerp =  (ix - 1) / (#TempOrigLodVertexs[ix] - 1)
                         if self.CurrentLod < self.R_LOD and ix >= #TempOrigLodVertexs * 0.5 then
+                            local lerp =  math.clamp((ix - #TempOrigLodVertexs * 0.5) / (#TempOrigLodVertexs * 0.5), 0, 1)
                             OrigLodVertex[iy].y = math.lerp (OrigLodVertex[iy].y, TempOrigLodVertexs[ix][iy + 1].y, lerp)
+                            OrigLodVertex[iy].z = Tile3D.TestH * math.noise(OrigLodVertex[iy].x * Tile3D.TestCo, OrigLodVertex[iy].y * Tile3D.TestCo, Tile3D.TestRandom)
+
+                            OrigLodVertex[iy].Normal = Vector3.lerp (OrigLodVertex[iy].Normal, TempOrigLodVertexs[ix][iy + 1].Normal, lerp)
                         end
 
                         if self.CurrentLod < self.L_LOD and ix < #TempOrigLodVertexs * 0.5 then
+                            local lerp =  math.clamp((ix - 1) / (#TempOrigLodVertexs * 0.5), 0, 1)
                             OrigLodVertex[iy].y = math.lerp (OrigLodVertex[iy].y, TempOrigLodVertexs[ix][iy + 1].y, 1 - lerp)
+                            OrigLodVertex[iy].z = Tile3D.TestH * math.noise(OrigLodVertex[iy].x * Tile3D.TestCo, OrigLodVertex[iy].y * Tile3D.TestCo, Tile3D.TestRandom)
+
+                            OrigLodVertex[iy].Normal = Vector3.lerp (OrigLodVertex[iy].Normal, TempOrigLodVertexs[ix][iy + 1].Normal, 1 - lerp)
                         end
                     end 
                 end
@@ -348,6 +389,11 @@ TileCached.GetAroundLODCached = function(tile)
     local center = (tile.EndPos + tile.StartPos) * 0.5
     local ix = math.ceil((center.x - TileCached.Min.x) / TileCached.TileSizeX)
     local iy = math.ceil((center.y - TileCached.Min.y) / TileCached.TileSizeY)
+
+    tile.Old_L_LOD = tile.L_LOD;
+    tile.Old_R_LOD = tile.R_LOD;
+    tile.Old_T_LOD = tile.T_LOD;
+    tile.Old_B_LOD = tile.B_LOD;
 
     tile.L_LOD = 1
     tile.R_LOD = 1
