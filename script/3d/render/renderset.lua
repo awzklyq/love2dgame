@@ -105,24 +105,34 @@ RenderSet.getSSAOValue = function()
     return ssao
 end
 
--- local normal_depth_buffer = Canvas.new(w, h, {format = "depth32fstencil8", readable = true, msaa = 0, mipmaps="none"})
--- local normal_depth_buffer.renderWidth = w
--- local normal_depth_buffer.renderHeight = h
+RenderSet.BGColor = LColor.new(0,0,0,255)
+local CanvasColor = Canvas.new(love.graphics.getPixelWidth(), love.graphics.getPixelHeight(), {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
+RenderSet.getCanvasColor = function ()
+    return CanvasColor
+end
 
--- local canvascolor = Canvas.new(w, h, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
--- local canvascolor.renderWidth = w
--- local canvascolor.renderHeight = h
+local DepthBuff = Canvas.new(love.graphics.getPixelWidth(), love.graphics.getPixelHeight(), {format = "depth32fstencil8", readable = true, msaa = 0, mipmaps="none"})
 
--- RenderSet.SetRenderMethond = function(type)
---     if type == "normal" then
---         love.graphics.setMeshCullMode("front")
---         love.graphics.setDepthMode("less", true)
---         love.graphics.setCanvas({canvascolor.obj, depthstencil = normal_depth_buffer.obj})
---     elseif type == 'none' or not type then
---         love.graphics.setMeshCullMode("none")
---         love.graphics.setCanvas()
---     end
--- end
+RenderSet.GetDepthBuff = function ()
+    return DepthBuff
+end
+
+RenderSet.UseCanvasColorAndDepth = function ()
+    love.graphics.setMeshCullMode("front")
+    love.graphics.setDepthMode("less", true)
+    love.graphics.setCanvas({CanvasColor.obj, depthstencil = DepthBuff.obj})
+    love.graphics.clear(RenderSet.BGColor._r, RenderSet.BGColor._g, RenderSet.BGColor._b, RenderSet.BGColor._a)
+end
+
+RenderSet.ClearCanvasColorAndDepth = function ()
+    love.graphics.setCanvas()
+    love.graphics.setMeshCullMode("none")
+end
+
+app.resizeWindow(function(w, h)
+    CanvasColor = Canvas.new(w, h, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
+    DepthBuff = Canvas.new(w, h, {format = "depth32fstencil8", readable = true, msaa = 0, mipmaps="none"})
+end)
 
 RenderSet.screenwidth = love.graphics.getPixelWidth()
 RenderSet.screenheight = love.graphics.getPixelHeight()

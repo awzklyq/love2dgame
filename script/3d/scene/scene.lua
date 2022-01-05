@@ -201,6 +201,11 @@ function Scene3D:draw(isdrawCanvaColor)
     love.graphics.setDepthMode("less", true)
     love.graphics.setCanvas({self.CanvasColor.obj, depthstencil = self.normal_depth_buffer.obj})
     love.graphics.clear(self.bgColor._r, self.bgColor._g, self.bgColor._b, self.bgColor._a)
+
+    if self.Tiles then--TODO
+        
+    end
+    
     for i = 1, #self.visiblenodes do
         local node = self.visiblenodes[i]
         if node.mesh then--  

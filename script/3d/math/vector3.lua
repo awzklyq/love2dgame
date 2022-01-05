@@ -12,7 +12,13 @@ metatable_vector3.__sub = function(myvalue, value)
 end
 
 metatable_vector3.__mul = function(myvalue, value)
-    return Vector3.new(myvalue.x * value, myvalue.y * value, myvalue.z * value)
+    if type(value) == "number" then
+        return Vector3.new(myvalue.x * value, myvalue.y * value, myvalue.z * value)
+    elseif  type(value) == "table" and value.renderid == Render.Vector3Id then
+        return Vector3.new(myvalue.x * value.x, myvalue.y * value.y, myvalue.z * value.z)
+    else
+        _errorAssert(false, "metatable_vector3.__mul~")
+    end
 end
 
 metatable_vector3.__unm = function(myvalue)
@@ -20,7 +26,13 @@ metatable_vector3.__unm = function(myvalue)
 end
 
 metatable_vector3.__div = function(myvalue, value)
-    return Vector3.new(myvalue.x / value, myvalue.y / value, myvalue.z / value)
+    if type(value) == "number" then
+        return Vector3.new(myvalue.x / value, myvalue.y / value, myvalue.z / value)
+    elseif  type(value) == "table" and value.renderid == Render.Vector3Id then
+        return Vector3.new(myvalue.x / value.x, myvalue.y / value.y, myvalue.z / value.z)
+    else
+        _errorAssert(false, "metatable_vector3.__div~")
+    end 
 end
 
 function Vector3.new(x ,y, z)

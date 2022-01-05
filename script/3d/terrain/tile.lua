@@ -4,7 +4,7 @@ local vertexFormat = {
     {"VertexPosition", "float", 3},
     {"VertexTexCoord", "float", 2},
     {"VertexColor", "float", 3},--normal
-    -- {"ConstantColor", "byte", 4},
+    {"ConstantColor", "float", 3},
 }
 
 function Tile3D.new(StartPos, EndPos, BlockNum, LodLevel)-- lw :line width
@@ -47,6 +47,7 @@ local CopyVertex = function(v)
     local result = Vector3.new(v.x, v.y, v.z)
     result.UV = Vector.new(v.UV.x, v.UV.y)
     result.Normal = Vector3.new(v.Normal.x, v.Normal.y, v.Normal.z)
+    result.Color = Vector3.new(v.Color.x, v.Color.y, v.Color.z)
     result.UserData = v.UserData
     return result
 end
@@ -74,6 +75,7 @@ function Tile3D:CreateVertexLod(StartPos, EndPos, BlockNum, LodLevel)
                     local Vertex = Vector3.new(ix, iy, Tile3D.TestH * math.noise(ix * Tile3D.TestCo, iy * Tile3D.TestCo, Tile3D.TestRandom)) -- test
                     Vertex.UV = Vector.new((ix - StartPos.x) / (EndPos.x - StartPos.x), (iy - StartPos.y) / (EndPos.y - StartPos.y))
                     Vertex.Normal = Vector3.new(0, 0, 1)
+                    Vertex.Color = Vector3.new(0,0,0)
                     Vertrxs[xi][yi] = Vertex
                     yi = yi + 1
                 end
@@ -143,7 +145,7 @@ function Tile3D:CreateVertexLod(StartPos, EndPos, BlockNum, LodLevel)
         for i = 1, #Faces do
             local Face  = Faces[i]
             for fi = 1, 3 do
-                LodVertexs[#LodVertexs + 1] = {Face[fi].x, Face[fi].y, Face[fi].z, Face[fi].UV.x, Face[fi].UV.y, Face[fi].Normal.x, Face[fi].Normal.y, Face[fi].Normal.z }
+                LodVertexs[#LodVertexs + 1] = {Face[fi].x, Face[fi].y, Face[fi].z, Face[fi].UV.x, Face[fi].UV.y, Face[fi].Normal.x, Face[fi].Normal.y, Face[fi].Normal.z, Face[fi].Color.x, Face[fi].Color.y, Face[fi].Color.z }
             end
             
         end
@@ -152,6 +154,10 @@ function Tile3D:CreateVertexLod(StartPos, EndPos, BlockNum, LodLevel)
         self.OrigLodVertexs[level] = OrigLodVertexs
         self.LodLevel = level
     end --LodLevel
+end
+
+function Tile3D:GetLodVertex(lod)
+    return self.LodVertexs[lod or 1]
 end
 
 function Tile3D:ChangeLod(LodLevel)
@@ -258,7 +264,7 @@ function Tile3D:SelectLod()
     end
 end
 
-function Tile3D:UpdateForLOD(dt)
+function Tile3D:UpdateForLOD(dt, harmonics)
     -- if self.CurrentLod == self.LodLevel then
     --     return
     -- end
@@ -291,6 +297,7 @@ function Tile3D:UpdateForLOD(dt)
                             OrigLodVertex[iy].z = Tile3D.TestH * math.noise(OrigLodVertex[iy].x * Tile3D.TestCo, OrigLodVertex[iy].y * Tile3D.TestCo, Tile3D.TestRandom)
 
                             OrigLodVertex[iy].Normal =  Vector3.lerp(OrigLodVertex[iy].Normal, TempOrigLodVertexs[ix + 1][iy].Normal, lerp)
+                            OrigLodVertex[iy].Color =  Vector3.lerp(OrigLodVertex[iy].Color, TempOrigLodVertexs[ix + 1][iy].Color, lerp)
                         end
 
                         if self.CurrentLod < self.T_LOD and iy < #TempOrigLodVertexs[ix] * 0.5 then   
@@ -299,6 +306,7 @@ function Tile3D:UpdateForLOD(dt)
                             OrigLodVertex[iy].z = Tile3D.TestH * math.noise(OrigLodVertex[iy].x * Tile3D.TestCo, OrigLodVertex[iy].y * Tile3D.TestCo, Tile3D.TestRandom)
 
                             OrigLodVertex[iy].Normal = Vector3.lerp (OrigLodVertex[iy].Normal, TempOrigLodVertexs[ix + 1][iy].Normal, 1 - lerp)
+                            OrigLodVertex[iy].Color = Vector3.lerp (OrigLodVertex[iy].Color, TempOrigLodVertexs[ix + 1][iy].Color, 1 - lerp)
                         end
                     end
                 end
@@ -312,6 +320,7 @@ function Tile3D:UpdateForLOD(dt)
                             OrigLodVertex[iy].z = Tile3D.TestH * math.noise(OrigLodVertex[iy].x * Tile3D.TestCo, OrigLodVertex[iy].y * Tile3D.TestCo, Tile3D.TestRandom)
 
                             OrigLodVertex[iy].Normal = Vector3.lerp (OrigLodVertex[iy].Normal, TempOrigLodVertexs[ix][iy + 1].Normal, lerp)
+                            OrigLodVertex[iy].Color = Vector3.lerp (OrigLodVertex[iy].Color, TempOrigLodVertexs[ix][iy + 1].Color, lerp)
                         end
 
                         if self.CurrentLod < self.L_LOD and ix < #TempOrigLodVertexs * 0.5 then
@@ -320,6 +329,7 @@ function Tile3D:UpdateForLOD(dt)
                             OrigLodVertex[iy].z = Tile3D.TestH * math.noise(OrigLodVertex[iy].x * Tile3D.TestCo, OrigLodVertex[iy].y * Tile3D.TestCo, Tile3D.TestRandom)
 
                             OrigLodVertex[iy].Normal = Vector3.lerp (OrigLodVertex[iy].Normal, TempOrigLodVertexs[ix][iy + 1].Normal, 1 - lerp)
+                            OrigLodVertex[iy].Color = Vector3.lerp (OrigLodVertex[iy].Color, TempOrigLodVertexs[ix][iy + 1].Color, 1 - lerp)
                         end
                     end 
                 end
@@ -347,7 +357,14 @@ function Tile3D:UpdateForLOD(dt)
     for i = 1, #Faces do
         local Face  = Faces[i]
         for fi = 1, 3 do
-            LodVertexs[#LodVertexs + 1] = {Face[fi].x, Face[fi].y, Face[fi].z, Face[fi].UV.x, Face[fi].UV.y, Face[fi].Normal.x, Face[fi].Normal.y, Face[fi].Normal.z }  
+            if harmonics then
+                local nor = Vector3.new(Face[fi].Normal.x, Face[fi].Normal.y, Face[fi].Normal.z)
+                local color = harmonics:GetColor(nor)
+                Face[fi].Color.x = color._r
+                Face[fi].Color.y = color._g
+                Face[fi].Color.z = color._b
+            end
+            LodVertexs[#LodVertexs + 1] = {Face[fi].x, Face[fi].y, Face[fi].z, Face[fi].UV.x, Face[fi].UV.y, Face[fi].Normal.x, Face[fi].Normal.y, Face[fi].Normal.z,  Face[fi].Color.x, Face[fi].Color.y, Face[fi].Color.z}  
         end
         
     end

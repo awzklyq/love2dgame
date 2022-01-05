@@ -55,6 +55,7 @@ dofile('script/math/matrix.lua')
 dofile('script/3d/math/vector3.lua')
 dofile('script/3d/math/vector4.lua')
 dofile('script/3d/math/matrix3d.lua')
+dofile('script/3d/math/harmonics.lua')
 
 dofile('script/groupmanager.lua')
 
@@ -114,5 +115,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_tile.lua')--test_frustum
+	dofile('script/test/test_harmonics.lua')--test_frustum
 end

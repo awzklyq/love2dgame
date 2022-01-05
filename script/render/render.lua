@@ -65,6 +65,10 @@ Render.Tile3DId = 32
 
 Render.PointLightId = 33
 
+Render.ThreeBandSHVectorRGBId = 34
+
+Render.ThreeBandSHVectorId = 35
+
 Render.getRenderIdName = function(id)
     if Render.CircleId == id then
         return "Circle"
@@ -118,6 +122,10 @@ Render.getRenderIdName = function(id)
         return "Tile3DId"
     elseif Render.PointLightId == id then
         return "PointLightId"
+    elseif Render.ThreeBandSHVectorRGBId == id then
+        return "ThreeBandSHVectorRGBId"
+    elseif Render.ThreeBandSHVectorId == id then
+        return "ThreeBandSHVectorId"
     end
 
     return "Null"

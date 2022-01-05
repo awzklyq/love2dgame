@@ -4,7 +4,11 @@ _G.ImageEx = {}
 function ImageEx.new(name, ...)
     local image = setmetatable({}, ImageEx);
 
-    image.obj = love.graphics.newImage(_G.FileManager.findFile(name), ...)
+    if type(name) == 'string' then
+        image.obj = love.graphics.newImage(_G.FileManager.findFile(name), ...)
+    else
+        image.obj = love.graphics.newImage(name, ...)
+    end
 
     image.transform = Matrix.new()
 

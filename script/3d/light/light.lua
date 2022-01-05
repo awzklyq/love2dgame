@@ -4,6 +4,7 @@ _G.DirectionLight = {}
 function DirectionLight.new(dir, color)-- lw :line width
     local light = setmetatable({}, {__index = DirectionLight});
     light.dir =dir
+    light.dir:normalize()
     light.color = color
 
     light.renderid = Render.DirectionLightId;

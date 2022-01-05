@@ -9,7 +9,7 @@ _G.lovedebug.logtab = function(tab)
 end
 
 _G.log = function(...)
-    print(RenderSet.frameToken, ...)
+    print(...)
 end
 
 _G._warn = function(...)
@@ -24,7 +24,7 @@ end
 _G.lovedebug.renderbox2d = true;   
 _G.lovedebug.renderobject = true;
 
-_G.lovedebug.showstat = true
+_G.lovedebug.showstat = false
 
 
 _G.lovedebug.showgridinfo = false

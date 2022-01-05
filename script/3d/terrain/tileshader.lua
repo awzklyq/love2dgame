@@ -11,6 +11,7 @@ function Shader.GetTile3DVSShaderCode()
         vertexcode = vertexcode .. "varying vec4 vnormal;\n"
     end
     vertexcode = vertexcode .. "varying vec4 modelpos; \n"
+    vertexcode = vertexcode .. "varying vec4 VColor; \n"
     local directionlights = Lights.getDirectionLights()
 
     local needshadow = false
@@ -35,7 +36,7 @@ function Shader.GetTile3DVSShaderCode()
     if not normalmap and Shader.neednormal > 0 then
         vertexcode = vertexcode.."   vnormal = VertexColor;\n "
     end
-
+    vertexcode = vertexcode.."   VColor = ConstantColor;\n "
     vertexcode = vertexcode.." vec4 wpos = projectionMatrix * viewMatrix * modelMatrix * VertexPosition; \n"
     vertexcode = vertexcode.." modelpos =  modelMatrix * VertexPosition; \n"
     -- vertexcode = vertexcode.." modelpos.z =  modelpos.z / modelpos.w; \n"
@@ -118,6 +119,7 @@ function Shader.GetTile3DPSShaderCode()
     elseif Shader.neednormal > 0 then
         pixelcode = pixelcode.."varying vec4 vnormal; \n"
     end
+    pixelcode = pixelcode .. "varying vec4 VColor; \n"
 
     pixelcode = pixelcode .. "varying  vec4 modelpos; \n"
 
@@ -133,6 +135,7 @@ function Shader.GetTile3DPSShaderCode()
         vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
         {
             vec4 texcolor = Texel(tex, texture_coords) * bcolor;
+            texcolor.xyz = texcolor.xyz + VColor.xyz;
             vec3 viewdir = normalize( camerapos.xyz - modelpos.xyz);
             ]];
 
