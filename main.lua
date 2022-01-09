@@ -118,5 +118,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_bloom.lua')--test_frustum
+	dofile('script/test/test_pbr.lua')--test_frustum
 end

@@ -15,7 +15,7 @@ for i = 1, cubenum do
     mesh3d:setBaseColor(LColor.new(10,10,10, 255))
 
     local node = scene:addMesh(mesh3d)
-    node.PBR = true
+    node.PBR = true --i % 2 == 0
 end
 
 currentCamera3D.eye = Vector3.new( 33.386304308313, 363.36230638215, 232.64515424476)
