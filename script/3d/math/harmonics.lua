@@ -119,9 +119,7 @@ _G.Harmonics = {}
 function Harmonics.new()
     local harmonics = setmetatable({}, {__index = Harmonics});
 
-    harmonics.m_Degree = 9
-
-    harmonics.m_Coefs = ThreeBandSHVector.new()
+    harmonics.m_Coefs = ThreeBandSHVectorRGB.new()
 
     return harmonics
 end

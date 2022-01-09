@@ -75,39 +75,6 @@ function Shader.GetBaseImageShader()
    return shader
 end
 
-function Shader.GetBrightnessShader(l)
-    if not l then
-        l = 0
-    end
-    local pixelcode = [[
-    uniform float l;
-    vec4 effect( vec4 color, sampler2D tex, vec2 texture_coords, vec2 screen_coords )
-    {
-        vec4 texcolor = Texel(tex, texture_coords);
-        vec4 basecolor = texcolor * color;
-        float bl = 0.2126 * basecolor.x + 0.7152 * basecolor.y + 0.0722 * basecolor.z;
-        if (bl <=l)
-            discard;
-
-        return basecolor;
-
-    }
-]]
- 
-    local vertexcode = [[
-    vec4 position( mat4 transform_projection, vec4 vertex_position )
-    {
-        return transform_projection * vertex_position;
-    }
-]]
-
-
-    local shader =   Shader.new(pixelcode, vertexcode)
-    assert(shader:hasUniform( "l"))
-    shader:send('l', l);
-    return shader
-end
-
 function Shader.GeDepth3DShader(projectionMatrix, modelMatrix, viewMatrix)
    local shader = ShaderObjects["base3dshader_depth"]
    if shader then

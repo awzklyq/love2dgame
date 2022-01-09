@@ -37,3 +37,18 @@ _G.ShaderFunction.GetTTF = [[
         return term1 + term2;
     }
 ]]
+
+_G.ShaderFunction.Luminance = [[
+    float Luminance(vec3 basecolor)
+    {
+        return 0.2126 * basecolor.x + 0.7152 * basecolor.y + 0.0722 * basecolor.z;
+    }
+]]
+
+_G.ShaderFunction.CircleSampler = [[
+    vec2 CircleSampler(float SliceCount, float Start, float Offset)
+    {
+        float radian = (3.141592 * 2.0 * (1.0 / SliceCount)) * (Start + Offset);
+        return vec2(sin(radian), cos(radian));
+    }
+]]

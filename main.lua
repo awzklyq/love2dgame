@@ -94,6 +94,9 @@ dofile 'script/render/font.lua'
 dofile 'script/common/timer.lua'
 
 
+dofile 'script/postprocess/bloom.lua'
+
+
 FileManager.addAllPath("assert")
 
 _G.mlib = require 'script/mlib' 
@@ -115,5 +118,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_harmonics.lua')--test_frustum
+	dofile('script/test/test_bloom.lua')--test_frustum
 end

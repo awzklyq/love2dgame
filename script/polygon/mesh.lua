@@ -1,8 +1,17 @@
 _G.Mesh = {}
 
+
+local vertexFormat = {
+    {"VertexPosition", "float", 2},
+    {"VertexTexCoord", "float", 2},
+    {"VertexColor", "float", 4},--normal
+    -- {"ConstantColor", "byte", 4},
+}
+
 function Mesh.new(vertices, mode, usage)
     local mesh = setmetatable({}, Mesh);
-    mesh.obj = love.graphics.newMesh(vertices, mode, usage)
+    -- mesh.obj = love.graphics.newMesh(vertices, mode, usage)
+    mesh.obj = love.graphics.newMesh(vertexFormat, vertices, "fan")
 
     mesh.transform = Matrix.new()
     mesh.renderid = Render.MeshId ;

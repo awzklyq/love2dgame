@@ -42,7 +42,7 @@ local meshblurh = MeshQuad.new(texturesize / 4, texturesize / 4, LColor.new(250,
 -- meshblurh.transform:moveTo(10, 10)
 
 meshblurh.shader = Shader.GetHBlurShader(texturesize / 4, 1, 12, 0.4)
-meshblurw.shader = Shader.GetWBlurShader(texturesize / 4,1, 12, 0.4)
+meshblurw.shader = Shader.GetHBlurShader(texturesize / 4,1, 12, 0.4)
 
 local meshtest = MeshQuad.new(texturesize, texturesize, LColor.new(250, 250, 250, 255), canvasblurh)
 meshtest.shader = Shader.GetBaseShader()

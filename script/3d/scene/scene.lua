@@ -29,6 +29,8 @@ function Scene3D.new()
 
     scene.visiblenodes = {}
     scene.cullednumber = 0
+
+    scene.needBloom = false;
     return scene
 end
 
@@ -376,7 +378,7 @@ function Scene3D:drawCanvaColor()
     local canvas2 = self.canvasPostprocess
     local rendercolor = self.CanvasColor
     if self.needFXAA then
-        love.graphics.setCanvas(canvas2)
+        love.graphics.setCanvas(canvas2.obj)
         self.meshquad:setCanvas(canvas1)
         self.meshquad.shader = Shader.GetFXAAShader(canvas1.renderWidth , canvas1.renderHeight)
         self.meshquad:draw()
@@ -389,7 +391,7 @@ function Scene3D:drawCanvaColor()
     end
 
     if self.needSSAO then
-        love.graphics.setCanvas(canvas2)
+        love.graphics.setCanvas(canvas2.obj)
         self.meshquad:setCanvas(canvas1)
         self.meshquad.shader = Shader.GetSSAOShader(self.canvasnormal, self.canvasdepth)
         self.meshquad:draw()
@@ -400,7 +402,11 @@ function Scene3D:drawCanvaColor()
         canvas1 = rendercolor
     end
 
-    rendercolor:draw()
+    if self.needBloom then
+        Bloom.Execute(canvas1, self.meshquad)
+    else
+        rendercolor:draw()
+    end
 end
 
 function Scene3D:drawCanvaNormalmap()
