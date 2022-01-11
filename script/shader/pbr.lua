@@ -34,7 +34,7 @@ _G.ShaderFunction.GetPBRCode = [[
     float Geometric (float a, vec3 nor, vec3 viewdir, vec3 lightdir)
     {
         float k = ((a + 1) * (a + 1)) / 8;
-        return G_SUB(nor, viewdir, k) * max(G_SUB(nor, lightdir, k), 0.001);
+        return G_SUB(nor, viewdir, k) * max(G_SUB(nor, lightdir, k), 0.0005);
     }
 
     vec3 fresnelSchlick(vec3 F0, vec3 H, vec3 V)
@@ -44,8 +44,8 @@ _G.ShaderFunction.GetPBRCode = [[
 
     vec3 GetPBR(float a, float metalness, vec3 color, vec3 viewdir, vec3 lightdir, vec3 nor)
     {
-        a = 0.4;
-        metalness = 1;
+        a = 0.1; // TODO
+        metalness = 1; //TODO
         lightdir = -lightdir;
         //float ks = 1 - kd;
         vec3 h = normalize(viewdir + lightdir);
@@ -53,7 +53,7 @@ _G.ShaderFunction.GetPBRCode = [[
 
         float G = Geometric(a, nor, viewdir, lightdir);
 
-        vec3 F0 = vec3(0.04);
+        vec3 F0 = vec3(0.4);
         
          F0 = mix(F0,  color * vec3(1), metalness);
         vec3 F = fresnelSchlick(F0, h, viewdir);

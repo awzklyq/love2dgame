@@ -15,13 +15,13 @@ Bloom.Execute = function(Canva1, InMeshQuad)
     love.graphics.setCanvas(Bloom.Canvae.obj)
     love.graphics.clear()
     Bloom.meshquad:setCanvas(Canva1)
-    Bloom.meshquad.shader = Shader.GetBrightnessShader(0.15)
+    Bloom.meshquad.shader = Shader.GetBrightnessShader(0.65)
     Bloom.meshquad:draw()
     love.graphics.setCanvas()    
 
-    local RenderCanvan = BlurHSE.Execute(Bloom.Canvae, 1, 1, Canva1.renderWidth / 8 , Canva1.renderHeight / 8 )
+    local RenderCanvan = BlurHSE.Execute(Bloom.Canvae, 1, 2, Canva1.renderWidth / 8 , Canva1.renderHeight / 8 )
     -- RenderCanvan = BlurCircle.Execute(Bloom.Canvae)
-    RenderCanvan = BlurWSE.Execute(RenderCanvan, 1, 1, Canva1.renderWidth / 8, Canva1.renderHeight / 8)
+    RenderCanvan = BlurWSE.Execute(RenderCanvan, 1, 2, Canva1.renderWidth / 8, Canva1.renderHeight / 8)
     RenderCanvan = BlurHSE.Execute(RenderCanvan, 1, 1, Canva1.renderWidth / 16, Canva1.renderHeight / 16)
     RenderCanvan = BlurWSE.Execute(RenderCanvan, 1, 1, Canva1.renderWidth / 16, Canva1.renderHeight / 16)
     RenderCanvan = BlurHSE.Execute(RenderCanvan, 1, 1, Canva1.renderWidth / 8, Canva1.renderHeight / 8)
@@ -30,7 +30,7 @@ Bloom.Execute = function(Canva1, InMeshQuad)
     RenderCanvan = BloomAdd.Execute(Canva1, RenderCanvan, Canva1.renderWidth, Canva1.renderHeight)
     RenderCanvan.renderHeight = Canva1.renderHeight
     RenderCanvan.renderWidth = Canva1.renderWidth
-    RenderCanvan:draw()
+    return RenderCanvan
 end
 
 _G.BlurHSE = {}

@@ -95,6 +95,7 @@ dofile 'script/common/timer.lua'
 
 
 dofile 'script/postprocess/bloom.lua'
+dofile 'script/postprocess/outline.lua'
 
 
 FileManager.addAllPath("assert")
@@ -118,5 +119,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_pbr.lua')--test_frustum
+	dofile('script/test/test_outline.lua')--test_frustum
 end

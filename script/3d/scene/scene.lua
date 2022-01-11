@@ -31,6 +31,7 @@ function Scene3D.new()
     scene.cullednumber = 0
 
     scene.needBloom = false;
+    scene.needOutLine = false;
     return scene
 end
 
@@ -403,10 +404,14 @@ function Scene3D:drawCanvaColor()
     end
 
     if self.needBloom then
-        Bloom.Execute(canvas1, self.meshquad)
-    else
-        rendercolor:draw()
+        rendercolor = Bloom.Execute(canvas1, self.meshquad)
     end
+    
+    if self.needOutLine then
+        rendercolor = OutLine.Execute(rendercolor)
+    end
+
+    rendercolor:draw()
 end
 
 function Scene3D:drawCanvaNormalmap()
