@@ -57,5 +57,9 @@ app.keypressed(function(key, scancode, isrepeat)
 
     if key == "a" then
         scene.needSSAO = not scene.needSSAO
+    elseif key == "x" then
+        scene.needBloom = not scene.needBloom
+    elseif key == "c" then
+        scene.needOutLine = not scene.needOutLine    
     end
 end)

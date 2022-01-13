@@ -380,6 +380,7 @@ function Scene3D:drawCanvaColor()
     local rendercolor = self.CanvasColor
     if self.needFXAA then
         love.graphics.setCanvas(canvas2.obj)
+        love.graphics.clear()
         self.meshquad:setCanvas(canvas1)
         self.meshquad.shader = Shader.GetFXAAShader(canvas1.renderWidth , canvas1.renderHeight)
         self.meshquad:draw()
@@ -393,6 +394,7 @@ function Scene3D:drawCanvaColor()
 
     if self.needSSAO then
         love.graphics.setCanvas(canvas2.obj)
+        love.graphics.clear()
         self.meshquad:setCanvas(canvas1)
         self.meshquad.shader = Shader.GetSSAOShader(self.canvasnormal, self.canvasdepth)
         self.meshquad:draw()
@@ -406,7 +408,7 @@ function Scene3D:drawCanvaColor()
     if self.needBloom then
         rendercolor = Bloom.Execute(canvas1, self.meshquad)
     end
-    
+
     if self.needOutLine then
         rendercolor = OutLine.Execute(rendercolor)
     end

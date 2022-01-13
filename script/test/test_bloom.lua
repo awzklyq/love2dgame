@@ -29,7 +29,7 @@ app.render(function(dt)
     scene:draw(true)
    
 end)
-print("出生")
+
 app.keypressed(function(key, scancode, isrepeat)
     if key == "space" then
         log(currentCamera3D.eye.x, currentCamera3D.eye.y, currentCamera3D.eye.z)
