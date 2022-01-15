@@ -96,13 +96,22 @@ RenderSet.getNormalMap = function()
     return normalmap
 end
 
-local ssao = 0.0001
+local ssao = 2
 RenderSet.setSSAOValue = function(value)
     ssao = math.max(0, value)
 end
 
 RenderSet.getSSAOValue = function()
     return ssao
+end
+
+local ssaolimit = 0.00001
+RenderSet.setSSAODepthLimit = function(value)
+    ssaolimit = math.max(0, value)
+end
+
+RenderSet.getSSAODepthLimit = function()
+    return ssaolimit
 end
 
 RenderSet.BGColor = LColor.new(0,0,0,255)
@@ -125,6 +134,7 @@ RenderSet.UseCanvasColorAndDepth = function ()
 end
 
 RenderSet.ClearCanvasColorAndDepth = function ()
+    love.graphics.present()
     love.graphics.setCanvas()
     love.graphics.setMeshCullMode("none")
 end

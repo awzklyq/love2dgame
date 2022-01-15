@@ -3,7 +3,6 @@ _G.ShaderObjects = {}
 _G.ShaderFunction = {}
 
 dofile('script/shader/pcf.lua')
-dofile('script/shader/ssao.lua')
 dofile('script/shader/blur.lua')
 dofile('script/shader/fxaa.lua')
 dofile('script/shader/hdr.lua')
@@ -82,7 +81,7 @@ function Shader.GeDepth3DShader(projectionMatrix, modelMatrix, viewMatrix)
    end
    if not shader then
         local pixelcode = [[
-            varying float depth;
+            varying highp float depth;
             vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
             {
                 return vec4(depth, depth, depth, 1);
@@ -93,11 +92,11 @@ function Shader.GeDepth3DShader(projectionMatrix, modelMatrix, viewMatrix)
             uniform mat4 projectionMatrix;
             uniform mat4 modelMatrix;
             uniform mat4 viewMatrix;
-            varying float depth;
+            varying highp float depth;
             vec4 position(mat4 transform_projection, vec4 vertex_position)
             {
                 vec4 basepos = projectionMatrix * viewMatrix * modelMatrix * VertexPosition;
-                depth = basepos.z / basepos.w * 0.5 + 0.5;
+                depth = basepos.z / basepos.w * 0.5 + 0.5;//
                 return basepos;
             }
     ]]
@@ -170,10 +169,17 @@ function Shader.GeNormal3DShader(projectionMatrix, viewMatrix, modelMatrix)
         else
             pixelcode = pixelcode.."vec4 normal = vec4(0 ,0, 0, 0); \n"
         end
-    pixelcode = pixelcode .. [[
-        return vec4(normal.x, normal.y, normal.z,1);
-        }
-    ]]
+        if normalmap then
+            pixelcode = pixelcode .. [[
+                return vec4(normal.x, normal.y, normal.z,1);
+                }
+            ]]
+        else
+            pixelcode = pixelcode .. [[
+                return (vec4(normal.x, normal.y, normal.z,1) + vec4(1,1,1,1)) * 0.5;
+                }
+            ]]
+        end
 
     local vertexcode = [[
         uniform mat4 projectionMatrix;

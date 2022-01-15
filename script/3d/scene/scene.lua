@@ -156,7 +156,7 @@ function Scene3D:reseizeScreen(w, h)
     self.canvasPostprocess.renderWidth = w
     self.canvasPostprocess.renderHeight = h
     
-    self.canvasdepth = Canvas.new(w, h, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
+    self.canvasdepth = Canvas.new(w, h, {format = "r32f", readable = true, msaa = 0, mipmaps="none"})
     self.canvasdepth.renderWidth = w
     self.canvasdepth.renderHeight = h
 
@@ -336,6 +336,9 @@ function Scene3D:DrawAlphaTest2(AlphaTestNodes)
 end
 
 function Scene3D:drawNormalmap()
+    _G.useNormal()
+
+    Shader.neednormal = 1
     love.graphics.setCanvas({self.canvasnormal.obj, depthstencil = self.normalmap_depth_buffer.obj})
     love.graphics.setMeshCullMode("front")
     love.graphics.setDepthMode("less", true)
@@ -344,15 +347,15 @@ function Scene3D:drawNormalmap()
     for i = 1, #self.visiblenodes do
         local node = self.visiblenodes[i]
         if node.mesh  then
-            _G.useNormal()
             node.mesh:setRenderType("normalmap")
             node.mesh:draw()
             node.mesh:setRenderType("normal")
-            _G.unUseNormal()
         end
     end
     love.graphics.setMeshCullMode("none")
     love.graphics.setCanvas()
+
+    _G.unUseNormal()
 end
 
 function Scene3D:drawDepth()
@@ -393,16 +396,18 @@ function Scene3D:drawCanvaColor()
     end
 
     if self.needSSAO then
-        love.graphics.setCanvas(canvas2.obj)
-        love.graphics.clear()
-        self.meshquad:setCanvas(canvas1)
-        self.meshquad.shader = Shader.GetSSAOShader(self.canvasnormal, self.canvasdepth)
-        self.meshquad:draw()
-        love.graphics.setCanvas()
+        -- love.graphics.setCanvas(canvas2.obj)
+        -- love.graphics.clear()
+        -- self.meshquad:setCanvas(canvas1)
+        -- self.meshquad.shader = Shader.GetSSAOShader(self.canvasnormal, self.canvasdepth)
+        -- self.meshquad:draw()
+        -- love.graphics.setCanvas()
 
-        rendercolor = canvas2
-        canvas2 = canvas1
-        canvas1 = rendercolor
+        -- rendercolor = canvas2
+        -- canvas2 = canvas1
+        -- canvas1 = rendercolor
+
+        rendercolor = SSAONode.Execute(canvas1, self.canvasnormal, self.canvasdepth)
     end
 
     if self.needBloom then

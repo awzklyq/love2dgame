@@ -1,36 +1,85 @@
 FileManager.addAllPath("assert")
 math.randomseed(os.time()%10000)
 local mesh3d = Mesh3D.new("SM_RailingStairs_Internal.OBJ")
-mesh3d:setNormalMap("T_Railing_N.TGA")
+-- mesh3d:setNormalMap("T_Railing_N.TGA")
 currentCamera3D.eye = Vector3.new( 33.386304308313, 363.36230638215, 232.64515424476)
 currentCamera3D.look = Vector3.new( 22.558604721495, -61.107337559643, 5.2498110475302)
-for i = 1, 12 do
-    local v = Vector3.new(math.random(-100, 100), math.random(-100, 100), math.random(-100, 100))
-    v:normalize()
-    v:mulSelf(math.random(1, 3))
-    log("vec4 rpos"..tostring(i).." = vec4("..string.format("%0.4f", v.x)..', '..string.format("%0.4f", v.y)..', '..string.format("%0.4f", v.z).. ', 1);')
+
+local QudiXULie = function (e, base)
+    local C = base
+    local Total = 0
+    local Nums = {}
+    while(e > C) do
+        --C = C * 10
+        Nums[#Nums + 1] = e % C
+
+        e = (e - Nums[#Nums]) / base
+    end
+
+    Nums[#Nums + 1] = e % C
+
+    local Result = 0
+    local Di = 1 / math.pow(base, #Nums)
+    for i = #Nums, 1, -1 do
+        Result = Result + Di * Nums[i]
+        Di = Di * base
+    end
+
+    return Result
 end
 
+-- 2, 3, 5, 7, 11,
+-- 13, 17, 19, 23,
+-- 29, 31, 37, 41,
+-- 43, 47, 53, 59,
+-- 61, 67, 71, 73 
+-----Halton序列
+local Hammersley = function(dimension, index, numSamples, Prime)
+    if dimension == 0 then
+        return index / numSamples;
+    else
+        return QudiXULie(index, Prime);
+    end
+end
+
+--Hammersley 序列
+function MatchRandom4()
+    local total = 0
+    MatchRects = {}
+    local step = 8
+    for i= 1, step do
+        local xi = Hammersley(0, i, step, 2)
+        local yi = Hammersley(1, i, step, 2)
+        local zi = Hammersley(1, i, step, 3)
+        local V = Vector3.new(xi, yi, zi)
+        V:normalize()
+        log('Match Hammersley', V.x, V.y, V.z )
+    end
+
+end
+
+MatchRandom4()
 local imagenames = {'T_Railing_M.TGA', "T_FloorMarble_D.TGA"}
-index = 2
-local image = ImageEx.new(imagenames[index]) 
-app.resizeWindow(function(w, h)
-    image.renderWidth = w
-    image.renderHeight = h
-end)
+
+local index = 2
+mesh3d:setCanvas(ImageEx.new(imagenames[index]) )
 
 local scene = Scene3D.new()
 scene.needSSAO = true
 local node = scene:addMesh(mesh3d)
-mesh3d:setCanvas(image)
+
+local RenderNormal = false
+local RenderDepth = false
 app.render(function(dt)
-    -- image:draw()
-    -- mesh3d:draw()
     scene:update(dt)
     scene:draw(true)
-    -- scene:drawDepth()
-    -- scene:getDepthCanvas():draw()
-    love.graphics.print( "Image name: ".. imagenames[index] .. " SSAO: ".. tostring(scene.needSSAO) .. " SSAOValue: ".. tostring(RenderSet.getSSAOValue()), 10, 10)
+
+    if RenderNormal then
+        scene.canvasnormal:draw()
+    elseif RenderDepth then
+        scene.canvasdepth:draw()
+    end
+    love.graphics.print( "Image name: ".. imagenames[index] .. " SSAO: ".. tostring(scene.needSSAO) .. " SSAOValue: ".. tostring(RenderSet.getSSAOValue()).." SSAODepthLimit: ".. tostring(RenderSet.getSSAODepthLimit()), 10, 10)
 end)
 
 app.keypressed(function(key, scancode, isrepeat)
@@ -40,26 +89,23 @@ app.keypressed(function(key, scancode, isrepeat)
     end
 
     if key == "up" then
-        -- index = index +1
-        -- if index == #imagenames +1 then
-        --     index = 1
-        -- end
-        -- image = ImageEx.new(imagenames[index]) 
-        -- image.renderWidth = RenderSet.screenwidth
-        -- image.renderHeight = RenderSet.screenheight
-
-        -- mesh3d:setCanvas(image)
-
-        RenderSet.setSSAOValue(RenderSet.getSSAOValue() + 0.0001)
+        RenderSet.setSSAOValue(RenderSet.getSSAOValue() + 1)
     elseif key == 'down' then
-        RenderSet.setSSAOValue(RenderSet.getSSAOValue() - 0.0001)
+        RenderSet.setSSAOValue(RenderSet.getSSAOValue() - 1)
+    end
+
+    if key == "left" then
+        RenderSet.setSSAODepthLimit(RenderSet.getSSAODepthLimit() + 0.000001)
+    elseif key == 'right' then
+        RenderSet.setSSAODepthLimit(RenderSet.getSSAODepthLimit() - 0.000001)
     end
 
     if key == "a" then
         scene.needSSAO = not scene.needSSAO
-    elseif key == "x" then
-        scene.needBloom = not scene.needBloom
-    elseif key == "c" then
-        scene.needOutLine = not scene.needOutLine    
+    elseif key == 'z' then
+        RenderNormal = not RenderNormal
+    elseif key == 'x' then
+        RenderDepth = not RenderDepth
+
     end
 end)
