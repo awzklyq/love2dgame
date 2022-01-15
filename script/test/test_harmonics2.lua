@@ -24,9 +24,9 @@ end
 
 -- love.graphics.setWireframe( true )
 local aixs = Aixs.new(0,0,0, 150)
-local image = ImageEx.new("shtest.png")
+local image = ImageEx.new("itgongzuo.jpg")
 
-local ImgData = love.image.newImageData(_G.FileManager.findFile"shtest.png")
+local ImgData = love.image.newImageData(_G.FileManager.findFile"itgongzuo.jpg")
 log('aaaa', image.w, image.h)
 
 local Normals = {}
@@ -34,18 +34,14 @@ local Normals = {}
 local SampleSize = Vector.new(image.w, image.h)
 local ImageData3 =love.image.newImageData(SampleSize.x, SampleSize.y)
 local harmonics = Harmonics.new()
-local dir = Vector3.new(math.random(), math.random(), math.random())
-local basecolor = Vector3.new(math.random(), math.random(), math.random())
 for x = 1, SampleSize.x - 1 do
     for y = 1, SampleSize.y - 1 do
         local r, g, b, a = ImgData:getPixel(x, y)
         local result = UniformSampleSphere(Vector.new(x / SampleSize.x , y / SampleSize.y))
 
         local nor = Vector3.new(result.x, result.y, result.z)
-
-        local dot = Vector3.dot(nor, dir)
-        local color =  basecolor * dot
-
+        nor:normalize()
+        local color = Vector3.new(r, g, b)
         ImageData3:setPixel(x, y, color.x, color.y, color.z, 1)
         Normals[#Normals + 1] = {Normal = nor, Color =  color, X = x, Y = y}
     end
@@ -66,7 +62,7 @@ app.render(function(dt)
     love.graphics.clear(0,0,0,1)
     aixs:draw()
     if RenderImage then
-        image3:draw()
+        image:draw()
     else
         image2:draw()
     end

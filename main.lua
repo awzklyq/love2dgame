@@ -119,5 +119,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_outline.lua')--test_frustum
+	dofile('script/test/test_LowDiscrepancySequence.lua')--test_frustum
 end

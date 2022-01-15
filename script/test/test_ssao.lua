@@ -12,7 +12,7 @@ for i = 1, 12 do
 end
 
 local imagenames = {'T_Railing_M.TGA', "T_FloorMarble_D.TGA"}
-index = 1
+index = 2
 local image = ImageEx.new(imagenames[index]) 
 app.resizeWindow(function(w, h)
     image.renderWidth = w
@@ -22,7 +22,7 @@ end)
 local scene = Scene3D.new()
 scene.needSSAO = true
 local node = scene:addMesh(mesh3d)
--- mesh3d:setCanvas(image)
+mesh3d:setCanvas(image)
 app.render(function(dt)
     -- image:draw()
     -- mesh3d:draw()
