@@ -114,6 +114,24 @@ RenderSet.getSSAODepthLimit = function()
     return ssaolimit
 end
 
+local HBAORayMatchLength = 1;
+RenderSet.getHBAORayMatchLength = function()
+    return HBAORayMatchLength
+end
+
+RenderSet.setHBAORayMatchLength = function(lenght)
+    HBAORayMatchLength = lenght
+end
+
+local HBAOBaseAngle = 30
+RenderSet.getHBAOBaseAngle = function()
+    return HBAOBaseAngle;
+end
+
+RenderSet.setHBAOBaseAngle = function(angle)
+    HBAOBaseAngle = angle;
+end
+
 RenderSet.BGColor = LColor.new(0,0,0,255)
 local CanvasColor = Canvas.new(love.graphics.getPixelWidth(), love.graphics.getPixelHeight(), {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
 RenderSet.getCanvasColor = function ()

@@ -423,6 +423,10 @@ function MeshLine:setEndVector(v)
     self:setVertex(1, v.x, v.y, v.z, 1, 1, 1,1,1,1)
 end
 
+function MeshLine:setBaseColor(color)
+    self.bcolor = color
+end
+
 
 MeshLine.__index = function(tab, key, ...)
     local value = rawget(tab, key);

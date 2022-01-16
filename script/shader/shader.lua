@@ -21,6 +21,12 @@ function Shader.new(pixelcode, vertexcode)
     return shader;
 end
 
+function Shader:sendValue(name, value)
+    if self:hasUniform(name) then
+        self:send(name, value)
+    end 
+end
+
 function Shader.GetBaseVSCodeShader()
     local vertexcode = [[
     vec4 position( mat4 transform_projection, vec4 vertex_position )

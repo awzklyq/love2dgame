@@ -32,6 +32,7 @@ function Scene3D.new()
 
     scene.needBloom = false;
     scene.needOutLine = false;
+    scene.needHBAO = false;
     return scene
 end
 
@@ -381,41 +382,35 @@ function Scene3D:drawCanvaColor()
     local canvas1 = self.CanvasColor
     local canvas2 = self.canvasPostprocess
     local rendercolor = self.CanvasColor
+
+    if self.needSSAO then
+        rendercolor = SSAONode.Execute(canvas1, self.canvasnormal, self.canvasdepth)
+    end
+
+    if self.needHBAO then
+        rendercolor = HBAONode.Execute(rendercolor, self.canvasnormal, self.canvasdepth)
+    end
+
+    if self.needBloom then
+        rendercolor = Bloom.Execute(rendercolor, self.meshquad)
+    end
+
+    if self.needOutLine then
+        rendercolor = OutLine.Execute(rendercolor)
+    end
+
     if self.needFXAA then
         love.graphics.setCanvas(canvas2.obj)
         love.graphics.clear()
-        self.meshquad:setCanvas(canvas1)
-        self.meshquad.shader = Shader.GetFXAAShader(canvas1.renderWidth , canvas1.renderHeight)
+        self.meshquad:setCanvas(rendercolor)
+        self.meshquad.shader = Shader.GetFXAAShader(rendercolor.renderWidth , rendercolor.renderHeight)
         self.meshquad:draw()
         needbase = false
         love.graphics.setCanvas()
 
         rendercolor = canvas2
-        canvas2 = canvas1
-        canvas1 = rendercolor
-    end
-
-    if self.needSSAO then
-        -- love.graphics.setCanvas(canvas2.obj)
-        -- love.graphics.clear()
-        -- self.meshquad:setCanvas(canvas1)
-        -- self.meshquad.shader = Shader.GetSSAOShader(self.canvasnormal, self.canvasdepth)
-        -- self.meshquad:draw()
-        -- love.graphics.setCanvas()
-
-        -- rendercolor = canvas2
         -- canvas2 = canvas1
         -- canvas1 = rendercolor
-
-        rendercolor = SSAONode.Execute(canvas1, self.canvasnormal, self.canvasdepth)
-    end
-
-    if self.needBloom then
-        rendercolor = Bloom.Execute(canvas1, self.meshquad)
-    end
-
-    if self.needOutLine then
-        rendercolor = OutLine.Execute(rendercolor)
     end
 
     rendercolor:draw()
