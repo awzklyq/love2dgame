@@ -98,6 +98,7 @@ dofile 'script/postprocess/bloom.lua'
 dofile 'script/postprocess/outline.lua'
 dofile 'script/postprocess/ssao.lua'
 dofile 'script/postprocess/hbao.lua'
+dofile 'script/postprocess/gtao.lua'
 
 FileManager.addAllPath("assert")
 
@@ -120,5 +121,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_hbao.lua')--test_frustum
+	dofile('script/test/test_gtao.lua')--test_frustum
 end

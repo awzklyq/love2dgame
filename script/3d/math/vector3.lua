@@ -64,6 +64,10 @@ function Vector3:normalize()
     return self
 end
 
+function Vector3:getShaderValue()
+    return{self.x, self.y, self.z}
+end
+
 function Vector3:mulSelf(value)
     self.x = self.x  * value;
     self.y = self.y  * value;

@@ -33,6 +33,7 @@ function Scene3D.new()
     scene.needBloom = false;
     scene.needOutLine = false;
     scene.needHBAO = false;
+    scene.needGTAO = false;
     return scene
 end
 
@@ -385,10 +386,11 @@ function Scene3D:drawCanvaColor()
 
     if self.needSSAO then
         rendercolor = SSAONode.Execute(canvas1, self.canvasnormal, self.canvasdepth)
-    end
-
-    if self.needHBAO then
-        rendercolor = HBAONode.Execute(rendercolor, self.canvasnormal, self.canvasdepth)
+    elseif self.needHBAO then
+        rendercolor = HBAONode.Execute(rendercolor, self.canvasdepth)
+    elseif self.needGTAO then
+        local camera3d = _G.getGlobalCamera3D()
+        rendercolor = GTAONode.Execute(rendercolor, self.canvasnormal, self.canvasdepth, camera3d.eye)
     end
 
     if self.needBloom then

@@ -8,7 +8,7 @@ HBAONode.meshquad = _G.MeshQuad.new(1,1, LColor.new(255, 255, 255, 255))
 HBAONode.LineWidth = 4;
 HBAONode.Color = LColor.new(255,0,0,255);
 HBAONode.Threshold = 1
-HBAONode.Execute = function(Canva1, screennormalmap, screendepthmap)
+HBAONode.Execute = function(Canva1, screendepthmap)
    
     if HBAONode.Canvae.renderWidth ~= Canva1.renderWidth  or HBAONode.Canvae.renderHeight ~= Canva1.renderHeight then
         HBAONode.Canvae = Canvas.new(Canva1.renderWidth , Canva1.renderHeight , {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
@@ -124,16 +124,16 @@ function Shader.GetHBAOShader(screendepthmap, sw, sh)
         float BaseAngle = radians(HBAOBaseAngle);
         vec4 spos1 = Inverse_ProjectviewMatrix * vec4(uv1.x, uv1.y, depth1, 1);
         float T = depthlimit;
-        float AnglePos1 = depth - depth1 > T ? 0 : atan(spos1.z / length(spos1.xy));
+        float AnglePos1 = 1 / depth1  - 1 / depth> T ? 0 : atan(spos1.z / length(spos1.xy));
 
         vec4 spos2 = Inverse_ProjectviewMatrix * vec4(uv2.x, uv2.y, depth2, 1);
-        float AnglePos2 = depth - depth2 > T ? 0 : atan(spos2.z / length(spos2.xy));
+        float AnglePos2 = 1 / depth2 - 1 / depth > T ? 0 : atan(spos2.z / length(spos2.xy));
 
         vec4 spos3 = Inverse_ProjectviewMatrix * vec4(uv3.x, uv3.y, depth3, 1);
-        float AnglePos3 = depth - depth3 > T ? 0 : atan(spos3.z / length(spos3.xy));
+        float AnglePos3 = 1 / depth3 - 1 / depth > T ? 0 : atan(spos3.z / length(spos3.xy));
 
         vec4 spos4 = Inverse_ProjectviewMatrix * vec4(uv4.x, uv4.y, depth4, 1);
-        float AnglePos4 = depth - depth4 > T ? 0 : atan(spos4.z / length(spos4.xy));
+        float AnglePos4 = 1 / depth4 - 1 / depth > T ? 0 : atan(spos4.z / length(spos4.xy));
 
         float MaxAngle = max(max(AnglePos1, AnglePos2), max(AnglePos3, AnglePos4));
 

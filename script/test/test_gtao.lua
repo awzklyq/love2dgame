@@ -2,8 +2,8 @@ FileManager.addAllPath("assert")
 math.randomseed(os.time()%10000)
 local mesh3d = Mesh3D.new("SM_RailingStairs_Internal.OBJ")
 -- mesh3d:setNormalMap("T_Railing_N.TGA")
-currentCamera3D.eye = Vector3.new( 33.386304308313, 363.36230638215, 232.64515424476)
-currentCamera3D.look = Vector3.new( 22.558604721495, -61.107337559643, 5.2498110475302)
+currentCamera3D.eye = Vector3.new( 195.88320929841 ,281.50478660121 ,-206.73155244685)
+currentCamera3D.look = Vector3.new(-179.03673421501   ,     37.019015588789 ,-173.0665490595)
 
 local QudiXULie = function (e, base)
     local C = base
@@ -65,7 +65,7 @@ local index = 2
 mesh3d:setCanvas(ImageEx.new(imagenames[index]) )
 
 local scene = Scene3D.new()
-scene.needHBAO = true
+scene.needGTAO = true
 local node = scene:addMesh(mesh3d)
 
 local RenderNormal = false
@@ -84,30 +84,28 @@ end)
 
 app.keypressed(function(key, scancode, isrepeat)
     if key == "space" then
-        currentCamera3D.eye = Vector3.sub(currentCamera3D.eye, currentCamera3D.look)
-        currentCamera3D.look = Vector3.new(0,0,0)
+        -- currentCamera3D.eye = Vector3.sub(currentCamera3D.eye, currentCamera3D.look)
+        -- currentCamera3D.look = Vector3.new(0,0,0)
+
+        log('aaa', currentCamera3D.eye.x, currentCamera3D.eye.y, currentCamera3D.eye.z)
+
+        log('bbb', currentCamera3D.look.x, currentCamera3D.look.y, currentCamera3D.look.z)
     end
 
     if key == "up" then
-        RenderSet.setHBAORayMatchLength(RenderSet.getHBAORayMatchLength() + 0.05)
+        RenderSet.setHBAORayMatchLength(RenderSet.getHBAORayMatchLength() + 0.5)
     elseif key == 'down' then
-        RenderSet.setHBAORayMatchLength(RenderSet.getHBAORayMatchLength() - 0.05)
+        RenderSet.setHBAORayMatchLength(math.max(0, RenderSet.getHBAORayMatchLength() - 0.5))
     end
 
-    if key == "left" then
-        RenderSet.setHBAOBaseAngle(RenderSet.getHBAOBaseAngle() - 5)
-    elseif key == 'right' then
-        RenderSet.setHBAOBaseAngle(RenderSet.getHBAOBaseAngle() + 5)
-    end
-
-    if key == "w" then
-        RenderSet.setSSAODepthLimit(RenderSet.getSSAODepthLimit() + 1)
-    elseif key == 'q' then
-        RenderSet.setSSAODepthLimit(math.max(RenderSet.getSSAODepthLimit() - 1, 0))
+    if key == "right" then
+        RenderSet.setSSAODepthLimit(RenderSet.getSSAODepthLimit() + 0.000001)
+    elseif key == 'left' then
+        RenderSet.setSSAODepthLimit(math.max(RenderSet.getSSAODepthLimit() - 0.000001, 0))
     end
 
     if key == "a" then
-        scene.needHBAO = not scene.needHBAO
+        scene.needGTAO = not scene.needGTAO
     elseif key == "s" then
             scene.needFXAA = not scene.needFXAA
     elseif key == 'z' then

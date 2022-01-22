@@ -72,14 +72,14 @@ function Shader.GetSSAOShader(screennormalmap, screendepthmap, sw, sh)
 
        normal = projectionViewMatrix * normal;//TODO.. 需要切换到切线空间
 
-       vec4 rpos1 = vec4( 0.20365326999064  ,0.81461307996256   ,     0.5430753866417,	1);
-        vec4 rpos2 = vec4(0.35112344158839  ,0       			,	0.93632917756904, 	1);
-        vec4 rpos3 = vec4(0.44721359549996  ,0.89442719099992   ,     0,				1);
-        vec4 rpos4 = vec4(0.74740931868366  ,0       			,	0.66436383882992,	1);
-        vec4 rpos5 = vec4(0.56001172580038  ,0.4480093806403 	,	0.69690348099602,	1);
-        vec4 rpos6 = vec4(0.86458119390912  ,0.43229059695456   ,     0.2561722056027,	1);
-        vec4 rpos7 = vec4(0.64507749440595  ,0.64507749440595   ,     0.40957301232124,	1);
-        vec4 rpos8 = vec4(0.74740931868366  ,0       			,	0.66436383882992, 	1);
+       vec4 rpos1 = vec4(  0.5     ,       0.5     ,       0.70710678118655,	1);
+        vec4 rpos2 = vec4( 1       ,       6.1232339957368e-17     ,       0,	1);
+        vec4 rpos3 = vec4( 0.57735026918963        ,       -0.57735026918963       ,       0.57735026918963,1);
+        vec4 rpos4 = vec4( 1.2246467991474e-16     ,       -1      ,       0,	1);
+        vec4 rpos5 = vec4( -0.5    ,       -0.5    ,       0.70710678118655,	1);
+        vec4 rpos6 = vec4( -0.73450955526776       ,       -1.3492721637027e-16    ,       0.67859834454585,	1);
+        vec4 rpos7 = vec4( -0.66040155174815       ,       0.66040155174815        ,       0.35740674433659,	1);
+        vec4 rpos8 = vec4( -2.4492935982947e-16    ,       1       ,       0,	1);
 
         vec2 screenpos0 = vpos.xy + vec2(1 * (1/viewsizew), 0.0);
         vec2 uv0 = vec2((screenpos0.x + 1) * 0.5, 1 - (screenpos0.y + 1) * 0.5);
@@ -141,15 +141,15 @@ function Shader.GetSSAOShader(screennormalmap, screendepthmap, sw, sh)
         float depth8 = texture2D(screendepthmap, ScreenPosToViewportUV(vpos8.xy)).r;
 
         float T = depthlimit;
-		float value1 = depth1 - depth > T ? 0 : 1;
-		float value2 = depth2 - depth > T ? 0 : 1;
-        float value3 = depth3 - depth > T ? 0 : 1;
-        float value4 = depth4 - depth > T ? 0 : 1;
-        float value5 = depth5 - depth > T ? 0 : 1;
-        float value6 = depth6 - depth > T ? 0 : 1;
+		float value1 = 1 / depth - 1 / depth1 > T ? 0 : 1;
+		float value2 = 1 / depth- 1 / depth2 > T ? 0 : 1;
+        float value3 = 1 / depth- 1 / depth3 > T ? 0 : 1;
+        float value4 = 1 / depth- 1 / depth4 > T ? 0 : 1;
+        float value5 = 1 / depth- 1 / depth5 > T ? 0 : 1;
+        float value6 = 1 / depth- 1 / depth6 > T ? 0 : 1;
 
-        float value7 = vpos7.z -  depth7 > depth ? 0 : 1;
-		float value8 = vpos8.z -  depth8 > depth ? 0 : 1;
+        float value7 = 1 / depth - 1 / depth7 > depth ? 0 : 1;
+		float value8 =1 / depth -  1 /depth8 > depth ? 0 : 1;
 
        vec4 basecolor = texture2D(tex, texture_coords);
        float value = value1 + value2 + value3 + value4 + value5 + value6 + value7 + value8;

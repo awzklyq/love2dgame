@@ -31,10 +31,11 @@ local GenerateSphereXYZ = function(xx, yy)
     local v = Vector3.new(x, y, z)
     v:normalize()
 
+    log(v.x, ',', v.y, ',',v.z)
     return v * length
 end
 
-local step = 20
+local step = 8
 function MatchRandom()
     local total = 0
     MatchRects = {}
@@ -130,6 +131,7 @@ function MatchRandom4()
         local xi = Hammersley(0, i, step) * 360
         local yi = Hammersley(1, i, step) * 180
         local v = GenerateSphereXYZ(xi, yi)
+        
         local meshline = MeshLine.new(Vector3.new(0 ,0 ,0), v)
         MatchRects[#MatchRects + 1] = meshline
         MatchRects[#MatchRects]:setBaseColor(LColor.new(255,255,0,255))

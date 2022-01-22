@@ -95,9 +95,9 @@ app.keypressed(function(key, scancode, isrepeat)
     end
 
     if key == "left" then
-        RenderSet.setSSAODepthLimit(RenderSet.getSSAODepthLimit() + 0.000001)
+        RenderSet.setSSAODepthLimit(RenderSet.getSSAODepthLimit() + 0.0001)
     elseif key == 'right' then
-        RenderSet.setSSAODepthLimit(RenderSet.getSSAODepthLimit() - 0.000001)
+        RenderSet.setSSAODepthLimit(math.max(RenderSet.getSSAODepthLimit() - 0.0001, 0))
     end
 
     if key == "a" then
