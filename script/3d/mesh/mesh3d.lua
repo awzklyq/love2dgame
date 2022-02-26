@@ -11,6 +11,8 @@ function Mesh3D.new(file)-- lw :line width
     local mesh = setmetatable({}, Mesh3D);
     mesh.transform3d = Matrix3D.new();
 
+    mesh.PreTransform = Matrix3D.new();
+
     mesh.verts = Mesh3D.loadObjFile(_G.FileManager.findFile(file))
     mesh.shader = Shader.GetBase3DShader()
     mesh:makeNormals()
@@ -198,18 +200,25 @@ end
 
 function Mesh3D:draw()
     if not self.visible then return end
+
     local camera3d = _G.getGlobalCamera3D()
     --modelMatrix, projectionMatrix, viewMatrix
 
     RenderSet.setNormalMap(self.normalmap)
     self:useLights()
-    self.shader:setCameraAndMatrix3D(self.transform3d, RenderSet.getUseProjectMatrix(), RenderSet.getUseViewMatrix(), camera3d.eye)
+    self.shader:setCameraAndMatrix3D(self.transform3d, RenderSet.getUseProjectMatrix(), RenderSet.getUseViewMatrix(), camera3d.eye, self)
 
     if self.shader:hasUniform( "bcolor") and self.bcolor then
         self.shader:send('bcolor',{self.bcolor._r, self.bcolor._g, self.bcolor._b, self.bcolor._a})
     end
     Render.RenderObject(self)
     RenderSet.setNormalMap()
+
+    self:AfterDraw()
+end
+
+function Mesh3D:AfterDraw()
+    --self.PreTransform = Matrix3D.copy(self.transform3d)
 end
 
 function Mesh3D:DrawAlphaTest(DepthTexture, ColorTexture, BlendCoef)

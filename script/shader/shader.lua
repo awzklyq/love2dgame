@@ -22,8 +22,10 @@ function Shader.new(pixelcode, vertexcode)
 end
 
 function Shader:sendValue(name, value)
-    if self:hasUniform(name) then
+    if self:hasUniform(name) and value then
         self:send(name, value)
+    else
+        log("Error! name and value:", name, value)
     end 
 end
 
@@ -109,7 +111,7 @@ function Shader.GeDepth3DShader(projectionMatrix, modelMatrix, viewMatrix)
 
         shader = Shader.new(pixelcode, vertexcode)
 
-        shader.setCameraAndMatrix3D = function(obj, modelMatrix, projectionMatrix, viewMatrix)
+        shader.setCameraAndMatrix3D = function(obj, modelMatrix, projectionMatrix, viewMatrix, mesh)
             if projectionMatrix then
                 obj:send('projectionMatrix', projectionMatrix)
             end
@@ -121,6 +123,7 @@ function Shader.GeDepth3DShader(projectionMatrix, modelMatrix, viewMatrix)
             if viewMatrix then
                 obj:send('viewMatrix', viewMatrix)
             end
+
         end
 
         ShaderObjects["base3dshader_depth"] = shader
@@ -214,7 +217,7 @@ function Shader.GeNormal3DShader(projectionMatrix, viewMatrix, modelMatrix)
     -- log(pixelcode)
     shader = Shader.new(pixelcode, vertexcode)
 
-    shader.setCameraAndMatrix3D = function(obj, modelMatrix, projectionMatrix, viewMatrix)
+    shader.setCameraAndMatrix3D = function(obj, modelMatrix, projectionMatrix, viewMatrix, mesh)
         if projectionMatrix then
             obj:send('projectionMatrix', projectionMatrix)
         end
@@ -226,6 +229,10 @@ function Shader.GeNormal3DShader(projectionMatrix, viewMatrix, modelMatrix)
         if viewMatrix then
             obj:send('viewMatrix', viewMatrix)
         end
+
+        -- if mesh then
+        --     mesh.PreTransform  = projectionMatrix * viewMatrix * modelMatrix;
+        -- end
     end
 
     ShaderObjects["normalshader" .. (normalmap and "map" or "")] = shader

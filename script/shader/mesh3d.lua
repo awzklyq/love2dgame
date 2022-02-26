@@ -340,7 +340,7 @@ function Shader.GetBase3DShader(color, projectionMatrix, modelMatrix, viewMatrix
         shader:send('bcolor', {color._r,color._g, color._b, color._a})
     end
     
-    shader.setCameraAndMatrix3D = function(obj, modelMatrix, projectionMatrix, viewMatrix, camerapos)
+    shader.setCameraAndMatrix3D = function(obj, modelMatrix, projectionMatrix, viewMatrix, camerapos, mesh)
         if projectionMatrix then
             obj:send('projectionMatrix', projectionMatrix)
         end
@@ -355,6 +355,15 @@ function Shader.GetBase3DShader(color, projectionMatrix, modelMatrix, viewMatrix
 
         if camerapos and obj:hasUniform( "camerapos")  then
             obj:send('camerapos', {camerapos.x, camerapos.y, camerapos.z})
+        end
+
+        if mesh then
+
+            -- local mat = Matrix3D.copy(projectionMatrix);
+            -- mat:mulRight(viewMatrix)--Todo..
+            -- mat:mulRight(modelMatrix);
+            -- mesh.PreTransform  = mat;
+            mesh.PreTransform = projectionMatrix * viewMatrix * modelMatrix
         end
     end
 

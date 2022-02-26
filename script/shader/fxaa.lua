@@ -1,9 +1,9 @@
 
 function Shader.GetFXAAShader(w, h)
-    if Shader["taa"] then
-        Shader["taa"]:send('w', w)
-        Shader["taa"]:send('h', h)
-        return Shader["taa"]
+    if Shader["fxaa"] then
+        Shader["fxaa"]:send('w', w)
+        Shader["fxaa"]:send('h', h)
+        return Shader["fxaa"]
     end
     local pixelcode = [[
     uniform float w;
@@ -76,6 +76,6 @@ function Shader.GetFXAAShader(w, h)
     assert(shader:hasUniform( "w") and shader:hasUniform( "h"))
     shader:send('w', w)
     shader:send('h', h)
-    Shader["taa"] = shader;
+    Shader["fxaa"] = shader;
     return shader
 end

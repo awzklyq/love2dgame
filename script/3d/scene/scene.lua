@@ -26,7 +26,7 @@ function Scene3D.new()
 
     scene:reseizeScreen(scene.screenwidth, scene.screenheight)
     scene.needFXAA = false
-
+    scene.needTAA = false
     scene.visiblenodes = {}
     scene.cullednumber = 0
 
@@ -201,6 +201,8 @@ function Scene3D:draw(isdrawCanvaColor)
         end
     end
 
+    MotionVectorNode:BeforeExecute()
+
     local AlphaTestNodes = {}
     love.graphics.setMeshCullMode("front")
     love.graphics.setDepthMode("less", true)
@@ -219,6 +221,8 @@ function Scene3D:draw(isdrawCanvaColor)
             else
                 RenderSet.setshadowReceiver(node.shadowReceiver)
                 RenderSet.SetPBR(node.PBR)
+
+                MotionVectorNode.Execute(node.mesh)
                 node.mesh:draw()
                 RenderSet.setshadowReceiver(false)
                 RenderSet.SetPBR(false)
@@ -401,6 +405,10 @@ function Scene3D:drawCanvaColor()
         rendercolor = OutLine.Execute(rendercolor)
     end
 
+    if self.needTAA then
+        rendercolor = TAANode.Execute(canvas1, self.canvasnormal, self.canvasdepth)
+    end
+
     if self.needFXAA then
         love.graphics.setCanvas(canvas2.obj)
         love.graphics.clear()
@@ -505,7 +513,6 @@ function Scene3D:drawDirectionLightShadow(isdebug)
             mat:mulRight(Matrix3D.transpose(lightmat))
             -- mat:mulRight(texmat)
             lightnode.directionlightMatrix = mat
-
             if isdebug then
                 lightnode.shadowmap:draw()
                 -- lightnode.depth_buffer:draw()
@@ -523,6 +530,7 @@ function Scene3D:drawDirectionLightCSM(isdebug)
         self:drawDirectionLightShadow()
         return;
     end
+
     for i = 1, #self.lights do
         local lightnode = self.lights[i]
         local directionLight = lightnode.directionLight

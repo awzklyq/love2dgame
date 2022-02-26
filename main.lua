@@ -99,6 +99,9 @@ dofile 'script/postprocess/outline.lua'
 dofile 'script/postprocess/ssao.lua'
 dofile 'script/postprocess/hbao.lua'
 dofile 'script/postprocess/gtao.lua'
+dofile 'script/postprocess/taa.lua'
+
+dofile 'script/3d/effect/motionvector.lua'
 
 FileManager.addAllPath("assert")
 
@@ -121,5 +124,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_gtao.lua')--test_frustum
+	dofile('script/test/test_taa.lua')--test_taa
 end

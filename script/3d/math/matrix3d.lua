@@ -1,10 +1,38 @@
 _G.Matrix3D = {}
 
+
+local metatable_Matrix3D = {}
+metatable_Matrix3D.__index = Matrix3D
+
+-- metatable_Matrix3D.__add = function(myvalue, value)
+--     return Vector3.new(myvalue.x + value.x, myvalue.y + value.y, myvalue.z + value.z)
+-- end
+
+-- metatable_Matrix3D.__sub = function(myvalue, value)
+--     return Vector3.new(myvalue.x - value.x, myvalue.y - value.y, myvalue.z - value.z)
+-- end
+
+metatable_Matrix3D.__mul = function(myvalue, value)
+
+    if  type(value) == "table" and value.renderid == Render.Matrix3DId then
+		local mat = Matrix3D.copy(myvalue)
+		mat:mulRight(value)
+        return mat--Matrix3D.matrixMult(myvalue, value)
+    else
+        _errorAssert(false, "metatable_Matrix3D.__mul~")
+    end
+end
+
+-- metatable_Matrix3D.__unm = function(myvalue)
+--     return Vector3.new( -myvalue.x, -myvalue.y, -myvalue.z)
+-- end
+
+
 Matrix3D.new = function()
     local mat = setmetatable({1,0,0,0,
                             0,1,0,0,
                             0,0,1,0,
-                            0,0,0,1}, {__index = Matrix3D});
+                            0,0,0,1}, metatable_Matrix3D);
 
     mat.translation = Vector3.new();
     mat.rotation = Vector3.new();
@@ -16,8 +44,9 @@ Matrix3D.new = function()
 end
 
 Matrix3D.createFromNumbers = function(...)
-    local mat = setmetatable({...}, {__index = Matrix3D});
+    local mat = setmetatable({...}, metatable_Matrix3D);
 
+	mat.renderid = Render.Matrix3DId
     return mat;
 end
 
@@ -516,9 +545,27 @@ end
 
 function Matrix3D.copy(mat)
 	local result = Matrix3D.new()
-	for i = 1, 16 do
-		result[i] = mat[i]
-	end
+	
+	result[1] = mat[1]
+	result[2] = mat[2]
+	result[3] = mat[3]
+	result[4] = mat[4]
+
+	result[5] = mat[5]
+	result[6] = mat[6]
+	result[7] = mat[7]
+	result[8] = mat[8]
+	
+	result[9] = mat[9]
+	result[10] = mat[10]
+	result[11] = mat[11]
+	result[12] = mat[12]
+
+	result[13] = mat[13]
+	result[14] = mat[14]
+	result[15] = mat[15]
+	result[16] = mat[16]
+
 	return result;
 end
 
