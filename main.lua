@@ -124,5 +124,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_taa.lua')--test_taa
+	dofile('script/test/test_checkcollision_line_rect.lua')--test_taa
 end
