@@ -69,6 +69,8 @@ Render.ThreeBandSHVectorRGBId = 34
 
 Render.ThreeBandSHVectorId = 35
 
+Render.Triangle2DId = 36
+
 Render.getRenderIdName = function(id)
     if Render.CircleId == id then
         return "Circle"
@@ -126,6 +128,8 @@ Render.getRenderIdName = function(id)
         return "ThreeBandSHVectorRGBId"
     elseif Render.ThreeBandSHVectorId == id then
         return "ThreeBandSHVectorId"
+    elseif Render.Triangle2DId == id then
+        return "Triangle2DId"
     end
 
     return "Null"
@@ -290,6 +294,21 @@ Render.RenderObject = function(obj)
             love.graphics.setColor(r, g, b, a);
         elseif obj.renderid == Render.Tile3DId then
             love.graphics.draw( obj.obj )
+        elseif obj.renderid == Render.Triangle2DId then
+            if #obj.vertices > 0 then
+                love.graphics.setColor(obj.Color._r, obj.Color._g, obj.Color._b, obj.Color._a);
+                if obj.mode == 'line' then
+                    local lw = love.graphics.getLineWidth();
+                    love.graphics.setLineWidth( obj.LineWidth);
+
+                    love.graphics.polygon("line", obj.vertices);
+
+                    love.graphics.setLineWidth( lw);
+                else
+                    love.graphics.polygon("file", obj.vertices);
+
+                end
+            end
         end
 
         

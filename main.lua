@@ -35,10 +35,13 @@ dofile('script/shader/shaderfunction.lua')
 dofile('script/polygon/rect.lua')
 dofile('script/polygon/circle.lua')
 dofile('script/polygon/line.lua')
+dofile('script/polygon/edge.lua')
 dofile('script/polygon/box.lua')
 dofile('script/polygon/mesh.lua')
 dofile('script/3d/mesh/mesh3d.lua')
 dofile('script/3d/mesh/aixs.lua')
+
+dofile('script/polygon/triangle.lua')
 
 dofile('script/3d/terrain/tile.lua')
 dofile 'script/3d/terrain/tileshader.lua'
@@ -124,5 +127,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_checkcollision_line_rect.lua')--test_taa
+	dofile('script/test/test_CatmullClark_2d.lua')--test_taa
 end

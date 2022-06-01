@@ -30,7 +30,7 @@ app.render(function(dt)
     end
 end)
 
-local step = 15
+local step = 200
 local GR = 0
 function MatchRandom()
     local total = 0
@@ -113,6 +113,7 @@ function MatchRandom3()
         local yi = QudiXULie(i, 3) * OH
         MatchRects[#MatchRects + 1] = Rect.new(xi - 1,  yi -1, 2, 2)
         MatchRects[#MatchRects]:setColor(255,0,0,255)
+        log('aaaa', QudiXULie(i, 2), QudiXULie(i, 3))
         if xi >= startx and xi <= SUBW + startx and yi >= starty and yi <= starty + SUBh then
             total = total + 1
         end

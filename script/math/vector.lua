@@ -23,6 +23,10 @@ metatable_vector.__div = function(myvalue, value)
     return Vector.new(myvalue.x / value, myvalue.y / value)
 end
 
+metatable_vector.__eq = function(myvalue, value)
+    return myvalue.x == value.x and myvalue.y == value.y
+end
+
 function Vector.new(x ,y)
     local v = setmetatable({}, metatable_vector);
     v.x = x or 0;
