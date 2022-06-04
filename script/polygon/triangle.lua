@@ -15,6 +15,22 @@ function Triangle2D.new(p1, p2, p3, linewidth)-- Vector2 or Vector3...
     tri.edge2 = Edge2D.new(tri.P2, tri.P3)
     tri.edge3 = Edge2D.new(tri.P3, tri.P1)
 
+    if not tri.edge1.ThirdPoints then
+        tri.edge1.ThirdPoints = {}
+    end
+
+    if not tri.edge2.ThirdPoints then
+        tri.edge2.ThirdPoints = {}
+    end
+
+    if not tri.edge3.ThirdPoints then
+        tri.edge3.ThirdPoints = {}
+    end
+
+    tri.edge1.ThirdPoints[#tri.edge1.ThirdPoints + 1] = tri.P3
+    tri.edge2.ThirdPoints[#tri.edge2.ThirdPoints + 1] = tri.P1
+    tri.edge3.ThirdPoints[#tri.edge3.ThirdPoints + 1] = tri.P2
+
     tri.mode = "line"
 
     tri.vertices = {}

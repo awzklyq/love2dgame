@@ -192,7 +192,6 @@ math.CheckLineAndRectCollision = function(StartPos, EndPos, BA, BB, IntersecPoin
 	if math.IntersectLine(StartPos, EndPos, point1, point2, intersec) then
 		IsIntersec = IsIntersec + 1
 		minintersec = intersec;
-        log('aaaaaaaaaaaaaa')
     end
 
 	if (math.IntersectLine(StartPos, EndPos, point2, point3, intersec)) then
@@ -204,12 +203,6 @@ math.CheckLineAndRectCollision = function(StartPos, EndPos, BA, BB, IntersecPoin
         else
             minintersec = intersec;
         end
-
-        log('bbbbbbbbb')
-        log("StartPos", StartPos.x, StartPos.y)
-        log("EndPos", EndPos.x, EndPos.y)
-        log("point2", point2.x, point2.y)
-        log("point3", point3.x, point3.y)
 	end
 
 	if (IsIntersec < 2 and math.IntersectLine(StartPos, EndPos, point3, point4, intersec)) then
@@ -222,8 +215,6 @@ math.CheckLineAndRectCollision = function(StartPos, EndPos, BA, BB, IntersecPoin
         else
             minintersec = intersec;
         end
-
-        log('ccccccccccccccccc')
 	end
 
 	if (IsIntersec < 2 and math.IntersectLine11(StartPos, EndPos, point4, point1, intersec)) then
@@ -236,8 +227,6 @@ math.CheckLineAndRectCollision = function(StartPos, EndPos, BA, BB, IntersecPoin
         else
             minintersec = intersec;
         end
-
-        log('ddddddddddddddddd')
 	end
 	
 	if (IsIntersec > 0) then

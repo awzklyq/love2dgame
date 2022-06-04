@@ -127,5 +127,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_CatmullClark_2d.lua')--test_taa
+	dofile('script/test/test_loopsubdivision2d.lua')--test_taa
 end
