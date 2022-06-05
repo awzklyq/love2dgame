@@ -31,9 +31,12 @@ function Scene3D.new()
     scene.cullednumber = 0
 
     scene.needBloom = false;
+    scene.needBloom2 = false;
     scene.needOutLine = false;
     scene.needHBAO = false;
     scene.needGTAO = false;
+
+    scene.needToneMapping = false;
     return scene
 end
 
@@ -146,7 +149,11 @@ function Scene3D:update(e)
 end
 
 function Scene3D:reseizeScreen(w, h)
-    self.CanvasColor = Canvas.new(w, h, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
+    if  RenderSet.HDR then
+        self.CanvasColor = Canvas.new(w, h, {format = "rgba16f", readable = true, msaa = 0, mipmaps="none"})
+    else
+        self.CanvasColor = Canvas.new(w, h, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
+    end
     self.CanvasColor.renderWidth = w
     self.CanvasColor.renderHeight = h
 
@@ -154,7 +161,12 @@ function Scene3D:reseizeScreen(w, h)
     self.CanvasAlphaTest.renderWidth = w
     self.CanvasAlphaTest.renderHeight = h
 
-    self.canvasPostprocess = Canvas.new(w, h, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
+    if RenderSet.HDR then
+        self.canvasPostprocess = Canvas.new(w, h, {format = "rgba16f", readable = true, msaa = 0, mipmaps="none"})
+    else
+        self.canvasPostprocess = Canvas.new(w, h, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
+    end
+
     self.canvasPostprocess.renderWidth = w
     self.canvasPostprocess.renderHeight = h
     
@@ -388,6 +400,10 @@ function Scene3D:drawCanvaColor()
     local canvas2 = self.canvasPostprocess
     local rendercolor = self.CanvasColor
 
+    -- if self.needToneMapping and RenderSet.HDR then
+    --     rendercolor = ToneMapping.Execute(rendercolor)
+    -- end
+
     if self.needSSAO then
         rendercolor = SSAONode.Execute(canvas1, self.canvasnormal, self.canvasdepth)
     elseif self.needHBAO then
@@ -399,6 +415,12 @@ function Scene3D:drawCanvaColor()
 
     if self.needBloom then
         rendercolor = Bloom.Execute(rendercolor, self.meshquad)
+    elseif self.needBloom2 then
+        rendercolor = Bloom2.Execute(rendercolor, self.meshquad)
+    end
+
+    if self.needToneMapping and RenderSet.HDR then
+        rendercolor = ToneMapping.Execute(rendercolor)
     end
 
     if self.needOutLine then

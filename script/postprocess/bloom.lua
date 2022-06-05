@@ -1,11 +1,15 @@
+local PixelFormat = "rgba8"
+
 _G.Bloom = {}
-Bloom.Canvae = Canvas.new(1, 1, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
+Bloom.Canvae = Canvas.new(1, 1, {format = PixelFormat, readable = true, msaa = 0, mipmaps="none"})
 Bloom.Canvae.renderWidth = 1
 Bloom.Canvae.renderHeight = 1
 Bloom.meshquad = _G.MeshQuad.new(1,1, LColor.new(255, 255, 255, 255))
+
+Bloom.ClamptBrightness = 0.65
 Bloom.Execute = function(Canva1, InMeshQuad)
     if Bloom.Canvae.renderWidth ~= Canva1.renderWidth or Bloom.Canvae.renderHeight ~= Canva1.renderHeight then
-        Bloom.Canvae = Canvas.new(Canva1.renderWidth , Canva1.renderHeight, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
+        Bloom.Canvae = Canvas.new(Canva1.renderWidth , Canva1.renderHeight, {format = PixelFormat, readable = true, msaa = 0, mipmaps="none"})
         Bloom.Canvae.renderWidth = Canva1.renderWidth 
         Bloom.Canvae.renderHeight = Canva1.renderHeight
 
@@ -15,7 +19,7 @@ Bloom.Execute = function(Canva1, InMeshQuad)
     love.graphics.setCanvas(Bloom.Canvae.obj)
     love.graphics.clear()
     Bloom.meshquad:setCanvas(Canva1)
-    Bloom.meshquad.shader = Shader.GetBrightnessShader(0.65)
+    Bloom.meshquad.shader = Shader.GetBrightnessShader(Bloom.ClamptBrightness)
     Bloom.meshquad:draw()
     love.graphics.setCanvas()    
 
@@ -34,14 +38,14 @@ Bloom.Execute = function(Canva1, InMeshQuad)
 end
 
 _G.BlurHSE = {}
-BlurHSE.Canvae = Canvas.new(1, 1, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
+BlurHSE.Canvae = Canvas.new(1, 1, {format = PixelFormat, readable = true, msaa = 0, mipmaps="none"})
 BlurHSE.Canvae.renderWidth = 1
 BlurHSE.Canvae.renderHeight = 1
 BlurHSE.meshquad = _G.MeshQuad.new(1,1, LColor.new(255, 255, 255, 255))
 BlurHSE.Execute = function(Canva1, offset, power, w, h)
    
     if BlurHSE.Canvae.renderWidth ~= w  or BlurHSE.Canvae.renderHeight ~= h then
-        BlurHSE.Canvae = Canvas.new(w , h , {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
+        BlurHSE.Canvae = Canvas.new(w , h , {format = PixelFormat, readable = true, msaa = 0, mipmaps="none"})
         BlurHSE.Canvae.renderWidth = w
         BlurHSE.Canvae.renderHeight = h
 
@@ -59,14 +63,14 @@ BlurHSE.Execute = function(Canva1, offset, power, w, h)
 end
 
 _G.BlurWSE = {}
-BlurWSE.Canvae = Canvas.new(1, 1, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
+BlurWSE.Canvae = Canvas.new(1, 1, {format = PixelFormat, readable = true, msaa = 0, mipmaps="none"})
 BlurWSE.Canvae.renderWidth = 1
 BlurWSE.Canvae.renderHeight = 1
 BlurWSE.meshquad = _G.MeshQuad.new(1,1, LColor.new(255, 255, 255, 255))
 BlurWSE.Execute = function(Canva1, offset, power, w, h)
    
     if BlurWSE.Canvae.renderWidth ~= w   or BlurWSE.Canvae.renderHeight ~= h  then
-        BlurWSE.Canvae = Canvas.new(w , h , {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
+        BlurWSE.Canvae = Canvas.new(w , h , {format = PixelFormat, readable = true, msaa = 0, mipmaps="none"})
         BlurWSE.Canvae.renderWidth = w
         BlurWSE.Canvae.renderHeight = h
 
@@ -85,14 +89,14 @@ BlurWSE.Execute = function(Canva1, offset, power, w, h)
 end
 
 _G.BlurWHSE = {}
-BlurWHSE.Canvae = Canvas.new(1, 1, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
+BlurWHSE.Canvae = Canvas.new(1, 1, {format = PixelFormat, readable = true, msaa = 0, mipmaps="none"})
 BlurWHSE.Canvae.renderWidth = 1
 BlurWHSE.Canvae.renderHeight = 1
 BlurWHSE.meshquad = _G.MeshQuad.new(1,1, LColor.new(255, 255, 255, 255))
 BlurWHSE.Execute = function(Canva1, offset, power, w, h)
    
     if BlurWHSE.Canvae.renderWidth ~= w   or BlurWHSE.Canvae.renderHeight ~= h  then
-        BlurWHSE.Canvae = Canvas.new(w , h , {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
+        BlurWHSE.Canvae = Canvas.new(w , h , {format = PixelFormat, readable = true, msaa = 0, mipmaps="none"})
         BlurWHSE.Canvae.renderWidth = w
         BlurWHSE.Canvae.renderHeight = h
 
@@ -111,14 +115,14 @@ BlurWHSE.Execute = function(Canva1, offset, power, w, h)
 end
 
 _G.BlurCircle = {}
-BlurCircle.Canvae = Canvas.new(1, 1, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
+BlurCircle.Canvae = Canvas.new(1, 1, {format = PixelFormat, readable = true, msaa = 0, mipmaps="none"})
 BlurCircle.Canvae.renderWidth = 1
 BlurCircle.Canvae.renderHeight = 1
 BlurCircle.meshquad = _G.MeshQuad.new(1,1, LColor.new(255, 255, 255, 255))
 BlurCircle.Execute = function(Canva1)
    
     if BlurCircle.Canvae.renderWidth ~= Canva1.renderWidth   or BlurCircle.Canvae.renderHeight ~= Canva1.renderHeight  then
-        BlurCircle.Canvae = Canvas.new(Canva1.renderWidth , Canva1.renderHeight , {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
+        BlurCircle.Canvae = Canvas.new(Canva1.renderWidth , Canva1.renderHeight , {format = PixelFormat, readable = true, msaa = 0, mipmaps="none"})
         BlurCircle.Canvae.renderWidth = Canva1.renderWidth 
         BlurCircle.Canvae.renderHeight = Canva1.renderHeight 
 
@@ -137,14 +141,14 @@ BlurCircle.Execute = function(Canva1)
 end
 
 _G.BloomAdd = {}
-BloomAdd.Canvae = Canvas.new(1, 1, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
+BloomAdd.Canvae = Canvas.new(1, 1, {format = PixelFormat, readable = true, msaa = 0, mipmaps="none"})
 BloomAdd.Canvae.renderWidth = 1
 BloomAdd.Canvae.renderHeight = 1
 BloomAdd.meshquad = _G.MeshQuad.new(1,1, LColor.new(255, 255, 255, 255))
 BloomAdd.Execute = function(Canva1, img, w, h)
    
     if BloomAdd.Canvae.renderWidth ~= w  or BloomAdd.Canvae.renderHeight ~= h then
-        BloomAdd.Canvae = Canvas.new(w, h, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
+        BloomAdd.Canvae = Canvas.new(w, h, {format = PixelFormat, readable = true, msaa = 0, mipmaps="none"})
         BloomAdd.Canvae.renderWidth = w
         BloomAdd.Canvae.renderHeight = h
 
@@ -506,3 +510,18 @@ function Shader.GetBlurCircle()
     Shader['shader_GetBlurCircle'] = shader
     return shader
 end
+
+HDRSetting(function(IsHDR)
+    -- if IsHDR then
+    --     PixelFormat = "rgba16f"
+    -- else
+    --     PixelFormat = "rgba8"
+    -- end
+    -- Bloom.Canvae = Canvas.new(Bloom.Canvae.renderWidth, Bloom.Canvae.renderHeight, {format = PixelFormat, readable = true, msaa = 0, mipmaps="none"})
+
+    -- BlurHSE.Canvae = Canvas.new(BlurHSE.Canvae.renderWidth, BlurHSE.Canvae.renderHeight, {format = PixelFormat, readable = true, msaa = 0, mipmaps="none"})
+    -- BlurWSE.Canvae = Canvas.new(BlurWSE.Canvae.renderWidth, BlurWSE.Canvae.renderHeight, {format = PixelFormat, readable = true, msaa = 0, mipmaps="none"})
+    -- BlurWHSE.Canvae = Canvas.new(BlurWHSE.Canvae.renderWidth, BlurWHSE.Canvae.renderHeight, {format = PixelFormat, readable = true, msaa = 0, mipmaps="none"})
+    -- BlurCircle.Canvae = Canvas.new(BlurCircle.Canvae.renderWidth, BlurCircle.Canvae.renderHeight, {format = PixelFormat, readable = true, msaa = 0, mipmaps="none"})
+    -- BloomAdd.Canvae = Canvas.new(BloomAdd.Canvae.renderWidth, BloomAdd.Canvae.renderHeight, {format = PixelFormat, readable = true, msaa = 0, mipmaps="none"})
+end)

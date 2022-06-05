@@ -93,13 +93,6 @@ app.render(function(dt)
     meshblurh:draw()
     _G.popCanvas()
 
-    -- meshblurw:draw()
-   
-    -- print(mode, alphamode)
-    -- mesh:draw()
-    -- meshhelper:draw()
-    -- love.graphics.setBlendMode("add") 
     meshhdr:draw()
-    -- meshblurh:draw()
     love.graphics.setBlendMode(mode, alphamode) 
 end)

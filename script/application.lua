@@ -134,7 +134,7 @@ function love.draw()
     _G.UIHelper.draw()
     if _G.lovedebug.showstat then
     -- Stats
-local stats = love.graphics.getStats()
+    local stats = love.graphics.getStats()
     love.graphics.print(tostring(love.timer.getFPS()) .. " FPS | " .. tostring(math.floor(love.timer.getDelta() * 100000) / 100) .. " ms", 10, 10)
     love.graphics.print("Draw calls: " .. tostring(stats.drawcalls), 10, 30)
     love.graphics.print("Canvas switches: " .. tostring(stats.canvasswitches), 10, 50)

@@ -169,9 +169,19 @@ RenderSet.AlphaTestBlend = 0.5
 RenderSet.AlphaTestMode = 2
 RenderSet.frameToken = 1
 
+RenderSet.HDR = false
+
 RenderSet.EnableCDLOD = true
 
 
 RenderSet.LOD1Distance = 300
 RenderSet.LOD2Distance = 500
 RenderSet.LOD3Distance = 800
+
+HDRSetting(function(IsHDR)
+    if IsHDR then
+        RenderSet.HDR = true
+    else
+        RenderSet.HDR = false
+    end
+end)

@@ -75,6 +75,8 @@ dofile 'script/render/shadow.lua'
 
 dofile 'script/3d/light/light.lua'
 
+dofile 'script/render/hdrsetting.lua'
+
 dofile 'script/3d/render/renderset.lua'
 
 dofile 'script/3d/scene/scene.lua'
@@ -96,8 +98,9 @@ dofile 'script/render/font.lua'
 
 dofile 'script/common/timer.lua'
 
-
+dofile 'script/postprocess/tonemapping.lua'
 dofile 'script/postprocess/bloom.lua'
+dofile 'script/postprocess/bloom2.lua'
 dofile 'script/postprocess/outline.lua'
 dofile 'script/postprocess/ssao.lua'
 dofile 'script/postprocess/hbao.lua'
@@ -127,5 +130,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_loopsubdivision2d.lua')--test_taa
+	dofile('script/test/test_hdr2.lua')--test_taa
 end
