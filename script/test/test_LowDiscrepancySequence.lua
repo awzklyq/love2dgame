@@ -30,7 +30,7 @@ app.render(function(dt)
     end
 end)
 
-local step = 200
+local step = 64
 local GR = 0
 function MatchRandom()
     local total = 0
@@ -83,6 +83,7 @@ function MatchRandom2()
         for j = 1, SqrtSetp * 2, 2 do
             local xi = QudiXULie(i, 10) * OW
             local yi = QudiXULie(j, 10) * OH
+            log('Van der Corput', xi / OW, yi / OH)
             MatchRects[#MatchRects + 1] = Rect.new(xi - 1,  yi -1, 2, 2)
             MatchRects[#MatchRects]:setColor(255,0,0,255)
             if xi >= startx and xi <= SUBW + startx and yi >= starty and yi <= starty + SUBh then
@@ -113,7 +114,7 @@ function MatchRandom3()
         local yi = QudiXULie(i, 3) * OH
         MatchRects[#MatchRects + 1] = Rect.new(xi - 1,  yi -1, 2, 2)
         MatchRects[#MatchRects]:setColor(255,0,0,255)
-        log('aaaa', QudiXULie(i, 2), QudiXULie(i, 3))
+        log('JitterVec['..tostring(i - 1)..'] = vec2( (0.5 - '..tostring(QudiXULie(i, 2))..') * offsetw, (0.5 -  '..tostring(QudiXULie(i, 3))..') * offseth);')
         if xi >= startx and xi <= SUBW + startx and yi >= starty and yi <= starty + SUBh then
             total = total + 1
         end

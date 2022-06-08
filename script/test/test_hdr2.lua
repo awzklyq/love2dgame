@@ -32,7 +32,9 @@ app.render(function(dt)
     scene:update(dstlen)
     scene:draw(true)
 
-    love.graphics.print( "Press Key A.  Bloom2: "..tostring(scene.needBloom2) .. " Key Z HDR: " .. tostring(RenderSet.HDR) .. " Key C needToneMapping: " .. tostring(scene.needToneMapping) .. ' Bloom2.Adapted_lum:' .. tostring(Bloom2.Adapted_lum) .. " Bloom2.ClamptBrightness: " .. tostring(Bloom2.ClamptBrightness), 10, 10)
+    love.graphics.print( "Press Key A.  Bloom2: "..tostring(scene.needBloom2) .. " Key B TAA " .. tostring(scene.needTAA) .." Key N FXAA " .. tostring(scene.needFXAA).. " Key Z HDR: " .. tostring(RenderSet.HDR), 10, 10)
+
+    love.graphics.print( " Key C needToneMapping: " .. tostring(scene.needToneMapping) .. ' Bloom2.Adapted_lum:' .. tostring(Bloom2.Adapted_lum) .. " Bloom2.ClamptBrightness: " .. tostring(Bloom2.ClamptBrightness), 10, 40)
    
 end)
 
@@ -42,6 +44,10 @@ app.keypressed(function(key, scancode, isrepeat)
         log(currentCamera3D.look.x, currentCamera3D.look.y, currentCamera3D.look.z)
     elseif key == "a" then
         scene.needBloom2 = not scene.needBloom2
+    elseif key == "b" then
+        scene.needTAA = not scene.needTAA
+    elseif key == "n" then
+        scene.needFXAA = not scene.needFXAA
     elseif key == "z" then
         RenderSet.HDR = not RenderSet.HDR
         HDRSetting(RenderSet.HDR)

@@ -130,5 +130,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_hdr2.lua')--test_taa
+	dofile('script/test/test_taa.lua')--test_taa
 end

@@ -70,7 +70,7 @@ app.render(function(dt)
         MotionVectorNode.Canvas:draw();
     end
     love.graphics.print( "Press Key a.  scene.needFXAA: "..tostring(scene.needFXAA) .. " Frustum Cull: "..tostring(RenderSet.isNeedFrustum) .. " Culled Number: "..tostring(scene.cullednumber), 10, 10)
-    love.graphics.print( "Press Key b.  scene.needTAA: "..tostring(scene.needTAA), 10, 30)
+    love.graphics.print( "Press Key b.  scene.needTAA: "..tostring(scene.needTAA) .. " TAANode.Threshold " .. tostring(TAANode.Threshold), 10, 30)
     love.graphics.print( "Press Key space.  IsDrawMotionVector: "..tostring(IsDrawMotionVector), 10, 50)
 end)
 
@@ -83,6 +83,11 @@ app.keypressed(function(key, scancode, isrepeat)
         scene.needFXAA = not scene.needFXAA
     elseif key == "b" then
         scene.needTAA = not scene.needTAA
+
+    elseif key == "up" then
+        TAANode.Threshold = math.clamp(TAANode.Threshold + 0.02, 0, 1)
+    elseif key == "down" then
+        TAANode.Threshold = math.clamp(TAANode.Threshold - 0.02, 0, 1)
     end
 
     if key == 'x' then
