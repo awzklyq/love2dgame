@@ -413,20 +413,6 @@ function Scene3D:drawCanvaColor()
         rendercolor = GTAONode.Execute(rendercolor, self.canvasnormal, self.canvasdepth, camera3d.eye)
     end
 
-    if self.needBloom then
-        rendercolor = Bloom.Execute(rendercolor, self.meshquad)
-    elseif self.needBloom2 then
-        rendercolor = Bloom2.Execute(rendercolor, self.meshquad)
-    end
-
-    if self.needToneMapping and RenderSet.HDR then
-        rendercolor = ToneMapping.Execute(rendercolor)
-    end
-
-    if self.needOutLine then
-        rendercolor = OutLine.Execute(rendercolor)
-    end
-
     if self.needTAA then
         rendercolor = TAANode.Execute(canvas1, self.canvasnormal, self.canvasdepth)
     end
@@ -443,6 +429,20 @@ function Scene3D:drawCanvaColor()
         rendercolor = canvas2
         -- canvas2 = canvas1
         -- canvas1 = rendercolor
+    end
+    
+    if self.needBloom then
+        rendercolor = Bloom.Execute(rendercolor, self.meshquad)
+    elseif self.needBloom2 then
+        rendercolor = Bloom2.Execute(rendercolor, self.meshquad)
+    end
+
+    if self.needToneMapping and RenderSet.HDR then
+        rendercolor = ToneMapping.Execute(rendercolor)
+    end
+
+    if self.needOutLine then
+        rendercolor = OutLine.Execute(rendercolor)
     end
 
     rendercolor:draw()
