@@ -32,6 +32,7 @@ function Scene3D.new()
 
     scene.needBloom = false;
     scene.needBloom2 = false;
+    scene.needBloom3 = false;
     scene.needOutLine = false;
     scene.needHBAO = false;
     scene.needGTAO = false;
@@ -435,6 +436,8 @@ function Scene3D:drawCanvaColor()
         rendercolor = Bloom.Execute(rendercolor, self.meshquad)
     elseif self.needBloom2 then
         rendercolor = Bloom2.Execute(rendercolor, self.meshquad)
+    elseif self.needBloom3 then
+        rendercolor = Bloom3.Execute(rendercolor, self.meshquad)
     end
 
     if self.needToneMapping and RenderSet.HDR then

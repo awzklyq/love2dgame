@@ -101,6 +101,7 @@ dofile 'script/common/timer.lua'
 dofile 'script/postprocess/tonemapping.lua'
 dofile 'script/postprocess/bloom.lua'
 dofile 'script/postprocess/bloom2.lua'
+dofile 'script/postprocess/bloom3.lua'
 dofile 'script/postprocess/outline.lua'
 dofile 'script/postprocess/ssao.lua'
 dofile 'script/postprocess/hbao.lua'
@@ -131,5 +132,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_gaussianfilter.lua')--test_taa
+	dofile('script/test/test_bloom3.lua')--test_taa
 end
