@@ -132,5 +132,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_bloom3.lua')--test_taa
+	dofile('script/test/test_tonemapfunc.lua')--test_taa
 end

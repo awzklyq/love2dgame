@@ -23,9 +23,13 @@ Bloom2.Execute = function(Canva1, InMeshQuad)
     Bloom2.meshquad:draw()
     love.graphics.setCanvas()    
 
-    local RenderCanvan = Blur2Down.Execute(Bloom2.Canvae, PixelOffset, 1, Canva1.renderWidth / 8, Canva1.renderHeight / 8)
-    RenderCanvan = Blur2Down.Execute(RenderCanvan, PixelOffset, 1, Canva1.renderWidth / 16, Canva1.renderHeight / 16)
+    local RenderCanvan = Blur2Down.Execute(Bloom2.Canvae, PixelOffset, 1, Canva1.renderWidth / 2, Canva1.renderHeight / 2, false)
+    RenderCanvan = Blur2Down.Execute(RenderCanvan, PixelOffset, 1, Canva1.renderWidth / 4, Canva1.renderHeight / 4, true)
+    RenderCanvan = Blur2Down.Execute(RenderCanvan, PixelOffset, 1, Canva1.renderWidth / 8, Canva1.renderHeight / 8, true)
+    RenderCanvan = Blur2Down.Execute(RenderCanvan, PixelOffset, 1, Canva1.renderWidth / 16, Canva1.renderHeight / 16, true)
     RenderCanvan = Blur2Up.Execute(RenderCanvan, PixelOffset, 1, Canva1.renderWidth / 8, Canva1.renderHeight / 8)
+    RenderCanvan = Blur2Up.Execute(RenderCanvan, PixelOffset, 1, Canva1.renderWidth / 4, Canva1.renderHeight / 4)
+    RenderCanvan = Blur2Up.Execute(RenderCanvan, PixelOffset, 1, Canva1.renderWidth / 2, Canva1.renderHeight / 2)
     RenderCanvan = Blur2Up.Execute(RenderCanvan, PixelOffset, 1, Canva1.renderWidth, Canva1.renderHeight)
     RenderCanvan = Bloom2Add.Execute(Canva1, RenderCanvan, Canva1.renderWidth, Canva1.renderHeight)
     RenderCanvan.renderHeight = Canva1.renderHeight
@@ -38,7 +42,7 @@ Blur2Down.Canvae = Canvas.new(1, 1, {format = PixelFormat, readable = true, msaa
 Blur2Down.Canvae.renderWidth = 1
 Blur2Down.Canvae.renderHeight = 1
 Blur2Down.meshquad = _G.MeshQuad.new(1,1, LColor.new(255, 255, 255, 255))
-Blur2Down.Execute = function(Canva1, offset, power, w, h)
+Blur2Down.Execute = function(Canva1, offset, power, w, h, NeedAdd)
    
     if Blur2Down.Canvae.renderWidth ~= w  or Blur2Down.Canvae.renderHeight ~= h then
         Blur2Down.Canvae = Canvas.new(w , h , {format = PixelFormat, readable = true, msaa = 0, mipmaps="none"})
@@ -51,7 +55,7 @@ Blur2Down.Execute = function(Canva1, offset, power, w, h)
     love.graphics.setCanvas(Blur2Down.Canvae.obj)
     love.graphics.clear()
     Blur2Down.meshquad:setCanvas(Canva1)
-    Blur2Down.meshquad.shader = Shader.GetBlur2Down(Blur2Down.Canvae.renderWidth, Blur2Down.Canvae.renderHeight, offset, power)
+    Blur2Down.meshquad.shader = Shader.GetBlur2Down(Blur2Down.Canvae.renderWidth, Blur2Down.Canvae.renderHeight, offset, power, NeedAdd)
     Blur2Down.meshquad:draw()
     love.graphics.setCanvas()
     return Blur2Down.Canvae
@@ -153,12 +157,13 @@ function Shader.GetBrightnessShader2(l)
 end
 
 
-function Shader.GetBlur2Down(w, h, offset, power)
+function Shader.GetBlur2Down(w, h, offset, power, NeedAdd)
 
-    if Shader['shader_GetBlur2Down']  then
-        Shader['shader_GetBlur2Down']:send('w', w);
-        Shader['shader_GetBlur2Down']:send('h', h);
-        Shader['shader_GetBlur2Down']:send('offset', offset or 1);
+    if Shader['shader_GetBlur2Down' .. tostring(NeedAdd)]  then
+        Shader['shader_GetBlur2Down'.. tostring(NeedAdd)]:send('w', w);
+        Shader['shader_GetBlur2Down'.. tostring(NeedAdd)]:send('h', h);
+        Shader['shader_GetBlur2Down'.. tostring(NeedAdd)]:send('offset', offset or 1);
+        Shader['shader_GetBlur2Down'.. tostring(NeedAdd)]:send('offset', offset or 1);
        -- Shader['shader_GetBlur2Down']:send('power', power or 1);
         -- Shader['shader_GetBlur2SSE']:send('baseimg', img.obj);
         return  Shader['shader_GetBlur2Down']
@@ -176,14 +181,25 @@ function Shader.GetBlur2Down(w, h, offset, power)
         vec2 halfpixel = vec2(offset / w, offset / h);
         halfpixel *= 0.5;
 
-        vec4 sum = texture2D(tex, vTexCoord2) * 4.0;
+        vec4 BaseColor =  texture2D(tex, vTexCoord2);
+        vec4 sum = BaseColor * 4.0;
         sum += texture2D(tex, vTexCoord2 - halfpixel.xy);
         sum += texture2D(tex, vTexCoord2 + halfpixel.xy);
         sum += texture2D(tex, vTexCoord2 + vec2(halfpixel.x, -halfpixel.y));
         sum += texture2D(tex, vTexCoord2 - vec2(halfpixel.x, -halfpixel.y));
-        return sum / 8.0;
-    }
-]]
+        ]]
+        if NeedAdd then
+            pixelcode = pixelcode .. [[
+                return vec4(BaseColor.xyz + sum.xyz / 8.0, BaseColor.a);
+        }
+            ]]
+        else
+            pixelcode = pixelcode .. [[
+                return vec4(sum.xyz / 8.0, BaseColor.a);
+        }
+            ]]
+        end
+
     local vertexcode = [[
     varying vec2 vTexCoord2;
     vec4 position( mat4 transform_projection, vec4 vertex_position )
@@ -199,7 +215,7 @@ function Shader.GetBlur2Down(w, h, offset, power)
     shader:send('offset', offset or 1);
     --shader:send('power', power or 1);
     -- shader:send('baseimg',  img.obj);
-    Shader['shader_GetBlur2Down'] = shader
+    Shader['shader_GetBlur2Down'.. tostring(NeedAdd)] = shader
     return shader
 end
 
@@ -227,6 +243,7 @@ function Shader.GetBlur2Up(w, h, offset, power)
     {
         vec2 halfpixel = vec2(offset / w, offset / h);
         halfpixel *= 0.5;
+        vec4 BaseColor =  texture2D(tex, vTexCoord2);
         vec4 sum = texture2D(tex, vTexCoord2 + vec2(-halfpixel.x * 2.0, 0.0));
         sum += texture2D(tex, vTexCoord2 + vec2(-halfpixel.x, halfpixel.y)) * 2.0;
         sum += texture2D(tex, vTexCoord2 + vec2(0.0, halfpixel.y * 2.0));
@@ -235,7 +252,7 @@ function Shader.GetBlur2Up(w, h, offset, power)
         sum += texture2D(tex, vTexCoord2 + vec2(halfpixel.x, -halfpixel.y)) * 2.0;
         sum += texture2D(tex, vTexCoord2 + vec2(0.0, -halfpixel.y * 2.0));
         sum += texture2D(tex, vTexCoord2 + vec2(-halfpixel.x, -halfpixel.y)) * 2.0;
-        return sum / 12.0;
+        return vec4(BaseColor.xyz + sum.xyz / 12.0, BaseColor.a) ;
     }
 ]]
 
