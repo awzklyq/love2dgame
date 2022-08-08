@@ -25,7 +25,7 @@ function Shader:sendValue(name, value)
     if self:hasUniform(name) and value then
         self:send(name, value)
     else
-        log("Error! name and value:", name, value)
+        --log("Error! name and value:", name, value)
     end 
 end
 

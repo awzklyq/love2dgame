@@ -27,8 +27,8 @@ local k = 5
 -- end
 
 function GetFunction(x)
-    x = x * 0.05
-    local f = (1/3) * (math.pi / 2) * math.pow(x, 2) * math.sqrt(100- math.pow(x, 2))
+    x = x * 0.01
+    local f = math.exp(x)
     return f
 end
 
@@ -149,7 +149,7 @@ function resize()
     for i = y1, y2, offsetaix do
         local line = Line.new(startx2, i + oy, startx2 + 10, i + oy)
         line:setColor(200, 0, 0, 255)
-        ynumbers[#ynumbers + 1] = {line = line, value = (y1 - y1 % 10) / 10, x = startx2, y = i + oy}
+        ynumbers[#ynumbers + 1] = {line = line, value = ( i % 10 - i) / 10, x = startx2, y = i + oy}
     end
     --#endregion
 

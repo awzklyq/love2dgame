@@ -36,6 +36,8 @@ function Scene3D.new()
     scene.needOutLine = false;
     scene.needHBAO = false;
     scene.needGTAO = false;
+    scene.needSimpleSSGI = false;
+    scene.needSSAO = false
 
     scene.needToneMapping = false;
     return scene
@@ -404,6 +406,10 @@ function Scene3D:drawCanvaColor()
     -- if self.needToneMapping and RenderSet.HDR then
     --     rendercolor = ToneMapping.Execute(rendercolor)
     -- end
+
+    if self.needSimpleSSGI then
+        rendercolor = SimpleSSGINode.Execute(rendercolor, self.canvasnormal, self.canvasdepth)
+    end
 
     if self.needSSAO then
         rendercolor = SSAONode.Execute(canvas1, self.canvasnormal, self.canvasdepth)
