@@ -109,6 +109,7 @@ dofile 'script/postprocess/gtao.lua'
 dofile 'script/postprocess/taa.lua'
 dofile 'script/postprocess/gaussianfilter.lua'
 dofile 'script/postprocess/simplessgi.lua'
+dofile 'script/postprocess/esmblur.lua'
 
 dofile 'script/3d/effect/motionvector.lua'
 
@@ -133,5 +134,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_simplessgi.lua')--test_simplessgi
+	dofile('script/test/test_shadowmap.lua')--test_simplessgi
 end

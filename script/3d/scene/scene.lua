@@ -549,7 +549,9 @@ function Scene3D:drawDirectionLightShadow(isdebug)
                 -- lightnode.depth_buffer:draw()
             end
         end
-        
+        if RenderSet.EnableESM then
+            ESMBlurNode.Execute(lightnode.shadowmap)
+        end
     end
     
 end
@@ -675,7 +677,9 @@ function Scene3D:drawDirectionLightCSM(isdebug)
 
            
         end
-        
+        if RenderSet.EnableESM then
+            ESMBlurNode.Execute(lightnode.shadowmap)
+        end
     end
     
 end

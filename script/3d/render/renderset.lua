@@ -178,6 +178,8 @@ RenderSet.LOD1Distance = 300
 RenderSet.LOD2Distance = 500
 RenderSet.LOD3Distance = 800
 
+RenderSet.ESM_C = 10
+RenderSet.EnableESM = false
 HDRSetting(function(IsHDR)
     if IsHDR then
         RenderSet.HDR = true

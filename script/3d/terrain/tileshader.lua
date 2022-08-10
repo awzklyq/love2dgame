@@ -129,6 +129,7 @@ function Shader.GetTile3DPSShaderCode()
 
     if needshadow  and RenderSet.getshadowReceiver() then
         pixelcode = pixelcode .. _G.ShaderFunction.getShadowPCFCode
+        pixelcode = pixelcode .. _G.ShaderFunction.GetESMValue
     end
 
     pixelcode = pixelcode ..[[

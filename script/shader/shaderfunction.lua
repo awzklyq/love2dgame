@@ -52,3 +52,12 @@ _G.ShaderFunction.CircleSampler = [[
         return vec2(sin(radian), cos(radian));
     }
 ]]
+
+_G.ShaderFunction.GetESMValue = [[
+    float GetESMValue(vec2 suv, sampler2D shadowmap, float depth, float ESM_C)
+    {
+        vec2 shadowdepth = texture2D(shadowmap, suv).rg;
+        float Shadow = clamp( exp( -ESM_C * ( shadowdepth.x - depth ) ), 0.0, 1.0 );
+        return 1 - Shadow;
+    }
+]]

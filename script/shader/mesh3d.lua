@@ -96,6 +96,8 @@ function Shader.GetBase3DPSShaderCode(AlphaTest)
             -- pixelcode = pixelcode .. " uniform mat4 directionlightMatrix; ";
             pixelcode = pixelcode .. " uniform sampler2D directionlightShadowMap;  \n";
             pixelcode = pixelcode .. " uniform float shadowmapsize;  \n";
+            pixelcode = pixelcode .. " uniform float ESM_C;  \n";
+            
             needshadow = true
         end
 
@@ -157,6 +159,7 @@ function Shader.GetBase3DPSShaderCode(AlphaTest)
 
     if needshadow  and RenderSet.getshadowReceiver() then
         pixelcode = pixelcode .. _G.ShaderFunction.getShadowPCFCode
+        pixelcode = pixelcode .. _G.ShaderFunction.GetESMValue
     end
 
     if RenderSet.GetPBR() then
@@ -265,10 +268,19 @@ function Shader.GetBase3DPSShaderCode(AlphaTest)
                 float offset = 1/shadowmapsize;
                 vec2 suv = lightpos.xy;// * 0.5 + vec2(0.5, 0.5);
                 float shadowdepth = lightpos.z;// * 0.5 + 0.5;
-                float shadow = getShadowPCF(suv, directionlightShadowMap, shadowdepth, shadowmapsize);
-               
+                ]]
+            if RenderSet.EnableESM then
+                pixelcode = pixelcode..[[
+                    float shadow = GetESMValue(suv, directionlightShadowMap, shadowdepth, ESM_C);
+                    ]]
+            else
+                pixelcode = pixelcode..[[
+                    float shadow = getShadowPCF(suv, directionlightShadowMap, shadowdepth, shadowmapsize);
+                    ]]
+            end
+            pixelcode = pixelcode..[[
                 texcolor.xyz *= shadow;
-            ]]
+                ]]
 
             
         end
@@ -311,7 +323,8 @@ function Shader.GetBase3DShader(color, projectionMatrix, modelMatrix, viewMatrix
 
     local normalmap = RenderSet.getNormalMap()
 
-    local shader = ShaderObjects["base3dshader".."directionlights"..#directionlights..tostring(needshadow).. (normalmap and "normalmap" or "") ..  (RenderSet.GetPBR() and "PBR" or "") .. (AlphaTest and "AlphaTest" or "nil") .. tostring(RenderSet.AlphaTestMode)]
+    local HashIndex = "base3dshader".."directionlights"..#directionlights..tostring(needshadow).. (normalmap and "normalmap" or "") ..  (RenderSet.GetPBR() and "PBR" or "").. (AlphaTest and "AlphaTest" or "nil").. tostring(RenderSet.AlphaTestMode) .. tostring(RenderSet.EnableESM and "ESM" or "CSM")
+    local shader = ShaderObjects[HashIndex]
     if shader then
         if shader:hasUniform("normalmap") then
             shader:send("normalmap", normalmap.obj)
@@ -385,6 +398,9 @@ function Shader.GetBase3DShader(color, projectionMatrix, modelMatrix, viewMatrix
                 obj:send('shadowmapsize', RenderSet.getShadowMapSize())
             end
 
+            obj:sendValue('ESM_C', RenderSet.ESM_C)
+
+
             if shader:hasUniform( "directionlightShadowMap") then
                 obj:send('directionlightShadowMap',  node.shadowmap.obj)
             end
@@ -395,7 +411,7 @@ function Shader.GetBase3DShader(color, projectionMatrix, modelMatrix, viewMatrix
                 end
             elseif   _G.GConfig.CSMNumber == 2 then
                 if shader:hasUniform( "CSMMatrix1") then
-                   
+                   log('aaaaaaaaaaa', obj.send, node.CSMMatrix, node.CSMMatrix[1])
                     obj:send('CSMMatrix1', node.CSMMatrix[1])
                 end
 
@@ -486,6 +502,6 @@ function Shader.GetBase3DShader(color, projectionMatrix, modelMatrix, viewMatrix
         end
     end
 
-    ShaderObjects["base3dshader".."directionlights"..#directionlights..tostring(needshadow).. (normalmap and "normalmap" or "") ..  (RenderSet.GetPBR() and "PBR" or "").. (AlphaTest and "AlphaTest" or "nil").. tostring(RenderSet.AlphaTestMode)] = shader
+    ShaderObjects[HashIndex] = shader
     return  shader
 end
