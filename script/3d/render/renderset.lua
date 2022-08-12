@@ -152,7 +152,7 @@ RenderSet.UseCanvasColorAndDepth = function ()
 end
 
 RenderSet.ClearCanvasColorAndDepth = function ()
-    love.graphics.present()
+    -- love.graphics.present()
     love.graphics.setCanvas()
     love.graphics.setMeshCullMode("none")
 end

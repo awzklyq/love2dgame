@@ -305,7 +305,7 @@ Render.RenderObject = function(obj)
 
                     love.graphics.setLineWidth( lw);
                 else
-                    love.graphics.polygon("file", obj.vertices);
+                    love.graphics.polygon("fill", obj.vertices);
 
                 end
             end

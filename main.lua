@@ -31,6 +31,7 @@ dofile('script/map/terrain/tiled.lua')
 
 dofile('script/shader/shader.lua')
 dofile('script/shader/shaderfunction.lua')
+dofile('script/shader/shader_octahedralmap.lua')
 
 dofile('script/polygon/rect.lua')
 dofile('script/polygon/circle.lua')
@@ -98,6 +99,7 @@ dofile 'script/render/font.lua'
 
 dofile 'script/common/timer.lua'
 
+
 dofile 'script/postprocess/tonemapping.lua'
 dofile 'script/postprocess/bloom.lua'
 dofile 'script/postprocess/bloom2.lua'
@@ -134,5 +136,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_shadowmap.lua')--test_simplessgi
+	dofile('script/test/test_Octahedralmap.lua')--test_simplessgi
 end
