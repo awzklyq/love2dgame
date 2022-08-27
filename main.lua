@@ -136,5 +136,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_Octahedralmap.lua')--test_simplessgi
+	dofile('script/test/test_obj.lua')--test_simplessgi  test_Octahedralmap
 end

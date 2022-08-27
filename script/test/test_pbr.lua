@@ -12,7 +12,7 @@ for i = 1, cubenum do
     mesh3d.transform3d:mulTranslationRight(-3000 + 400 * i, -3000 + 400 * i, 800)
     local scale = 3--math.random(0.5, 2)
     mesh3d.transform3d:mulScalingLeft(scale ,scale, scale)
-    mesh3d:setBaseColor(LColor.new(10,10,10, 255))
+    mesh3d:setBaseColor(LColor.new(255,255,255, 255))
 
     local node = scene:addMesh(mesh3d)
     node.PBR = true --i % 2 == 0

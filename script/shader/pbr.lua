@@ -44,8 +44,8 @@ _G.ShaderFunction.GetPBRCode = [[
 
     vec3 GetPBR(float a, float metalness, vec3 color, vec3 viewdir, vec3 lightdir, vec3 nor)
     {
-        a = 0.1; // TODO
-        metalness = 1; //TODO
+        //a = 0.1; // TODO
+      //  metalness = 1; //TODO
         lightdir = -lightdir;
         //float ks = 1 - kd;
         vec3 h = normalize(viewdir + lightdir);
