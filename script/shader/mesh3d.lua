@@ -204,19 +204,19 @@ function Shader.GetBase3DPSShaderCode(AlphaTest)
             -- pixelcode = pixelcode .. " texcolor.xyz = texcolor.xyz * directionlightcolor"..i..".xyz * dotn; ";
             if RenderSet.GetPBR() then
 
-                pixelcode = pixelcode .. " vec3 pbr = ".._G.ShaderFunction.PBRFunctionName.."(0.4, 4, texcolor.xyz, viewdir.xyz, lightdir, normal.xyz);\n";
+                pixelcode = pixelcode .. " vec3 specular = ".._G.ShaderFunction.PBRFunctionName.."(0.4, 4, texcolor.xyz, viewdir.xyz, lightdir, normal.xyz);\n";
             else
-                pixelcode = pixelcode .. " vec3 pbr = vec3(1);\n";
-            end
-            
-            pixelcode = pixelcode .. [[
+                pixelcode = pixelcode .. [[
                 vec3 _Specluar = lightcolor;//vec3(1,1,1);
                 float _Intensity = 1;
                 float _Gloss = 1.5;
                 vec3 reflectDir = normalize(reflect(-lightdir.xyz,normal.xyz));
                 vec3 specular = _Specluar * _Intensity * pow(clamp(dot(reflectDir, viewdir.xyz), 0, 1),_Gloss);
             ]]
-            pixelcode = pixelcode .. " texcolor.xyz = texcolor.xyz * lightcolor * dotn * pbr + specular;\n ";
+            end
+            
+            
+            pixelcode = pixelcode .. " texcolor.xyz = texcolor.xyz * lightcolor * dotn + specular;\n ";
         end
 
         if needshadow and RenderSet.getshadowReceiver() then
