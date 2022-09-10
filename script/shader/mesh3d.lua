@@ -70,9 +70,17 @@ function Shader.GetBase3DVSShaderCode(AlphaTest)
     return vertexcode
 end
 
-function Shader.GetBase3DPSShaderCode(AlphaTest)
+function Shader.GetBase3DPSShaderCode(AlphaTest, PBR)
     local pixelcode = "uniform vec4 bcolor;\n"
     pixelcode = pixelcode .. " uniform vec3 camerapos;  \n";
+
+    if PBRData.IsUsePBR(PBR) then
+        pixelcode = pixelcode .. [[
+            uniform float Roughness;
+            uniform float Metallic;
+            uniform vec3 F0;
+        ]]
+    end
 
     if AlphaTest then
         if RenderSet.AlphaTestMode == 1 then
@@ -162,7 +170,7 @@ function Shader.GetBase3DPSShaderCode(AlphaTest)
         pixelcode = pixelcode .. _G.ShaderFunction.GetESMValue
     end
 
-    if RenderSet.GetPBR() then
+    if PBRData.IsUsePBR(PBR) then
         pixelcode = pixelcode .. _G.ShaderFunction.GetPBRCode
     end
 
@@ -202,9 +210,8 @@ function Shader.GetBase3DPSShaderCode(AlphaTest)
             pixelcode = pixelcode .. " vec3 lightcolor = normalize(directionlightcolor"..i..".xyz);\n";
             pixelcode = pixelcode .. " dotn = clamp(dot(lightdir, normal.xyz), 0.1, 10);\n ";
             -- pixelcode = pixelcode .. " texcolor.xyz = texcolor.xyz * directionlightcolor"..i..".xyz * dotn; ";
-            if RenderSet.GetPBR() then
-
-                pixelcode = pixelcode .. " vec3 specular = ".._G.ShaderFunction.PBRFunctionName.."(0.4, 4, texcolor.xyz, viewdir.xyz, lightdir, normal.xyz);\n";
+            if PBRData.IsUsePBR(PBR) then
+                pixelcode = pixelcode .. " texcolor.xyz = ".._G.ShaderFunction.PBRFunctionName.."(Roughness, Metallic, F0, texcolor.xyz, viewdir.xyz, lightdir, normal.xyz);\n";
             else
                 pixelcode = pixelcode .. [[
                 vec3 _Specluar = lightcolor;//vec3(1,1,1);
@@ -212,11 +219,13 @@ function Shader.GetBase3DPSShaderCode(AlphaTest)
                 float _Gloss = 1.5;
                 vec3 reflectDir = normalize(reflect(-lightdir.xyz,normal.xyz));
                 vec3 specular = _Specluar * _Intensity * pow(clamp(dot(reflectDir, viewdir.xyz), 0, 1),_Gloss);
+                texcolor.xyz = texcolor.xyz * lightcolor * dotn + specular;
+                
             ]]
             end
             
             
-            pixelcode = pixelcode .. " texcolor.xyz = texcolor.xyz * lightcolor * dotn + specular;\n ";
+            -- pixelcode = pixelcode .. " texcolor.xyz = texcolor.xyz * lightcolor * dotn + specular;\n ";
         end
 
         if needshadow and RenderSet.getshadowReceiver() then
@@ -315,7 +324,7 @@ function Shader.GetBase3DPSShaderCode(AlphaTest)
     return pixelcode
 end
 
-function Shader.GetBase3DShader(color, projectionMatrix, modelMatrix, viewMatrix, AlphaTest)
+function Shader.GetBase3DShader(color, projectionMatrix, modelMatrix, viewMatrix, AlphaTest, pbr)
     local directionlights = Lights.getDirectionLights()
     local needshadow = false
     if RenderSet.getshadowReceiver() then
@@ -332,7 +341,7 @@ function Shader.GetBase3DShader(color, projectionMatrix, modelMatrix, viewMatrix
 
     local normalmap = RenderSet.getNormalMap()
 
-    local HashIndex = "base3dshader".."directionlights"..#directionlights..tostring(needshadow).. (normalmap and "normalmap" or "") ..  (RenderSet.GetPBR() and "PBR" or "").. (AlphaTest and "AlphaTest" or "nil").. tostring(RenderSet.AlphaTestMode) .. tostring(RenderSet.EnableESM and "ESM" or "CSM")
+    local HashIndex = "base3dshader".."directionlights"..#directionlights..tostring(needshadow).. (normalmap and "normalmap" or "") ..  (pbr and tostring(pbr.IsUsePBR) or "").. (AlphaTest and "AlphaTest" or "nil").. tostring(RenderSet.AlphaTestMode) .. tostring(RenderSet.EnableESM and "ESM" or "CSM")
     local shader = ShaderObjects[HashIndex]
     if shader then
         if shader:hasUniform("normalmap") then
@@ -341,8 +350,7 @@ function Shader.GetBase3DShader(color, projectionMatrix, modelMatrix, viewMatrix
         return shader
     end
 
-    -- log(Shader.GetBase3DPSShaderCode())
-    shader = Shader.new(Shader.GetBase3DPSShaderCode(AlphaTest), Shader.GetBase3DVSShaderCode(AlphaTest))
+    shader = Shader.new(Shader.GetBase3DPSShaderCode(AlphaTest, pbr), Shader.GetBase3DVSShaderCode(AlphaTest))
     assert(shader:hasUniform( "projectionMatrix") and shader:hasUniform( "modelMatrix") and shader:hasUniform( "viewMatrix"))
     if projectionMatrix then
         shader:send('projectionMatrix', projectionMatrix)
@@ -362,6 +370,15 @@ function Shader.GetBase3DShader(color, projectionMatrix, modelMatrix, viewMatrix
         shader:send('bcolor', {color._r,color._g, color._b, color._a})
     end
     
+    shader.SetPBRValue = function(obj, PBRData)
+        if not PBRData then return end
+        if not PBRData.IsUsePBR then return end
+        
+        obj:sendValue("Roughness", PBRData.Roughness)
+        obj:sendValue("Metallic", PBRData.Metallic)
+        obj:sendValue("F0", {PBRData.F0.x,PBRData.F0.y, PBRData.F0.z})
+    end
+
     shader.setCameraAndMatrix3D = function(obj, modelMatrix, projectionMatrix, viewMatrix, camerapos, mesh)
         if projectionMatrix then
             obj:send('projectionMatrix', projectionMatrix)
@@ -420,7 +437,6 @@ function Shader.GetBase3DShader(color, projectionMatrix, modelMatrix, viewMatrix
                 end
             elseif   _G.GConfig.CSMNumber == 2 then
                 if shader:hasUniform( "CSMMatrix1") then
-                   log('aaaaaaaaaaa', obj.send, node.CSMMatrix, node.CSMMatrix[1])
                     obj:send('CSMMatrix1', node.CSMMatrix[1])
                 end
 

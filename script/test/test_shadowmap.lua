@@ -73,15 +73,15 @@ app.render(function(dt)
     if frustummeshlines then
         frustummeshlines:draw()
     end
-    love.graphics.print( "Press Key Space.  scene.needFXAA: "..tostring(scene.needFXAA) .. " Frustum Cull: "..tostring(RenderSet.isNeedFrustum) .. " Culled Number: "..tostring(scene.cullednumber), 10, 10)
-    love.graphics.print( "Press Key Space.  RenderSet.ESM_C: "..tostring(RenderSet.ESM_C) .. " ESMBlurNode.Sigma: "..tostring(ESMBlurNode.Sigma), 10, 30)
+    love.graphics.print( "Press Key Space.  RenderSet.EnableESM : " .. tostring(RenderSet.EnableESM ) ..  " RenderSet.ESM_C: "..tostring(RenderSet.ESM_C) .. " ESMBlurNode.Sigma: "..tostring(ESMBlurNode.Sigma), 10, 30)
 end)
-
+RenderSet.isNeedFrustum = false
 app.keypressed(function(key, scancode, isrepeat)
     if key == "space" then
         -- log('eye: ',currentCamera3D.eye.x, currentCamera3D.eye.y, currentCamera3D.eye.z)
         -- log('look: ',currentCamera3D.look.x, currentCamera3D.look.y, currentCamera3D.look.z)
         RenderSet.EnableESM = not RenderSet.EnableESM
+        --RenderSet.ESM_C = 1
     elseif key == "f" then
         scene.needFXAA = not scene.needFXAA
     end
@@ -91,9 +91,9 @@ app.keypressed(function(key, scancode, isrepeat)
     elseif love.keyboard.isDown"s" then
         ESMBlurNode.Sigma = ESMBlurNode.Sigma - 1
     elseif love.keyboard.isDown"a" then
-        RenderSet.ESM_C = RenderSet.ESM_C - 1
+        RenderSet.ESM_C = RenderSet.ESM_C * 10
     elseif love.keyboard.isDown"d" then
-        RenderSet.ESM_C = RenderSet.ESM_C + 1
+        RenderSet.ESM_C = RenderSet.ESM_C * 0.1
     end
 
     if key == 'x' then

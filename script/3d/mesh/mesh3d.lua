@@ -163,8 +163,8 @@ function Mesh3D:makeNormals()
 end
 
 function Mesh3D:useLights(alphatest)
-    self.shader = Shader.GetBase3DShader(nil, nil, nil, nil, alphatest);
-
+    self.shader = Shader.GetBase3DShader(nil, nil, nil, nil, alphatest, self.PBRData);
+    self.shader:SetPBRValue(self.PBRData)
     if self.rendertype == 'normalmap' then
         local  normalmap = RenderSet.getNormalMap(self.normalmap)
         self.shader = Shader.GeNormal3DShader();
@@ -206,8 +206,9 @@ function Mesh3D:draw()
 
     RenderSet.setNormalMap(self.normalmap)
     self:useLights()
-    self.shader:setCameraAndMatrix3D(self.transform3d, RenderSet.getUseProjectMatrix(), RenderSet.getUseViewMatrix(), camera3d.eye, self)
 
+    self.shader:setCameraAndMatrix3D(self.transform3d, RenderSet.getUseProjectMatrix(), RenderSet.getUseViewMatrix(), camera3d.eye, self)
+    
     if self.shader:hasUniform( "bcolor") and self.bcolor then
         self.shader:send('bcolor',{self.bcolor._r, self.bcolor._g, self.bcolor._b, self.bcolor._a})
     end

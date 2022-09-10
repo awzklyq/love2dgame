@@ -42,29 +42,31 @@ _G.ShaderFunction.GetPBRCode = [[
         return F0 + (1.0 - F0) * pow(1.0 - dot(H, V), 5.0);
     }
 
-    vec3 GetPBR(float a, float metalness, vec3 color, vec3 viewdir, vec3 lightdir, vec3 nor)
+    vec3 GetPBR(float Roughness, float metalness, vec3 F0, vec3 color, vec3 viewdir, vec3 lightdir, vec3 nor)
     {
-        //a = 0.1; // TODO
-      //  metalness = 1; //TODO
         lightdir = -lightdir;
-        //float ks = 1 - kd;
+
         vec3 h = normalize(viewdir + lightdir);
+
+        float a = Roughness;
         float D = D_GGX_TR(nor, h, a);
 
         float G = Geometric(a, nor, viewdir, lightdir);
-
-        vec3 F0 = vec3(0.4);
         
-         F0 = mix(F0,  color * vec3(1), metalness);
+         F0 = mix(F0,  color , metalness);
         vec3 F = fresnelSchlick(F0, h, viewdir);
-        vec3 kd = mix(vec3(1.0) - F, vec3(0.0), metalness);
+        //vec3 kd = mix(vec3(1.0) - F, vec3(0.0), metalness);
         float temp = max(4 * dot(viewdir, nor) * dot(lightdir, nor), 0.00001);
 
-        vec3 Specular  = ((D * F * G ) / temp) * vec3(1);
+        vec3 Specular  = ((D * F * G ) / temp) ;//* color;//vec3(1);
 
-        vec3 diffuse = kd * color;//(color / PI);
+        // kS is equal to Fresnel
+        vec3 kS = F;
+        vec3 kD = vec3(1.0) - kS;
+        kD *= 1.0 - metalness;
+        vec3 diffuse = kD * (color / PI);
 
-        return (vec3(1) - kd) * Specular + kd * diffuse;
+        return Specular + diffuse;
     }
 ]]
 _G.ShaderFunction.PBRFunctionName = "GetPBR"
