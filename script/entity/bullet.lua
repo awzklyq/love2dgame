@@ -40,7 +40,6 @@ _G.Bullet = {}
 
 function Bullet.new(x, y, speed, life)
     local bullet = setmetatable({}, {__index = Bullet});
-    bullet.polygon = Polygon.new(x, y)
     bullet.tick = 0;
 
     bullet.life = life or 5;
@@ -48,13 +47,17 @@ function Bullet.new(x, y, speed, life)
     bullet.speed = speed or 1;
 
     bullet.direction = Vector.new();
-
-    bullet:moveTo(x, y);
+    bullet.position = Vector.new(x, y);
+    bullet.target = Vector.new(x, y);
     bullet.ismove = false;
 
     BulletManager.add(bullet);
 
     return bullet;
+end
+
+function Bullet:reset()
+    self.tick = 0
 end
 
 function Bullet:setDirection(x, y)
@@ -63,36 +66,39 @@ function Bullet:setDirection(x, y)
 
     self.direction:normalize();
     self.ismove = true;
+
+
+    self.target.x = self.position.x + self.direction.x * self.speed * self.life;
+    self.target.y = self.position.y + self.direction.y * self.speed * self.life;;
 end
 
-function Bullet:setDirectionTo(x, y)
-    self.direction.x = x - self.pos.x;
-    self.direction.y = y - self.pos.y;
+function Bullet:setTarget(x, y)
+    self.target.x = x;
+    self.target.y = y;
+
+    self.direction.x = x - self.position.x;
+    self.direction.y = y - self.position.y;
 
     self.direction:normalize();
-
     self.ismove = true;
 end
 
+function Bullet:setDirectionTo(x, y)
+    self:setDirection(x - self.position.x, y - self.position.y)
+end
+
 function Bullet:moveTo(x, y)
-    self.polygon:moveTo(x, y);
+    self.position.x = x;
+    self.position.y = y;
 end
 
 function Bullet:move(x, y)
-    self.polygon:move(x, y);
-end
-
-function Bullet:scale(x, y)
-    self.polygon:scale( x, y);
-end
-
-function Bullet:faceTo(x, y)
-    self.polygon:setXDirection( x - self.pos.x, y - self.pos.y);
+    self.position.x = self.position.x + x;
+    self.position.y = self.position.y + y;
 end
 
 function Bullet:update(dt)
     if not self.isalive then return end
-
     self.tick = self.tick + dt;
     self.isalive = self.tick <= self.life;
 
@@ -106,6 +112,8 @@ function Bullet:update(dt)
 end
 
 function Bullet:draw(e)
-    self.polygon:draw(e);
+    if self.RenderObj then
+        self.RenderObj:draw(e);
+    end
 end
 

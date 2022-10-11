@@ -67,6 +67,7 @@ dofile('script/groupmanager.lua')
 dofile('script/physics/world.lua')
 
 dofile('script/entity/entity.lua')
+dofile('script/entity/bullet.lua')
 dofile('script/entity/body.lua')
 dofile('script/entity/me.lua')
 dofile('script/entity/powerbar.lua')
@@ -138,5 +139,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_perlinenoise1.lua')--test_simplessgi  test_Octahedralmap
+	dofile('script/test/test_bullet.lua')--test_simplessgi  test_Octahedralmap
 end
