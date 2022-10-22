@@ -45,6 +45,8 @@ function Vector:normalize()
 
     self.x = self.x  / w;
     self.y = self.y  / w;
+
+    return self
 end
 
 function Vector:mul(value)

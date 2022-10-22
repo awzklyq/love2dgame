@@ -68,8 +68,8 @@ function Bullet:setDirection(x, y)
     self.ismove = true;
 
 
-    self.target.x = self.position.x + self.direction.x * self.speed * self.life;
-    self.target.y = self.position.y + self.direction.y * self.speed * self.life;;
+    self.target.x = self.position.x + self.direction.x * self.speed * self.life
+    self.target.y = self.position.y + self.direction.y * self.speed * self.life
 end
 
 function Bullet:setTarget(x, y)

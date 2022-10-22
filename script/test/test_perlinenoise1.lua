@@ -14,8 +14,6 @@ for i = 1, Num - 1 do
     -- log(XT[i], YT[i], XT[i + 1], YT[i + 1])
 end
 
-
-
 app.render(function(dt)
     for i = 1, Num - 1 do
         LinesDatas[i]:draw()

@@ -24,6 +24,7 @@ dofile('script/render/image.lua')
 dofile('script/common/color.lua')
 dofile('script/common/filepath.lua')
 dofile('script/common/pbr.lua')
+dofile('script/common/radarfrustum.lua')
 dofile('script/file/file.lua')
 
 dofile('script/xml/xmlload.lua')
@@ -41,6 +42,7 @@ dofile('script/polygon/edge.lua')
 dofile('script/polygon/box.lua')
 dofile('script/polygon/mesh.lua')
 dofile('script/3d/mesh/mesh3d.lua')
+dofile('script/3d/mesh/aixs.lua')
 dofile('script/3d/mesh/aixs.lua')
 
 dofile('script/polygon/triangle.lua')
@@ -139,5 +141,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_bullet.lua')--test_simplessgi  test_Octahedralmap
+	dofile('script/test/test_radarfrustum.lua')--test_simplessgi  test_Octahedralmap
 end
