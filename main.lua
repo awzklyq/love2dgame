@@ -59,6 +59,7 @@ dofile('script/math/math.lua')
 dofile('script/math/vector.lua')
 dofile('script/math/complex.lua')
 dofile('script/math/matrix.lua')
+dofile('script/math/matrix2d.lua')
 dofile('script/3d/math/vector3.lua')
 dofile('script/3d/math/vector4.lua')
 dofile('script/3d/math/matrix3d.lua')
@@ -120,6 +121,12 @@ dofile 'script/postprocess/esmblur.lua'
 
 dofile 'script/3d/effect/motionvector.lua'
 
+dofile 'script/3d/math/edge3d.lua'
+dofile 'script/3d/math/face.lua'
+dofile 'script/3d/math/point.lua'
+
+dofile('script/3d/mesh/qem.lua')
+
 FileManager.addAllPath("assert")
 
 _G.mlib = require 'script/mlib' 
@@ -141,5 +148,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_radarfrustum.lua')--test_simplessgi  test_Octahedralmap
+	dofile('script/test/test_qem.lua')--test_simplessgi  test_Octahedralmap
 end

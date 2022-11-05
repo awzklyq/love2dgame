@@ -35,6 +35,10 @@ metatable_vector3.__div = function(myvalue, value)
     end 
 end
 
+metatable_vector3.__eq = function(myvalue, value)
+    return (myvalue.x == value.x and  myvalue.y == value.y and myvalue.z == value.z)
+end
+
 function Vector3.new(x ,y, z)
     local v = setmetatable({}, metatable_vector3);
     v.x = x or 0;
@@ -43,6 +47,11 @@ function Vector3.new(x ,y, z)
 
     v.renderid = Render.Vector3Id
     return v;
+end
+
+function Vector3:Log(sss)
+    log("Vector3: ", sss)
+    log(self.x, self.y, self.z)
 end
 
 function Vector3.copy(v)
@@ -206,6 +215,11 @@ Vector3.lerp = function(a,b, lerp)
         math.lerp(a.z, b.z, math.clamp(lerp, 0, 1))
 )
     return result
+end
+
+function Vector3:Log(sss)
+    log("Vector3 ", sss)
+    log(self.x, self.y, self.z)
 end
 
 

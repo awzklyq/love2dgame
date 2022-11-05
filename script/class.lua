@@ -1,9 +1,17 @@
 
-_G.__setParentClass = function(obj, parent)
-    for i, v in pairs(Entity) do
+_G.__setParentFunction = function(obj, parent)
+    for i, v in pairs(parent) do
         if not obj[i] and type(parent[i]) == "function" then
             obj[i] = parent[i];
             
+        end
+    end
+end
+
+_G.__setParentClassNoTable = function(obj, parent)
+    for i, v in pairs(parent) do
+        if not obj[i] and (type(parent[i]) == "function" or type(parent[i]) == "string" or type(parent[i]) == "number" or type(parent[i]) == "number") then
+            obj[i] = parent[i];            
         end
     end
 end

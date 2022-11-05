@@ -62,7 +62,7 @@
 --     mat:mulRotationRight(self.up.x, self.up.y, self.up.z, phi)
 --     mat:mulTranslationRight(self.look.x, self.look.y, self.look.z)
 
---     self.eye = mat:mulVector(self.eye)
+--     self.eye = mat:mulVector3(self.eye)
 -- end
 
 -- function Camera3D:moveTheta( theta)
@@ -81,7 +81,7 @@
 --     mat:mulRotationRight(right.x, right.y, right.z, theta)
 --     mat:mulTranslationRight(self.look.x, self.look.y, self.look.z)
 
---     local eye = mat:mulVector(self.eye);
+--     local eye = mat:mulVector3(self.eye);
 -- 	local vec2 = Vector3.cross( Vector3.sub(self.eye, self.look), right );
 
 -- 	if ( Vector3.dot( vec1, self.up ) * Vector3.dot( vec2, self.up ) < 0.0 ) then

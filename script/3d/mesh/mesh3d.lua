@@ -8,27 +8,7 @@ local vertexFormat = {
 }
 
 function Mesh3D.new(file)-- lw :line width
-    local mesh = setmetatable({}, Mesh3D);
-    mesh.transform3d = Matrix3D.new();
-
-    mesh.PreTransform = Matrix3D.new();
-
-    mesh.verts = Mesh3D.loadObjFile(_G.FileManager.findFile(file))
-    mesh.shader = Shader.GetBase3DShader()
-    mesh:makeNormals()
-    mesh.obj = love.graphics.newMesh(vertexFormat, mesh.verts, "triangles")
-
-    mesh.bcolor = LColor.new(255,255,255,255)
-    mesh.renderid = Render.Mesh3DId;
-
-    mesh.rendertype = "normal"
-
-    mesh.nolight = false
-
-    mesh.visible = true
-
-    mesh:setRenderType("normal")
-    return mesh;
+    return Mesh3D.createFromPoints(Mesh3D.loadObjFile(_G.FileManager.findFile(file)))
 end
 
 function Mesh3D:setCanvas(canvas)
@@ -70,16 +50,24 @@ function Mesh3D.createFromPoints(datas)
     local mesh = setmetatable({}, Mesh3D);
     mesh.transform3d = Matrix3D.new();
 
+    mesh.PreTransform = Matrix3D.new();
+
     mesh.verts = datas
     mesh.shader = Shader.GetBase3DShader()
+    mesh:makeNormals()
     mesh.obj = love.graphics.newMesh(vertexFormat, mesh.verts, "triangles")
 
+    mesh.bcolor = LColor.new(255,255,255,255)
     mesh.renderid = Render.Mesh3DId;
 
-    mesh.bcolor = LColor.new(255,255,255,255)
+    mesh.rendertype = "normal"
+
+    mesh.nolight = false
+
+    mesh.visible = true
 
     mesh:setRenderType("normal")
-    return mesh
+    return mesh;
 end
 
 

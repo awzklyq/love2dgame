@@ -16,7 +16,6 @@ local meshquad = _G.MeshQuad.new(love.graphics.getWidth(), love.graphics.getHeig
 meshquad.shader = Shader.GetFXAAShader(canvas:getWidth(), canvas:getHeight())
 local str = "FXAA key: Space"
 app.render(function(dt)
-    
     _G.pushCanvas(canvas)
     mesh:draw()
     _G.popCanvas()

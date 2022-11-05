@@ -31,6 +31,9 @@ function Vector.new(x ,y)
     local v = setmetatable({}, metatable_vector);
     v.x = x or 0;
     v.y = y or 0;
+
+    v.renderid = Render.Vector2Id
+
     return v;
 end
 

@@ -14,8 +14,13 @@ end
 metatable_vector4.__mul = function(myvalue, value)
     if type(value) == "number" then
         return Vector4.new(myvalue.x * value, myvalue.y * value, myvalue.z * value, myvalue.w * value)
-    elseif  type(value) == "table" and value.renderid == Render.Vector4Id then
-        return Vector4.new(myvalue.x * value.x, myvalue.y * value.y, myvalue.z * value.z, myvalue.w * value.w)
+    elseif  type(value) == "table" then
+        if value.renderid == Render.Vector4Id then
+            return Vector4.new(myvalue.x * value.x, myvalue.y * value.y, myvalue.z * value.z, myvalue.w * value.w)
+        elseif value.renderid == Render.Matrix3DId then
+            local result = Vector4.Copy(myvalue)
+            return result:mulMatrix(value)
+        end
     else
         _errorAssert(false, "metatable_vector4.__mul~")
     end
@@ -61,4 +66,8 @@ end
 
 Vector4.dot = function(v1, v2)
     return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w;
+end
+
+function Vector4.Copy(v)
+    return Vector4.new(v.x ,v.y, v.z, v.w)
 end

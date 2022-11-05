@@ -1,6 +1,6 @@
 
 _G.Me = {}
-_G.__setParentClass(Me, _G.Entity)
+_G.__setParentFunction(Me, _G.Entity)
 function Me.new()
     local me = setmetatable({}, {__index = Me});
     _G.__setParentObject(me, Entity);

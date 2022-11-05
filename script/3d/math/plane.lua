@@ -53,7 +53,7 @@ function Plane.mulMatrix( plane, mat )
     v:mulSelf( -plane.d)
 
     local temp = Matrix3D.transpose(mat)
-    temp:mulVector(v)
+    temp:mulVector3(v)
 
     local newplane = Plane.new(aa, bb, cc, Vector3.dot( v, Vector3.new( aa, bb, cc ) ))
 

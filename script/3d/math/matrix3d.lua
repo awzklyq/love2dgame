@@ -4,9 +4,19 @@ _G.Matrix3D = {}
 local metatable_Matrix3D = {}
 metatable_Matrix3D.__index = Matrix3D
 
--- metatable_Matrix3D.__add = function(myvalue, value)
---     return Vector3.new(myvalue.x + value.x, myvalue.y + value.y, myvalue.z + value.z)
--- end
+metatable_Matrix3D.__add = function(myvalue, value)
+    return Matrix3D.createFromNumbers(myvalue[1] + value[1], myvalue[2] + value[2], myvalue[3] + value[3], myvalue[4] + value[4],
+								myvalue[5] + value[5], myvalue[6] + value[6], myvalue[7] + value[7], myvalue[8] + value[8],
+								myvalue[9] + value[9], myvalue[10] + value[10], myvalue[11] + value[11], myvalue[12] + value[12],
+								myvalue[13] + value[13], myvalue[14] + value[14], myvalue[15] + value[15], myvalue[16] + value[16])
+end
+
+metatable_Matrix3D.__div = function(myvalue, value)
+    return Matrix3D.createFromNumbers(myvalue[1] / value, myvalue[2] / value, myvalue[3] / value, myvalue[4] / value,
+								myvalue[5] / value, myvalue[6] / value, myvalue[7] / value, myvalue[8] / value,
+								myvalue[9] / value, myvalue[10] / value, myvalue[11] / value, myvalue[12] / value,
+								myvalue[13] / value, myvalue[14] / value, myvalue[15] / value, myvalue[16] / value)
+end
 
 -- metatable_Matrix3D.__sub = function(myvalue, value)
 --     return Vector3.new(myvalue.x - value.x, myvalue.y - value.y, myvalue.z - value.z)
@@ -14,10 +24,14 @@ metatable_Matrix3D.__index = Matrix3D
 
 metatable_Matrix3D.__mul = function(myvalue, value)
 
-    if  type(value) == "table" and value.renderid == Render.Matrix3DId then
+    if  type(value) == "table" then
 		local mat = Matrix3D.copy(myvalue)
-		mat:mulRight(value)
-        return mat--Matrix3D.matrixMult(myvalue, value)
+		if value.renderid == Render.Matrix3DId then
+			mat:mulRight(value)
+			return mat--Matrix3D.matrixMult(myvalue, value)
+		elseif value.renderid == Render.Vector4Id then
+			return mat:mulVector4(value)--Matrix3D.matrixMult(myvalue, value
+		end
     else
         _errorAssert(false, "metatable_Matrix3D.__mul~")
     end
@@ -110,7 +124,7 @@ Matrix3D.createLookAtRH = function(  eye, lookat, upaxis )
 end
 
 
-function Matrix3D:mulVector(tab2, NeedNotW)
+function Matrix3D:mulVector3(tab2, NeedNotW)
 	local xx, yy, zz = tab2.x, tab2.y, tab2.z
 	local mat = self
 	local w = xx * mat:getData(1,4) + yy * mat:getData(2,4) + zz * mat:getData(3,4) + mat:getData(4,4)
@@ -128,6 +142,19 @@ function Matrix3D:mulVector(tab2, NeedNotW)
 	return rsult
 end
 
+function Matrix3D:mulVector4(v4)
+	local xx, yy, zz, ww = v4.x, v4.y, v4.z, v4.w
+	local mat = self
+	local rsult = Vector4.new()
+	
+	rsult.x = xx * mat:getData(1, 1) + yy * mat:getData(1, 2) + zz * mat:getData(1, 3) + mat:getData(1, 4) * ww
+	rsult.y = xx * mat:getData(2, 1) + yy * mat:getData(2, 2) + zz * mat:getData(2, 3) + mat:getData(2, 4) * ww
+	rsult.z = xx * mat:getData(3, 1) + yy * mat:getData(3, 2) + zz * mat:getData(3, 3) + mat:getData(3 ,4) * ww
+	rsult.w = xx * mat:getData(4, 1) + yy * mat:getData(4, 2) + zz * mat:getData(4, 3) + mat:getData(4 ,4) * ww
+
+	return rsult
+end
+
 function Matrix3D:mulBoundBox(boundbox, NeedNotW)
 
 	local mat = Matrix3D.transpose(self)
@@ -135,7 +162,7 @@ function Matrix3D:mulBoundBox(boundbox, NeedNotW)
 	local box = OrientedBox.buildFormBoundBox(boundbox)
 
 	for i = 1, 8 do
-		box.vs[i] = mat:mulVector(box.vs[i], NeedNotW)
+		box.vs[i] = mat:mulVector3(box.vs[i], NeedNotW)
 	end
 
 	return box:getBoundBox()
@@ -576,17 +603,9 @@ function Matrix3D.inverse(mat)
 	if d ~= 0 then
 		m:adjoint( );
 		d = 1.0 / d;
-		
 		for i = 1, 16 do
-			
 			m[i] = m[i] * d;
-		end
-		
-		-- m[0][0] *= d; m[0][1] *= d; m[0][2] *= d; m[0][3] *= d;
-		-- m[1][0] *= d; m[1][1] *= d; m[1][2] *= d; m[1][3] *= d;
-		-- m[2][0] *= d; m[2][1] *= d; m[2][2] *= d; m[2][3] *= d;
-		-- m[3][0] *= d; m[3][1] *= d; m[3][2] *= d; m[3][3] *= d;
-		
+		end		
 	end
 
 	return m;
@@ -616,4 +635,14 @@ function Matrix3D.createPerspectiveFovLH( fovy, aspect, znear, zfar )
 		0.0,   ys, 0.0, 0.0,
 		0.0, 0.0,   zf, 1.0,
 		0.0, 0.0,   zn, 0.0 );
+end
+
+function Matrix3D:Log(sss)
+	log()
+	log('Matrix3D: ', sss)
+	log(self[1], self[2], self[3], self[4])
+	log(self[5], self[6], self[7], self[8])
+	log(self[9], self[10], self[11], self[12])
+	log(self[13], self[14], self[15], self[16])
+	log()
 end

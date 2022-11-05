@@ -192,7 +192,7 @@ function Frustum.buildDrawLines(camera3d)
 	-- local mat = Matrix3D.createLookAtLH( camera3d.eye, camera3d.look, Vector3.negative(camera3d.up) )
 	-- mat = Matrix3D.transpose(mat)
 	for i = 1, 8 do
-		-- Verts[i] = mat:mulVector(Verts[i])
+		-- Verts[i] = mat:mulVector3(Verts[i])
 		Verts[i] = Vector3.add(Verts[i], camera3d.eye)
 	end
 
@@ -389,14 +389,14 @@ function Frustum:buildFromViewAndProject(V, P )
 	-- viewcopy:mulRight(proj);
 	local vp = Matrix3D.inverse( self.pv );
 	-- vp:transposeSelf()
-	self.vs[1] = vp:mulVector(Vector3.new( -1.0, -1.0, 0.0 ));
-	self.vs[2] = vp:mulVector(Vector3.new( -1.0,  1.0, 0.0 ));
-	self.vs[3] = vp:mulVector(Vector3.new(  1.0,  1.0, 0.0 ));
-	self.vs[4] = vp:mulVector(Vector3.new(  1.0, -1.0, 0.0 ));
-	self.vs[5] = vp:mulVector(Vector3.new( -1.0, -1.0, 1.0 ));
-	self.vs[6] = vp:mulVector(Vector3.new( -1.0,  1.0, 1.0 ));
-	self.vs[7] = vp:mulVector(Vector3.new(  1.0,  1.0, 1.0 ));
-	self.vs[8] = vp:mulVector(Vector3.new(  1.0, -1.0, 1.0 ));
+	self.vs[1] = vp:mulVector3(Vector3.new( -1.0, -1.0, 0.0 ));
+	self.vs[2] = vp:mulVector3(Vector3.new( -1.0,  1.0, 0.0 ));
+	self.vs[3] = vp:mulVector3(Vector3.new(  1.0,  1.0, 0.0 ));
+	self.vs[4] = vp:mulVector3(Vector3.new(  1.0, -1.0, 0.0 ));
+	self.vs[5] = vp:mulVector3(Vector3.new( -1.0, -1.0, 1.0 ));
+	self.vs[6] = vp:mulVector3(Vector3.new( -1.0,  1.0, 1.0 ));
+	self.vs[7] = vp:mulVector3(Vector3.new(  1.0,  1.0, 1.0 ));
+	self.vs[8] = vp:mulVector3(Vector3.new(  1.0, -1.0, 1.0 ));
 
 	-- for i = 1, 8 do
 	-- 	log('box i', i, self.vs[i].x, self.vs[i].y, self.vs[i].z)

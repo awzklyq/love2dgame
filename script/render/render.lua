@@ -71,6 +71,12 @@ Render.ThreeBandSHVectorId = 35
 
 Render.Triangle2DId = 36
 
+Render.Point3Id = 37
+
+Render.Matrix2DId = 38
+
+Render.Vector2Id = 39
+
 Render.getRenderIdName = function(id)
     if Render.CircleId == id then
         return "Circle"
@@ -130,8 +136,14 @@ Render.getRenderIdName = function(id)
         return "ThreeBandSHVectorId"
     elseif Render.Triangle2DId == id then
         return "Triangle2DId"
+    elseif Render.Point3Id == id then
+        return "Point3Id"
+    elseif Render.Matrix2D == id then
+        return "Matrix2DId"
+    elseif Render.Vector2Id == id then
+        return "Vector2Id"
     end
-
+    
     return "Null"
 end
 
