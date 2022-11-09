@@ -258,7 +258,6 @@ function Harmonics:Generate(Normals)
 		-- nor:normalize()
 		local n = Vector3.copy(nor.Normal):normalize()
         local SHVector = self:SHBasisFunction3(n)
-        local color = LColor.new(0, 0, 0, 0)
 
 		-- color = Vector3.new(math.random(),math.random(),math.random())
 		local SHVectorRGB = self:MulSH3(SHVector, nor.Color)

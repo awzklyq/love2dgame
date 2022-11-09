@@ -67,6 +67,9 @@ end
 Vector4.dot = function(v1, v2)
     return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w;
 end
+Vector4.dot3 = function(v1, v2)
+    return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+end
 
 function Vector4.Copy(v)
     return Vector4.new(v.x ,v.y, v.z, v.w)

@@ -148,5 +148,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_qem.lua')--test_simplessgi  test_Octahedralmap
+	dofile('script/test/test_perlinenoise1.lua')--test_simplessgi  test_Octahedralmap
 end
