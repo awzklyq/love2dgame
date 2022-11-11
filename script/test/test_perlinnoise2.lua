@@ -5,7 +5,7 @@ local XT = {}
 local YT = {}
 for i = 1, Num do
     XT[#XT + 1] = i * Scale
-    YT[#YT + 1] = PerLinNoise1.Process(i * 0.1) + OffsetY
+    YT[#YT + 1] = PerLinNoise2.Process(math.random() , math.random() , math.random() ) * 60+ OffsetY
 end
 
 local LinesDatas = {}

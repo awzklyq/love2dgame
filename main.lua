@@ -95,6 +95,7 @@ dofile 'script/3d/math/frustum.lua'
 dofile 'script/3d/math/box.lua'
 dofile 'script/3d/math/ray.lua'
 dofile 'script/3d/math/perlinnoise1.lua'
+dofile 'script/3d/math/perlinnoise2.lua'
 
 dofile 'script/3d/water/MeshWater.lua'
 dofile 'script/3d/water/watershader.lua'
@@ -148,5 +149,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_perlinenoise1.lua')--test_simplessgi  test_Octahedralmap
+	dofile('script/test/test_perlinnoise3.lua')--test_simplessgi  test_Octahedralmap
 end

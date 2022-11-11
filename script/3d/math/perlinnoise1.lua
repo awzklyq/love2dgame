@@ -14,7 +14,7 @@ local perm = {151,160,137,91,90,15,
 49,192,214, 31,181,199,106,157,184, 84,204,176,115,121,50,45,127, 4,150,254,
 138,236,205,93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180};
 
-PerLinNoise1.GetValue = function (x)
+PerLinNoise1.Process = function (x)
     local x1 = math.floor(x)
     local x2 = x1 + 1
     
@@ -24,8 +24,6 @@ PerLinNoise1.GetValue = function (x)
     local vec1 = x - x1;
     local vec2 = x - x2;
     local t = 3 * math.pow(vec1, 2) - 2 * math.pow(vec1, 3);
-
-    log(math.random(), t, x, x1, x2)
 
     local product1 = grad1 * vec1;
     local product2 = grad2 * vec2;
