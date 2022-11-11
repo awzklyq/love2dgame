@@ -34,6 +34,7 @@ end
 
 local grad = function(hash, x, y, z)
     hash = math.floor(hash) % 0xF + 1
+    -- log('cccccccccc', hash)
     if hash == 0x0 then
         return  x + y
     elseif hash == 0x1 then
@@ -71,11 +72,15 @@ local grad = function(hash, x, y, z)
     end
 end
 
-local repeatValue = 256
+local repeatValue = 512
 local inc = function(num)
     num = num + 1
     if repeatValue > 0 then 
-        num = num % repeatValue + 1;
+        local temp = num
+        num = num % (repeatValue + 1);
+        if temp ~= num then
+            log('sssssssssssss', temp, num, temp % repeatValue)
+        end
     end
     
     return num;
@@ -83,9 +88,9 @@ end
 
 _G.PerLinNoise2.Process = function(x, y, z)
     if repeatValue > 0  then                                    -- If we have any repeat on, change the coordinates to their "local" repetitions
-        x = x % repeatValue + 1;
-        y = y % repeatValue + 1;
-        z = z % repeatValue + 1;
+        x = x % (repeatValue + 1);
+        y = y % (repeatValue + 1);
+        z = z % (repeatValue + 1);
     end
     
     local xi = math.floor(x) % 256 + 1--(int)x & 255;                               -- Calculate the "unit cube" that the point asked will be located in
