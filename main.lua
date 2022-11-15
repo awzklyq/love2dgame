@@ -149,5 +149,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_perlinnoise3.lua')--test_simplessgi  test_Octahedralmap
+	dofile('script/test/test_mathfunction2.lua')--test_simplessgi  test_Octahedralmap
 end
