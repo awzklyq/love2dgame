@@ -177,11 +177,6 @@ math.CheckLineAndRectCollision = function(StartPos, EndPos, BA, BB, IntersecPoin
 	
 	local point4 = Vector.new(point1.x, point3.y);
 
-    log('rrrrrrrrrrrrrr point1', point1.x, point1.y)
-    log('rrrrrrrrrrrrrr point2', point2.x, point2.y)
-    log('rrrrrrrrrrrrrr point3', point3.x, point3.y)
-    log('rrrrrrrrrrrrrr point4', point4.x, point4.y)
-
     -- local MinPos = Vector.new(math.min(StartPos.x, EndPos.x), math.min(StartPos.y, EndPos.y))
 	-- local MaxPos = Vector.new(math.max(StartPos.x, EndPos.x), math.max(StartPos.y, EndPos.y))
 

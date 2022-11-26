@@ -93,6 +93,14 @@ function Mesh3D:setBaseColor(color)
     
 end
 
+function Mesh3D:GetPositions()
+    local result = {}
+    for i, v in pairs(self.verts) do
+        result[#result + 1] = Vector3.new(v[1], v[2], v[3])
+    end
+    return result
+end
+
 -- populate model's normals in model's mesh automatically
 function Mesh3D:makeNormals()
     local Faces = {}
@@ -252,9 +260,16 @@ local concatTables = function(t1,t2,t3)
     for i,v in ipairs(t1) do
         ret[#ret +1] = v
     end
-    for i,v in ipairs(t2) do
-        ret[#ret +1] = v
+
+    if t2 then
+        for i,v in ipairs(t2) do
+            ret[#ret +1] = v
+        end
+    else
+        ret[#ret +1] = 0
+        ret[#ret +1] = 0
     end
+
     for i,v in ipairs(t3) do
         ret[#ret +1] = v
     end
@@ -345,10 +360,15 @@ Mesh3D.loadObjFile = function(path)
                 store[#store+1] = tonumber(num)
             end
 
+            -- log("aaaaa", #store)
+            -- for jjj = 1, #store do
+            --     log('bbbbbbbbbbb', store[jjj])
+            -- end
             faces[#faces+1] = store
         end
     end
 
+    
     if NeedCreateNormal then
         assert(#verts %3 == 0, "verts number is error : " .. tostring(#verts))
         for i = 1, #verts, 3 do
@@ -365,6 +385,7 @@ Mesh3D.loadObjFile = function(path)
             normals[#normals+1] = {tonumber(result.x), tonumber(result.y), tonumber(result.z)}
         end
     end
+
     -- put it all together in the right order
     local compiled = {}
     for i,face in pairs(faces) do
@@ -373,9 +394,28 @@ Mesh3D.loadObjFile = function(path)
             compiled[#compiled +1] = concatTables(verts[face[3]], uvs[face[4]], normals[i])
             compiled[#compiled +1] = concatTables(verts[face[5]], uvs[face[6]], normals[i])
         else
-            compiled[#compiled +1] = concatTables(verts[face[1]], uvs[face[2]], normals[face[3]])
-            compiled[#compiled +1] = concatTables(verts[face[4]], uvs[face[5]], normals[face[6]])
-            compiled[#compiled +1] = concatTables(verts[face[7]], uvs[face[8]], normals[face[9]])
+            if #uvs > 0 then
+                compiled[#compiled +1] = concatTables(verts[face[1]], uvs[face[2]], normals[face[3]])
+                compiled[#compiled +1] = concatTables(verts[face[4]], uvs[face[5]], normals[face[6]])
+                compiled[#compiled +1] = concatTables(verts[face[7]], uvs[face[8]], normals[face[9]])
+            else
+                if #face > 6 then
+                    compiled[#compiled +1] = concatTables(verts[face[1]], nil, normals[face[2]])
+                    compiled[#compiled +1] = concatTables(verts[face[3]], nil, normals[face[4]])
+                    compiled[#compiled +1] = concatTables(verts[face[5]], nil, normals[face[6]])
+                    
+                    
+                    -- compiled[#compiled +1] = concatTables(verts[face[3]], nil, normals[face[4]])
+                    compiled[#compiled +1] = concatTables(verts[face[5]], nil, normals[face[6]])
+                    compiled[#compiled +1] = concatTables(verts[face[7]], nil, normals[face[8]])
+                    compiled[#compiled +1] = concatTables(verts[face[1]], nil, normals[face[2]])
+                else
+                    compiled[#compiled +1] = concatTables(verts[face[1]], nil, normals[face[2]])
+                    compiled[#compiled +1] = concatTables(verts[face[3]], nil, normals[face[4]])
+                    compiled[#compiled +1] = concatTables(verts[face[5]], nil, normals[face[6]])                    
+                end
+
+            end
         end
         
     end

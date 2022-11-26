@@ -13,7 +13,7 @@ function Scene3D.new()
     scene.needcreateoctrees = false;
     scene.octrees = Octree.new()
 
-    scene.bgColor = LColor.new(0.2,0.2,0.2,0)
+    scene.bgColor = LColor.new(125,125,125,255)
 
     scene.screenwidth = love.graphics.getPixelWidth()
     scene.screenheight = love.graphics.getPixelHeight()
@@ -38,7 +38,7 @@ function Scene3D.new()
     scene.needGTAO = false;
     scene.needSimpleSSGI = false;
     scene.needSSAO = false
-
+    scene.needSSDO = false
     scene.needToneMapping = false;
     return scene
 end
@@ -223,7 +223,6 @@ function Scene3D:draw(isdrawCanvaColor)
     love.graphics.setDepthMode("less", true)
     love.graphics.setCanvas({self.CanvasColor.obj, depthstencil = self.normal_depth_buffer.obj})
     love.graphics.clear(self.bgColor._r, self.bgColor._g, self.bgColor._b, self.bgColor._a)
-
     if self.Tiles then--TODO
         
     end
@@ -285,7 +284,6 @@ function Scene3D:DrawAlphaTest(AlphaTestNodes)
     love.graphics.setMeshCullMode("front")
     love.graphics.setDepthMode("less", true)
     love.graphics.setCanvas({self.CanvasColor.obj, depthstencil = self.normal_depth_buffer.obj})
-    -- love.graphics.clear(self.bgColor._r, self.bgColor._g, self.bgColor._b, self.bgColor._a)
     for i = 1, #AlphaTestNodes do
         local node = AlphaTestNodes[i]
         if node.mesh then--  
@@ -411,8 +409,12 @@ function Scene3D:drawCanvaColor()
         rendercolor = SimpleSSGINode.Execute(rendercolor, self.canvasnormal, self.canvasdepth)
     end
 
+    if self.needSSDO then
+        rendercolor = SSDONode.Execute(rendercolor, self.canvasnormal, self.canvasdepth, self)
+    end
+
     if self.needSSAO then
-        rendercolor = SSAONode.Execute(canvas1, self.canvasnormal, self.canvasdepth)
+        rendercolor = SSAONode.Execute(rendercolor, self.canvasnormal, self.canvasdepth)
     elseif self.needHBAO then
         rendercolor = HBAONode.Execute(rendercolor, self.canvasdepth)
     elseif self.needGTAO then

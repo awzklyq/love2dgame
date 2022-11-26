@@ -1,36 +1,37 @@
 
-_G.SSAONode = {}
-SSAONode.Canvae = Canvas.new(1, 1, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
-SSAONode.Canvae.renderWidth = 1
-SSAONode.Canvae.renderHeight = 1
-SSAONode.meshquad = _G.MeshQuad.new(1,1, LColor.new(255, 255, 255, 255))
+_G.SSDONode = {}
+SSDONode.Power = 1
+SSDONode.Canvae = Canvas.new(1, 1, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
+SSDONode.Canvae.renderWidth = 1
+SSDONode.Canvae.renderHeight = 1
+SSDONode.meshquad = _G.MeshQuad.new(1,1, LColor.new(255, 255, 255, 255))
 
-SSAONode.LineWidth = 4;
-SSAONode.Color = LColor.new(255,0,0,255);
-SSAONode.Threshold = 1
-SSAONode.Execute = function(Canva1, screennormalmap, screendepthmap)
+SSDONode.LineWidth = 4;
+SSDONode.Color = LColor.new(255,0,0,255);
+SSDONode.Threshold = 1
+SSDONode.Execute = function(Canva1, screennormalmap, screendepthmap, scene)
    
-    if SSAONode.Canvae.renderWidth ~= Canva1.renderWidth  or SSAONode.Canvae.renderHeight ~= Canva1.renderHeight then
-        SSAONode.Canvae = Canvas.new(Canva1.renderWidth , Canva1.renderHeight , {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
-        SSAONode.Canvae.renderWidth = Canva1.renderWidth
-        SSAONode.Canvae.renderHeight = Canva1.renderHeight
+    if SSDONode.Canvae.renderWidth ~= Canva1.renderWidth  or SSDONode.Canvae.renderHeight ~= Canva1.renderHeight then
+        SSDONode.Canvae = Canvas.new(Canva1.renderWidth , Canva1.renderHeight , {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
+        SSDONode.Canvae.renderWidth = Canva1.renderWidth
+        SSDONode.Canvae.renderHeight = Canva1.renderHeight
 
-        SSAONode.meshquad = _G.MeshQuad.new(SSAONode.Canvae.renderWidth, SSAONode.Canvae.renderHeight , LColor.new(255, 255, 255, 255))
+        SSDONode.meshquad = _G.MeshQuad.new(SSDONode.Canvae.renderWidth, SSDONode.Canvae.renderHeight , LColor.new(255, 255, 255, 255))
     end
     
-    love.graphics.setCanvas(SSAONode.Canvae.obj)
-    love.graphics.clear()
-    SSAONode.meshquad:setCanvas(Canva1)
-    SSAONode.meshquad.shader = Shader.GetSSAOShader(screennormalmap, screendepthmap, SSAONode.Canvae.renderWidth , SSAONode.Canvae.renderHeight )
-    SSAONode.meshquad:draw()
+    love.graphics.setCanvas(SSDONode.Canvae.obj)
+    love.graphics.clear(scene.bgColor._r, scene.bgColor._g, scene.bgColor._b, scene.bgColor._a) 
+    SSDONode.meshquad:setCanvas(Canva1)
+    SSDONode.meshquad.shader = Shader.GetSSDOShader(screennormalmap, screendepthmap, SSDONode.Canvae.renderWidth , SSDONode.Canvae.renderHeight )
+    SSDONode.meshquad:draw()
     love.graphics.setCanvas()
-    return SSAONode.Canvae
+    return SSDONode.Canvae
 end
 
-function Shader.GetSSAOShader(screennormalmap, screendepthmap, sw, sh)
-    if Shader["ssao"] then
-        Shader["ssao"].setValue(Shader["ssao"], screennormalmap, screendepthmap)
-        return Shader["ssao"]
+function Shader.GetSSDOShader(screennormalmap, screendepthmap, sw, sh)
+    if Shader["ssdo"] then
+        Shader["ssdo"].setValue(Shader["ssdo"], screennormalmap, screendepthmap)
+        return Shader["ssdo"]
     end
     local pixelcode = [[
     uniform sampler2D screennormalmap;
@@ -45,6 +46,7 @@ function Shader.GetSSAOShader(screennormalmap, screendepthmap, sw, sh)
     uniform float viewsizeh;
     uniform float ssaooffset;
     uniform float depthlimit;
+    uniform float SSDOPower;
     // Maps standard viewport UV to screen position.
     vec2 ViewportUVToScreenPos(vec2 ViewportUV)
     {
@@ -56,6 +58,38 @@ function Shader.GetSSAOShader(screennormalmap, screendepthmap, sw, sh)
         return vec2(0.5 + 0.5 * ScreenPos.x, 0.5 - 0.5 * ScreenPos.y);
     }
 
+    vec4 CacleValue(sampler2D tex, float value1, vec4 vpos1, vec4 normal, vec4 spos, vec4 rpos1)
+    {
+        
+        if(value1 < 1)
+            return vec4(0, 0, 0, 0);
+
+        vec4 vonormal = texture2D(screennormalmap, ScreenPosToViewportUV(vpos1.xy));
+        vonormal = normalize(vonormal * 2.0 - vec4(1.0, 1.0, 1.0, 1.0));
+    
+       // vonormal = projectionViewMatrix * vonormal;
+        float weight = dot(vonormal.xyz, normal.xyz);
+        if(weight > 0)
+        {
+            vec3 dir = normalize(spos.xyz - rpos1.xyz);
+            float dis = distance(spos.xyz, rpos1.xyz);
+
+            weight = clamp(dot(vonormal.xyz, dir), 0, 1);
+            weight *= clamp(dot(normal.xyz, dir), 0, 1);
+
+            weight /= 3.14 * dis * dis;
+            //weight *= dis * dis;
+            vec4 vocolor = vec4(0);
+            vocolor.xyz = texture2D(tex, ScreenPosToViewportUV(vpos1.xy)).xyz * weight;
+            vocolor.w = weight;
+            return vocolor;
+        }
+        else
+        {
+            return vec4(0, 0, 0, 0);
+        }
+
+    }
     vec4 effect( vec4 color, sampler2D tex, vec2 texture_coords, vec2 screen_coords )
     {
        float depth = texture2D(screendepthmap, texture_coords).r;
@@ -70,7 +104,7 @@ function Shader.GetSSAOShader(screennormalmap, screendepthmap, sw, sh)
        vec4 normal = texture2D(screennormalmap, texture_coords);
        normal = normalize(normal * 2.0 - vec4(1.0, 1.0, 1.0, 1.0));
 
-       normal = projectionViewMatrix * normal;//TODO.. 需要切换到切线空间
+       //normal = projectionViewMatrix * normal;//TODO.. 需要切换到切线空间
 
        vec4 rpos1 = vec4(  0.5     ,       0.5     ,       0.70710678118655,	1);
         vec4 rpos2 = vec4( 1       ,       6.1232339957368e-17     ,       0,	1);
@@ -141,19 +175,76 @@ function Shader.GetSSAOShader(screennormalmap, screendepthmap, sw, sh)
         float depth8 = texture2D(screendepthmap, ScreenPosToViewportUV(vpos8.xy)).r;
 
         float T = depthlimit;
-		float value1 = vpos1.z - depth1 > T ? 0 : 1;
-		float value2 = vpos2.z- depth2 > T ? 0 : 1;
-        float value3 = vpos3.z- depth3 > T ? 0 : 1;
-        float value4 = vpos4.z- depth4 > T ? 0 : 1;
-        float value5 = vpos5.z- depth5 > T ? 0 : 1;
-        float value6 = vpos6.z- depth6 > T ? 0 : 1;
+		float value1 = vpos1.z - depth1 > T ? 1 : 0;
+		float value2 = vpos2.z- depth2 > T ? 1 : 0;
+        float value3 = vpos3.z- depth3 > T ? 1 : 0;
+        float value4 = vpos4.z- depth4 > T ? 1 : 0;
+        float value5 = vpos5.z- depth5 > T ? 1 : 0;
+        float value6 = vpos6.z- depth6 > T ? 1 : 0;
 
-        float value7 = vpos7.z - depth7 > T ? 0 : 1;
-		float value8 = vpos8.z - depth8 > T ? 0 : 1;
+        float value7 = vpos7.z - depth7 > T ? 1 : 0;
+		float value8 = vpos8.z - depth8 > T ? 1 : 0;
+
+        if(depth1 == 1)
+        {
+            value1 = 0;
+        }
+        if(depth2 == 1)
+        {
+            value2 = 0;
+        }
+        if(depth3 == 1)
+        {
+            value3 = 0;
+        }
+        if(depth4 == 1)
+        {
+            value4 = 0;
+        }
+        if(depth5 == 1)
+        {
+            value5 = 0;
+        }
+        if(depth6 == 1)
+        {
+            value6 = 0;
+        }
+        if(depth7 == 1)
+        {
+            value7 = 0;
+        }
+        if(depth8 == 1)
+        {
+            value8 = 0;
+        }
+
+        vec4 vocolor =vec4(0, 0, 0, 0);
+        
+        vocolor += CacleValue(tex, value1, vpos1, normal, spos, rpos1);
+        vocolor += CacleValue(tex, value2, vpos2, normal, spos, rpos1);
+        vocolor += CacleValue(tex, value3, vpos3, normal, spos, rpos1);
+        vocolor += CacleValue(tex, value4, vpos4, normal, spos, rpos1);
+        vocolor += CacleValue(tex, value5, vpos5, normal, spos, rpos1);
+        vocolor += CacleValue(tex, value6, vpos6, normal, spos, rpos1);
+        vocolor += CacleValue(tex, value7, vpos7, normal, spos, rpos1);
 
        vec4 basecolor = texture2D(tex, texture_coords);
-       float value = value1 + value2 + value3 + value4 + value5 + value6 + value7 + value8;
-       basecolor.xyz *=  value / 8;
+
+       if(vocolor.w == 0)
+       {
+            vocolor.w = 1;
+            vocolor.xyz = vec3(0);
+       }
+        else
+        {
+            vocolor.xyz /= vocolor.w;
+        }
+       
+       basecolor.xyz +=  vocolor.xyz * SSDOPower;//max(vocolor.xyz, vec3(0));
+       basecolor.w = 1;
+//       vocolor.w *= 0.5;
+ //      vocolor.w += 1;
+//       basecolor.xyz /= vocolor.w;
 
        //return vec4(vec3(depth1),1);
        return basecolor;
@@ -170,7 +261,7 @@ function Shader.GetSSAOShader(screennormalmap, screendepthmap, sw, sh)
 -- log(vertexcode)
 -- log(pixelcode)
     local shader =   Shader.new(pixelcode, vertexcode)
-    Shader["ssao"] = shader;
+    Shader["ssdo"] = shader;
     shader.setValue = function (shader, screennormalmap, screendepthmap)
         if shader:hasUniform("screennormalmap") then
             shader:send("screennormalmap", screennormalmap.obj)
@@ -182,6 +273,10 @@ function Shader.GetSSAOShader(screennormalmap, screendepthmap, sw, sh)
 
         if shader:hasUniform("depthlimit") then
             shader:send("depthlimit", RenderSet.getSSAODepthLimit())
+        end
+
+        if shader:hasUniform("SSDOPower") then
+            shader:send("SSDOPower", SSDONode.Power )
         end
 
         local viewm = RenderSet.getUseViewMatrix()

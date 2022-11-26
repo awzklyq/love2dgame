@@ -24,8 +24,8 @@ end
 function BoundBox.new()
     local box = setmetatable({}, metatable_BoundBox);
 
-    box.min = Vector3.new(0,0,0)
-    box.max = Vector3.new(1,1,1)
+    box.min = Vector3.new(math.maxFloat, math.maxFloat, math.maxFloat)
+    box.max = Vector3.new(-math.maxFloat, -math.maxFloat, -math.maxFloat)
 
     box.center = Vector3.new(0.5, 0.5, 0.5)
 
@@ -45,6 +45,12 @@ function BoundBox:addSelf(bb)
     self.center = Vector3.new((self.min.x + self.max.x) * 0.5, (self.min.y + self.max.y) * 0.5, (self.min.z + self.max.z) * 0.5)
 end
 
+function BoundBox:GetSurfaceArea()
+    local extendSize =  self.max - self.min
+
+    return extendSize.x * extendSize.y + extendSize.x * extendSize.z + extendSize.z * extendSize.y
+end
+
 function BoundBox.add(bb1, bb2)
     local box = BoundBox.new()
     box.min.x = math.min(bb1.min.x, bb2.min.x)
@@ -56,6 +62,7 @@ function BoundBox.add(bb1, bb2)
     box.max.z = math.max(bb1.max.z, bb2.max.z)
 
     box.center = Vector3.new((box.min.x + box.max.x) * 0.5, (box.min.y + box.max.y) * 0.5, (box.min.z + box.max.z) * 0.5)
+    return box
 end
 
 BoundBox.buildFromMesh3D = function(mesh)

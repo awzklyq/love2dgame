@@ -25,6 +25,8 @@ dofile('script/common/color.lua')
 dofile('script/common/filepath.lua')
 dofile('script/common/pbr.lua')
 dofile('script/common/radarfrustum.lua')
+dofile('script/common/SpaceSplit.lua')
+
 dofile('script/file/file.lua')
 
 dofile('script/xml/xmlload.lua')
@@ -106,13 +108,13 @@ dofile 'script/render/font.lua'
 
 dofile 'script/common/timer.lua'
 
-
 dofile 'script/postprocess/tonemapping.lua'
 dofile 'script/postprocess/bloom.lua'
 dofile 'script/postprocess/bloom2.lua'
 dofile 'script/postprocess/bloom3.lua'
 dofile 'script/postprocess/outline.lua'
 dofile 'script/postprocess/ssao.lua'
+dofile 'script/postprocess/ssdo.lua'
 dofile 'script/postprocess/hbao.lua'
 dofile 'script/postprocess/gtao.lua'
 dofile 'script/postprocess/taa.lua'
@@ -149,5 +151,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_mathfunction2.lua')--test_simplessgi  test_Octahedralmap
+	dofile('script/test/test_SpaceSplit.lua')--test_simplessgi  test_Octahedralmap
 end
