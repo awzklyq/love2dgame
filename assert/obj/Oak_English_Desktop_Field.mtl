@@ -1,0 +1,48 @@
+# Wavefront Object Material File
+# Generated using SpeedTree tools
+
+newmtl Cluster_Bare_Mat
+map_Kd Cluster_Bare.png
+map_d Cluster_Bare_Opacity.png
+map_bump Cluster_Bare_Normal.png
+bump Cluster_Bare_Normal.png -bm 1
+Ns 128
+illum 2
+
+
+newmtl Oak_English_Cluster_1_spring_Mat
+map_Kd Oak_English_Cluster_1_spring.png
+map_d Oak_English_Cluster_1_spring_Opacity.png
+map_bump Oak_English_Cluster_1_spring_Normal.png
+bump Oak_English_Cluster_1_spring_Normal.png -bm 1
+Ns 128
+illum 2
+
+
+newmtl Oak_English_Cluster_2_spring_Mat
+map_Kd Oak_English_Cluster_2_spring.png
+map_d Oak_English_Cluster_2_spring_Opacity.png
+map_bump Oak_English_Cluster_2_spring_Normal.png
+bump Oak_English_Cluster_2_spring_Normal.png -bm 1
+Ns 128
+illum 2
+
+
+newmtl Oak_English_Cluster_2_summer_Mat
+map_Kd Oak_English_Cluster_2_summer.png
+map_d Oak_English_Cluster_2_summer_Opacity.png
+map_bump Oak_English_Cluster_2_summer_Normal.png
+bump Oak_English_Cluster_2_summer_Normal.png -bm 1
+Ns 128
+illum 2
+
+
+newmtl Oak_bark_3_Mat
+map_Kd Oak_bark_3.png
+map_d 
+map_bump Oak_bark_3_Normal.png
+bump Oak_bark_3_Normal.png -bm 1
+Ns 128
+illum 2
+
+

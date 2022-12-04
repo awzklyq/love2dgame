@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated using SpeedTree tools -->
+<Materials Count="2" Mesh="TestSpeedTree.obj" FlipOpacity="0">
+	<Material ID="0" Name="Default_Mat" TwoSided="1" UserData="" VertexOpacity="0" FlipNormalsOnBackside="1">
+		<Map Name="Color" ColorR="0.8" ColorG="0.8" ColorB="0.8" />
+		<Map Name="Gloss" Value="0.25" />
+		<Map Name="Specular" ColorR="0.75" ColorG="0.75" ColorB="0.75" />
+		<Map Name="Height" Value="0.5" />
+		<Map Name="Custom" ColorR="0" ColorG="0" ColorB="0" />
+		<Map Name="Custom2" Value="0" />
+	</Material>
+	<Material ID="1" Name="Sample_Mat" TwoSided="1" UserData="" VertexOpacity="0" FlipNormalsOnBackside="1">
+		<Map Name="Color" ColorR="1" ColorG="1" ColorB="1" />
+		<Map Name="Gloss" Value="0.25" />
+		<Map Name="Specular" ColorR="0.75" ColorG="0.75" ColorB="0.75" />
+		<Map Name="Height" Value="0.5" />
+		<Map Name="Custom" ColorR="0" ColorG="0" ColorB="0" />
+		<Map Name="Custom2" Value="0" />
+	</Material>
+</Materials>

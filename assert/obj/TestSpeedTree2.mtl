@@ -1,0 +1,11 @@
+# Wavefront Object Material File
+# Generated using SpeedTree tools
+
+newmtl Default_Mat
+map_d 
+map_bump 
+bump  -bm 1
+Ns 128
+illum 2
+
+

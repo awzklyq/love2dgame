@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated using SpeedTree tools -->
+<Materials Count="5" Mesh="Oak_English_Desktop_Field.obj" FlipOpacity="0">
+	<Material ID="4" Name="Cluster_Bare_Mat" TwoSided="1" UserData="" VertexOpacity="0" FlipNormalsOnBackside="1">
+		<Map Name="Color" File="Cluster_Bare.png" Source="C:/Program Files/SpeedTree/SpeedTree Games v9.0.0/samples/Broadleaf/Clusters/Oak_English_Cluster_bare.png" />
+		<Map Name="Opacity" File="Cluster_Bare_Opacity.png" Source="C:/Program Files/SpeedTree/SpeedTree Games v9.0.0/samples/Broadleaf/Clusters/Oak_English_Cluster_bare_Opacity.png" />
+		<Map Name="Normal" File="Cluster_Bare_Normal.png" Source="C:/Program Files/SpeedTree/SpeedTree Games v9.0.0/samples/Broadleaf/Clusters/Oak_English_Cluster_bare_Normal.png" />
+		<Map Name="Gloss" File="Cluster_Bare_Gloss.png" Source="C:/Program Files/SpeedTree/SpeedTree Games v9.0.0/samples/Broadleaf/Clusters/Oak_English_Cluster_bare_Gloss.png" />
+		<Map Name="Specular" ColorR="0.75" ColorG="0.75" ColorB="0.75" />
+		<Map Name="SubsurfaceColor" ColorR="0" ColorG="0" ColorB="0" />
+		<Map Name="SubsurfaceAmount" Value="1" />
+		<Map Name="AO" File="Cluster_Bare_AO.png" Source="C:/Program Files/SpeedTree/SpeedTree Games v9.0.0/samples/Broadleaf/Clusters/Oak_English_Cluster_bare_AO.png" />
+		<Map Name="Height" Value="0.5" />
+		<Map Name="Custom" ColorR="0" ColorG="0" ColorB="0" />
+		<Map Name="Custom2" Value="0" />
+	</Material>
+	<Material ID="6" Name="Oak_English_Cluster_1_spring_Mat" TwoSided="1" UserData="" VertexOpacity="0" FlipNormalsOnBackside="1">
+		<Map Name="Color" File="Oak_English_Cluster_1_spring.png" Source="C:/Program Files/SpeedTree/SpeedTree Games v9.0.0/samples/Broadleaf/Clusters/Oak_English_Cluster_1_spring.png" />
+		<Map Name="Opacity" File="Oak_English_Cluster_1_spring_Opacity.png" Source="C:/Program Files/SpeedTree/SpeedTree Games v9.0.0/samples/Broadleaf/Clusters/Oak_English_Cluster_1_spring_Opacity.png" />
+		<Map Name="Normal" File="Oak_English_Cluster_1_spring_Normal.png" Source="C:/Program Files/SpeedTree/SpeedTree Games v9.0.0/samples/Broadleaf/Clusters/Oak_English_Cluster_1_spring_Normal.png" />
+		<Map Name="Gloss" File="Oak_English_Cluster_1_spring_Gloss.png" Source="C:/Program Files/SpeedTree/SpeedTree Games v9.0.0/samples/Broadleaf/Clusters/Oak_English_Cluster_1_spring_Gloss.png" />
+		<Map Name="Specular" ColorR="0.75" ColorG="0.75" ColorB="0.75" />
+		<Map Name="SubsurfaceColor" File="Oak_English_Cluster_1_spring_SubsurfaceColor.png" Source="C:/Program Files/SpeedTree/SpeedTree Games v9.0.0/samples/Broadleaf/Clusters/Oak_English_Cluster_1_spring_Subsurface.png" />
+		<Map Name="SubsurfaceAmount" File="Oak_English_Cluster_1_spring_SubsurfaceAmount.png" Source="C:/Program Files/SpeedTree/SpeedTree Games v9.0.0/samples/Broadleaf/Clusters/Oak_English_Cluster_1_spring_SubsurfaceAmount.png" />
+		<Map Name="AO" File="Oak_English_Cluster_1_spring_AO.png" Source="C:/Program Files/SpeedTree/SpeedTree Games v9.0.0/samples/Broadleaf/Clusters/Oak_English_Cluster_1_spring_AO.png" />
+		<Map Name="Height" Value="0" />
+		<Map Name="Custom" ColorR="0" ColorG="0" ColorB="0" />
+		<Map Name="Custom2" Value="0" />
+	</Material>
+	<Material ID="9" Name="Oak_English_Cluster_2_spring_Mat" TwoSided="1" UserData="" VertexOpacity="0" FlipNormalsOnBackside="1">
+		<Map Name="Color" File="Oak_English_Cluster_2_spring.png" Source="C:/Program Files/SpeedTree/SpeedTree Games v9.0.0/samples/Broadleaf/Clusters/Oak_English_Cluster_2_spring.png" />
+		<Map Name="Opacity" File="Oak_English_Cluster_2_spring_Opacity.png" Source="C:/Program Files/SpeedTree/SpeedTree Games v9.0.0/samples/Broadleaf/Clusters/Oak_English_Cluster_2_spring_Opacity.png" />
+		<Map Name="Normal" File="Oak_English_Cluster_2_spring_Normal.png" Source="C:/Program Files/SpeedTree/SpeedTree Games v9.0.0/samples/Broadleaf/Clusters/Oak_English_Cluster_2_spring_Normal.png" />
+		<Map Name="Gloss" File="Oak_English_Cluster_2_spring_Gloss.png" Source="C:/Program Files/SpeedTree/SpeedTree Games v9.0.0/samples/Broadleaf/Clusters/Oak_English_Cluster_2_spring_Gloss.png" />
+		<Map Name="Specular" ColorR="0.75" ColorG="0.75" ColorB="0.75" />
+		<Map Name="SubsurfaceColor" File="Oak_English_Cluster_2_spring_SubsurfaceColor.png" Source="C:/Program Files/SpeedTree/SpeedTree Games v9.0.0/samples/Broadleaf/Clusters/Oak_English_Cluster_2_spring_Subsurface.png" />
+		<Map Name="SubsurfaceAmount" File="Oak_English_Cluster_2_spring_SubsurfaceAmount.png" Source="C:/Program Files/SpeedTree/SpeedTree Games v9.0.0/samples/Broadleaf/Clusters/Oak_English_Cluster_2_spring_SubsurfaceAmount.png" />
+		<Map Name="AO" File="Oak_English_Cluster_2_spring_AO.png" Source="C:/Program Files/SpeedTree/SpeedTree Games v9.0.0/samples/Broadleaf/Clusters/Oak_English_Cluster_2_spring_AO.png" />
+		<Map Name="Height" Value="0.5" />
+		<Map Name="Custom" ColorR="0" ColorG="0" ColorB="0" />
+		<Map Name="Custom2" Value="0" />
+	</Material>
+	<Material ID="31" Name="Oak_English_Cluster_2_summer_Mat" TwoSided="1" UserData="" VertexOpacity="0" FlipNormalsOnBackside="1">
+		<Map Name="Color" File="Oak_English_Cluster_2_summer.png" Source="C:/Program Files/SpeedTree/SpeedTree Games v9.0.0/samples/Broadleaf/Clusters/Oak_English_Cluster_2_summer.png" />
+		<Map Name="Opacity" File="Oak_English_Cluster_2_summer_Opacity.png" Source="C:/Program Files/SpeedTree/SpeedTree Games v9.0.0/samples/Broadleaf/Clusters/Oak_English_Cluster_2_summer_Opacity.png" />
+		<Map Name="Normal" File="Oak_English_Cluster_2_summer_Normal.png" Source="C:/Program Files/SpeedTree/SpeedTree Games v9.0.0/samples/Broadleaf/Clusters/Oak_English_Cluster_2_summer_Normal.png" />
+		<Map Name="Gloss" File="Oak_English_Cluster_2_summer_Gloss.png" Source="C:/Program Files/SpeedTree/SpeedTree Games v9.0.0/samples/Broadleaf/Clusters/Oak_English_Cluster_2_summer_Gloss.png" />
+		<Map Name="Specular" ColorR="0.75" ColorG="0.75" ColorB="0.75" />
+		<Map Name="SubsurfaceColor" File="Oak_English_Cluster_2_summer_SubsurfaceColor.png" Source="C:/Program Files/SpeedTree/SpeedTree Games v9.0.0/samples/Broadleaf/Clusters/Oak_English_Cluster_2_summer_Subsurface.png" />
+		<Map Name="SubsurfaceAmount" File="Oak_English_Cluster_2_summer_SubsurfaceAmount.png" Source="C:/Program Files/SpeedTree/SpeedTree Games v9.0.0/samples/Broadleaf/Clusters/Oak_English_Cluster_2_summer_SubsurfaceAmount.png" />
+		<Map Name="AO" File="Oak_English_Cluster_2_summer_AO.png" Source="C:/Program Files/SpeedTree/SpeedTree Games v9.0.0/samples/Broadleaf/Clusters/Oak_English_Cluster_2_summer_AO.png" />
+		<Map Name="Height" Value="0.5" />
+		<Map Name="Custom" ColorR="0" ColorG="0" ColorB="0" />
+		<Map Name="Custom2" Value="0" />
+	</Material>
+	<Material ID="2" Name="Oak_bark_3_Mat" TwoSided="0" UserData="" VertexOpacity="0" FlipNormalsOnBackside="1">
+		<Map Name="Color" File="Oak_bark_3.png" Source="C:/Program Files/SpeedTree/SpeedTree Games v9.0.0/samples/Broadleaf/bark/Oak_bark_3.png" />
+		<Map Name="Normal" File="Oak_bark_3_Normal.png" Source="C:/Program Files/SpeedTree/SpeedTree Games v9.0.0/samples/Broadleaf/bark/Oak_bark_3_Normal.png" />
+		<Map Name="Gloss" File="Oak_bark_3_Gloss.png" Source="C:/Program Files/SpeedTree/SpeedTree Games v9.0.0/samples/Broadleaf/bark/Oak_bark_3_Gloss.png" />
+		<Map Name="Specular" ColorR="0.75" ColorG="0.75" ColorB="0.75" />
+		<Map Name="AO" File="Oak_bark_3_AO.png" Source="C:/Program Files/SpeedTree/SpeedTree Games v9.0.0/samples/Broadleaf/bark/Oak_bark_3_AO.png" />
+		<Map Name="Height" Value="1" />
+		<Map Name="Custom" ColorR="0" ColorG="0" ColorB="0" />
+		<Map Name="Custom2" Value="0" />
+	</Material>
+</Materials>
