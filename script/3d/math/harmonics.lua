@@ -252,7 +252,6 @@ function Harmonics:Generate(Normals)
 	local UniformPDF = 1.0 / (2.0 * math.pi);
 	local SampleWeight = 1.0 / (UniformPDF * #Normals);
 	-- local SampleWeight = 4 * math.pi /  #Normals;
-	local ccc = Vector3.new(math.random(), math.random(), math.random())
 	self.m_Coefs = ThreeBandSHVectorRGB.new()
     for _, nor in pairs(Normals) do
 		-- nor:normalize()

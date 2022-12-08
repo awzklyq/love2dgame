@@ -151,5 +151,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_SpaceSplit.lua')--test_simplessgi  test_Octahedralmap
+	dofile('script/test/test_RayIntersectBox.lua')--test_simplessgi  test_Octahedralmap
 end

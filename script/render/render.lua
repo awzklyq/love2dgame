@@ -77,6 +77,9 @@ Render.Matrix2DId = 38
 
 Render.Vector2Id = 39
 
+Render.RayId = 40
+
+
 Render.getRenderIdName = function(id)
     if Render.CircleId == id then
         return "Circle"
@@ -142,6 +145,8 @@ Render.getRenderIdName = function(id)
         return "Matrix2DId"
     elseif Render.Vector2Id == id then
         return "Vector2Id"
+    elseif Render.RayId == id then
+        return "RayId"
     end
     
     return "Null"

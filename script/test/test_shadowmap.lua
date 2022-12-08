@@ -12,9 +12,9 @@ local cubenum = 5
 local mesh
 for i = 1, cubenum do
     local mesh3d = Mesh3D.new("assert/obj/bbb.obj")
-    mesh3d.transform3d:mulTranslationRight(math.random(-1000, 1000), math.random(-500, 900), math.random(-500, 500))
-    mesh3d.transform3d:mulScalingLeft(0.5, 0.5, 0.5)
-    mesh3d:setBaseColor(LColor.new(math.random(1, 255), math.random(1, 255), math.random(1, 255), 255))
+    -- mesh3d.transform3d:mulTranslationRight(math.random(-1000, 1000), math.random(-500, 900), math.random(-500, 500))
+    -- mesh3d.transform3d:mulScalingLeft(0.5, 0.5, 0.5)
+    -- mesh3d:setBaseColor(LColor.new(math.random(1, 255), math.random(1, 255), math.random(1, 255), 255))
 
     local node = scene:addMesh(mesh3d)
     node.isDrawBox = true

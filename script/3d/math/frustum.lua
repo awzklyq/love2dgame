@@ -509,7 +509,7 @@ function Frustum:intersectBox( box )
 		for j = 1, 4 do
 			local r = rays[j];
 
-			local dist = r:isIntersectPlane(p1);
+			local dist = r:IsIntersectPlane(p1);
 			if ( dist > 0 ) then
 				-- pick1 += 1 << j;
 				pick1 = pick1 + math.pow(2, j - 1);
@@ -522,7 +522,7 @@ function Frustum:intersectBox( box )
 		for j = 1, 4 do
 			local r = rays[j];
 
-			local dist = r:isIntersectPlane(p2);
+			local dist = r:IsIntersectPlane(p2);
 			if  dist > 0 then
 				-- pick2 += 1 << j;
 				pick2 = pick2 + math.pow(2, j - 1);
