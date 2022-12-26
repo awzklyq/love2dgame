@@ -11,7 +11,7 @@ VelocityBuffNode.GatherDynamicMesh = function(Mesh)
     PreVelocityMats[#PreVelocityMats + 1] = Matrix3D.copy(Mesh.PreTransform)
 end
 
-VelocityBuffNode.VelocityBuff = Canvas.new(1, 1, {format = "rgba32f", readable = true, msaa = 0, mipmaps="none"})
+VelocityBuffNode.VelocityBuff = Canvas.new(1, 1, {format = "rg16f", readable = true, msaa = 0, mipmaps="none"})
 VelocityBuffNode.VelocityBuff.renderWidth = 1
 VelocityBuffNode.VelocityBuff.renderHeight = 1
 
@@ -22,7 +22,7 @@ normal_depth_buffer.renderHeight = 1
 VelocityBuffNode.Execute = function(renderWidth, renderHeight)
    
     if VelocityBuffNode.VelocityBuff.renderWidth ~= renderWidth  or VelocityBuffNode.VelocityBuff.renderHeight ~= renderHeight then
-        VelocityBuffNode.VelocityBuff = Canvas.new(renderWidth , renderHeight , {format = "r16f", readable = true, msaa = 0, mipmaps="none"})
+        VelocityBuffNode.VelocityBuff = Canvas.new(renderWidth , renderHeight , {format = "rg16f", readable = true, msaa = 0, mipmaps="none"})
         VelocityBuffNode.VelocityBuff.renderWidth = renderWidth
         VelocityBuffNode.VelocityBuff.renderHeight = renderHeight
 
@@ -198,8 +198,8 @@ function Shader.GetVelocityBlurShader(w, h)
     }
 ]]
 
-log(vertexcode)
-log(pixelcode)
+-- log(vertexcode)
+-- log(pixelcode)
     local shader =   Shader.new(pixelcode, vertexcode)
     Shader["VelocityBlur"] = shader;
     shader.setValue = function (shader, w, h)
