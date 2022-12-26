@@ -11,7 +11,7 @@ VelocityBuffNode.GatherDynamicMesh = function(Mesh)
     PreVelocityMats[#PreVelocityMats + 1] = Matrix3D.copy(Mesh.PreTransform)
 end
 
-VelocityBuffNode.VelocityBuff = Canvas.new(1, 1, {format = "rg16f", readable = true, msaa = 0, mipmaps="none"})
+VelocityBuffNode.VelocityBuff = Canvas.new(1, 1, {format = "rg32f", readable = true, msaa = 0, mipmaps="none"})
 VelocityBuffNode.VelocityBuff.renderWidth = 1
 VelocityBuffNode.VelocityBuff.renderHeight = 1
 
@@ -22,7 +22,7 @@ normal_depth_buffer.renderHeight = 1
 VelocityBuffNode.Execute = function(renderWidth, renderHeight)
    
     if VelocityBuffNode.VelocityBuff.renderWidth ~= renderWidth  or VelocityBuffNode.VelocityBuff.renderHeight ~= renderHeight then
-        VelocityBuffNode.VelocityBuff = Canvas.new(renderWidth , renderHeight , {format = "rg16f", readable = true, msaa = 0, mipmaps="none"})
+        VelocityBuffNode.VelocityBuff = Canvas.new(renderWidth , renderHeight , {format = "rg32f", readable = true, msaa = 0, mipmaps="none"})
         VelocityBuffNode.VelocityBuff.renderWidth = renderWidth
         VelocityBuffNode.VelocityBuff.renderHeight = renderHeight
 
@@ -36,8 +36,6 @@ VelocityBuffNode.Execute = function(renderWidth, renderHeight)
     love.graphics.setMeshCullMode("front")
     love.graphics.setDepthMode("less", true)
     love.graphics.setCanvas({VelocityBuffNode.VelocityBuff.obj, depthstencil = normal_depth_buffer.obj})
-
-    love.graphics.setCanvas(VelocityBuffNode.VelocityBuff.obj)
     love.graphics.clear(0,0,0,1)
 
     for i = 1, #DynamicMeshs do
@@ -87,12 +85,12 @@ function Shader.GetVelocityBuffShader(ModelViewProjection, PrevModelViewProjecti
     vec4 effect( vec4 color, sampler2D tex, vec2 texture_coords, vec2 screen_coords )
     {
         vec4 oVelocity = vec4(0.0, 0.0, 0.0, 1.0);
-        vec2 a = (vPosition.xy / vPosition.w) * 0.5 + 0.5;
-        vec2 b = (vPrevPosition.xy / vPrevPosition.w) * 0.5 + 0.5;
-        oVelocity.xy = (a - b);
+        vec2 a = (vPosition.xy / vPosition.w);
+        vec2 b = (vPrevPosition.xy / vPrevPosition.w);
+        oVelocity.xy = (a - b) * 0.5 + 0.5;
 
-        oVelocity.x = pow(oVelocity.x, 3.0);
-        oVelocity.y = pow(oVelocity.y, 3.0);
+        //oVelocity.x = pow(oVelocity.x, 3.0);
+        //oVelocity.y = pow(oVelocity.y, 3.0);
        return oVelocity;
     }
 ]]
@@ -161,25 +159,25 @@ function Shader.GetVelocityBlurShader(w, h)
             return BaseColor;
         }
 
-        velocity.x = pow(velocity.x, 1.0 / 3.0);
-        velocity.y = pow(velocity.y, 1.0 / 3.0);
+        //velocity.x = pow(velocity.x, 1.0 / 3.0);
+       // velocity.y = pow(velocity.y, 1.0 / 3.0);
         velocity = velocity * 2.0 - 1.0;
 
-       
         float TargetFps = 120.0;
         float uVelocityScale = CurrentFPS / TargetFps;
 
-        //velocity *= uVelocityScale;
+        velocity *= uVelocityScale;
 
-        float speed = length(velocity) / length(texelSize);
-
+        //texelSize.xy *= normalize(velocity.xy);
+        
         float MAX_SAMPLES = 16;
+        float speed = length(velocity) / length(texelSize);
         float nSamples =  clamp(speed, 1, MAX_SAMPLES);
 
         float velocityscale = clamp(speed, 4, 8);
         for (int i = 1; i < nSamples; ++i)
         {
-            vec2 offset = texelSize * velocityscale * (float(i) / float(nSamples - 1) - 0.5);
+            vec2 offset = velocity * velocityscale * (float(i) / float(nSamples - 1) - 0.5);
             BaseColor.xyz += texture2D(tex, vTexCoord2 + offset).xyz;
         }
 

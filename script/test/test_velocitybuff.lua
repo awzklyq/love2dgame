@@ -4,6 +4,7 @@ FileManager.addAllPath("assert")
 local width = love.graphics.getPixelWidth() * 1.5 -- love.graphics.getWidth() * 2
 local height = love.graphics.getPixelHeight()  * 1.5--love.graphics.getHeight() * 2
 local scene = Scene3D.new()
+-- scene.bgColor = LColor.new(0, 0, 0, 255)
 local plane = Mesh3D.new("assert/obj/plane.obj")
 plane:setBaseColor(LColor.new(125,125,125, 255))
 -- mesh3d:setTexture(love.graphics.newImage("assert/obj/earth.png"))
@@ -35,7 +36,7 @@ plane.transform3d:mulScalingLeft(50,1,50)
 
 plane:setBaseColor(LColor.new(125, 125,255, 255))
 -- plane.nolight = true
-local planenode = scene:addMesh(plane)
+-- local planenode = scene:addMesh(plane)
 
 local IsDrawVelocity = false
 
@@ -46,10 +47,10 @@ local color_buffer = Canvas.new(100, 100, {format = "rgba8", readable = true, ms
 local speed = 1
 
 app.update(function(dt)
-    for i = 1, #nodes do
-        nodes[i].mesh.transform3d:mulRotationRight(0, 1, 0, speed * nodes[i].speed * dt)
-        --nodes[i].mesh.transform3d:mulTranslationRight(0, 0, speed * nodes[i].speed * dt)
-     end
+    -- for i = 1, #nodes do
+    --     nodes[i].mesh.transform3d:mulRotationRight(0, 1, 0, speed * nodes[i].speed * dt)
+    --     --nodes[i].mesh.transform3d:mulTranslationRight(0, 0, speed * nodes[i].speed * dt)
+    --  end
 end)
 
 
@@ -62,6 +63,11 @@ app.render(function(dt)
     if IsDrawVelocity then
         VelocityBuffNode.VelocityBuff:draw()
     end
+    
+    for i = 1, #nodes do
+        nodes[i].mesh.transform3d:mulRotationRight(0, 1, 0, speed * nodes[i].speed * love.timer.getFPS() * 0.001)
+        --nodes[i].mesh.transform3d:mulTranslationRight(0, 0, speed * nodes[i].speed * dt)
+     end
 
     love.graphics.print( "Press Key Space.  scene.needVelocityBuff: "..tostring(scene.needVelocityBuff) .. " VelocityBuffNode.uVelocityScale: " .. tostring(VelocityBuffNode.uVelocityScale) .. " speed: " .. tostring(speed) .. "  FPS: " .. tostring(love.timer.getFPS()), 10, 10)
 end)
@@ -74,9 +80,9 @@ app.keypressed(function(key, scancode, isrepeat)
     elseif key == 's' then
         VelocityBuffNode.uVelocityScale = VelocityBuffNode.uVelocityScale - 0.5
     elseif key == 'e' then
-        speed = speed + 0.5
+        speed = speed + 0.1
     elseif key == 'd' then
-        speed = speed - 0.5
+        speed = speed - 0.1
     elseif key == 'r' then
         speed = -speed
     elseif key == 'a' then
