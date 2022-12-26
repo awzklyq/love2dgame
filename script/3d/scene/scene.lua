@@ -40,6 +40,10 @@ function Scene3D.new()
     scene.needSSAO = false
     scene.needSSDO = false
     scene.needToneMapping = false;
+
+    scene.needVelocityBuff = false;
+
+    VelocityBuffNode.InitDynamicMeshs()
     return scene
 end
 
@@ -138,6 +142,8 @@ function Scene3D:getFrustumResultNodes()
 end
 
 function Scene3D:update(e)
+    VelocityBuffNode.InitDynamicMeshs()
+
     if self.screenwidth ~= RenderSet.screenwidth or self.screenheight ~= RenderSet.screenheight then
         self.screenwidth = RenderSet.screenwidth-- love.graphics.getWidth() * 2
         self.screenheight = RenderSet.screenheight--love.graphics.getHeight() * 2
@@ -233,6 +239,12 @@ function Scene3D:draw(isdrawCanvaColor)
             if node.AlphaTest then
                 table.insert(AlphaTestNodes, node) 
             else
+                if self.needVelocityBuff then
+                    if node.needVelocityBuff or node.mesh.needVelocityBuff then
+                        VelocityBuffNode.GatherDynamicMesh(node.mesh)
+                    end
+                end
+
                 RenderSet.setshadowReceiver(node.shadowReceiver)
                 RenderSet.SetPBR(node.PBR)
 
@@ -404,6 +416,12 @@ function Scene3D:drawCanvaColor()
     -- if self.needToneMapping and RenderSet.HDR then
     --     rendercolor = ToneMapping.Execute(rendercolor)
     -- end
+
+    if self.needVelocityBuff then
+        VelocityBuffNode.Execute(self.screenwidth, self.screenheight)
+
+        rendercolor = VelocityBuffNode.ExecuteBlur(rendercolor, rendercolor.renderWidth , rendercolor.renderHeight)
+    end
 
     if self.needSimpleSSGI then
         rendercolor = SimpleSSGINode.Execute(rendercolor, self.canvasnormal, self.canvasdepth)

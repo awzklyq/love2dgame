@@ -18,6 +18,13 @@ metatable_Matrix3D.__div = function(myvalue, value)
 								myvalue[13] / value, myvalue[14] / value, myvalue[15] / value, myvalue[16] / value)
 end
 
+metatable_Matrix3D.__eq = function(myvalue, value)
+    return (myvalue[1] == value[1] and myvalue[2] == value[2] and myvalue[3] == value[3] and myvalue[4] == value[4] and
+	myvalue[5] == value[5] and myvalue[6] == value[6] and myvalue[7] == value[7] and myvalue[8] == value[8] and
+	myvalue[9] == value[9] and myvalue[10] == value[10] and myvalue[11] == value[11] and myvalue[12] == value[12] and
+	myvalue[13] == value[13] and myvalue[14] == value[14] and myvalue[15] == value[15] and myvalue[16] == value[16])
+end
+	
 -- metatable_Matrix3D.__sub = function(myvalue, value)
 --     return Vector3.new(myvalue.x - value.x, myvalue.y - value.y, myvalue.z - value.z)
 -- end

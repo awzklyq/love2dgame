@@ -121,6 +121,8 @@ dofile 'script/postprocess/taa.lua'
 dofile 'script/postprocess/gaussianfilter.lua'
 dofile 'script/postprocess/simplessgi.lua'
 dofile 'script/postprocess/esmblur.lua'
+dofile 'script/postprocess/VelocityBuff.lua'
+
 
 dofile 'script/3d/effect/motionvector.lua'
 
@@ -151,5 +153,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_RayIntersectBox.lua')--test_simplessgi  test_Octahedralmap
+	dofile('script/test/test_velocitybuff.lua')--test_simplessgi  test_Octahedralmap
 end
