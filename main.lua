@@ -132,6 +132,10 @@ dofile 'script/3d/math/point.lua'
 
 dofile('script/3d/mesh/qem.lua')
 
+dofile('script/shader/ImageAnimaShader.lua')
+
+dofile('script/render/imageanima.lua')
+
 FileManager.addAllPath("assert")
 
 _G.mlib = require 'script/mlib' 
@@ -153,5 +157,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_velocitybuff.lua')--test_simplessgi  test_Octahedralmap
+	dofile('script/test/test_imageanima.lua')--test_simplessgi  test_Octahedralmap
 end

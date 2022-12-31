@@ -79,6 +79,8 @@ Render.Vector2Id = 39
 
 Render.RayId = 40
 
+Render.ImageAnimaId = 41
+
 
 Render.getRenderIdName = function(id)
     if Render.CircleId == id then
@@ -147,6 +149,8 @@ Render.getRenderIdName = function(id)
         return "Vector2Id"
     elseif Render.RayId == id then
         return "RayId"
+    elseif Render.ImageAnimaId == id then
+        return "Render.ImageAnimaId"
     end
     
     return "Null"
@@ -303,6 +307,16 @@ Render.RenderObject = function(obj)
             love.graphics.setColor(r * 0.9, g * 0.9, b * 0.9, obj.alpha);
             love.graphics.draw( obj.obj, obj.x, obj.y, 0, obj.w / obj:getWidth(), obj.h / obj:getHeight())
             love.graphics.setColor(r, g, b, a);
+        elseif obj.renderid == Render.ImageAnimaId then
+            if obj:IsRenderAsImage() then
+                local r, g, b, a = love.graphics.getColor( );
+                love.graphics.setColor(r * 0.9, g * 0.9, b * 0.9, obj.alpha);
+                love.graphics.draw( obj.obj, obj.CurrentQuad, obj.x, obj.y, 0, obj.w / obj:getWidth(), obj.h / obj:getHeight())
+                love.graphics.setColor(r, g, b, a);
+            else
+                love.graphics.draw( obj.MeshQuad.obj)
+            end
+            
         elseif obj.renderid == Render.LoveScreenTextId then
             local r, g, b, a = love.graphics.getColor( );
             love.graphics.setColor(obj.color._r, obj.color._g, obj.color._b);

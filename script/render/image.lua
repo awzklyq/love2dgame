@@ -54,4 +54,3 @@ end
 function ImageEx:draw()
     Render.RenderObject(self)
 end
-
