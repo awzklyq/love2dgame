@@ -23,7 +23,15 @@ end
 
 function Shader:sendValue(name, value)
     if self:hasUniform(name) and value then
-        self:send(name, value)
+        if type(value) == 'table' and (value.renderid == Render.ImageId or value.renderid == Render.ImageAnimaId) then
+            if value.obj then
+                self:send(name, value.obj)
+            else
+                self:send(name, value)
+            end
+        else
+            self:send(name, value)
+        end
     else
         --log("Error! name and value:", name, value)
     end 

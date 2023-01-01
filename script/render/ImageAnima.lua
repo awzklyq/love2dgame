@@ -131,17 +131,18 @@ end
 function ImageAnima:Update(dt)
     self.Tick = self.Tick + dt
 
+    local Index = 0
     if self.Tick < self.Duration then
-        local Index = math.ceil(self.Tick / self.PageTime)
+        Index = math.ceil(self.Tick / self.PageTime)
         self.CurrentQuad = self.Quads[Index]
     else
         if not self.IsLoop then
             self:Pause()
-            local Index = #ImageAnimaManager.ImageAnimas
+            Index = #ImageAnimaManager.ImageAnimas
             self.CurrentQuad = self.Quads[Index]
         else
             self.Tick = self.Tick % self.Duration
-            local Index = math.ceil(self.Tick / self.PageTime)
+            Index = math.ceil(self.Tick / self.PageTime)
             self.CurrentQuad = self.Quads[Index]
         end
     end
@@ -153,8 +154,18 @@ function ImageAnima:Update(dt)
 
         local ScaleU = w / self:getWidth()
         local ScaleV = h / self:getHeight()
+
+        local NextIndex = (Index + 1)
+        if NextIndex > #self.Quads then
+            self.shader = ImageAnimaShader.GetImageAnimaShader(StartU, StartV, ScaleU, ScaleV)
+        else
+            local nx, ny, nw, hn = self.Quads[NextIndex]:getViewport( )
+            local NextU = nx / self:getWidth()
+            local NextV = ny / self:getHeight()
+            self.shader = ImageAnimaShader.GetImageAnimaShader(StartU, StartV, ScaleU, ScaleV, self.FlowMap, (self.Tick % self.PageTime) / self.PageTime, NextU, NextV)
+        end
     
-        self.shader = ImageAnimaShader.GetImageAnimaShader(StartU, StartV, ScaleU, ScaleV)
+        
     end
 end
 
