@@ -149,14 +149,12 @@ math.IntersectLine11 = function( a, b, c, d, intersect_p) --out intersect_p
 	local area_abc = (a.x - c.x) * (b.y - c.y) - (a.y - c.y) * (b.x - c.x);
 	local area_abd = (a.x - d.x) * (b.y - d.y) - (a.y - d.y) * (b.x - d.x);
 
-    log('tttttt111111', area_abc, area_abd)
 	if (area_abc * area_abd >= 0)  then return false end
 
     
 	local area_cda = (c.x - a.x) * (d.y - a.y) - (c.y - a.y) * (d.x - a.x);
 	local area_cdb = (c.x - b.x)* (d.y - b.y) - (c.y - b.y) * (d.x - b.x);
 
-    log('tttttt22222', area_cda, area_cdb)
 	if (area_cda * area_cdb >= 0) then return false end
 
 	local t = area_cda / (area_abd - area_abc);
@@ -240,6 +238,218 @@ math.CheckLineAndRectCollision = function(StartPos, EndPos, BA, BB, IntersecPoin
 	return false;
 end
 
+
+math.LeftMove = function(x, offset)
+    assert(offset)
+    if offset < 1 then
+        return x
+    end
+
+    local v, _ = math.modf(x)
+
+    return v * math.pow(2, offset)
+end
+
+math.RightMove = function(x, offset)
+    assert(offset)
+    if offset < 1 then
+        return x
+    end
+
+    local v, _ = math.modf(x)
+    
+    local r, _ =  math.modf(v / math.pow(2, offset))
+    return r
+end
+
+math.BitXor = function(v1, v2, type)
+    local Step = 0
+    local result = 0
+
+    v1 = math.modf(v1)
+    v2 = math.modf(v2)
+    while (v1 ~= 0 or  v2 ~= 0) do
+        local r1 = v1 % 2
+        local r2 = v2 % 2
+        if r1 ~= r2 then
+            result = result + math.pow(2, Step)
+        else
+            result = result + 0
+        end
+
+        Step = Step + 1
+        v1 = math.RightMove(v1, 1)
+        v2 = math.RightMove(v2, 1)
+    end
+    return result
+end
+
+math.BitAnd = function(v1, v2, type)
+    local Step = 0
+    local result = 0
+
+    v1 = math.modf(v1)
+    v2 = math.modf(v2)
+    while (v1 ~= 0 or  v2 ~= 0) do
+        local r1 = v1 % 2
+        local r2 = v2 % 2
+        if r1 == 1 and r2 == 1 then
+            result = result + math.pow(2, Step)
+        else
+            result = result + 0
+        end
+
+        Step = Step + 1
+        v1 = math.RightMove(v1, 1)
+        v2 = math.RightMove(v2, 1)
+    end
+    return result
+end
+
+math.BitOr = function(v1, v2, type)
+    local Step = 0
+    local result = 0
+
+    v1 = math.modf(v1)
+    v2 = math.modf(v2)
+    while (v1 ~= 0 or  v2 ~= 0) do
+        local r1 = v1 % 2
+        local r2 = v2 % 2
+        if r1 == 1 or r2 == 1 then
+            result = result + math.pow(2, Step)
+        else
+            result = result + 0
+        end
+
+        Step = Step + 1
+        v1 = math.RightMove(v1, 1)
+        v2 = math.RightMove(v2, 1)
+    end
+    return result
+end
+
+math.MortonCode3 = function(x)
+    x = math.BitAnd(0x000003ff, x);
+
+    x = math.BitAnd(math.BitXor(x, math.LeftMove(x, 16)), 0xff0000ff);
+   
+    x = math.BitAnd(math.BitXor(x, math.LeftMove(x, 8)), 0x0300f00f);
+    x = math.BitAnd(math.BitXor(x, math.LeftMove(x, 4)), 0x030c30c3);
+    x = math.BitAnd(math.BitXor(x, math.LeftMove(x, 2)), 0x09249249);
+
+    return x
+end
+
+math.ReverseMortonCode3 = function( x )
+    x = math.BitAnd(0x09249249, x);
+
+    x = math.BitAnd(math.BitXor(x, math.RightMove(x, 2)), 0x030c30c3)
+    x = math.BitAnd(math.BitXor(x, math.RightMove(x, 4)), 0x0300f00f)
+    x = math.BitAnd(math.BitXor(x, math.RightMove(x, 8)), 0xff0000ff)
+    x = math.BitAnd(math.BitXor(x, math.RightMove(x, 16)), 0x000003ff)
+
+    return x
+end
+
+math.RadixSort32 = function(Src, SortKey)
+    local Histogram0 = {}
+	local Histogram1 = {}
+	local Histogram2 = {}
+
+    local Num = #Src
+    for i = 1, 1024 do
+        Histogram0[i] = 0
+
+        Histogram1[i] = 0
+        Histogram1[i + 1024] = 0
+
+        Histogram2[i] = 0
+        Histogram2[i + 1024] = 0
+    end
+
+    -- Parallel histogram generation pass
+    for i = 1, Num do
+        local Key = SortKey( Src[i] );
+
+        local key1 =  math.BitAnd(math.RightMove( Key,  0 ), 1023) + 1
+        local key2 =  math.BitAnd(math.RightMove( Key,  10 ), 2047) + 1
+        local key3 =  math.BitAnd(math.RightMove( Key,  21 ), 2047) + 1
+
+        Histogram0[key1] = Histogram0[key1] + 1
+        Histogram1[key2] = Histogram1[key2] + 1
+        Histogram2[key3] = Histogram2[key3] + 1
+
+    end
+
+    -- Prefix sum
+	-- Set each histogram entry to the sum of entries preceding it
+	local Sum0 = 0;
+	local Sum1 = 0;
+	local Sum2 = 0;
+
+    for i = 1, 1024 do
+        local t;
+
+        t = Histogram0[i] + Sum0
+        Histogram0[i] = t
+        Sum0 = t
+
+        t = Histogram1[i] + Sum1
+        Histogram1[i] = t
+        Sum1 = t
+
+        t = Histogram2[i] + Sum2
+        Histogram2[i] = t
+        Sum2 = t
+    end
+
+    for i = 1025, 2038 do
+        local t;
+
+        t = Histogram1[i] + Sum1
+        Histogram1[i] = t
+        Sum1 = t
+
+        t = Histogram2[i] + Sum2
+        Histogram2[i] = t
+        Sum2 = t
+    end
+
+    local Dst = {}
+    for i = 1, Num do
+        local Value = Src[i];
+        local Key = SortKey( Value );
+        local key1 =  math.BitAnd(math.RightMove( Key,  0 ), 1023) + 1
+        Dst[ Histogram0[ key1 ] ] = Value;
+
+        local temp = Histogram0[ key1 ] 
+        Histogram0[ key1 ] = Histogram0[ key1 ] - 1
+    end
+
+    Src = Dst
+    Dst = {}
+    for i = 1, Num do
+        local Value = Src[i];
+        local Key = SortKey( Value );
+        local key2 =  math.BitAnd(math.RightMove( Key,  10 ), 2047) + 1
+        Dst[ Histogram1[ key2 ] ] = Value;
+        Histogram1[ key2 ] = Histogram1[ key2 ] - 1
+    end
+
+    Src = Dst
+    Dst = {}
+    for i = 1, Num do
+        local Value = Src[i];
+        local Key = SortKey( Value );
+        local key3 =  math.BitAnd(math.RightMove( Key,  21 ), 2047) + 1
+        Dst[ Histogram2[ key3 ] ] = Value;
+        Histogram2[ key3 ] = Histogram2[ key3 ] - 1
+    end
+
+
+	return Dst
+
+end
 
 math.defaulttransform =  love.math.newTransform( );
 math.MinNumber = 0.000001;

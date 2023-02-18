@@ -20,6 +20,29 @@ _G._errorAssert = function(a, ...)
     assert(a, "Error : ".. ...)
 end
 
+_G.logbit = function(v)
+    assert(type(v) == 'number')
+    v = math.modf(v)
+    local temp = v
+    local str = {}
+    while(v ~= 0) do
+        if v%2 == 0 then
+            str[#str +1] = "0"
+        else
+            str[#str +1] = "1"
+        end
+
+        v = math.RightMove(v)
+    end
+
+    local result = ""
+    for i =  #str, 1, -1 do
+        result = result .. str[i]
+    end
+    
+    log("Bit: ", temp, result)
+end
+
 --deubg
 _G.lovedebug.renderbox2d = true;   
 _G.lovedebug.renderobject = true;

@@ -88,6 +88,11 @@ function ImageAnima.new(name, xnum, ynum, Duration ,  ...)
     return image;
 end
 
+function ImageAnima:SetDuration(Duration)
+    self.Duration = Duration;
+    self.PageTime = self.Duration / #self.Quads
+end
+
 function ImageAnima:SetFlowMap(name, ...)
     self.FlowMap =  ImageEx.new(name, ...)
 end
