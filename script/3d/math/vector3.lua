@@ -142,6 +142,13 @@ function Vector3:negativeSelf(v)
     self.z = -self.z
 end
 
+function Vector3:GetMortonCode3()
+    local Morton = math.MortonCode3( self.x );
+    Morton = math.BitOr(Morton, math.LeftMove(math.MortonCode3( self.y ) ,1));
+    Morton = math.BitOr(Morton, math.LeftMove(math.MortonCode3( self.z ) ,2));
+    return Morton
+end
+
 function Vector3.negative(v)
     return Vector3.new(-v.x, -v.y, -v.z)
 end
