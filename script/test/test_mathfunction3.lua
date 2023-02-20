@@ -39,11 +39,11 @@ math.randomseed(os.time()%10000)
 
 -- log(#tab, #tab1, s1, s2, s3, s2 - s1, s3-s2)
 
-local offset = Vector3.new(64, 64, 64)
+local offset = Vector3.new(32, 32, 32)
 
 local min1 = Vector3.new(0,0,0)
-local min2 = Vector3.new(211,211,211)
-local min3 = Vector3.new(666,666,100)
+local min2 = Vector3.new(17,29,21)
+local min3 = Vector3.new(33,11,57)
 local b1 = BoundBox.buildFromMinMax(min1, min1 + offset)
 
 local b2 = BoundBox.buildFromMinMax(min2, min2 + offset)
@@ -79,6 +79,16 @@ splitbox(b1, tabs)
 splitbox(b2, tabs)
 splitbox(b3, tabs)
 
+
+for i = 1, #tabs do
+    if i ~= #tabs then
+        log(tabs[i].index1, tabs[i].index2, Vector3.distance(tabs[i].box.center, tabs[i + 1].box.center))
+    else
+        log(tabs[i].index1, tabs[i].index2)
+    end
+    
+end
+
 local TN = #tabs
 for i = 1, 100 do
     local r1, _ = math.modf(math.random() * TN + 1) % TN + 1
@@ -90,9 +100,14 @@ for i = 1, 100 do
     end
 end
 
-for i = 1, #tabs do
-    log(tabs[i].index1, tabs[i].index2,  tabs[i].box.center:GetMortonCode3())
-end
+-- for i = 1, #tabs do
+--     if i ~= #tabs then
+--         log(tabs[i].index1, tabs[i].index2, Vector3.distance(tabs[i].box.center, tabs[i + 1].box.center))
+--     else
+--         log(tabs[i].index1, tabs[i].index2)
+--     end
+    
+-- end
 
 local result = math.RadixSort32(tabs, function(key) 
     return key.box.center:GetMortonCode3()
@@ -100,10 +115,10 @@ local result = math.RadixSort32(tabs, function(key)
 
  log("ssssssssssssssssssssss")
  for i = 1, #result do
-    log(result[i].index1, result[i].index2, result[i].box.center:GetMortonCode3())
-end
-
-log("aaaaaaaaaaaaaaaaaaaa")
-for i = 1, #result do
-   log(result[i].index1, result[i].box.center.x, result[i].box.center.y, result[i].box.center.z)
+    if i ~= #result then
+        log(result[i].index1, result[i].index2, Vector3.distance(result[i].box.center, result[i + 1].box.center), i)
+    else
+        log(result[i].index1, result[i].index2)
+    end
+   
 end

@@ -10,6 +10,18 @@ function LColor.new(r, g, b, a)
     return color;
 end
 
+function LColor:GetMortonCodeRGB()
+    local Morton = math.MortonCode3( self.r / 255 * 1023 );
+    Morton = math.BitOr(Morton, math.LeftMove(math.MortonCode3( self.g / 255 * 1023) ,1));
+    Morton = math.BitOr(Morton, math.LeftMove(math.MortonCode3( self.b / 255 * 1023) ,2));
+    return Morton
+end
+
+function LColor:GetLuminance()
+    return 0.299* self._r +  0.587 * self._g + 0.114 * self._b
+end
+
+
 
 LColor.__index = function(tab, key)
     if key == 'r' then
