@@ -78,9 +78,6 @@ local inc = function(num)
     if repeatValue > 0 then 
         local temp = num
         num = num % (repeatValue + 1);
-        if temp ~= num then
-            log('sssssssssssss', temp, num, temp % repeatValue)
-        end
     end
     
     return num;

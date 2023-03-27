@@ -17,6 +17,13 @@ function LColor:GetMortonCodeRGB()
     return Morton
 end
 
+function LColor:GetReverseMortonCodeRGB(x)
+    self.r = math.ReverseMortonCode3( x ) / 1023 * 255;
+    self.g = math.ReverseMortonCode3( math.RightMove(x, 1) ) / 1023 * 255;
+    self.b = math.ReverseMortonCode3( math.RightMove(x, 2) ) / 1023 * 255;
+    return self
+end
+
 function LColor:GetLuminance()
     return 0.299* self._r +  0.587 * self._g + 0.114 * self._b
 end
