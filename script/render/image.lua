@@ -30,6 +30,14 @@ ImageEx.__index = function(tab, key, ...)
         return value;
     end
 
+    if key == 'renderWidth' then
+        return rawget(tab, 'w');
+    end
+
+    if key == 'renderHeight' then
+        return rawget(tab, 'h');
+    end
+
     if ImageEx[key] then
         return ImageEx[key];
     end
@@ -48,7 +56,13 @@ ImageEx.__index = function(tab, key, ...)
 end
 
 ImageEx.__newindex = function(tab, key, value)
-    rawset(tab, key, value);
+    if key == 'renderWidth' then
+        rawset(tab, 'w', value);
+    elseif key == 'renderHeight' then
+        rawset(tab, 'h', value);
+    else
+        rawset(tab, key, value);
+    end
 end
 
 function ImageEx:draw()

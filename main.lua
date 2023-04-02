@@ -123,7 +123,7 @@ dofile 'script/postprocess/gaussianfilter.lua'
 dofile 'script/postprocess/simplessgi.lua'
 dofile 'script/postprocess/esmblur.lua'
 dofile 'script/postprocess/VelocityBuff.lua'
-
+dofile 'script/postprocess/depthoffield.lua'
 
 dofile 'script/3d/effect/motionvector.lua'
 
@@ -158,5 +158,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_fbm.lua')--test_simplessgi  test_Octahedralmap
+	dofile('script/test/test_depthoffield.lua')--test_simplessgi  test_Octahedralmap
 end
