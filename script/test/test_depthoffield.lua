@@ -5,7 +5,7 @@ meshquad.h = RenderSet.screenheight
 
 -- local image = ImageEx.new("OriBA.png")
 local image = ImageEx.new("yizi.png")
-
+-- local image = ImageEx.new("xing.png")
 app.update(function(dt)
    
 end)
