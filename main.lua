@@ -62,6 +62,7 @@ dofile('script/math/vector.lua')
 dofile('script/math/complex.lua')
 dofile('script/math/matrix.lua')
 dofile('script/math/matrix2d.lua')
+dofile 'script/math/kmeans.lua'
 dofile('script/3d/math/vector3.lua')
 dofile('script/3d/math/vector4.lua')
 dofile('script/3d/math/matrix3d.lua')
@@ -158,5 +159,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_depthoffield.lua')--test_simplessgi  test_Octahedralmap
+	dofile('script/test/test_kmeans.lua')--test_simplessgi  test_Octahedralmap
 end
