@@ -51,23 +51,31 @@ KMeans.Process = function(V3Datas, GroupNumber)
     end
 
     local NewV3Datas = {}
+    local NewV3DatasVariance = {}
+
     local GroupData = {}
+    local GroupDataVariance = {}
     for i = 1, GroupNumber do
         GroupData[i] = {}
         GroupData[i][1] = V3Datas[SelectIndexs[i]]
+
+        GroupDataVariance[i] = {}
+        GroupDataVariance[i][1] = V3Datas[SelectIndexs[i]]
     end
 
     for i = 1, #V3Datas do
         if not CheckValueInArray(SelectIndexs, i) then
             NewV3Datas[#NewV3Datas + 1] = V3Datas[i]
+            NewV3DatasVariance[#NewV3DatasVariance + 1] = V3Datas[i]
         end
     end
 
     for i = 1, #NewV3Datas do
         KMeans.FindNearestVector(GroupData, GroupNumber, NewV3Datas[i])
+        KMeans.FindNearestVectorByVariance(GroupDataVariance, GroupNumber, NewV3Datas[i])
     end
 
-    return GroupData
+    return GroupData, GroupDataVariance
 end
 
 KMeans.FindNearestVector = function(GroupData, GroupNumber, data)
@@ -79,4 +87,46 @@ KMeans.FindNearestVector = function(GroupData, GroupNumber, data)
     local NeedIndex = CalculateShortDistance(Centroids, data)
 
     GroupData[NeedIndex][#GroupData[NeedIndex] + 1] = data
+end
+
+KMeans.FindNearestVectorByVariance = function(GroupData, GroupNumber, data)
+    local vari = math.maxFloat
+    local NeedIndex = -1
+    for i = 1, GroupNumber do
+        local Variance = KMeans.CalculateVariance(GroupData[i], data)
+        if vari > Variance then
+            vari = Variance
+            NeedIndex = i
+        end
+    end
+
+    GroupData[NeedIndex][#GroupData[NeedIndex] + 1] = data
+end
+
+KMeans.CalculateVariance = function(GroupData, data)
+    local NewDatas = {}
+    for i = 1, #GroupData do
+        NewDatas[#NewDatas + 1] = GroupData[i]
+    end
+
+    NewDatas[#NewDatas + 1] = data
+
+    local vx = 0
+    local vy = 0
+    for i = 1, #NewDatas do
+        vx = vx + NewDatas[i].x
+        vy = vy + NewDatas[i].y
+    end 
+
+    vx = vx / #NewDatas
+    vy = vy / #NewDatas
+
+    local Variance = 0
+    for i = 1, #NewDatas do
+        Variance = math.pow(NewDatas[i].x - vx, 2) + math.pow(NewDatas[i].y - vy, 2)
+    end 
+
+    Variance = Variance / #NewDatas
+
+    return Variance
 end
