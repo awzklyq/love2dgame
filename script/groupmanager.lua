@@ -5,10 +5,10 @@ _G.GroupManager.groups = {};
 
 _G.GroupManager.loadGroup = function(name)
     if not _G[name..'Group'] then
-        if love.filesystem.exists("script/"..name..'Group.lua') then
-            dofile("script/"..name..'Group.lua');
+        if love.filesystem.exists("script/"..name..'group.lua') then
+            dofile("script/"..name..'group.lua');
         else
-            dofile("script/groups/"..name..'Group.lua');
+            dofile("script/groups/"..name..'group.lua');
         end
     end
 

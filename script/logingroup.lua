@@ -11,7 +11,7 @@ function LoginGroup:init()
     button:setText("Login");
     button.click = function()
         _G.GroupManager.releaseGroup(self)
-        _G.GroupManager.loadGroup("Main");
+        _G.GroupManager.loadGroup("Level1");
     end
 end
 

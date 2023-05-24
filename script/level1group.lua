@@ -1,5 +1,6 @@
 _G.Level1Group = {}
 
+log('bbbbbbbbbbbbbbbb')
 function Level1Group.new()
     local group = setmetatable({}, {__index = Level1Group});
     return group;

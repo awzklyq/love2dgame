@@ -138,6 +138,12 @@ dofile('script/shader/ImageAnimaShader.lua')
 
 dofile('script/render/imageanima.lua')
 
+
+dofile 'script/ballgame/collision/collisionmanager.lua'
+dofile 'script/ballgame/collision/collisionbinder.lua'
+dofile 'script/ballgame/collision/collisiongroup.lua'
+dofile 'script/ballgame/collision/collisionphysics.lua'
+
 FileManager.addAllPath("assert")
 
 _G.mlib = require 'script/mlib' 
@@ -152,12 +158,12 @@ _G.getMe = function(obj)
 	return me
 end
 
-_G.TEST = true
+_G.TEST = false
 if not _G.TEST then
 app.load(function()
 	_G.GroupManager.loadGroup("Login");
 end)
 
 else
-	dofile('script/test/test_kmeans.lua')--test_simplessgi  test_Octahedralmap
+	dofile('script/test/test_imageanima.lua')--test_simplessgi  test_Octahedralmap
 end
