@@ -158,12 +158,12 @@ _G.getMe = function(obj)
 	return me
 end
 
-_G.TEST = false
+_G.TEST = true
 if not _G.TEST then
 app.load(function()
 	_G.GroupManager.loadGroup("Login");
 end)
 
 else
-	dofile('script/test/test_imageanima.lua')--test_simplessgi  test_Octahedralmap
+	dofile('script/test/test_Gamma.lua')--test_simplessgi  test_Octahedralmap
 end
