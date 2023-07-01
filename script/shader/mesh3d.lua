@@ -530,3 +530,64 @@ function Shader.GetBase3DShader(color, projectionMatrix, modelMatrix, viewMatrix
     ShaderObjects[HashIndex] = shader
     return  shader
 end
+
+function Shader.GetPrePassBlack3DPSShaderCode()   
+    local pixelcode = [[
+        vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
+        {
+            return vec4(0, 0, 0, 1);
+        }
+    ]];
+
+    return pixelcode
+end
+
+
+function Shader.GetPrePassBlack3DShader(color, projectionMatrix, modelMatrix, viewMatrix)
+    local directionlights = Lights.getDirectionLights()
+
+    local HashIndex = "GetPrePassBlack3DShader"
+    local shader = ShaderObjects[HashIndex]
+    if shader then
+        return shader
+    end
+
+    shader = Shader.new(Shader.GetPrePassBlack3DPSShaderCode(), Shader.GetBase3DVSShaderCode())
+    assert(shader:hasUniform( "projectionMatrix") and shader:hasUniform( "modelMatrix") and shader:hasUniform( "viewMatrix"))
+    if projectionMatrix then
+        shader:send('projectionMatrix', projectionMatrix)
+    end
+
+    if modelMatrix then
+        shader:send('modelMatrix', modelMatrix)
+    end
+
+    if viewMatrix then
+        shader:send('viewMatrix', viewMatrix)
+    end
+
+    shader.setCameraAndMatrix3D = function(obj, modelMatrix, projectionMatrix, viewMatrix, camerapos, mesh)
+        if projectionMatrix then
+            obj:send('projectionMatrix', projectionMatrix)
+        end
+    
+        if modelMatrix then
+            obj:send('modelMatrix', modelMatrix)
+        end
+    
+        if viewMatrix then
+            obj:send('viewMatrix', viewMatrix)
+        end
+
+        if camerapos and obj:hasUniform( "camerapos")  then
+            obj:send('camerapos', {camerapos.x, camerapos.y, camerapos.z})
+        end
+
+        if mesh then
+            mesh.PreTransform = projectionMatrix * viewMatrix * modelMatrix
+        end
+    end
+
+    ShaderObjects[HashIndex] = shader
+    return  shader
+end

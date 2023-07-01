@@ -214,6 +214,24 @@ function Mesh3D:draw()
     self:AfterDraw()
 end
 
+function Mesh3D:DrawPrePassBlack()
+    if not self.visible then return end
+
+    local camera3d = _G.getGlobalCamera3D()
+    --modelMatrix, projectionMatrix, viewMatrix
+
+    local shader = self.shader
+    self.shader = Shader.GetPrePassBlack3DShader(nil, nil, nil, nil);
+     
+    self.shader:setCameraAndMatrix3D(self.transform3d, RenderSet.getUseProjectMatrix(), RenderSet.getUseViewMatrix(), camera3d.eye, self)
+
+    Render.RenderObject(self)
+
+    self.shader = shader
+
+    self:AfterDraw()
+end
+
 function Mesh3D:AfterDraw()
     --self.PreTransform = Matrix3D.copy(self.transform3d)
 end

@@ -227,7 +227,7 @@ function Scene3D:draw(isdrawCanvaColor)
     local AlphaTestNodes = {}
     love.graphics.setMeshCullMode("front")
     love.graphics.setDepthMode("less", true)
-    love.graphics.setCanvas({self.CanvasColor.obj, depthstencil = self.normal_depth_buffer.obj})
+    love.graphics.setCanvas({self.CanvasColor.obj, depthstencil = self.depthmap_depth_buffer.obj})
     love.graphics.clear(self.bgColor._r, self.bgColor._g, self.bgColor._b, self.bgColor._a)
     if self.Tiles then--TODO
         
@@ -295,7 +295,7 @@ function Scene3D:DrawAlphaTest(AlphaTestNodes)
 
     love.graphics.setMeshCullMode("front")
     love.graphics.setDepthMode("less", true)
-    love.graphics.setCanvas({self.CanvasColor.obj, depthstencil = self.normal_depth_buffer.obj})
+    love.graphics.setCanvas({self.CanvasColor.obj, depthstencil = self.depthmap_depth_buffer.obj})
     for i = 1, #AlphaTestNodes do
         local node = AlphaTestNodes[i]
         if node.mesh then--  
@@ -349,7 +349,7 @@ function Scene3D:DrawAlphaTest2(AlphaTestNodes)
 
     love.graphics.setMeshCullMode("none")
     love.graphics.setDepthMode("less", false)
-    love.graphics.setCanvas({self.CanvasColor.obj, depthstencil = self.normal_depth_buffer.obj})
+    love.graphics.setCanvas({self.CanvasColor.obj, depthstencil = self.depthmap_depth_buffer.obj})
     -- love.graphics.clear(self.bgColor._r, self.bgColor._g, self.bgColor._b, self.bgColor._a)
     for i = 1, #AlphaTestNodes do
         local node = AlphaTestNodes[i]

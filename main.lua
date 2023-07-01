@@ -125,6 +125,7 @@ dofile 'script/postprocess/simplessgi.lua'
 dofile 'script/postprocess/esmblur.lua'
 dofile 'script/postprocess/VelocityBuff.lua'
 dofile 'script/postprocess/depthoffield.lua'
+dofile 'script/postprocess/godray.lua'
 
 dofile 'script/3d/effect/motionvector.lua'
 
@@ -165,5 +166,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_Gamma.lua')--test_simplessgi  test_Octahedralmap
+	dofile('script/test/test_godray.lua')--test_simplessgi  test_Octahedralmap
 end
