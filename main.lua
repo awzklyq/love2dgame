@@ -23,6 +23,7 @@ dofile('script/render/image.lua')
 
 dofile('script/common/color.lua')
 dofile('script/common/filepath.lua')
+dofile('script/common/earclip.lua')
 dofile('script/common/pbr.lua')
 dofile('script/common/radarfrustum.lua')
 dofile('script/common/SpaceSplit.lua')
@@ -166,5 +167,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_godray.lua')--test_simplessgi  test_Octahedralmap
+	dofile('script/test/test_earclip.lua')--test_simplessgi  test_Octahedralmap
 end

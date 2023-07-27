@@ -81,6 +81,7 @@ Render.RayId = 40
 
 Render.ImageAnimaId = 41
 
+Render.EdgeId = 42
 
 Render.getRenderIdName = function(id)
     if Render.CircleId == id then
@@ -150,7 +151,9 @@ Render.getRenderIdName = function(id)
     elseif Render.RayId == id then
         return "RayId"
     elseif Render.ImageAnimaId == id then
-        return "Render.ImageAnimaId"
+        return "ImageAnimaId"
+    elseif Render.EdgeId == id then
+        return "EdgeId"
     end
     
     return "Null"
@@ -236,6 +239,12 @@ Render.RenderObject = function(obj)
             love.graphics.setLineWidth( obj.lw);
             love.graphics.setColor(obj.color.r, obj.color.g, obj.color.b, obj.color.a);
             love.graphics.line( obj.x1, obj.y1, obj.x2, obj.y2)
+            love.graphics.setLineWidth(lw);
+        elseif obj.renderid == Render.EdgeId then
+            local lw = love.graphics.getLineWidth();
+            love.graphics.setLineWidth( obj.lw or 2);
+            love.graphics.setColor(obj.Color.r, obj.Color.g, obj.Color.b, obj.Color.a);
+            love.graphics.line( obj.P1.x, obj.P1.y, obj.P2.x, obj.P2.y)
             love.graphics.setLineWidth(lw);
         elseif obj.renderid == Render.LinesId then
             local lw = love.graphics.getLineWidth();

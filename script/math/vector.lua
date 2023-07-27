@@ -70,10 +70,32 @@ Vector.angle = function(v1, v2)
     v11:normalize( );
 
     local v22 = Vector.new(v2.x, v2.y)
-    v2:normalize( );
+    v22:normalize( );
     local dot = Vector.dot(v11, v22);
 
     return math.acos(dot);
+end
+
+Vector.angleX = function(v1)
+    local v11 = Vector.new(v1.x, v1.y);
+    v11:normalize( );
+
+    if v11.y >= 0 then
+        return math.acos(v11.x);
+    elseif v11.y < 0 then
+        return math.c2pi - math.acos(v11.x);
+    end
+end
+
+Vector.angleClockwise = function(v1, v2)
+    local a1 = Vector.angleX(v1)
+    local a2 = Vector.angleX(v2)
+
+    if a2 > a1 then
+        return math.c2pi - (a2 - a1)
+    else
+        return a1 - a2
+    end
 end
 
 Vector.copy = function(v)

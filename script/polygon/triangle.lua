@@ -1,6 +1,6 @@
 _G.Triangle2D = {}
 
-function Triangle2D.new(p1, p2, p3, linewidth)-- Vector2 or Vector3...
+function Triangle2D.new(p1, p2, p3, IsNeedEdge, linewidth)-- Vector2 or Vector3...
     local tri = setmetatable({}, {__index = Triangle2D});
 
     tri.P1 = p1
@@ -11,25 +11,27 @@ function Triangle2D.new(p1, p2, p3, linewidth)-- Vector2 or Vector3...
 
     tri.LineWidth = linewidth or 2
 
-    tri.edge1 = Edge2D.new(tri.P1, tri.P2)
-    tri.edge2 = Edge2D.new(tri.P2, tri.P3)
-    tri.edge3 = Edge2D.new(tri.P3, tri.P1)
+    if IsNeedEdge or IsNeedEdge == nil then
+        tri.edge1 = Edge2D.new(tri.P1, tri.P2)
+        tri.edge2 = Edge2D.new(tri.P2, tri.P3)
+        tri.edge3 = Edge2D.new(tri.P3, tri.P1)
 
-    if not tri.edge1.ThirdPoints then
-        tri.edge1.ThirdPoints = {}
+        if not tri.edge1.ThirdPoints then
+            tri.edge1.ThirdPoints = {}
+        end
+
+        if not tri.edge2.ThirdPoints then
+            tri.edge2.ThirdPoints = {}
+        end
+
+        if not tri.edge3.ThirdPoints then
+            tri.edge3.ThirdPoints = {}
+        end
+
+        tri.edge1.ThirdPoints[#tri.edge1.ThirdPoints + 1] = tri.P3
+        tri.edge2.ThirdPoints[#tri.edge2.ThirdPoints + 1] = tri.P1
+        tri.edge3.ThirdPoints[#tri.edge3.ThirdPoints + 1] = tri.P2
     end
-
-    if not tri.edge2.ThirdPoints then
-        tri.edge2.ThirdPoints = {}
-    end
-
-    if not tri.edge3.ThirdPoints then
-        tri.edge3.ThirdPoints = {}
-    end
-
-    tri.edge1.ThirdPoints[#tri.edge1.ThirdPoints + 1] = tri.P3
-    tri.edge2.ThirdPoints[#tri.edge2.ThirdPoints + 1] = tri.P1
-    tri.edge3.ThirdPoints[#tri.edge3.ThirdPoints + 1] = tri.P2
 
     tri.mode = "line"
 
@@ -63,6 +65,22 @@ function Triangle2D:draw()
     -- local r, g, b, a = love.graphics.getColor( );
     Render.RenderObject(self);
     -- love.graphics.setColor(r, g, b, a );
+end
+
+function Triangle2D:CheckPointIn(Point)
+    local v1 = (self.P1 - Point):normalize()
+    local v2 = (self.P2 - Point):normalize()
+    local v3 = (self.P3 - Point):normalize()
+
+    local a1 = Vector.angle(v1, v2)
+    local a2 = Vector.angle(v2, v3)
+    local a3 = Vector.angle(v3, v1)
+
+    if math.abs((a1 + a2 + a3) - math.c2pi) > math.cEpsilon then
+        return false
+    end
+
+    return true;
 end
 
 

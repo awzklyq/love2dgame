@@ -26,5 +26,35 @@ function Edge2D.new(p1, p2)
     edge.P1.Edges[#edge.P1.Edges + 1] = edge
     edge.P2.Edges[#edge.P2.Edges + 1] = edge
 
+    edge.Color = LColor.new(255,255,255,255)
+
+    edge.renderid = Render.EdgeId ;
     return edge
+end
+
+function Edge2D:GetOtherPoint(p)
+    if self.P1 == p then
+        return self.P2
+    elseif  self.P2 == p then
+        return self.P1
+    else
+        assert(false)
+    end 
+end
+
+function Edge2D:ChangePoint(p, newp)
+    if self.P1 == p then
+        self.P1 = newp
+    elseif self.P2 == p then
+        self.P2 = newp
+    -- else
+    --     assert(false)
+    end 
+end
+
+function Edge2D:draw()
+    -- local r, g, b, a = love.graphics.getColor( );
+    Render.RenderObject(self);
+ 
+    -- love.graphics.setColor(r, g, b, a );
 end

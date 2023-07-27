@@ -21,7 +21,6 @@ DepthOfField.Canvae.renderWidth = 1
 DepthOfField.Canvae.renderHeight = 1
 DepthOfField.meshquad = _G.MeshQuad.new(1,1, LColor.new(255, 255, 255, 255))
 
-DepthOfField.ClamptBrightness = 0.0
 local Bi = 1
 DepthOfField.Execute = function(Canva1, InMeshQuad)
     if DepthOfField.Canvae.renderWidth ~= Canva1.renderWidth or DepthOfField.Canvae.renderHeight ~= Canva1.renderHeight then
@@ -224,7 +223,7 @@ function Shader.DOFGetDOFFilters(w, h, offset, power, DOFFiltersType)
         vec2 stepVal = 1.0/vec2(w, h);
         
         vec4 val = vec4(0,0,0,0);
-        float filterRadius = 1.0;//texture2D(tex, uv).a;
+        float filterRadius = texture2D(tex, uv).a;
         for (int i=-KERNEL_RADIUS; i <=KERNEL_RADIUS; ++i)
         {
             vec2 coords = uv + stepVal*vec2(float(i),0.0)*filterRadius;
@@ -361,7 +360,7 @@ function Shader.DOFGetDOFFilterCom(ImageR, ImageG, ImageB, w, h)
             vec4 valR = vec4(0,0,0,0);
             vec4 valG = vec4(0,0,0,0);
             vec4 valB = vec4(0,0,0,0);
-            float filterRadius = 1.0;//texture2D(tex, uv).a;
+            float filterRadius = texture2D(tex, uv).a;
             for (int i=-KERNEL_RADIUS; i <=KERNEL_RADIUS; ++i)
             {
                 vec2 coords = uv + stepVal*vec2(0.0,float(i))*filterRadius;
