@@ -16,7 +16,7 @@ app.render(function(dt)
     if IsRenderOri then
         image:draw()
     else
-        local RenderCanvan = DepthOfField.Execute(image) 
+        local RenderCanvan = WaterColorFilterNode.Execute(image) 
         RenderCanvan:draw()
     end
 

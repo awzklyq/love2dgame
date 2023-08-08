@@ -4,7 +4,7 @@ local far = 400
 local near = 100
 local pos = Vector.new(RenderSet.screenwidth * 0.5, RenderSet.screenheight * 0.5)
 local frustum = RadarFrustum2D.new(pos, Vector.new(0, 1), math.rad(90), near, far)
-local triangle = Triangle2D.new(Vector.new(), Vector.new(), Vector.new(), 2)
+local triangle = Triangle2D.new(Vector.new(), Vector.new(), Vector.new())
 local rect1
 local rect2
 local rect3

@@ -127,6 +127,7 @@ dofile 'script/postprocess/esmblur.lua'
 dofile 'script/postprocess/VelocityBuff.lua'
 dofile 'script/postprocess/depthoffield.lua'
 dofile 'script/postprocess/godray.lua'
+dofile 'script/postprocess/watercolorfilter.lua'
 
 dofile 'script/3d/effect/motionvector.lua'
 
@@ -167,5 +168,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_earclip.lua')--test_simplessgi  test_Octahedralmap
+	dofile('script/test/test_watercolorfilter.lua')--test_simplessgi  test_Octahedralmap
 end
