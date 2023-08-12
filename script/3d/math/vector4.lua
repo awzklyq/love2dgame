@@ -4,11 +4,22 @@ local metatable_vector4 = {}
 metatable_vector4.__index = Vector4
 
 metatable_vector4.__add = function(myvalue, value)
-    return Vector4.new(myvalue.x + value.x, myvalue.y + value.y, myvalue.z + value.z, myvalue.w + value.w)
+    if type(value) == "number" then
+        return Vector4.new(myvalue.x + value, myvalue.y + value, myvalue.z + value, myvalue.w + value)
+    else
+        return Vector4.new(myvalue.x + value.x, myvalue.y + value.y, myvalue.z + value.z, myvalue.w + value.w)
+    end
+   
 end
 
 metatable_vector4.__sub = function(myvalue, value)
-    return Vector4.new(myvalue.x - value.x, myvalue.y - value.y, myvalue.z - value.z, myvalue.w - value.w)
+
+    if type(value) == "number" then
+        return Vector4.new(myvalue.x - value, myvalue.y - value, myvalue.z - value, myvalue.w - value)
+    else
+        return Vector4.new(myvalue.x - value.x, myvalue.y - value.y, myvalue.z - value.z, myvalue.w - value.w)
+    end
+    
 end
 
 metatable_vector4.__mul = function(myvalue, value)

@@ -168,5 +168,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_watercolorfilter.lua')--test_simplessgi  test_Octahedralmap
+	dofile('script/test/test_normalencode.lua')--test_simplessgi  test_Octahedralmap
 end

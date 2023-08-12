@@ -451,6 +451,65 @@ math.RadixSort32 = function(Src, SortKey)
 
 end
 
+-- Encode for normal map.
+math.SphericalEncode = function(v3)
+    local v = Vector.new()
+    v.x = math.atan2(v3.y, v3.x) * math.invc2pi
+    v.y = v3.z
+
+    v = v * 0.5 + 0.5
+    return v
+end
+
+math.SphericalDecode = function(v)
+    local ang = v * 2.0 - 1.0
+
+    local scth = Vector.new()
+
+    local r = ang.x * math.c2pi
+    local d2 =  1.0 - ang.y * ang.y
+     
+
+    scth.x = math.cos(r)
+    scth.y = math.sin(r)
+
+    local schpi = Vector.new(math.sqrt( 1.0 - ang.y * ang.y ), ang.y)
+
+    local v3 = Vector3.new(scth.x * schpi.x, scth.y * schpi.x, schpi.y)
+
+    return v3
+end
+
+local OctWrap = function(v)
+    local x = ( 1.0 - math.abs( v.x ) ) * ( v.x >= 0.0 and 1.0 or -1.0 );
+    local y = ( 1.0 - math.abs( v.y ) ) * ( v.y >= 0.0 and 1.0 or -1.0 );
+    return Vector.new(y, x)
+end
+
+math.OctEncode = function(v3)
+    v3 = v3 / (math.abs(v3.x) + math.abs(v3.y) + math.abs(v3.z))
+
+    local n = Vector.new(v3.x, v3.y)
+
+    if v3.z < 0 then
+        n = OctWrap(n)
+    end
+
+    n = n * 0.5 + 0.5
+    return n
+end
+
+math.OctDecode = function(v)
+    v = v * 2.0 - 1.0
+
+    local n = Vector3.new(v.x, v.y, 1.0 - math.abs(v.x) - math.abs(v.y))
+    local t = math.clamp(-n.z, 0, 1)
+    n.x = n.x + (n.x > 0 and -t or t)
+    n.y = n.y + (n.y > 0 and -t or t)
+
+    return n:normalize()
+end
+
 math.defaulttransform =  love.math.newTransform( );
 math.MinNumber = 0.000001;
 math.MaxNumber = 999999.0;
@@ -460,4 +519,6 @@ math.maxFloat	=  3.402823466e+38;
 math.minFloat	= -3.402823466e+38;
 
 math.c2pi = math.pi * 2
+math.invpi = 1 / math.pi
+math.invc2pi = 1 / math.c2pi
 -- math.ARC = math.PI * 2;

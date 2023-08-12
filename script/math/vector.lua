@@ -4,11 +4,19 @@ local metatable_vector = {}
 metatable_vector.__index = Vector
 
 metatable_vector.__add = function(myvalue, value)
-    return Vector.new(myvalue.x + value.x, myvalue.y + value.y)
+    if type(value) == "number" then
+        return Vector.new(myvalue.x + value, myvalue.y + value)
+    else
+        return Vector.new(myvalue.x + value.x, myvalue.y + value.y)
+    end
 end
 
 metatable_vector.__sub = function(myvalue, value)
-    return Vector.new(myvalue.x - value.x, myvalue.y - value.y)
+    if type(value) == "number" then
+        return Vector.new(myvalue.x - value, myvalue.y - value)
+    else
+        return Vector.new(myvalue.x - value.x, myvalue.y - value.y)
+    end
 end
 
 metatable_vector.__mul = function(myvalue, value)
