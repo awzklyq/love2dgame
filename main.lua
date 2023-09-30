@@ -24,6 +24,7 @@ dofile('script/render/image.lua')
 dofile('script/common/color.lua')
 dofile('script/common/filepath.lua')
 dofile('script/common/earclip.lua')
+dofile('script/common/voronoi.lua')
 dofile('script/common/pbr.lua')
 dofile('script/common/radarfrustum.lua')
 dofile('script/common/SpaceSplit.lua')
@@ -41,6 +42,8 @@ dofile('script/shader/shader_octahedralmap.lua')
 dofile('script/polygon/rect.lua')
 dofile('script/polygon/circle.lua')
 dofile('script/polygon/line.lua')
+dofile('script/polygon/HermiteCurve.lua')
+dofile('script/polygon/BezierCurve.lua')
 dofile('script/polygon/edge.lua')
 dofile('script/polygon/box.lua')
 dofile('script/polygon/mesh.lua')
@@ -168,5 +171,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_normalencode.lua')--test_simplessgi  test_Octahedralmap
+	dofile('script/test/test_BezierCurve.lua')--test_simplessgi  test_Octahedralmap
 end

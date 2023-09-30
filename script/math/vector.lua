@@ -45,6 +45,13 @@ function Vector.new(x ,y)
     return v;
 end
 
+function Vector:Log(info)
+    if not info then
+        info = ""
+    end
+    log(info, "Vector X, Y :", self.x, self.y)
+end
+
 function Vector:length()
     return math.sqrt(math.pow(self.x, 2) + math.pow(self.y, 2));
 end
@@ -71,6 +78,10 @@ end
 
 Vector.dot = function(v1, v2)
     return v1.x * v2.x + v1.y * v2.y;
+end
+
+Vector.cross = function(v1, v2)
+    return v1.x * v2.y - v2.x * v1.y
 end
 
 Vector.angle = function(v1, v2)

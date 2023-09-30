@@ -79,6 +79,22 @@ end
     
 --  end
 
+function cross(a, b, c, d)
+    return (b.x - a.x)*(d.y - c.y) - (b.y - a.y)*(d.x - c.x)
+end
+
+function Lines:IsIntersectLine(line)
+    local d1 = cross(a, b, c)
+    local d2 = cross(a, b, d)
+    local d3 = cross(c, d, a)
+    local d4 = cross(c, d, b)
+    if d1*d2 < 0 and d3*d4 < 0 then
+        return true
+    end
+    return false
+end
+
+
 _G.CrossLine = {}
 function CrossLine.new(x, y, w, h, lw)-- lw :line width
     local line = setmetatable({}, {__index = CrossLine});

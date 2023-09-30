@@ -42,6 +42,21 @@ function Edge2D:GetOtherPoint(p)
     end 
 end
 
+function Edge2D:CheckPointIn(p)
+    return self.P1 == p or self.P2 == p
+end
+
+
+function Edge2D:Log(info)
+    if not info then
+        info = ''
+    else
+        info = info .. " "
+    end
+    self.P1:Log(info .. "Point1")
+    self.P2:Log(info .. "Point2")
+end
+
 function Edge2D:ChangePoint(p, newp)
     if self.P1 == p then
         self.P1 = newp
@@ -50,6 +65,22 @@ function Edge2D:ChangePoint(p, newp)
     -- else
     --     assert(false)
     end 
+end
+
+function Edge2D:Release()
+    for i = 1, #self.P1.Edges do
+        if self.P1.Edges[i] == self then
+            table.remove( self.P1.Edges, i )
+            break
+        end
+    end
+
+    for i = 1, #self.P2.Edges do
+        if self.P2.Edges[i] == self then
+            table.remove( self.P2.Edges, i )
+            break
+        end
+    end
 end
 
 function Edge2D:draw()

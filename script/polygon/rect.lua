@@ -1,5 +1,6 @@
 _G.Rect = {}
 
+local EventRects = {}
 function Rect.new(x, y, w, h, mode)
     local rect = setmetatable({}, {__index = Rect});
     rect.x = x or 0;
@@ -20,6 +21,28 @@ function Rect:setColor(r, g, b, a)
     self.color.g = g;
     self.color.b = b;
     self.color.a = a;
+end
+
+function Rect:SetMouseEventEable(enable)
+    if enable then
+        local needadd = true
+        for i = 1, #EventRects do
+            if EventRects[i] == self then
+                needadd = false
+                break
+            end
+        end
+        if needadd then
+            EventRects[#EventRects + 1] = self
+        end
+    else
+        for i = 1, #EventRects do
+            if EventRects[i] == self then
+                table.remove( EventRects, i)
+                break
+            end
+        end
+    end
 end
 
 function Rect:moveTo(x, y)
@@ -47,6 +70,10 @@ function Rect:update(e)
     end
  end
 
+ function Rect:CheckPointInXY(x, y)
+    return x >= self.x and x < self.x + self.w and y >= self.y and y < self.y + self.h
+ end
+
 function Rect:createBox2D(state, ...)
     if self.box2d then
         self.box2d:release();
@@ -54,3 +81,36 @@ function Rect:createBox2D(state, ...)
     self.box2d_state = state;
     self.box2d = Box2dObject:CreateRect(self.x + self.w * 0.5,  self.y +  self.h * 0.5,  self.w,  self.h,state, ...)
  end
+
+ local SelectRects = {}
+app.mousepressed(function(x, y, button, istouch)
+    for i = 1, #EventRects do
+        if EventRects[i]:CheckPointInXY(x, y) then
+            local SelectRect = EventRects[i]
+            SelectRects[#SelectRects + 1] = SelectRect
+            if SelectRect.MouseDownEvent then
+                SelectRect.MouseDownEvent(SelectRect, x, y, button, istouch)
+            end
+        end
+    end
+end)
+
+app.mousemoved(function(x, y, button, istouch)
+    for i = 1, #SelectRects do
+        local SelectRect = SelectRects[i]
+        if SelectRect.MouseMoveEvent then
+            SelectRect.MouseMoveEvent(SelectRect, x, y, button, istouch)
+        end
+    end
+end)
+
+app.mousereleased(function(x, y, button, istouch)
+    for i = 1, #SelectRects do
+        local SelectRect = SelectRects[i]
+        if SelectRect.MouseUpEvent then
+            SelectRect.MouseUpEvent(SelectRect, x, y, button, istouch)
+        end
+    end
+
+    SelectRects = {}
+end)

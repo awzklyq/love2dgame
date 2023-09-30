@@ -6,11 +6,11 @@ function Circle.new(r, x ,y, segments)
     circle.x = x;
     circle.y = y;
 
-    circle.seg = segments;
+    circle.seg = segments or 100;
 
     circle.color = LColor.new(255,255,255,255)
 
-    circle.mode = 'fill';
+    circle.mode = 'line';
 
     circle.renderid = Render.CircleId;
     return circle;
@@ -22,6 +22,15 @@ function Circle:setColor(r, g, b, a)
     self.color.b = b;
     self.color.a = a;
 end
+
+function Circle:CheckPointIn(p)
+    local xx = p.x - self.x
+    local yy = p.y - self.y
+
+    return xx * xx + yy * yy < self.r * self.r
+end
+
+
 
 function Circle:draw()
     local r, g, b, a = love.graphics.getColor( );

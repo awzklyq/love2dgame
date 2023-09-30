@@ -92,8 +92,10 @@ math.IntersectLine = function( a, b, c, d, intersect_p) --out intersect_p
 	local t = area_cda / (area_abd - area_abc);
 	local dx = t * (b.x - a.x);
 	local dy = t * (b.y - a.y);
-	intersect_p.x = a.x + dx;
-	intersect_p.y = a.y + dy;
+    if intersect_p then
+        intersect_p.x = a.x + dx;
+        intersect_p.y = a.y + dy;
+    end
 
 	return true;
 end
