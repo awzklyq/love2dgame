@@ -71,6 +71,15 @@ function Vector:mul(value)
     self.x = self.x  * value;
     self.y = self.y  * value;
 end
+
+function Vector:draw()
+    if not self.rect then
+        self.rect =  Rect.new(self.x - 4, self.y - 4, 4, 4)
+        self.rect:SetColor(0,0,255)
+    end
+
+    self.rect:draw()
+end
     
 Vector.distance = function(v1, v2)
     return math.sqrt(math.pow(v1.x - v2.x, 2) + math.pow(v1.y - v2.y, 2))
@@ -120,6 +129,8 @@ end
 Vector.copy = function(v)
     return Vector.new(v.x, v.y)
 end
+
+Vector.Copy = Vector.copy  
 
 
 

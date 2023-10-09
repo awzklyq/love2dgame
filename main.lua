@@ -42,6 +42,7 @@ dofile('script/shader/shader_octahedralmap.lua')
 dofile('script/polygon/rect.lua')
 dofile('script/polygon/circle.lua')
 dofile('script/polygon/line.lua')
+dofile('script/polygon/ray.lua')
 dofile('script/polygon/HermiteCurve.lua')
 dofile('script/polygon/BezierCurve.lua')
 dofile('script/polygon/edge.lua')
@@ -171,5 +172,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_BezierCurve.lua')--test_simplessgi  test_Octahedralmap
+	dofile('script/test/test_IntersectLine.lua')--test_simplessgi  test_Octahedralmap
 end

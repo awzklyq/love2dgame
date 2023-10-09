@@ -12,11 +12,23 @@ function Rect.new(x, y, w, h, mode)
 
     rect.mode = mode or 'fill';
 
+    rect:GeneraOutCircle()
+
+    rect:GeneraLines()
+
     rect.renderid = Render.RectId;
+    
     return rect;
 end
 
 function Rect:setColor(r, g, b, a)
+    self.color.r = r;
+    self.color.g = g;
+    self.color.b = b;
+    self.color.a = a;
+end
+
+function Rect:SetColor(r, g, b, a)
     self.color.r = r;
     self.color.g = g;
     self.color.b = b;
@@ -54,8 +66,12 @@ function Rect:moveTo(x, y)
 end
 
 function Rect:draw()
-   local r, g, b, a = love.graphics.getColor( );
-   Render.RenderObject(self);
+    local r, g, b, a = love.graphics.getColor( );
+    Render.RenderObject(self);
+
+    -- for i = 1, 4 do
+    --     self.Lines[i]:draw()
+    -- end
     love.graphics.setColor(r, g, b, a );
     if self.box2d then
         self.box2d:draw()
@@ -81,6 +97,26 @@ function Rect:createBox2D(state, ...)
     self.box2d_state = state;
     self.box2d = Box2dObject:CreateRect(self.x + self.w * 0.5,  self.y +  self.h * 0.5,  self.w,  self.h,state, ...)
  end
+
+function Rect:GeneraOutCircle()
+    local r = math.sqrt(self.w * self.w + self.h * self.h) * 0.5
+    local center = Vector.new(self.x + self.w * 0.5,  self.y + self.h * 0.5)
+
+    self.OutCircle = Circle.new(r, center.x , center.y, 50)
+end
+
+function Rect:GeneraLines()
+    self.Lines = {}
+    local l1 =  Line.new(self.x, self.y, self.x + self.w, self.y)
+    local l2 =  Line.new(self.x + self.w, self.y, self.x + self.w, self.y +  self.h)
+    local l3 =  Line.new(self.x + self.w, self.y + self.h, self.x, self.y + self.h)
+    local l4 =  Line.new(self.x, self.y  + self.h, self.x, self.y)
+
+    self.Lines[#self.Lines + 1] = l1
+    self.Lines[#self.Lines + 1] = l2
+    self.Lines[#self.Lines + 1] = l3
+    self.Lines[#self.Lines + 1] = l4
+end
 
  local SelectRects = {}
 app.mousepressed(function(x, y, button, istouch)

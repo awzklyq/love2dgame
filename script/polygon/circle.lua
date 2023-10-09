@@ -23,6 +23,13 @@ function Circle:setColor(r, g, b, a)
     self.color.a = a;
 end
 
+function Circle:SetColor(r, g, b, a)
+    self.color.r = r;
+    self.color.g = g;
+    self.color.b = b;
+    self.color.a = a;
+end
+
 function Circle:CheckPointIn(p)
     local xx = p.x - self.x
     local yy = p.y - self.y

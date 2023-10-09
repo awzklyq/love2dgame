@@ -21,7 +21,10 @@ function Line.new(x1, y1, x2, y2, lw)-- lw :line width
     
     line.color = LColor.new(255,255,255,255)
 
+    line:GeneraOutCircle()
     line.renderid = Render.LineId ;
+
+    line.IsDrawOutCircle = false
     return line;
 end
 
@@ -32,10 +35,24 @@ function Line:setColor(r, g, b, a)
     self.color.a = a;
 end
 
+function Line:GeneraOutCircle()
+    local x =  self.x2 - self.x1
+    local y =  self.y2 - self.y1
+
+    local r = math.sqrt(x * x + y * y) * 0.5
+
+    local center = Vector.new((self.x2 + self.x1) * 0.5, (self.y2 + self.y1) * 0.5)
+
+    self.OutCircle = Circle.new(r, center.x ,center.y, 50)
+end
+
 function Line:draw()
     -- local r, g, b, a = love.graphics.getColor( );
     Render.RenderObject(self);
     -- love.graphics.setColor(r, g, b, a );
+    if self.IsDrawOutCircle then
+        self.OutCircle:draw()    
+    end
 end
 
 _G.Lines = {}
