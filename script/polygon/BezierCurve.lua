@@ -16,7 +16,7 @@ function BezierCurve.new(p1, p2, p3, p4, seg)
     bz.seg = seg or 50
 
     bz.DebugLines = {}
-
+    bz.DebugPoints = {}
     bz:GenerateDebugLines()
 
     return bz
@@ -24,6 +24,7 @@ end
 
 function BezierCurve:GenerateDebugLines()
     self.DebugLines = {}
+    self.DebugPoints = {}
     for i = 0, self.seg - 1 do
         local t1 = i / self.seg
         local t2 = (i + 1) / self.seg
@@ -31,7 +32,11 @@ function BezierCurve:GenerateDebugLines()
         local p1 = self:GetPoint(t1)
         local p2 = self:GetPoint(t2)
         self.DebugLines[#self.DebugLines + 1] = Line.new(p1.x, p1.y, p2.x, p2.y)
+        self.DebugPoints[#self.DebugPoints + 1] = Vector.new(p1.x, p1.y)
     end
+
+    local DebugLine = self.DebugLines[#self.DebugLines]
+    self.DebugPoints[#self.DebugPoints + 1] = Vector.new(DebugLine.x2, DebugLine.y2)
 end
 
 function BezierCurve:GetPoint(t)

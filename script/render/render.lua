@@ -179,6 +179,9 @@ Render.RenderObject = function(obj)
     end
 
     if _G.lovedebug.renderobject then
+        local r, g, b, a = love.graphics.getColor( );
+        local lw = love.graphics.getLineWidth();
+
         if obj.renderid == Render.CircleId then
             love.graphics.circle( obj.mode, obj.x, obj.y, obj.r, obj.seg);
         elseif obj.renderid == Render.RectId then
@@ -239,12 +242,10 @@ Render.RenderObject = function(obj)
                 Render.RenderSVGPaths(obj.svgpaths);
             end
         elseif obj.renderid == Render.LineId then
-            local lw = love.graphics.getLineWidth();
             love.graphics.setLineWidth( obj.lw);
             love.graphics.setColor(obj.color.r, obj.color.g, obj.color.b, obj.color.a);
             
             love.graphics.line( obj.x1, obj.y1, obj.x2, obj.y2)
-            love.graphics.setLineWidth(lw);
         elseif obj.renderid == Render.Ray2DId then
            
             local ld 
@@ -256,19 +257,14 @@ Render.RenderObject = function(obj)
                 ld = math.max(width, height)
             end
                 
-            local lw = love.graphics.getLineWidth();
             love.graphics.setLineWidth( obj.lw);
             love.graphics.setColor(obj.color.r, obj.color.g, obj.color.b, obj.color.a);
             love.graphics.line( obj.orig.x, obj.orig.y, obj.orig.x + obj.dir.x * ld, obj.orig.y + obj.dir.y * ld)
-            love.graphics.setLineWidth(lw);
         elseif obj.renderid == Render.EdgeId then
-            local lw = love.graphics.getLineWidth();
             love.graphics.setLineWidth( obj.lw or 2);
             love.graphics.setColor(obj.Color.r, obj.Color.g, obj.Color.b, obj.Color.a);
             love.graphics.line( obj.P1.x, obj.P1.y, obj.P2.x, obj.P2.y)
-            love.graphics.setLineWidth(lw);
         elseif obj.renderid == Render.LinesId then
-            local lw = love.graphics.getLineWidth();
             love.graphics.setLineWidth( obj.lw);
             love.graphics.setColor(obj.color.r, obj.color.g, obj.color.b, obj.color.a);
             if #obj.values > 1 then
@@ -277,7 +273,6 @@ Render.RenderObject = function(obj)
                 end
             end
             
-            love.graphics.setLineWidth(lw);
         elseif obj.renderid == Render.CrossLineId then
             local lw = love.graphics.getLineWidth();
             love.graphics.setLineWidth( obj.lw);
@@ -288,35 +283,23 @@ Render.RenderObject = function(obj)
         elseif obj.renderid == Render.PowerBarId then
             love.graphics.rectangle("fill", obj.x1, obj.y1, obj.x2 - obj.x1, obj.h)
             love.graphics.setShader()
-            local lw = love.graphics.getLineWidth();
-            local r, g, b, a = love.graphics.getColor( );
             love.graphics.setColor(obj.color._r, obj.color._g, obj.color._b);
             love.graphics.setLineWidth( obj.lw);
             
             love.graphics.rectangle("line", obj.x1+0.5, obj.y2 - obj.oh+0.5, obj.x2 - obj.x1 -1, obj.oh-1)
-            love.graphics.setLineWidth(lw);
-            love.graphics.setColor(r, g, b, a);
         elseif obj.renderid == Render.NoiseLineId then 
-            local lw = love.graphics.getLineWidth();
-            local r, g, b, a = love.graphics.getColor( );
             love.graphics.setLineWidth( obj.lw);
             love.graphics.setColor(obj.color._r, obj.color._g, obj.color._b);
             -- love.graphics.polygon("line", obj.renderdatas)
             -- local poss = {100, 100, 200, 250, 300, 400}
             love.graphics.line(obj.renderdatas)
-            love.graphics.setLineWidth(lw);
-            love.graphics.setColor(r, g, b, a);
         elseif obj.renderid == Render.GridDebugViewId then 
             obj:renderDebugView()
         elseif obj.renderid == Render.BoxBoundId then 
-            local lw = love.graphics.getLineWidth();
-            local r, g, b, a = love.graphics.getColor( );
             love.graphics.setLineWidth( 3);
             love.graphics.setColor(0.9, 0.9, 0.0);
             local x1, y1, x2, y2 = obj:getBoxValueFromObj()
             love.graphics.rectangle("line", x1 - 3, y1 - 3, x2 - x1 + 6, y2 - y1 + 6)
-            love.graphics.setLineWidth(lw);
-            love.graphics.setColor(r, g, b, a);
         elseif obj.renderid == Render.MeshId then
             love.graphics.draw( obj.obj )
         elseif obj.renderid == Render.MeshWaterId then
@@ -333,38 +316,30 @@ Render.RenderObject = function(obj)
         elseif obj.renderid == Render.CanvasId then
             love.graphics.draw( obj.obj, obj.x, obj.y, 0, obj.renderWidth / obj:getWidth(), obj.renderHeight / obj:getHeight())
         elseif obj.renderid == Render.ImageId then
-            local r, g, b, a = love.graphics.getColor( );
             love.graphics.setColor(r * 0.9, g * 0.9, b * 0.9, obj.alpha);
             love.graphics.draw( obj.obj, obj.x, obj.y, 0, obj.w / obj:getWidth(), obj.h / obj:getHeight())
-            love.graphics.setColor(r, g, b, a);
         elseif obj.renderid == Render.ImageAnimaId then
             if obj:IsRenderAsImage() then
-                local r, g, b, a = love.graphics.getColor( );
                 love.graphics.setColor(r * 0.9, g * 0.9, b * 0.9, obj.alpha);
                 love.graphics.draw( obj.obj, obj.CurrentQuad, obj.x, obj.y, 0, obj.w / obj:getWidth(), obj.h / obj:getHeight())
-                love.graphics.setColor(r, g, b, a);
             else
                 love.graphics.draw( obj.MeshQuad.obj)
             end
             
         elseif obj.renderid == Render.LoveScreenTextId then
-            local r, g, b, a = love.graphics.getColor( );
             love.graphics.setColor(obj.color._r, obj.color._g, obj.color._b);
             love.graphics.print(tostring(obj.text), obj.x, obj.y, obj.r, obj.sx, obj.sy, obj.ox, obj.oy, obj.kx, obj.ky)
 
-            love.graphics.setColor(r, g, b, a);
         elseif obj.renderid == Render.Tile3DId then
             love.graphics.draw( obj.obj )
         elseif obj.renderid == Render.Triangle2DId then
             if #obj.vertices > 0 then
                 love.graphics.setColor(obj.Color._r, obj.Color._g, obj.Color._b, obj.Color._a);
                 if obj.mode == 'line' then
-                    local lw = love.graphics.getLineWidth();
                     love.graphics.setLineWidth( obj.LineWidth);
 
                     love.graphics.polygon("line", obj.vertices);
 
-                    love.graphics.setLineWidth( lw);
                 else
                     love.graphics.polygon("fill", obj.vertices);
 
@@ -372,7 +347,8 @@ Render.RenderObject = function(obj)
             end
         end
 
-        
+        love.graphics.setColor(r, g, b, a);
+        love.graphics.setLineWidth( lw);
         if obj.shader then
             love.graphics.setShader()
         end

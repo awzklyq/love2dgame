@@ -512,6 +512,40 @@ math.OctDecode = function(v)
     return n:normalize()
 end
 
+math.PointToLineDistance2D = function(point, line)
+    return math.PointToLineDistanceXY2D(point, line.x1, line.y1, line.x2, line.y2)
+end
+
+math.PointToLineDistanceXY2D = function(point, lineX1, lineY1, lineX2, lineY2)
+    local lineStart = Vector.new(lineX1, lineY1)
+    local lineEnd = Vector.new(lineX2, lineY2)
+    local dx = lineEnd.x - lineStart.x
+    local dy = lineEnd.y - lineStart.y
+    local lineLengthSquared = dx*dx + dy*dy
+
+    if lineLengthSquared == 0 then
+        dx = point.x - lineStart.x
+        dy = point.y - lineStart.y
+        return math.sqrt(dx*dx + dy*dy)
+    end
+
+    local t = ((point.x - lineStart.x) * dx + (point.y - lineStart.y) * dy) / lineLengthSquared
+
+    if t < 0 then
+        dx = point.x - lineStart.x
+        dy = point.y - lineStart.y
+    elseif t > 1 then
+        dx = point.x - lineEnd.x
+        dy = point.y - lineEnd.y
+    else
+        local proj = { x = lineStart.x + t * dx, y = lineStart.y + t * dy }
+        dx = point.x - proj.x
+        dy = point.y - proj.y
+    end
+
+    return math.sqrt(dx*dx + dy*dy)
+end
+
 math.defaulttransform =  love.math.newTransform( );
 math.MinNumber = 0.000001;
 math.MaxNumber = 999999.0;

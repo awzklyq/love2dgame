@@ -35,6 +35,8 @@ function Line:setColor(r, g, b, a)
     self.color.a = a;
 end
 
+Line.SetColor = Line.setColor
+
 function Line:GeneraOutCircle()
     local x =  self.x2 - self.x1
     local y =  self.y2 - self.y1

@@ -115,6 +115,8 @@ dofile 'script/render/font.lua'
 
 dofile 'script/common/timer.lua'
 
+dofile 'script/common/RamerDouglasPeucker.lua'
+
 dofile 'script/postprocess/tonemapping.lua'
 dofile 'script/postprocess/bloom.lua'
 dofile 'script/postprocess/bloom2.lua'
@@ -172,5 +174,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_IntersectLine.lua')--test_simplessgi  test_Octahedralmap
+	dofile('script/test/test_RamerDouglasPeucker.lua')--test_simplessgi  test_Octahedralmap
 end
