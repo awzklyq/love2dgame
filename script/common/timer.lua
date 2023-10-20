@@ -48,3 +48,7 @@ function Timer:Tick(dt)
         end
     end
 end
+
+_G.app.update(function(dt)
+    TimerManager.Tick(dt);
+end)

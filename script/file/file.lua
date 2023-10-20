@@ -1,5 +1,6 @@
 _G.lovefile = {}
 
+lovefile.DefaultForder =  'C:/Users/Liuyongqi/AppData/Roaming/LOVE/love2dgame/'
 lovefile.read = function(filename)
     local file = love.filesystem.newFile(_G.FileManager.findFile(filename))
     file:open("r")
@@ -33,6 +34,31 @@ end
 --获取扩展名
 lovefile.getextension = function(filename)
 	return filename:match(".+%.(%w+)$")
+end
+
+lovefile.exists = function(filename)
+	return love.filesystem.exists( filename )
+end
+
+lovefile.getWorkingDirectory = function()
+	return love.filesystem.getWorkingDirectory()
+end
+
+lovefile.newFile = function(filename, mode)
+	local file, errorstr = love.filesystem.newFile(filename, mode )
+	return file, errorstr
+end
+
+lovefile.write = function(name, data)
+	local f, errorstr = lovefile.newFile(name)
+	f:open("w")
+	f:write(data)
+	-- f:flush()
+	f:close()
+end
+
+lovefile.getUserDirectory = function()
+	return love.filesystem.getUserDirectory()
 end
 
 function Split(szFullString, szSeparator)

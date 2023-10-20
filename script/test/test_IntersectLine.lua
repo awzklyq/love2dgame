@@ -7,13 +7,36 @@ local Rects = {}
 local RectSeleted = {}
 local PointSeleted = {}
 local RaySeleted = {}
-local RMin = 25
+local VE = MovedEntity.new()
 
-local RMax = 50
+-- VE:AddTimeAndVelocity(2, 4)
+-- VE:AddTimeAndVelocity(4, 2)
+-- VE:AddTimeAndVelocity(6, 1)
+-- VE:AddTimeAndVelocity(10, 5)
 
-local Num = 40
+VE:AddTimeAndDistance(  0       ,       0       )
+VE:AddTimeAndDistance(  0.22213521126761        ,       498.51858037578 )
+VE:AddTimeAndDistance(  0.24239049295775        ,       536.848434238   )
+VE:AddTimeAndDistance(  0.50638204225352        ,       958.24634655532 )
+VE:AddTimeAndDistance(  0.53012535211268        ,       990.14947807933 )
+VE:AddTimeAndDistance(  0.83597323943662        ,       1334.4267223382 )
+VE:AddTimeAndDistance(  0.86320457746479        ,       1359.903131524  )
+VE:AddTimeAndDistance(  1.1804577464789 ,       1607.51565762   )
+VE:AddTimeAndDistance(  1.5036496478873 ,       1789.8956158664 )
+VE:AddTimeAndDistance(  1.5328732394366 ,       1801.5866388309 )
+VE:AddTimeAndDistance(  1.8954665492958 ,       1908.1419624217 )
+VE:AddTimeAndDistance(  1.9321690140845 ,       1915.8246346555 )
+VE:AddTimeAndDistance(  2.4212112676056 ,       1981.9624217119 )
+VE:AddTimeAndDistance(  2.4660158450704 ,       1985.3027139875 )
+VE:AddTimeAndDistance(  3       ,       2000    )
 
-local RayNum = 4
+VE:Log('VE')
+
+local CircleRole
+local MCE 
+local Size = 40
+
+local RayNum = 10
 local rw = 10
 
 local AddIntersectionData = function(ray)
@@ -46,34 +69,12 @@ local InitEvent = function(rect)
 
         for i = 1, #RectSeleted do
             RectSeleted[i]:SetColor(255,255,255)
-           
         end
 
         RectSeleted = {}
         PointSeleted = {}
-        --for i = 1, #Rects do
-            -- if rayMian:IsintersectCircle(Rects[i].OutCircle) then
-            --     Rects[i].OutCircle:SetColor(255,255,0)
-            --     local bIsIntersect, IntersectPoint = rayMian:IsIntersectRect(Rects[i])
-            --     if bIsIntersect then
-            --         RectSeleted[#RectSeleted + 1] = Rects[i]
-            --         PointSeleted[#PointSeleted + 1] = IntersectPoint
-            --         Rects[i]:SetColor(255,0,0)
-            --     end
-            -- else
-                --Rects[i].OutCircle:SetColor(255,0, 0)
-            -- end
-        --end
 
         RaySeleted = {}
-        -- local IntersectRectData =  rayMian:FindNearestPointByRects(Rects)
-        -- if IntersectRectData.IsIntersect then
-        --     RectSeleted[#RectSeleted + 1] = IntersectRectData.SelectRect
-        --     IntersectRectData.SelectRect:SetColor(255,0,0)
-        --     PointSeleted[#PointSeleted + 1] = IntersectRectData.IntersectPoint
-        --     RaySeleted[#RaySeleted + 1] = IntersectRectData.ReflectRay
-        --     IntersectRectData.ReflectRay:SetColor(0,255,0)
-        -- end
 
         local index = 1
         local ray = rayMian
@@ -94,6 +95,27 @@ local InitEvent = function(rect)
 
     rect.MouseUpEvent = function(rect, x, y)
         rect._IsSelect = false
+        if MCE:IsMove() == false then
+            local Index = 1
+            MCE.ArrviedEvent = function(Circle, Target, Dir)
+                Index = Index + 1
+                if Index <= #PointSeleted then
+                    MCE:SetTarget(PointSeleted[Index])
+                end
+
+                if MCE.ErrorDis ~= 0 then
+                    MCE:MoveActive(MCE.ErrorDis)
+                end
+            end
+
+            CircleRole.x = Rect1.x
+            CircleRole.y = Rect1.y
+
+            MCE:SetTarget(PointSeleted[Index])
+            MCE:Start()
+
+           
+        end
     end
 end
 
@@ -113,21 +135,31 @@ local GenerateFunc = function()
 
     InitEvent(Rect1)
     InitEvent(Rect2)
- 
-    for i = 1, Num do
-        local x = math.random(1, width - 1)
-        local y = math.random(1, height - 1)
-        local w = math.random(RMin, RMax)
-        local h = math.random(RMin, RMax)
-        local rect = Rect.new(x, y, w, h)
+    CircleRole = Circle.new(20, Rect1.x, Rect1.y)
+    CircleRole:SetColor(0,255,0)
 
-        if rayMian:IsintersectCircle(rect.OutCircle) then
-            rect.OutCircle:SetColor(255,255,0)
-        else
-            rect.OutCircle:SetColor(255,0, 0)
+    log("eeeeeeeeeee", VE.Time)
+    MCE = MotionCircleEntity.new(CircleRole, VE)
+
+    local xn = math.ceil(width / Size) - 1
+    local yn = math.ceil(height / Size) - 1
+    for i = 1, xn do
+        for j = 1, yn do
+            local Need = false
+            if i == 1 or i == xn or j == 1 or j == yn then
+                Need = true
+            else
+                local r = math.random(0, 100)
+                if r > 95 then
+                    Need = true
+                end
+            end
+
+            if Need then
+                local rect = Rect.new(i * Size, j * Size, Size, Size)
+                Rects[#Rects + 1] = rect
+            end
         end
-        
-        Rects[#Rects + 1]  = rect
     end
 end
 
@@ -135,7 +167,7 @@ GenerateFunc()
 app.render(function(dt)
     for i = 1, #Rects do
         Rects[i]:draw()
-        Rects[i].OutCircle:draw()
+        -- Rects[i].OutCircle:draw()
     end
 
 
@@ -150,6 +182,8 @@ app.render(function(dt)
     for i = 1, #PointSeleted do
         PointSeleted[i]:draw()
     end
+
+    CircleRole:draw()
 
 end)
 

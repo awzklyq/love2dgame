@@ -1,7 +1,7 @@
 UI.Text = {}
 function UI.Text.new( text, x, y, w, h )
 	local text = setmetatable({},UI.GetMeta(UI.Text));
-	UISystem.removeUI( self );
+	UISystem.removeUI( text );
 	text.type = "Text";
 	text._x = x or 0;
 	text._y = y or 0;

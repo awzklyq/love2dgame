@@ -9,7 +9,6 @@ _G.TEST = false
 --file
 _G.log = require "script/log"
 dofile('script/class.lua')
-dofile("script/ui/uihelper.lua")
 dofile('script/debug.lua')
 
 _G.lovector = require "lovector"
@@ -114,6 +113,7 @@ dofile 'script/text/lovescreentext.lua'
 dofile 'script/render/font.lua'
 
 dofile 'script/common/timer.lua'
+dofile 'script/common/motionmanager.lua'
 
 dofile 'script/common/RamerDouglasPeucker.lua'
 
@@ -174,5 +174,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_RamerDouglasPeucker.lua')--test_simplessgi  test_Octahedralmap
+	dofile('script/test/test_IntersectLine.lua')--test_IntersectLine  test_BezierCurve.lua
 end
