@@ -35,25 +35,7 @@ end
 Rect.setColor = Rect.SetColor
 
 function Rect:SetMouseEventEable(enable)
-    if enable then
-        local needadd = true
-        for i = 1, #EventRects do
-            if EventRects[i] == self then
-                needadd = false
-                break
-            end
-        end
-        if needadd then
-            EventRects[#EventRects + 1] = self
-        end
-    else
-        for i = 1, #EventRects do
-            if EventRects[i] == self then
-                table.remove( EventRects, i)
-                break
-            end
-        end
-    end
+    AddEventToPolygonevent(self, enable)
 end
 
 function Rect:moveTo(x, y)
@@ -116,36 +98,3 @@ function Rect:GeneraLines()
     self.Lines[#self.Lines + 1] = l3
     self.Lines[#self.Lines + 1] = l4
 end
-
- local SelectRects = {}
-app.mousepressed(function(x, y, button, istouch)
-    for i = 1, #EventRects do
-        if EventRects[i]:CheckPointInXY(x, y) then
-            local SelectRect = EventRects[i]
-            SelectRects[#SelectRects + 1] = SelectRect
-            if SelectRect.MouseDownEvent then
-                SelectRect.MouseDownEvent(SelectRect, x, y, button, istouch)
-            end
-        end
-    end
-end)
-
-app.mousemoved(function(x, y, button, istouch)
-    for i = 1, #SelectRects do
-        local SelectRect = SelectRects[i]
-        if SelectRect.MouseMoveEvent then
-            SelectRect.MouseMoveEvent(SelectRect, x, y, button, istouch)
-        end
-    end
-end)
-
-app.mousereleased(function(x, y, button, istouch)
-    for i = 1, #SelectRects do
-        local SelectRect = SelectRects[i]
-        if SelectRect.MouseUpEvent then
-            SelectRect.MouseUpEvent(SelectRect, x, y, button, istouch)
-        end
-    end
-
-    SelectRects = {}
-end)

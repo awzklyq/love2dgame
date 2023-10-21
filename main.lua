@@ -38,6 +38,7 @@ dofile('script/shader/shader.lua')
 dofile('script/shader/shaderfunction.lua')
 dofile('script/shader/shader_octahedralmap.lua')
 
+dofile('script/polygon/polygonevent.lua')
 dofile('script/polygon/rect.lua')
 dofile('script/polygon/circle.lua')
 dofile('script/polygon/line.lua')
@@ -59,7 +60,6 @@ dofile 'script/3d/terrain/tileshader.lua'
 dofile('script/polygon/polygon.lua')
 
 dofile('script/uisystem/uisystem.lua')
-dofile('script/uisystem/button.lua')
 
 dofile('script/math/math.lua')
 dofile('script/math/vector.lua')

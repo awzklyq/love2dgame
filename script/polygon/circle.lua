@@ -31,10 +31,18 @@ function Circle:SetColor(r, g, b, a)
 end
 
 function Circle:CheckPointIn(p)
-    local xx = p.x - self.x
-    local yy = p.y - self.y
+    return self:CheckPointInXY(p.x, p.y)
+end
+
+function Circle:CheckPointInXY(x, y)
+    local xx = x - self.x
+    local yy = y - self.y
 
     return xx * xx + yy * yy < self.r * self.r
+end
+
+function Circle:SetMouseEventEable(enable)
+    AddEventToPolygonevent(self, enable)
 end
 
 

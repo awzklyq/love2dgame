@@ -278,6 +278,15 @@ function Triangle2D:CheckPointIn(Point)
     return true;
 end
 
+function Triangle2D:SetMouseEventEable(enable)
+    AddEventToPolygonevent(self, enable)
+end
+
+
+function Triangle2D:CheckPointInXY(x, y)
+    return self:CheckPointIn(Vector.new(x, y))
+end
+
 
 _G.Triangle2Ds = {}
 
