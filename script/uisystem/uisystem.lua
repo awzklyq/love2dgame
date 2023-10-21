@@ -1,5 +1,14 @@
 _G.UI = {}
+
+UI.State_Normal = 1;
+UI.State_Press = 2;
+UI.State_Hover = 3;
+
 UI.UISystem = {};
+
+dofile('script/uisystem/button.lua')
+dofile('script/uisystem/text.lua')
+
 local UISystem = UI.UISystem;
 UISystem.buttons = {};
 
@@ -96,37 +105,6 @@ UISystem.isUIView = function( obj, isview )
 	end
 
 	return ( obj.type == "UIView" ) or UISystem.isButton( obj ) or UISystem.isText( obj ) or UISystem.isTextArea( obj ) or UISystem.isTextInput( obj );
-end
-
-UISystem.mouseDown = function( b, x, y )
-	UISystem.fouseuis = {}
-	for i, v in ipairs(UISystem.buttons) do
-		v:triggerMouseDown( b, x, y );
-	end
-
-	for i, v in ipairs(UISystem.uiviews) do
-		v:triggerMouseDown( b, x, y );
-	end
-
-	return false;
-end
-
-app.mousepressed(function(x, y, button, istouch)
-	UISystem.mouseDown(button, x, y)
-end)
-
-UISystem.keyDown = function( keyCode )
-	local  fouseuis = UISystem.fouseuis;
-	for i, v in ipairs(fouseuis) do
-	
-		if ( UISystem.isTextInput( fouseuis[i] ) ) then
-		
-			TextInput.doActionForKeyDown( keyCode, fouseuis[i] );
-			return true;
-		end
-	end
-
-	return false;
 end
 
 UI.get__x = function( self )
@@ -247,7 +225,7 @@ function UIBase__index(tab, key, ...)
 		return TypeObject[key];
 	end
 
-	return nil;
+	return rawget(tab, key, ...);
 end
 
 function UIBase__newindex(tab, key, value)
@@ -280,6 +258,86 @@ end
 -- 	end
 -- end
 
-UI.State_Normal = 1;
-UI.State_Press = 2;
-UI.State_Hover = 3;
+local SelectedUI = {}
+UISystem.mouseDown = function( b, x, y )
+	for i, v in ipairs(UISystem.buttons) do
+		if v.triggerMouseDown and v:triggerMouseDown( b, x, y ) then
+			SelectedUI[#SelectedUI + 1] = v
+		end
+	end
+
+	for i, v in ipairs(UISystem.uiviews) do
+		if v.triggerMouseDown and v:triggerMouseDown( b, x, y ) then
+			SelectedUI[#SelectedU + 1] = v
+		end
+	end
+
+	return false;
+end
+
+UISystem.mousereleased = function( b, x, y )
+	for i = 1, #SelectedUI do
+		local selectui = SelectedUI[i]
+		if selectui.triggerMouseRelease then
+			selectui:triggerMouseRelease(b, x, y)
+		end
+	end
+
+	SelectedUI = {}
+
+	return false;
+end
+
+local MouseMovedSelectedUI
+UISystem.mousemoved = function(x, y )
+	if MouseMovedSelectedUI then
+		if MouseMovedSelectedUI:triggerMouseMoved(x, y ) == false then
+			MouseMovedSelectedUI = nil
+		end
+	end
+
+	if not MouseMovedSelectedUI then
+		for i, v in ipairs(UISystem.buttons) do
+			if v.triggerMouseMoved and v:triggerMouseMoved(x, y ) then
+				MouseMovedSelectedUI = v
+			end
+		end
+	end
+
+	if not MouseMovedSelectedUI then
+		for i, v in ipairs(UISystem.uiviews) do
+			if v.triggerMouseMoved and v:triggerMouseMoved( x, y ) then
+				MouseMovedSelectedUI = v
+			end
+		end
+	end
+
+	return false;
+end
+
+UISystem.keyDown = function( keyCode )
+	local  fouseuis = UISystem.fouseuis;
+	for i, v in ipairs(fouseuis) do
+	
+		if ( UISystem.isTextInput( fouseuis[i] ) ) then
+		
+			TextInput.doActionForKeyDown( keyCode, fouseuis[i] )
+			return true;
+		end
+	end
+
+	return false;
+end
+
+
+app.mousepressed(function(x, y, button, istouch)
+	UISystem.mouseDown(button, x, y)
+end)
+
+app.mousereleased(function(x, y, button, istouch)
+	UISystem.mousereleased(button, x, y)
+end)
+
+app.mousemoved(function(x, y)
+	UISystem.mousemoved(x, y)
+end)

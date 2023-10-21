@@ -1,17 +1,22 @@
 UI.Text = {}
-function UI.Text.new( text, x, y, w, h )
-	local text = setmetatable({},UI.GetMeta(UI.Text));
-	UISystem.removeUI( text );
-	text.type = "Text";
-	text._x = x or 0;
-	text._y = y or 0;
-	text._w = w or 0;
-	text._h = h or 0;
-	text.text = text or "";
+local UIText = UI.Text
+local UISystem = UI.UISystem
 
-	text.lineWidth = 2;
+function UIText.new( text, x, y, w, h )
+	local uitext = setmetatable({}, UI.GetMeta(UIText));
+	-- UISystem.removeUI( uitext );
 
-	UISystem.addUI( text );
+	uitext.TypeObject = UIText;--must be
+	uitext.type = "Text";
+	uitext._x = x or 0;
+	uitext._y = y or 0;
+	uitext._w = w or 0;
+	uitext._h = h or 0;
+	uitext.text = text or "";
+
+	uitext.lineWidth = 2;
+
+	UISystem.addUI( uitext );
 	-- text.font = Global.FONT;
 	-- text.setFont = function( font )
 	-- {
@@ -24,10 +29,10 @@ function UI.Text.new( text, x, y, w, h )
 	-- 	self.style = style;
 	-- }
 
-	return text;
+	return uitext;
 end
 
-function UI.Text:setColor( color1, color2 )
+function UIText:setColor( color1, color2 )
 	
 	-- local temp = Math.DecompressionRGBA( color1 );
 	-- self.color1 = "rgba(" + temp.r + "," + temp.g + "," + temp.b + "," + temp.a + ")";
@@ -35,6 +40,10 @@ function UI.Text:setColor( color1, color2 )
 	-- self.color2 = "rgba(" + temp.r + "," + temp.g + "," + temp.b + "," + temp.a + ")";
 end
 
-function UI.Text:draw( )
+function UIText:setFont( )
+	
+end
+
+function UIText:draw( )
 	
 end
