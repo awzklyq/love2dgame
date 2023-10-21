@@ -28,6 +28,21 @@ function LColor:GetLuminance()
     return 0.299* self._r +  0.587 * self._g + 0.114 * self._b
 end
 
+function LColor:Log(info)
+    if not info then
+        info = ''
+    end
+    info  = info .. ' Color(rgba):'
+    log(info, self.r, self.g, self.b, self.a)
+end
+
+function LColor:Set(c)
+    self.r = c.r;
+    self.b = c.b;
+    self.g = c.g;
+    self.a = c.a;
+end
+
 
 
 LColor.__index = function(tab, key)

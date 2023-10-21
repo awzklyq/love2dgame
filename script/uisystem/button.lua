@@ -13,9 +13,11 @@ function Button.new( x, y, w, h, text, name )
 
 	btn._name = name or "";
 	
+	btn.text_sw = 0.6
+	btn.text_sh = 0.8
 	if text ~= null and text ~= "" then
 
-		btn.text = LoveScreenText.new(x, y, font, text)---UI.Text.new( text, x, y, w, h );
+		btn.text =  UI.Text.new(text, x, y, w * btn.text_sw, h * btn.text_sh)---UI.Text.new( text, x, y, w, h );
 		btn.text.text = text;
 		UI.UISystem.removeUI( btn );
 	end
@@ -32,9 +34,46 @@ function Button.new( x, y, w, h, text, name )
 
 	btn:reset( );
 	btn.type = "Button";
+
+	btn.renderid = Render.UIButtonId
 	UI.UISystem.addUI( btn );
 
 	return btn;
+end
+
+function Button:set__w(ww)
+
+	self._w = ww;
+	self:ResetXYWH()
+end
+
+function Button:set__h( hh )
+	self._h = hh;
+
+	self:ResetXYWH()
+end
+
+
+function Button:set__x( xx )
+
+	if type(xx) ~= 'number' then
+		return
+	end
+
+	self._x = xx
+
+	self:ResetXYWH()
+end
+
+
+function Button:set__y(yy)
+	if type(yy) ~= 'number' then
+		return
+	end
+
+	self._y = yy
+
+	self:ResetXYWH()
 end
 
 function Button:setNormalColor(color)
@@ -55,7 +94,10 @@ function Button:IsPressd()
 end
 
 function Button:ChangeState(state)
-	self.state = state;
+	if state then
+		self.state = state;
+	end
+	
 	if self.state == UI.State_Normal then
 		self.color:Set(self.color1);
 	elseif self.state == UI.State_Press then
@@ -100,6 +142,32 @@ function Button:release( )
 	self:removeUI( self.text );
 end
 
+function Button:ResetXYWH()
+	if self.rect then
+		self.rect.x = self._x
+		self.rect.y = self._y
+		self.rect.w = self._w
+		self.rect.h = self._h
+	end
+
+	if  self.text then
+		local tw = self.text_sw * self._w
+		local th = self.text_sh * self._h
+
+		local cx =  self._x + self._w * 0.5
+		local cy = self._y + self._h * 0.5
+		local tx = cx - tw * 0.5
+		local ty = cy - th * 0.5
+
+		self.text.x = tx
+		self.text.y = ty
+
+		self.text.w = tw
+		self.text.h = th
+
+	end
+end
+
 -- function Button:setRenderType( type )
 -- 	self.renderType = type;
 -- 	self:reset( );
@@ -128,7 +196,7 @@ function Button:draw( )
 		self.rect:draw( );
 	end
 
-	if ( self.text and self.text.text ~= "" )  then
+	if self.text and self.text.text ~= "" then
 		 self.text:draw( );
 	end
 

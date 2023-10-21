@@ -38,14 +38,14 @@ _G.app.wheelmoved = setmetatable({},  metatab)
 _G.app.resizeWindow = setmetatable({},  metatab)
 
 function love.mousereleased(x, y, button, isTouch)
-    _G.UIHelper.mouseUp(x, y, button, isTouch)
+  --  _G.UIHelper.mouseUp(x, y, button, isTouch)
     _G.app.mousereleased(x, y, button, isTouch)
 end
 
 function love.keypressed(key, scancode, isrepeat)
-    if  _G.UIHelper.keyDown then
-        _G.UIHelper.keyDown(key, scancode, isrepeat)
-    end
+    -- if  _G.UIHelper.keyDown then
+    --     _G.UIHelper.keyDown(key, scancode, isrepeat)
+    -- end
     
     _G.app.keypressed(key, scancode, isrepeat)
 
@@ -55,24 +55,24 @@ function love.keypressed(key, scancode, isrepeat)
 end
 
 function love.keyreleased(key)
-    if _G.UIHelper.keyUp then
-        _G.UIHelper.keyUp(key)
-    end
+    -- if _G.UIHelper.keyUp then
+    --     _G.UIHelper.keyUp(key)
+    -- end
 end
 
 function love.wheelmoved(x, y)
-    if  _G.UIHelper.wheelMove then
-        _G.UIHelper.wheelMove(x, y)
-    end
+    -- if  _G.UIHelper.wheelMove then
+    --     _G.UIHelper.wheelMove(x, y)
+    -- end
     _G.CameraManager.wheelmoved(x, y);
     _G.LightManager.wheelmoved(x, y);
     app.wheelmoved(x, y)
 end
 
 function love.textinput(text)
-    if _G.UIHelper.textInput then
-        _G.UIHelper.textInput(text)
-    end
+    -- if _G.UIHelper.textInput then
+    --     _G.UIHelper.textInput(text)
+    -- end
 end
 
 local screenwidth = love.graphics.getPixelWidth() 
@@ -82,7 +82,7 @@ function love.update(dt)
     if RenderSet then
         RenderSet.frameToken = RenderSet.frameToken + 1
     end
-    _G.UIHelper.update(dt);
+    --_G.UIHelper.update(dt);
     _G.CameraManager.update(dt)
     _G.LightManager.update(dt);
 
@@ -131,7 +131,7 @@ function love.draw()
 
     _G.app.afterrender();
 
-    _G.UIHelper.draw()
+   -- _G.UIHelper.draw()
     if _G.lovedebug.showstat then
     -- Stats
     local stats = love.graphics.getStats()
@@ -150,7 +150,7 @@ function love.mousepressed(x, y, button, istouch)
     --    printx = x
     --    printy = y
     -- end
-    _G.UIHelper.mouseDown(x, y, button, isTouch)
+    --_G.UIHelper.mouseDown(x, y, button, isTouch)
     _G.app.mousepressed(x, y, button, istouch);
  end
 
@@ -160,11 +160,14 @@ function love.mousepressed(x, y, button, istouch)
     --    printy = y
     -- end
 
-    _G.UIHelper.mousemoved(x, y, dx, dy);
-    _G.CameraManager.mousemoved(x, y, dx, dy, istouch);
-    _G.LightManager.mousemoved(x, y, dx, dy, istouch)
+    --_G.UIHelper.mousemoved(x, y, dx, dy);
+    local HasY = not not y
+    if y then
+        _G.CameraManager.mousemoved(x, y, dx, dy, istouch);
+        _G.LightManager.mousemoved(x, y, dx, dy, istouch)
 
-    _G.app.mousemoved(x, y, dx, dy, istouch);
+        _G.app.mousemoved(x, y, dx, dy, istouch);
+    end
  end
 
  function love.load()

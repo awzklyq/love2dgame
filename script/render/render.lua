@@ -85,6 +85,10 @@ Render.EdgeId = 42
 
 Render.Ray2DId = 43
 
+Render.UITextId = 44
+
+Render.UIButtonId = 45
+
 Render.getRenderIdName = function(id)
     if Render.CircleId == id then
         return "Circle"
@@ -158,6 +162,8 @@ Render.getRenderIdName = function(id)
         return "EdgeId"
     elseif Render.Ray2DId == id then
         return "Ray2DId"
+    elseif  Render.UITextId == id then
+        return "UITextId"
     end
     
     return "Null"
@@ -329,7 +335,9 @@ Render.RenderObject = function(obj)
         elseif obj.renderid == Render.LoveScreenTextId then
             love.graphics.setColor(obj.color._r, obj.color._g, obj.color._b);
             love.graphics.print(tostring(obj.text), obj.x, obj.y, obj.r, obj.sx, obj.sy, obj.ox, obj.oy, obj.kx, obj.ky)
-
+        elseif obj.renderid == Render.UITextId then
+            love.graphics.setColor(obj.color._r, obj.color._g, obj.color._b, obj.color._a or 1);
+            love.graphics.draw(obj.obj, obj._x, obj._y, 0, obj._w / obj.obj:getWidth(), obj._h / obj.obj:getHeight())
         elseif obj.renderid == Render.Tile3DId then
             love.graphics.draw( obj.obj )
         elseif obj.renderid == Render.Triangle2DId then

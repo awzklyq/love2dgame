@@ -40,10 +40,7 @@ end
 
 
 function Circle:draw()
-    local r, g, b, a = love.graphics.getColor( );
-    love.graphics.setColor(self.color.r, self.color.g, self.color.b, self.color.a );
     Render.RenderObject(self);
-    love.graphics.setColor(r, g, b, a );
 
     if self.box2d then
         self.box2d:draw()

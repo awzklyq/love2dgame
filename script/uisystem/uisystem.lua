@@ -27,34 +27,34 @@ UISystem.uilists = {};
 UISystem.swfs = {};
 
 UISystem.removeUI = function( ui )
-	if ( UISystem.isButton( ui )	) then
+	if ( UISystem.IsButton( ui )	) then
 		UISystem.buttons.remove( ui );
-	elseif ( UISystem.isText( ui ) ) then
+	elseif ( UISystem.IsText( ui ) ) then
 		UISystem.texts.remove( ui );
-	elseif ( UISystem.isTextArea( ui ) ) then
-		UISystem.textareas.remove( ui );
-	elseif ( UISystem.isTextInput( ui ) ) then
-		UISystem.textinputs.remove( ui );
-	elseif ( UISystem.isUIView( ui ) ) then
-		UISystem.uiviews.remove( ui );
-	elseif ( UISystem.isUIList( ui ) ) then
-		UISystem.uilists.remove( ui );
+	-- elseif ( UISystem.isTextArea( ui ) ) then
+	-- 	UISystem.textareas.remove( ui );
+	-- elseif ( UISystem.isTextInput( ui ) ) then
+	-- 	UISystem.textinputs.remove( ui );
+	-- elseif ( UISystem.isUIView( ui ) ) then
+	-- 	UISystem.uiviews.remove( ui );
+	-- elseif ( UISystem.isUIList( ui ) ) then
+	-- 	UISystem.uilists.remove( ui );
 	end
 end
 
 UISystem.addUI = function( ui )
-	if ( UISystem.isButton( ui )) then
+	if ( UISystem.IsButton( ui )) then
 		table.insert( UISystem.buttons, ui);
-	elseif ( UISystem.isText( ui ) ) then
+	elseif ( UISystem.IsText( ui ) ) then
 		table.insert( UISystem.texts, ui);
-	elseif ( UISystem.isTextArea( ui ) ) then
-		table.insert( UISystem.textareas, ui);
-	elseif ( UISystem.isTextInput( ui ) ) then
-		table.insert( UISystem.textinputs, ui);
-	elseif ( UISystem.isUIView( ui ) ) then
-		table.insert( UISystem.uiviews, ui);
-	elseif ( UISystem.isUIList( ui ) ) then
-		table.insert( UISystem.uilists, ui);
+	-- elseif ( UISystem.isTextArea( ui ) ) then
+	-- 	table.insert( UISystem.textareas, ui);
+	-- elseif ( UISystem.isTextInput( ui ) ) then
+	-- 	table.insert( UISystem.textinputs, ui);
+	-- elseif ( UISystem.isUIView( ui ) ) then
+	-- 	table.insert( UISystem.uiviews, ui);
+	-- elseif ( UISystem.isUIList( ui ) ) then
+	-- 	table.insert( UISystem.uilists, ui);
 	end
 end
 
@@ -76,12 +76,12 @@ _G.app.render(function(e)
     UISystem.render(e) 
 end)
 
-UISystem.isButton = function( obj )
-	return obj and obj.type and obj.type == "Button";
+UISystem.IsButton = function( obj )
+	return obj and obj.renderid and obj.renderid == Render.UIButtonId;
 end
 
-UISystem.isText = function( obj )
-	return obj.type == "Text";
+UISystem.IsText = function( obj )
+	return obj and obj.renderid and obj.renderid == Render.UITextId;
 end
 
 UISystem.isTextArea = function( obj )
@@ -104,13 +104,10 @@ UISystem.isUIView = function( obj, isview )
 		end
 	end
 
-	return ( obj.type == "UIView" ) or UISystem.isButton( obj ) or UISystem.isText( obj ) or UISystem.isTextArea( obj ) or UISystem.isTextInput( obj );
+	return ( obj.type == "UIView" ) or UISystem.IsButton( obj ) or UISystem.IsText( obj ) or UISystem.isTextArea( obj ) or UISystem.isTextInput( obj );
 end
 
 UI.get__x = function( self )
-	if ( self._parent ~= nil ) then
-		return self._x - self._parent._x;
-	end
 	return self._x;
 end
 
@@ -119,60 +116,20 @@ UI.set__x = function( self, xx )
 		return
 	end
 
-	local  oldx = self._x;
-	if ( self._parent ~= nil ) then
-		self._x = self._parent._x + xx;
-	else
-		self._x = xx;
-	end
-
-	if ( self.elements ) then
-	
-		local  temp = self.elements;
-		local  intervalx = self._x - oldx;
-		for i, v in ipairs(temp) do
-		
-			temp[i].x = temp[i].x +  intervalx;
-			if ( temp[i].triggerResizeXY ~= nil and Global.isFunction( temp[i].triggerResizeXY ) ) then
-				temp[i].triggerResizeXY( intervalx, 0 );
-			end
-		end
-	end
+	self._x = xx;
 end
 
 
 UI.get__y = function(self)
-	if ( self._parent ~= nil ) then
-		return self._y - self._parent._y;
-	end
-
 	return self._y;
 end
+
 UI.set__y = function(self, yy)
 	if type(yy) ~= 'number' then
 		return
 	end
 
-	local  oldy = self._y;
-	if ( self._parent ~= nil ) then
-		self._y = self._parent._y + yy;
-	else
-		self._y = yy;
-	end
-
-	if ( self.elements ) then
-		local  temp = self.elements;
-		local  intervaly = self._y - oldy;
-		for i = 1, #temp, 1 do
-		
-			temp[i].y = temp[i].y + intervaly;
-
-			if ( temp[i].triggerResizeXY ~= nil and Global.isFunction( temp[i].triggerResizeXY ) ) then
-				temp[i].triggerResizeXY( 0, intervaly );
-			end
-		
-		end
-	end
+	self._y = yy
 end
 
 UI.get__w = function(self)
@@ -187,9 +144,10 @@ end
 UI.get__h = function( )
 	return self._h;
 end
-UI.set__y = function( hh )
+UI.set__h = function( self, hh )
 	self._h = hh;
 end
+
 
 UI.get__name = function( )
 	return self._name;
@@ -216,11 +174,17 @@ UI.set__name = function( uiname )
 end
 
 function UIBase__index(tab, key, ...)
+	local TypeObject = rawget(tab, "TypeObject");
+	if TypeObject then
+		if TypeObject['get__'..key] then
+			return TypeObject['get__'..key](tab);
+		end
+	end
+
 	if UI['get__'..key] then
 		return UI['get__'..key](tab);
 	end
 	
-	local TypeObject = rawget(tab, "TypeObject");
 	if TypeObject and TypeObject[key] then
 		return TypeObject[key];
 	end
@@ -229,6 +193,13 @@ function UIBase__index(tab, key, ...)
 end
 
 function UIBase__newindex(tab, key, value)
+	local TypeObject = rawget(tab, "TypeObject");
+	if TypeObject then
+		if TypeObject['set__'..key] then
+			return TypeObject['set__'..key](tab, value);
+		end
+	end
+
 	if UI['set__'..key] then
 		UI['set__'..key](tab, value);
 	end

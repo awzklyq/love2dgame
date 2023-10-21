@@ -21,19 +21,18 @@ function Rect.new(x, y, w, h, mode)
     return rect;
 end
 
-function Rect:setColor(r, g, b, a)
-    self.color.r = r;
-    self.color.g = g;
-    self.color.b = b;
-    self.color.a = a;
+function Rect:SetColor(r, g, b, a)
+    if g ~= nil then
+        self.color.r = r;
+        self.color.g = g;
+        self.color.b = b;
+        self.color.a = a;
+    else
+        self.color:Set(r)
+    end
 end
 
-function Rect:SetColor(r, g, b, a)
-    self.color.r = r;
-    self.color.g = g;
-    self.color.b = b;
-    self.color.a = a;
-end
+Rect.setColor = Rect.SetColor
 
 function Rect:SetMouseEventEable(enable)
     if enable then
