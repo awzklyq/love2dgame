@@ -21,3 +21,9 @@ local scrollbar = UI.ScrollBar.new( 'test', 200, 200, 200, 40, 21, 98, 0.5)
 scrollbar.ChangeEvent = function(v)
     log('test scrollbar', v)
 end
+
+
+local checkb = UI.CheckBox.new( 200, 260, 20, 20, "Test CheckBox" )
+checkb.ChangeEvent = function(Enable)
+    log("Test CheckBox Enable", Enable)
+end

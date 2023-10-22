@@ -12,6 +12,8 @@ function Rect.new(x, y, w, h, mode)
 
     rect.mode = mode or 'fill';
 
+    rect.lw = 2
+
     rect:GeneraOutCircle()
 
     rect:GeneraLines()

@@ -85,6 +85,11 @@ end
 function UIScrollBar:draw()
     self.rect:draw()
     self.circle:draw()
+
+    if self.text then
+        self.text:draw()
+        self.ValueText:draw()
+    end
 end
 
 function UIScrollBar:IsInsert(x, y)
@@ -119,6 +124,33 @@ function UIScrollBar:triggerMouseRelease( b, x, y )
     return false
 end
 
+
+function UIScrollBar:get__Value()
+	return self._Value;
+end
+
+function UIScrollBar:set__Value(value)
+	self:SetValue(value)
+
+    local t = (value - self._minv) / (self._maxv - self._minv)
+    t = math.clamp(t, 0, 1)
+
+    self.circle.x = math.lerp(self._x, self._x + self._w, t)
+end
+
+function UIScrollBar:SetValue(value)
+    if value == self._Value then
+        return
+    end
+    self._Value = value;
+    self.ValueText.text = tostring(value)
+    self.ValueText.w = self.ValueText.ow 
+
+    if self.ChangeEvent then
+        self.ChangeEvent(self._Value)
+    end
+end
+
 function UIScrollBar:triggerMouseMoved( x, y )
 	if  self.IsSelect then
 
@@ -133,13 +165,7 @@ function UIScrollBar:triggerMouseMoved( x, y )
         
 
         local v = self:GetCurrentValue()
-        self.ValueText.text = tostring(v)
-        self.ValueText.w = self.ValueText.ow 
-
-        if self.ChangeEvent then
-            self.ChangeEvent(v)
-        end
-        return true;
+        self:SetValue(v)
     end
 
     return false

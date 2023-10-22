@@ -9,6 +9,7 @@ UI.UISystem = {};
 dofile('script/uisystem/button.lua')
 dofile('script/uisystem/text.lua')
 dofile('script/uisystem/scrollbar.lua')
+dofile('script/uisystem/checkbox.lua')
 
 local UISystem = UI.UISystem;
 UISystem.buttons = {};
@@ -16,6 +17,8 @@ UISystem.buttons = {};
 UISystem.texts = {};
 
 UISystem.scrollbars = {};
+
+UISystem.checkboxs = {};
 
 UISystem.uiviews = {}
 
@@ -32,11 +35,13 @@ end
 
 UISystem.removeUI = function( ui )
 	if ( UISystem.IsButton( ui )	) then
-		UISystem.RemoveUIFormTarry(UISystem.buttons)
+		UISystem.RemoveUIFormTarry(UISystem.buttons, ui)
 	elseif ( UISystem.IsText( ui ) ) then
-		UISystem.RemoveUIFormTarry(UISystem.texts)
+		UISystem.RemoveUIFormTarry(UISystem.texts, ui)
 	elseif UISystem.IsScrollBar(ui) then
-		UISystem.RemoveUIFormTarry(UISystem.scrollbars)
+		UISystem.RemoveUIFormTarry(UISystem.scrollbars, ui)
+	elseif UISystem.IsCheckBox(ui) then
+		UISystem.RemoveUIFormTarry(UISystem.checkboxs, ui)
 	end
 end
 
@@ -47,6 +52,8 @@ UISystem.addUI = function( ui )
 		table.insert( UISystem.texts, ui);
 	elseif UISystem.IsScrollBar(ui) then
 		table.insert( UISystem.scrollbars, ui);
+	elseif UISystem.IsCheckBox(ui) then
+		table.insert( UISystem.checkboxs, ui)
 	end
 end
 
@@ -60,6 +67,10 @@ UISystem.render = function( e )
 	end
 
 	for i, v in ipairs(UISystem.scrollbars) do
+		v:draw(e);
+	end
+
+	for i, v in ipairs(UISystem.checkboxs) do
 		v:draw(e);
 	end
 end
@@ -78,6 +89,10 @@ end
 
 UISystem.IsScrollBar = function( obj )
 	return obj and obj.renderid and obj.renderid == Render.UIScrollBarId;
+end
+
+UISystem.IsCheckBox = function( obj )
+	return obj and obj.renderid and obj.renderid == Render.UICheckBoxId;
 end
 
 UISystem.isTextArea = function( obj )
@@ -246,6 +261,11 @@ UISystem.mouseDown = function( b, x, y )
 		end
 	end
 
+	for i, v in ipairs(UISystem.checkboxs) do
+		if v.triggerMouseDown then
+			v:triggerMouseDown( b, x, y )
+		end
+	end
 	return false;
 end
 
@@ -291,6 +311,15 @@ UISystem.mousemoved = function(x, y )
 
 	if not MouseMovedSelectedUI then
 		for i, v in ipairs(UISystem.uiviews) do
+			if v.triggerMouseMoved and v:triggerMouseMoved( x, y ) then
+				MouseMovedSelectedUI = v
+				break
+			end
+		end
+	end
+
+	if not MouseMovedSelectedUI then
+		for i, v in ipairs(UISystem.checkboxs) do
 			if v.triggerMouseMoved and v:triggerMouseMoved( x, y ) then
 				MouseMovedSelectedUI = v
 				break

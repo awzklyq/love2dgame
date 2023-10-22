@@ -91,6 +91,8 @@ Render.UIButtonId = 45
 
 Render.UIScrollBarId = 46
 
+Render.UICheckBoxId = 47
+
 Render.getRenderIdName = function(id)
     if Render.CircleId == id then
         return "Circle"
@@ -199,6 +201,8 @@ Render.RenderObject = function(obj)
             if obj.color then
                 love.graphics.setColor(obj.color._r, obj.color._g, obj.color._b, obj.color._a);
             end
+
+            love.graphics.setLineWidth(obj.lw);
             
             love.graphics.rectangle( obj.mode, obj.x, obj.y, obj.w, obj.h);
         elseif obj.renderid == Render.EntityBodyId then

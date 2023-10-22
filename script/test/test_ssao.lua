@@ -84,13 +84,21 @@ end)
 
 
 local scrollbar1 = UI.ScrollBar.new( 'SSAOValue', 10, 10, 250, 40, 0, 20, 0.1)
+scrollbar1.Value = RenderSet.getSSAOValue()
 scrollbar1.ChangeEvent = function(v)
     RenderSet.setSSAOValue(v)
 end
 
-local scrollbar2 = UI.ScrollBar.new( 'SSAODepthLimit', 10, 60, 250, 40, 0, 1, 0.0001)
+local scrollbar2 = UI.ScrollBar.new( 'SSAODepthLimit', 10, 60, 250, 40, 0, 0.0001, 0.00001)
+scrollbar2.Value = RenderSet.getSSAODepthLimit()
 scrollbar2.ChangeEvent = function(v)
-    RenderSet.setSSAOValue(v)
+    RenderSet.setSSAODepthLimit(v)
+end
+
+local checkb = UI.CheckBox.new( 10, 110, 20, 20, "SSAO" )
+checkb.IsSelect = true
+checkb.ChangeEvent = function(Enable)
+    scene.needSSAO = Enable
 end
 
 app.keypressed(function(key, scancode, isrepeat)
@@ -111,9 +119,7 @@ app.keypressed(function(key, scancode, isrepeat)
         RenderSet.setSSAODepthLimit(math.max(RenderSet.getSSAODepthLimit() - 0.0001, 0))
     end
 
-    if key == "a" then
-        scene.needSSAO = not scene.needSSAO
-    elseif key == 'z' then
+    if key == 'z' then
         RenderNormal = not RenderNormal
     elseif key == 'x' then
         RenderDepth = not RenderDepth
