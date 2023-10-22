@@ -79,8 +79,19 @@ app.render(function(dt)
     elseif RenderDepth then
         scene.canvasdepth:draw()
     end
-    love.graphics.print( "Image name: ".. imagenames[index] .. " SSAO: ".. tostring(scene.needSSAO) .. " SSAOValue: ".. tostring(RenderSet.getSSAOValue()).." SSAODepthLimit: ".. tostring(RenderSet.getSSAODepthLimit()), 10, 10)
+    -- love.graphics.print( "Image name: ".. imagenames[index] .. " SSAO: ".. tostring(scene.needSSAO) .. " SSAOValue: ".. tostring(RenderSet.getSSAOValue()).." SSAODepthLimit: ".. tostring(RenderSet.getSSAODepthLimit()), 10, 10)
 end)
+
+
+local scrollbar1 = UI.ScrollBar.new( 'SSAOValue', 10, 10, 250, 40, 0, 20, 0.1)
+scrollbar1.ChangeEvent = function(v)
+    RenderSet.setSSAOValue(v)
+end
+
+local scrollbar2 = UI.ScrollBar.new( 'SSAODepthLimit', 10, 60, 250, 40, 0, 1, 0.0001)
+scrollbar2.ChangeEvent = function(v)
+    RenderSet.setSSAOValue(v)
+end
 
 app.keypressed(function(key, scancode, isrepeat)
     if key == "space" then

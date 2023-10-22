@@ -14,28 +14,10 @@ btn.click = function()
     text.text = "Test AAA"
 end
 
--- local text = love.graphics.newText( love.graphics.getFont(), "asdasdawarewre" )
 
--- app.render(function(dt)
---     love.graphics.draw(text, 200, 200, 0, 1, 1 )
--- end)
 
-local TestRect = Rect.new(200, 200, 50, 50)
 
-TestRect:SetMouseEventEable(true)
-TestRect.MouseDownEvent = function(SelectElement, x, y, button, istouch)
-    log('test Rect')
+local scrollbar = UI.ScrollBar.new( 'test', 200, 200, 200, 40, 21, 98, 0.5)
+scrollbar.ChangeEvent = function(v)
+    log('test scrollbar', v)
 end
-
-local TestCircle = Circle.new(50, 200 ,300, 50)
-TestCircle:SetMouseEventEable(true)
-TestCircle.MouseDownEvent = function(SelectElement, x, y, button, istouch)
-    log('test Circle')
-end
-
-app.render(function(dt)
-
-    TestRect:draw()
-
-    TestCircle:draw()
-end)

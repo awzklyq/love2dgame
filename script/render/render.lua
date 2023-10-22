@@ -89,6 +89,8 @@ Render.UITextId = 44
 
 Render.UIButtonId = 45
 
+Render.UIScrollBarId = 46
+
 Render.getRenderIdName = function(id)
     if Render.CircleId == id then
         return "Circle"
@@ -189,6 +191,9 @@ Render.RenderObject = function(obj)
         local lw = love.graphics.getLineWidth();
 
         if obj.renderid == Render.CircleId then
+            if obj.color then
+                love.graphics.setColor(obj.color._r, obj.color._g, obj.color._b, obj.color._a);
+            end
             love.graphics.circle( obj.mode, obj.x, obj.y, obj.r, obj.seg);
         elseif obj.renderid == Render.RectId then
             if obj.color then
@@ -338,6 +343,7 @@ Render.RenderObject = function(obj)
         elseif obj.renderid == Render.UITextId then
             love.graphics.setColor(obj.color._r, obj.color._g, obj.color._b, obj.color._a or 1);
             love.graphics.draw(obj.obj, obj._x, obj._y, 0, obj._w / obj.obj:getWidth(), obj._h / obj.obj:getHeight())
+            -- log('yyyyyyyyyyyyyy',  obj._w, obj._h )
         elseif obj.renderid == Render.Tile3DId then
             love.graphics.draw( obj.obj )
         elseif obj.renderid == Render.Triangle2DId then

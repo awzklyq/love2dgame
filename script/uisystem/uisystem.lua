@@ -8,37 +8,35 @@ UI.UISystem = {};
 
 dofile('script/uisystem/button.lua')
 dofile('script/uisystem/text.lua')
+dofile('script/uisystem/scrollbar.lua')
 
 local UISystem = UI.UISystem;
 UISystem.buttons = {};
 
-UISystem.textinputs ={};
-
 UISystem.texts = {};
 
-UISystem.textareas = {};
+UISystem.scrollbars = {};
 
-UISystem.uiviews = {};
+UISystem.uiviews = {}
 
-UISystem.fouseuis = {};
+UISystem.RemoveUIFormTarry = function(Elements, ui)
+	for i = 1, #Elements do
+		if Elements[i] == ui then
+			table.remove(Elements, i)
+			return true
+		end
+	end
 
-UISystem.uilists = {};
-
-UISystem.swfs = {};
+	return false
+end
 
 UISystem.removeUI = function( ui )
 	if ( UISystem.IsButton( ui )	) then
-		UISystem.buttons.remove( ui );
+		UISystem.RemoveUIFormTarry(UISystem.buttons)
 	elseif ( UISystem.IsText( ui ) ) then
-		UISystem.texts.remove( ui );
-	-- elseif ( UISystem.isTextArea( ui ) ) then
-	-- 	UISystem.textareas.remove( ui );
-	-- elseif ( UISystem.isTextInput( ui ) ) then
-	-- 	UISystem.textinputs.remove( ui );
-	-- elseif ( UISystem.isUIView( ui ) ) then
-	-- 	UISystem.uiviews.remove( ui );
-	-- elseif ( UISystem.isUIList( ui ) ) then
-	-- 	UISystem.uilists.remove( ui );
+		UISystem.RemoveUIFormTarry(UISystem.texts)
+	elseif UISystem.IsScrollBar(ui) then
+		UISystem.RemoveUIFormTarry(UISystem.scrollbars)
 	end
 end
 
@@ -47,14 +45,8 @@ UISystem.addUI = function( ui )
 		table.insert( UISystem.buttons, ui);
 	elseif ( UISystem.IsText( ui ) ) then
 		table.insert( UISystem.texts, ui);
-	-- elseif ( UISystem.isTextArea( ui ) ) then
-	-- 	table.insert( UISystem.textareas, ui);
-	-- elseif ( UISystem.isTextInput( ui ) ) then
-	-- 	table.insert( UISystem.textinputs, ui);
-	-- elseif ( UISystem.isUIView( ui ) ) then
-	-- 	table.insert( UISystem.uiviews, ui);
-	-- elseif ( UISystem.isUIList( ui ) ) then
-	-- 	table.insert( UISystem.uilists, ui);
+	elseif UISystem.IsScrollBar(ui) then
+		table.insert( UISystem.scrollbars, ui);
 	end
 end
 
@@ -67,12 +59,12 @@ UISystem.render = function( e )
 		v:draw(e);
 	end
 
-	for i, v in ipairs(UISystem.uiviews) do
+	for i, v in ipairs(UISystem.scrollbars) do
 		v:draw(e);
 	end
 end
 
-_G.app.render(function(e)
+_G.app.afterrender(function(e)
     UISystem.render(e) 
 end)
 
@@ -82,6 +74,10 @@ end
 
 UISystem.IsText = function( obj )
 	return obj and obj.renderid and obj.renderid == Render.UITextId;
+end
+
+UISystem.IsScrollBar = function( obj )
+	return obj and obj.renderid and obj.renderid == Render.UIScrollBarId;
 end
 
 UISystem.isTextArea = function( obj )
@@ -137,7 +133,6 @@ UI.get__w = function(self)
 end
 
 UI.set__w = function(self, ww)
-
 	self._w = ww;
 end
 
@@ -193,6 +188,7 @@ function UIBase__index(tab, key, ...)
 end
 
 function UIBase__newindex(tab, key, value)
+
 	local TypeObject = rawget(tab, "TypeObject");
 	if TypeObject then
 		if TypeObject['set__'..key] then
@@ -201,7 +197,7 @@ function UIBase__newindex(tab, key, value)
 	end
 
 	if UI['set__'..key] then
-		UI['set__'..key](tab, value);
+		return UI['set__'..key](tab, value);
 	end
 
 	rawset(tab, key, value);
@@ -237,6 +233,13 @@ UISystem.mouseDown = function( b, x, y )
 		end
 	end
 
+	for i, v in ipairs(UISystem.scrollbars) do
+		if v.triggerMouseDown and v:triggerMouseDown( b, x, y ) then
+			SelectedUI[#SelectedUI + 1] = v
+		end
+	end
+
+
 	for i, v in ipairs(UISystem.uiviews) do
 		if v.triggerMouseDown and v:triggerMouseDown( b, x, y ) then
 			SelectedUI[#SelectedU + 1] = v
@@ -259,7 +262,7 @@ UISystem.mousereleased = function( b, x, y )
 	return false;
 end
 
-local MouseMovedSelectedUI
+local MouseMovedSelectedUI = nil
 UISystem.mousemoved = function(x, y )
 	if MouseMovedSelectedUI then
 		if MouseMovedSelectedUI:triggerMouseMoved(x, y ) == false then
@@ -268,9 +271,20 @@ UISystem.mousemoved = function(x, y )
 	end
 
 	if not MouseMovedSelectedUI then
+		
 		for i, v in ipairs(UISystem.buttons) do
 			if v.triggerMouseMoved and v:triggerMouseMoved(x, y ) then
 				MouseMovedSelectedUI = v
+				break
+			end
+		end
+	end
+
+	if not MouseMovedSelectedUI then
+		for i, v in ipairs(UISystem.scrollbars) do
+			if v.triggerMouseMoved and v:triggerMouseMoved(x, y ) then
+				MouseMovedSelectedUI = v
+				break
 			end
 		end
 	end
@@ -279,6 +293,7 @@ UISystem.mousemoved = function(x, y )
 		for i, v in ipairs(UISystem.uiviews) do
 			if v.triggerMouseMoved and v:triggerMouseMoved( x, y ) then
 				MouseMovedSelectedUI = v
+				break
 			end
 		end
 	end

@@ -15,15 +15,15 @@ function Button.new( x, y, w, h, text, name )
 	
 	btn.text_sw = 0.6
 	btn.text_sh = 0.8
-	if text ~= null and text ~= "" then
-
+	if text ~= nil and text ~= "" then
 		btn.text =  UI.Text.new(text, x, y, w * btn.text_sw, h * btn.text_sh)---UI.Text.new( text, x, y, w, h );
+		btn.text:SetNormalColor(0, 0, 0, 255)
 		btn.text.text = text;
-		UI.UISystem.removeUI( btn );
+		UI.UISystem.removeUI( btn.text );
 	end
 
-	btn.color1 = LColor.new(160, 160, 160);
-	btn.color2 = LColor.new(125, 125, 125);
+	btn.color1 = LColor.new(125, 125, 125);
+	btn.color2 = LColor.new(150, 150, 150);
 	btn.color3 = LColor.new(180, 180, 180);
 
 	btn.color  = LColor.new(180, 180, 180);

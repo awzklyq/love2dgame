@@ -57,13 +57,19 @@ function UIText:setFont( )
 	
 end
 
-
 function UIText:get__text()
 	return self._text
 end
 
+function UIText:get__ow()
+	return self.obj:getWidth()
+end
+
+function UIText:get__oh()
+	return self.obj:getHeight()
+end
+
 function UIText:set__text(text)
-	log('gggggggggggg')
 	self._text = text
 	self.obj:set(text)
 end
