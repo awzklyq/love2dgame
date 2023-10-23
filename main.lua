@@ -27,6 +27,7 @@ dofile('script/common/voronoi.lua')
 dofile('script/common/pbr.lua')
 dofile('script/common/radarfrustum.lua')
 dofile('script/common/SpaceSplit.lua')
+dofile('script/common/psnr.lua')
 
 dofile('script/file/file.lua')
 
@@ -174,5 +175,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_ssao.lua')--test_IntersectLine  test_BezierCurve.lua
+	dofile('script/test/test_PSNR.lua')--test_IntersectLine  test_BezierCurve.lua
 end

@@ -8,7 +8,10 @@ function ImageEx.new(name, ...)
         image.obj = love.graphics.newImage(_G.FileManager.findFile(name), ...)
     else
         image.obj = love.graphics.newImage(name, ...)
+        image.ImageData = name
     end
+
+    image.filename = name
 
     image.transform = Matrix.new()
 
@@ -65,6 +68,36 @@ ImageEx.__newindex = function(tab, key, value)
     end
 end
 
+function ImageEx:GetImageData()
+    if not self.ImageData then
+        self.ImageData = love.image.newImageData( _G.FileManager.findFile(self.filename) )
+    end
+
+    return self.ImageData
+end
+
+function ImageEx:GetPixel(x, y)
+    local imgd = self:GetImageData()
+    local r, g, b, a = imgd:getPixel(x, y)
+    return LColor.new(r * 255, g * 255, b * 255, a * 255)
+end
+
+function ImageEx:SetPixel(x, y, r, g, b, a)
+    local imgd = self:GetImageData()
+    local IsColor = not not g
+    if IsColor then
+        imgd:setPixel(x, y, r._r, r._g, r._b, r._a)
+    else
+        imgd:setPixel(x, y, r, g, b, a)
+    end
+    
+end
+
+
 function ImageEx:draw()
     Render.RenderObject(self)
+end
+
+function ImageEx:Release()
+    self.ImageData = nil
 end
