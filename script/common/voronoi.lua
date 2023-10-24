@@ -283,6 +283,14 @@ Voronoi.Process = function(Points, FirstTri)
         -- end
     end
 
+    --Remove FirstTri
+    table.remove(ResetsTri, 1)
+    -- for i = #ResetsTri, 1, -1 do
+    --     if ResetsTri[i]:HasPoint(FirstTri.P1) or ResetsTri[i]:HasPoint(FirstTri.P2) or ResetsTri[i]:HasPoint(FirstTri.P3) then
+    --         table.remove(ResetsTri, i)
+    --     end
+    -- end
+
     return ResetsTri
 end
 

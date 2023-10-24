@@ -130,7 +130,7 @@ function Button:release( )
 
 	self.circle = nil
 
-	self.click = nil;
+	self.ClickEvent = nil;
 	for i, v in ipairs(UI.UISystem.buttons) do
 		if  UI.UISystem.buttons[i] == self then
 			
@@ -219,8 +219,8 @@ function Button:triggerMouseDown( b, x, y )
 		return false;
 	end
 	self:ChangeState(UI.State_Press)
-	if  self.click  then
-		self:click( );
+	if  self.ClickEvent  then
+		self:ClickEvent( );
 	end
 
 	return true;

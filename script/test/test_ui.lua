@@ -8,7 +8,7 @@ btn:setPressedColor(LColor.new(125, 125, 125))
 local text = UI.Text.new( "sdfertre", 100, 50, 60, 50 )
 text:SetNormalColor(255, 0, 0, 255)
 
-btn.click = function()
+btn.ClickEvent = function()
     text:SetNormalColor(0, 0, 255, 255)
 
     text.text = "Test AAA"

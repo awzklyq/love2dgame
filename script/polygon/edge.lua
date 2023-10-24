@@ -32,6 +32,10 @@ function Edge2D.new(p1, p2)
     return edge
 end
 
+function Edge2D.Copy(edge)
+    return Edge2D.new(Vector.Copy(edge.P1), Vector.Copy(edge.P2))
+end
+
 function Edge2D:GetOtherPoint(p)
     if self.P1 == p then
         return self.P2

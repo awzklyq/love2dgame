@@ -45,6 +45,10 @@ function Triangle2D.new(p1, p2, p3, IsNeedEdge, linewidth)-- Vector2 or Vector3.
     return tri
 end
 
+function Triangle2D:HasPoint(p)
+    return self.P1 == p or self.P2 == p or self.P3 == p
+end
+
 function Triangle2D.PointsEnableBuildTriagnle(p1, p2, p3)
     if p1.x == p2.x  and p2.x == p3.x then
         return false
@@ -152,40 +156,11 @@ function Triangle2D:GetOutCircleCenter()
     local x2, y2 = self.P2.x, self.P2.y
     local x3, y3 = self.P3.x, self.P3.y
 
-    -- local a = math.sqrt((x2 - x3)^2 + (y2 - y3)^2)
-    -- local b = math.sqrt((x1 - x3)^2 + (y1 - y3)^2)
-    -- local c = math.sqrt((x1 - x2)^2 + (y1 - y2)^2)
-    -- local x = (a*x1 + b*x2 + c*x3) / (a + b + c)
-    -- local y = (a*y1 + b*y2 + c*y3) / (a + b + c)
+    local x0 = ((y2 - y1) * (y3 * y3 - y1 * y1 + x3 * x3 - x1 * x1) - (y3 - y1) * (  y2 * y2 - y1 * y1 + x2 * x2 - x1 * x1)) /  (2 * (x3 - x1) * (y2 - y1) - 2 * (x2 - x1) * (y3 - y1))
+    
+    local y0 = ((x2 - x1) * (x3 * x3 - x1 * x1 + y3 * y3 - y1 * y1) - (x3 - x1) * ( x2 * x2 - x1 * x1 + y2 * y2 - y1 * y1)) / (2 * (y3 - y1) * (x2 - x1) - 2 * (y2 - y1) * (x3 - x1))
 
-    local mid_ab_x = (x1 + x2) / 2
-    local mid_ab_y = (y1 + y2) / 2
-
-    local mid_bc_x = (x2 + x3) / 2
-    local mid_bc_y = (y2 + y3) / 2
-
-    local slope_ab = (y2 - y1) / (x2 - x1)
-    local slope_bc = (y3 - y2) / (x3 - x2)
-
-    if x2 - x1 == 0 or x3 - x2 == 0 then
-        --errorAssert(false, "x2 - x1 == 0 or x3 - x2 == 0 ")
-    end
-    local k1 = slope_ab == 0 and 1 or -1 / slope_ab
-    local k2 = slope_bc == 0 and 1 or -1 / slope_bc
-
-    local c1 = mid_ab_y - k1 * mid_ab_x
-    local c2 = mid_bc_y - k2 * mid_bc_x
-
-    local x = (c1 -c2) / (k2 - k1)
-    local y = k1 * x + c1
-
-    -- local perpen_ab = -1 / slope_ab
-    -- local perpen_bc = -1 / slope_bc
-
-    -- local x = (mid_bc_y - mid_ab_y - perpen_bc * mid_bc_x + perpen_ab * mid_ab_x) / (perpen_ab - perpen_bc)
-    -- local y = perpen_ab * (x - mid_ab_x) + mid_ab_y
-
-    return Vector.new(x, y)
+    return Vector.new(x0, y0)
 end
 
 function Triangle2D:GenerateOutCircle()
