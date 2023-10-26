@@ -99,6 +99,10 @@ function ColorPlane:ResetValue()
     self._Value.a = self.AColor.a
 
     self.rect:SetColor(self._Value.r, self._Value.g, self._Value.b, self._Value.a)
+
+    if self.ChangeEvent then
+        self.ChangeEvent(self._Value)
+    end
 end
 
 function ColorPlane:ShowPlane(show)
