@@ -15,6 +15,10 @@ function Mesh3D:setCanvas(canvas)
     self:setTexture(canvas.obj)
 end
 
+function Mesh3D:SetImage(image)
+    self:setTexture(image.obj)
+end
+
 function Mesh3D:setNormalMap(image)
     if not image then
         self.normalmap = nil

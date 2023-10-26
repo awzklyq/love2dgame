@@ -35,11 +35,17 @@ function UIScrollBar.new( text, x, y, w, h, minv, maxv, offset )
 		UI.UISystem.removeUI( sb.ValueText );
     end
 
+    sb.IsShow = true
+
     sb:ResetXYWH()
 
     UI.UISystem.addUI(sb)
 
     return sb
+end
+
+function UIScrollBar:SetBackgroundColor(...)
+    self.rect:SetColor(...)
 end
 
 function UIScrollBar:ResetXYWH()
@@ -83,6 +89,10 @@ function UIScrollBar:ResetXYWH()
 end
 
 function UIScrollBar:draw()
+    if not self.IsShow then
+        return
+    end
+
     self.rect:draw()
     self.circle:draw()
 

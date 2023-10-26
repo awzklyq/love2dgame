@@ -27,3 +27,6 @@ local checkb = UI.CheckBox.new( 200, 260, 20, 20, "Test CheckBox" )
 checkb.ChangeEvent = function(Enable)
     log("Test CheckBox Enable", Enable)
 end
+
+local cp = UI.ColorPlane.new( "Test ColorPlane", 50, 280, 30, 30)
+cp.Value = LColor.new(255, 122, 21, 254)

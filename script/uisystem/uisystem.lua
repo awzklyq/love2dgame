@@ -10,6 +10,7 @@ dofile('script/uisystem/button.lua')
 dofile('script/uisystem/text.lua')
 dofile('script/uisystem/scrollbar.lua')
 dofile('script/uisystem/checkbox.lua')
+dofile('script/uisystem/ColorPlane.lua')
 
 local UISystem = UI.UISystem;
 UISystem.buttons = {};
@@ -42,10 +43,13 @@ UISystem.removeUI = function( ui )
 		UISystem.RemoveUIFormTarry(UISystem.scrollbars, ui)
 	elseif UISystem.IsCheckBox(ui) then
 		UISystem.RemoveUIFormTarry(UISystem.checkboxs, ui)
+	else
+		UISystem.RemoveUIFormTarry(UISystem.uiviews, ui)
 	end
 end
 
 UISystem.addUI = function( ui )
+	UISystem.RemoveUIFormTarry(ui)
 	if ( UISystem.IsButton( ui )) then
 		table.insert( UISystem.buttons, ui);
 	elseif ( UISystem.IsText( ui ) ) then
@@ -54,24 +58,30 @@ UISystem.addUI = function( ui )
 		table.insert( UISystem.scrollbars, ui);
 	elseif UISystem.IsCheckBox(ui) then
 		table.insert( UISystem.checkboxs, ui)
+	else
+		table.insert( UISystem.uiviews, ui)
 	end
 end
 
 UISystem.render = function( e )
 	for i, v in ipairs(UISystem.buttons) do
-		v:draw(e);
+		v:draw();
 	end
 
 	for i, v in ipairs(UISystem.texts) do
-		v:draw(e);
+		v:draw();
 	end
 
 	for i, v in ipairs(UISystem.scrollbars) do
-		v:draw(e);
+		v:draw();
 	end
 
 	for i, v in ipairs(UISystem.checkboxs) do
-		v:draw(e);
+		v:draw();
+	end
+
+	for i, v in ipairs(UISystem.uiviews) do
+		v:draw();
 	end
 end
 
@@ -128,6 +138,10 @@ UI.set__x = function( self, xx )
 	end
 
 	self._x = xx;
+
+	if self.ResetXYWH then
+		self:ResetXYWH()
+	end
 end
 
 
@@ -141,6 +155,10 @@ UI.set__y = function(self, yy)
 	end
 
 	self._y = yy
+
+	if self.ResetXYWH then
+		self:ResetXYWH()
+	end
 end
 
 UI.get__w = function(self)
@@ -149,13 +167,21 @@ end
 
 UI.set__w = function(self, ww)
 	self._w = ww;
+
+	if self.ResetXYWH then
+		self:ResetXYWH()
+	end
 end
 
-UI.get__h = function( )
+UI.get__h = function(self )
 	return self._h;
 end
 UI.set__h = function( self, hh )
 	self._h = hh;
+
+	if self.ResetXYWH then
+		self:ResetXYWH()
+	end
 end
 
 
@@ -242,6 +268,7 @@ end
 
 local SelectedUI = {}
 UISystem.mouseDown = function( b, x, y )
+	
 	for i, v in ipairs(UISystem.buttons) do
 		if v.triggerMouseDown and v:triggerMouseDown( b, x, y ) then
 			SelectedUI[#SelectedUI + 1] = v
@@ -254,16 +281,15 @@ UISystem.mouseDown = function( b, x, y )
 		end
 	end
 
-
-	for i, v in ipairs(UISystem.uiviews) do
-		if v.triggerMouseDown and v:triggerMouseDown( b, x, y ) then
-			SelectedUI[#SelectedU + 1] = v
-		end
-	end
-
 	for i, v in ipairs(UISystem.checkboxs) do
 		if v.triggerMouseDown then
 			v:triggerMouseDown( b, x, y )
+		end
+	end
+
+	for i, v in ipairs(UISystem.uiviews) do
+		if v.triggerMouseDown and v:triggerMouseDown( b, x, y ) then
+			SelectedUI[#SelectedUI + 1] = v
 		end
 	end
 	return false;
@@ -280,6 +306,20 @@ UISystem.mousereleased = function( b, x, y )
 	SelectedUI = {}
 
 	return false;
+end
+
+UI.HasFoucsUI = function()
+	return #SelectedUI > 0
+end
+
+UI.IsSelectUI = function(ui)
+	for i = 1, #SelectedUI do
+		if ui == SelectedUI[i] then
+			return true
+		end
+	end
+
+	return false
 end
 
 local MouseMovedSelectedUI = nil
@@ -310,7 +350,7 @@ UISystem.mousemoved = function(x, y )
 	end
 
 	if not MouseMovedSelectedUI then
-		for i, v in ipairs(UISystem.uiviews) do
+		for i, v in ipairs(UISystem.checkboxs) do
 			if v.triggerMouseMoved and v:triggerMouseMoved( x, y ) then
 				MouseMovedSelectedUI = v
 				break
@@ -319,7 +359,7 @@ UISystem.mousemoved = function(x, y )
 	end
 
 	if not MouseMovedSelectedUI then
-		for i, v in ipairs(UISystem.checkboxs) do
+		for i, v in ipairs(UISystem.uiviews) do
 			if v.triggerMouseMoved and v:triggerMouseMoved( x, y ) then
 				MouseMovedSelectedUI = v
 				break
