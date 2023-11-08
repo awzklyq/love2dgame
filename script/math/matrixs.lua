@@ -15,6 +15,16 @@ metatable_Matrixs.__mul = function(myvalue, value)
     end
 end
 
+metatable_Matrixs.__add = function(myvalue, value)
+    _errorAssert(type(value) == "table" and value.renderid == Render.MatrixsId, "metatable_Matrixs.__add")
+    return  Matrixs.Add(myvalue, value)
+end
+
+metatable_Matrixs.__sub = function(myvalue, value)
+    _errorAssert(type(value) == "table" and value.renderid == Render.MatrixsId, "metatable_Matrixs.__sub")
+    return  Matrixs.Sub(myvalue, value)
+end
+
 function Matrixs.new(row, column, v)
     local mat = setmetatable({}, metatable_Matrixs);
 
@@ -175,6 +185,31 @@ function Matrixs:MulRight(mat)
     return ResultMat
 end
 
+-- Not Self
+function Matrixs.Add(mat1, mat2)
+    _errorAssert(mat1.Row == mat2.Row and mat1.Column == mat2.Column, "Matrixs.Add  mat1.Row == mat2.Row")
+
+    local ResultMat = Matrixs.new(mat1.Row, mat1.Column )
+    for i = 1, self.Row do
+        for j = 1, mat.Column do
+            ResultMat[i][j] = mat1[i][j] + mat2[i][j]
+        end
+    end
+    return ResultMat
+end
+
+function Matrixs.Sub(mat1, mat2)
+    _errorAssert(mat1.Row == mat2.Row and mat1.Column == mat2.Column, "Matrixs.Sub  mat1.Row == mat2.Row")
+
+    local ResultMat = Matrixs.new(mat1.Row, mat1.Column )
+    for i = 1, self.Row do
+        for j = 1, mat.Column do
+            ResultMat[i][j] = mat1[i][j] - mat2[i][j]
+        end
+    end
+    return ResultMat
+end
+
 function Matrixs:MulNumber(v)
     for i = 1, self.Row do
         for j = 1, self.Column do
@@ -182,6 +217,50 @@ function Matrixs:MulNumber(v)
         end
     end
     return self
+end
+
+function Matrixs:NormRow(i)
+    _errorAssert(i > self.Row, "Matrixs:NormRow i > self.Row")
+    local result = 0
+    for j = 1, self.Column do
+        result = result + self[i][j] * self[i][j]
+    end
+    return math.sqrt(result)
+end
+
+function Matrixs:NormColumn(j)
+    _errorAssert(j > self.Column, "Matrixs:NormColumn j > self.Column")
+    local result = 0
+    for i = 1, self.Row do
+        result = result + self[i][j] * self[i][j]
+    end
+    return math.sqrt(result)
+end
+
+function Matrixs:GetColumn(j)
+    local result = {}
+    for i = 1, self.Row do
+        result[i] = self[i][j]
+    end
+
+    return result
+end
+
+function Matrixs:GetRow(i)
+    local result = {}
+    for j = 1, self.Column do
+        result[j] = self[i][j]
+    end
+
+    return result
+end
+
+function Matrixs:HouseHolder()
+    local v1 = self:GetColumn(1)
+    local d = math.ArrayNorm(v1)
+    local e1 = math.ArrayIdentity(v1)
+
+    local e1d = math.ArrayMulValue(e1, d)
 end
 
 function Matrixs:Log(info)

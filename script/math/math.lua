@@ -546,6 +546,82 @@ math.PointToLineDistanceXY2D = function(point, lineX1, lineY1, lineX2, lineY2)
     return math.sqrt(dx*dx + dy*dy)
 end
 
+math.ArrayAdd = function(a, b)
+    _errorAssert(#a == #b, "math.AddArray")
+    local Result = {}
+    for i = 1, #a do
+        Result[i] = a[i] + b[i]
+    end
+end
+
+math.ArraySub = function(a, b)
+    _errorAssert(#a == #b, "math.ArraySub")
+    local Result = {}
+    for i = 1, #a do
+        Result[i] = a[i] - b[i]
+    end
+end
+
+math.ArrayDiv = function(a, b)
+    _errorAssert(#a > 0 and type(b) == 'number', "math.ArrayDiv")
+    local Result = {}
+    for i = 1, #a do
+        Result[i] = a[i] / b
+    end
+end
+
+
+math.ArrayMulValue = function(a, b)
+    _errorAssert(#a > 0 and type(b) == 'number', "math.ArrayMulValue")
+    local Result = {}
+    for i = 1, #a do
+        Result[i] = a[i] * b
+    end
+end
+
+math.ArrayNorm = function(a)
+    _errorAssert(#a > 0, "math.ArrayNorm")
+    local Result = 0
+    for i = 1, #a do
+        Result = a[i] * a[i]
+    end
+
+    return math.sqrt(Result)
+end
+
+math.ArrayConvertMatrixsRow = function(v)
+    _errorAssert(#v > 0, "math.ArrayConvertMatrixsRow")
+    local m = #v
+    local mat = Matrixs.new(m, m)
+    for j = 1, mat.Column do
+        mat[1][j] = v[j]
+    end
+
+    return mat
+end
+
+math.ArrayConvertMatrixsColumn = function(v)
+    _errorAssert(#v > 0, "math.ArrayConvertMatrixsColumn")
+    local m = #v
+    local mat = Matrixs.new(m, m)
+    for i = 1, mat.Row do
+        mat[i][1] = v[i]
+    end
+
+    return mat
+end
+
+math.ArrayIdentity = function(v)
+    _errorAssert(#v > 1, "math.ArrayIdentity")
+    local Result = {}
+    Result[1] = 1
+    for i = 2, #v do
+        Result[i] = 0
+    end
+
+    return Result
+end
+
 math.defaulttransform =  love.math.newTransform( );
 math.MinNumber = 0.000001;
 math.MaxNumber = 999999.0;
