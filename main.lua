@@ -67,6 +67,7 @@ dofile('script/math/vector.lua')
 dofile('script/math/complex.lua')
 dofile('script/math/matrix.lua')
 dofile('script/math/matrix2d.lua')
+dofile('script/math/matrixs.lua')
 dofile 'script/math/kmeans.lua'
 dofile('script/3d/math/vector3.lua')
 dofile('script/3d/math/vector4.lua')
@@ -175,5 +176,5 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_ui.lua')--test_IntersectLine  test_BezierCurve.lua
+	dofile('script/test/test_matrixs.lua')--test_IntersectLine  test_BezierCurve.lua
 end

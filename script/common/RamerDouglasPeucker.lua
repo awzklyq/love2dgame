@@ -15,7 +15,7 @@ RamerDouglasPeucker.FindRedundanceData = function(Points, StartPointIndex, EndPo
         local dis = math.PointToLineDistanceXY2D(p, StartPoint.x, StartPoint.y, EndPoint.x, EndPoint.y)
 
         if dis > RamerDouglasPeucker.ThresholdDistance then
-            if MinDistance == -1 then
+            if MaxDistance == -1 then
                 SelectIndex = i
                 MaxDistance = dis
             elseif dis > MaxDistance then

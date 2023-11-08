@@ -95,6 +95,8 @@ Render.UICheckBoxId = 47
 
 Render.UIColorPlaneId = 48
 
+Render.MatrixsId = 49
+
 Render.getRenderIdName = function(id)
     if Render.CircleId == id then
         return "Circle"
