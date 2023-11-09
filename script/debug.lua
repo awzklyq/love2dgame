@@ -12,6 +12,19 @@ _G.log = function(...)
     print(...)
 end
 
+_G.logArray = function(a)
+    if type(a) == 'table' and a.renderid == nil and #a > 0 then
+        local str = "Array " .. tostring(#a) .. " : \n"
+        for i = 1, #a do
+            str = str .. " " .. tostring(a[i]) 
+        end
+        str = str .. "\n"
+        print(str)
+    else
+        _errorAssert(false, "Not array")
+    end
+end
+
 _G._warn = function(...)
     log("waring: ", ...)
 end

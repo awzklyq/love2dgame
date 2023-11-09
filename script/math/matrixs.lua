@@ -20,6 +20,20 @@ metatable_Matrixs.__add = function(myvalue, value)
     return  Matrixs.Add(myvalue, value)
 end
 
+metatable_Matrixs.__eq = function(myvalue, value)
+    _errorAssert(type(value) == "table" and value.renderid == Render.MatrixsId and myvalue.Row == value.Row and myvalue.Column == value.Column, "metatable_Matrixs.__eq")
+    for i = 1, myvalue.Row do
+        for j = 1, myvalue.Column do
+            if myvalue[i][j] ~= value[i][j] then
+                return false
+            end
+        end
+    end
+
+    return true
+end
+
+
 metatable_Matrixs.__sub = function(myvalue, value)
     _errorAssert(type(value) == "table" and value.renderid == Render.MatrixsId, "metatable_Matrixs.__sub")
     return  Matrixs.Sub(myvalue, value)
@@ -174,7 +188,7 @@ end
 
 -- Not Self
 function Matrixs:MulRight(mat)
-    _errorAssert(self.Column == mat.Row and self.Row == mat.Column, "Matrixs:Identity self.Column == self.Row")
+    _errorAssert(self.Column == mat.Row, "Matrixs:Identity self.Column == self.Row")
 
     local ResultMat = Matrixs.new(self.Row, mat.Column )
     for i = 1, self.Row do
@@ -190,8 +204,8 @@ function Matrixs.Add(mat1, mat2)
     _errorAssert(mat1.Row == mat2.Row and mat1.Column == mat2.Column, "Matrixs.Add  mat1.Row == mat2.Row")
 
     local ResultMat = Matrixs.new(mat1.Row, mat1.Column )
-    for i = 1, self.Row do
-        for j = 1, mat.Column do
+    for i = 1, mat1.Row do
+        for j = 1, mat1.Column do
             ResultMat[i][j] = mat1[i][j] + mat2[i][j]
         end
     end
@@ -202,8 +216,8 @@ function Matrixs.Sub(mat1, mat2)
     _errorAssert(mat1.Row == mat2.Row and mat1.Column == mat2.Column, "Matrixs.Sub  mat1.Row == mat2.Row")
 
     local ResultMat = Matrixs.new(mat1.Row, mat1.Column )
-    for i = 1, self.Row do
-        for j = 1, mat.Column do
+    for i = 1, mat1.Row do
+        for j = 1, mat1.Column do
             ResultMat[i][j] = mat1[i][j] - mat2[i][j]
         end
     end
@@ -255,12 +269,80 @@ function Matrixs:GetRow(i)
     return result
 end
 
+--http://math.itdiffer.com/qr_decomposition.html
 function Matrixs:HouseHolder()
+    if self.Row == 1 or self.Column == 1 then
+        return self:Copy()
+    end
+
     local v1 = self:GetColumn(1)
     local d = math.ArrayNorm(v1)
     local e1 = math.ArrayIdentity(v1)
 
     local e1d = math.ArrayMulValue(e1, d)
+    local xv = math.ArraySub(v1, e1d)
+    local v = math.ArrayDiv(xv, math.ArrayNorm(xv))
+
+    local I = Matrixs.new(self.Row, self.Column)
+    I:Identity()
+    local VR = math.ArrayConvertMatrixsRow(v)
+    local VT = math.ArrayConvertMatrixsColumn(v)
+
+    local H = I - VT * VR * 2.0
+    local mat = H * self
+
+    local RemoveMat = mat:Copy()
+    
+    RemoveMat:RemoveRow(1)
+    RemoveMat:RemoveColumn(1)
+
+    -- RemoveMat:Log("RemoveMat " .. tostring(RemoveMat.Row))
+
+    local NewMat, H1 = RemoveMat:HouseHolder()
+
+    if H1 then
+        local NewH = Matrixs.new(mat.Row, mat.Column)
+        NewH:Identity()
+        for i = 1, H1.Row do
+            for j = 1, H1.Column do
+                NewH[i + 1][j + 1] = H1[i][j]
+            end
+        end
+
+        H = H * NewH
+    end
+    
+    -- NewMat:Log("NewMat " .. tostring(NewMat.Row))
+    for i = 1, mat.Row - 1 do
+        for j = 1, mat.Column - 1 do
+            mat[i + 1][j + 1]= NewMat[i][j]
+        end
+    end
+
+    return mat, H -- R Q
+end
+
+function Matrixs:Eigenvalues()
+    _errorAssert(self.Column == self.Row, "Matrixs:Eigenvalues ")
+
+    local mat = self
+    local QMat = {}
+    for i = 1, math.min(self.Row, 10) do
+        local R, Q = mat:HouseHolder()
+        mat = R * Q
+        QMat[#QMat + 1] = Q
+    end
+
+    local QT = QMat[#QMat]:Transpose()
+    for i = #QMat - 1, 1, -1 do
+        QT = QT * QMat[i]:Transpose()
+    end
+
+    local Result = {}
+    for i = 1, self.Row do
+        Result[i] = mat[i][i]
+    end
+    return Result, QT
 end
 
 function Matrixs:Log(info)

@@ -552,6 +552,7 @@ math.ArrayAdd = function(a, b)
     for i = 1, #a do
         Result[i] = a[i] + b[i]
     end
+    return Result
 end
 
 math.ArraySub = function(a, b)
@@ -560,14 +561,17 @@ math.ArraySub = function(a, b)
     for i = 1, #a do
         Result[i] = a[i] - b[i]
     end
+    return Result
 end
 
 math.ArrayDiv = function(a, b)
     _errorAssert(#a > 0 and type(b) == 'number', "math.ArrayDiv")
     local Result = {}
     for i = 1, #a do
-        Result[i] = a[i] / b
+        Result[i] = b ~= 0 and a[i] / b or 0
     end
+
+    return Result
 end
 
 
@@ -577,13 +581,14 @@ math.ArrayMulValue = function(a, b)
     for i = 1, #a do
         Result[i] = a[i] * b
     end
+    return Result
 end
 
 math.ArrayNorm = function(a)
     _errorAssert(#a > 0, "math.ArrayNorm")
     local Result = 0
     for i = 1, #a do
-        Result = a[i] * a[i]
+        Result = Result + a[i] * a[i]
     end
 
     return math.sqrt(Result)
@@ -607,7 +612,6 @@ math.ArrayConvertMatrixsColumn = function(v)
     for i = 1, mat.Row do
         mat[i][1] = v[i]
     end
-
     return mat
 end
 
