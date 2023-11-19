@@ -17,7 +17,7 @@ end
 function Ray:IsIntersectPlane( p )
 	local dot = Vector3.dot( p:normal( ), self.dir );
 	if  math.abs( dot ) < math.cEpsilon then
-		return false;
+		return false, 0;
     end
 
 	-- local temp = p:distance( self.orig ) / -dot;
@@ -28,7 +28,7 @@ function Ray:IsIntersectPlane( p )
 	-- dist = temp;
 
     --return true
-	return p:distance( self.orig ) / -dot;
+	return true, p:distance( self.orig ) / -dot;
 end
 
 function Ray:IsIntersectBox( box ) --BoundBox

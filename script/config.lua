@@ -6,4 +6,4 @@ _G.GConfig = {}
 
 _G.GConfig.octreesize = 150
 
-_G.GConfig.CSMNumber = 1
+_G.GConfig.CSMNumber = 4

@@ -323,11 +323,11 @@ function Matrixs:HouseHolder()
 end
 
 function Matrixs:Eigenvalues()
-    _errorAssert(self.Column == self.Row, "Matrixs:Eigenvalues ")
+    _errorAssert(self.Column == self.Row, "Matrixs:Eigenvalues:  " .. tostring(self.Row) .. ' ' .. tostring(self.Column))
 
     local mat = self
     local QMat = {}
-    for i = 1, math.min(self.Row, 10) do
+    for i = 1, math.max(self.Row, 10) do
         local R, Q = mat:HouseHolder()
         mat = R * Q
         QMat[#QMat + 1] = Q
@@ -340,9 +340,45 @@ function Matrixs:Eigenvalues()
 
     local Result = {}
     for i = 1, self.Row do
-        Result[i] = mat[i][i]
+        Result[i] = {}
+        Result[i].x = mat[i][i]
+        Result[i].y = QT:GetRow(i)
     end
-    return Result, QT
+
+    table.sort(Result, function(a, b)
+        return a.x > b.x
+    end)
+
+    local values = {}
+    local QRMat = Matrixs.new(QT.Row, QT.Column)
+   
+    for i = 1, self.Row do
+        values[i] = Result[i].x
+        for j = 1, QRMat.Row do
+            QRMat:SetValue(j, i, Result[i].y[j])
+        end
+    end
+
+    return values, QRMat
+end
+
+function Matrixs:GetUVMats()
+    local A = self:Copy()
+    local AT = A:Transpose()
+    local ATA = AT * A
+    local V_Eigenvalues, V = ATA:Eigenvalues()
+
+    local AAT = A * AT
+
+    local U_Eigenvalues, U = AAT:Eigenvalues()
+
+    local n = #V_Eigenvalues
+    local MZ = Matrixs.new(U.Row,  V.Column)
+    for i = 1, n do
+        MZ[i][i] = math.sqrt(V_Eigenvalues[i])
+    end
+
+    return U, V, MZ
 end
 
 function Matrixs:Log(info)
