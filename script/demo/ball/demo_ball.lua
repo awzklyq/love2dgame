@@ -1,3 +1,4 @@
+dofile('script/demo/ball/demo_ball_motionmanager.lua')
 math.randomseed(os.time()%10000)
 
 local Rect1
@@ -101,6 +102,8 @@ local InitEvent = function(rect)
                 Index = Index + 1
                 if Index <= #PointSeleted then
                     MCE:SetTarget(PointSeleted[Index])
+                else
+                    MCE.ErrorDis = 0
                 end
 
                 if MCE.ErrorDis ~= 0 then

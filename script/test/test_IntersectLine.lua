@@ -150,7 +150,7 @@ local GenerateFunc = function()
                 Need = true
             else
                 local r = math.random(0, 100)
-                if r > 95 then
+                if r > 70 then
                     Need = true
                 end
             end

@@ -85,7 +85,6 @@ function MotionCircleEntity:SetTarget(v)
     self.Target = v
     self.IsArrived = false
     self.Dir = (self.Target - Vector.new(self.Circle.x, self.Circle.y)):normalize()
-    log('ssssssss', v.x, v.y)
 end
 
 function MotionCircleEntity:Start()
@@ -132,6 +131,8 @@ function MotionCircleEntity:MoveActive(MoveDis)
     if MoveDis >= TargetDis then
         if MoveDis > TargetDis then
             self.ErrorDis = MoveDis - TargetDis
+        else
+            self.ErrorDis = 0
         end
         MoveDis = TargetDis;
         self.IsArrived = true

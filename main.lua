@@ -115,7 +115,6 @@ dofile 'script/text/lovescreentext.lua'
 dofile 'script/render/font.lua'
 
 dofile 'script/common/timer.lua'
-dofile 'script/common/motionmanager.lua'
 
 dofile 'script/common/RamerDouglasPeucker.lua'
 
@@ -176,5 +175,6 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_matrixs.lua')--test_IntersectLine  test_BezierCurve.lua
+	dofile('script/demo/ball/demo_ball.lua')--test_IntersectLine  test_BezierCurve.lua
 end
+--dofile()
