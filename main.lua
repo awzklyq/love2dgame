@@ -175,6 +175,6 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_leastsquare.lua')--test_IntersectLine  test_BezierCurve.lua
+	dofile('script/test/test_kmeans.lua')--test_IntersectLine  test_BezierCurve.lua
 end
 --dofile()

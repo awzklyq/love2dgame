@@ -10,6 +10,7 @@ local OffsetY = 100
 
 local RectsGroup
 local RectsGroupV 
+local RectsGroupM 
 
 local IsRenderv = false
 
@@ -46,14 +47,53 @@ local GenerateData = function()
             RectsGroupV[i][#RectsGroupV[i] + 1] = _rect
         end
     end
+
+    RectsGroupM = {}
+    local v3 = {}
+    local m3 = {}
+    for i = 1, Num do
+        v3[i] = Vector3.new(vs[i].x, vs[i].y, 0)
+        m3[i] = v3[i]:GetMortonCode3()
+    end
+
+    table.sort(m3, function(a, b)
+        return a < b
+    end)
+
+    local ON = Num / SelectNum
+    for i = 1, SelectNum do
+        RectsGroupM[i] = {}
+        for j = 1 + (i - 1) * ON, ON * i  do
+            local v = Vector3.GetReverseMortonCodeRGB(m3[j])
+            local _rect = Rect.new(v.x + OffsetX, v.y + OffsetY, 5, 5)
+            _rect:setColor(Colors[i].r, Colors[i].g, Colors[i].b, Colors[i].a)
+            RectsGroupM[i][#RectsGroupM[i] + 1] = _rect
+        end
+    end
 end
 
-GenerateData{}
+GenerateData()
+
+
+local btn = UI.Button.new( 10, 10, 100, 30, 'GenerateData', 'btn' )
+btn:setPressedColor(LColor.new(125, 125, 125))
+
+btn.ClickEvent = function()
+    GenerateData()
+end
+
+local checkb = UI.CheckBox.new( 10, 40, 20, 20, "IsRenderv" )
+
+checkb.Value = IsRenderv
+checkb.ChangeEvent = function(Enable)
+    IsRenderv = Enable
+end
+
 app.render(function(dt)
     for i = 1, SelectNum do
         if IsRenderv then
-            for j = 1, #RectsGroupV[i] do
-                RectsGroupV[i][j]:draw()
+            for j = 1, #RectsGroupM[i] do
+                RectsGroupM[i][j]:draw()
             end
         else
             for j = 1, #RectsGroup[i] do
@@ -61,14 +101,5 @@ app.render(function(dt)
             end
         end
         
-    end
-end)
-
-app.keypressed(function(key, scancode, isrepeat)
-    if key == "space" then
-        GenerateData()
-    elseif key == "a" then
-        IsRenderv = not IsRenderv
-        log('IsRenderv', IsRenderv)
     end
 end)

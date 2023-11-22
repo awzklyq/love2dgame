@@ -157,6 +157,14 @@ function Vector3:GetMortonCode3()
     return Morton
 end
 
+function Vector3.GetReverseMortonCodeRGB(x)
+    local v = Vector3.new()
+    v.x = math.ReverseMortonCode3( x );
+    v.y = math.ReverseMortonCode3( math.RightMove(x, 1) );
+    v.z = math.ReverseMortonCode3( math.RightMove(x, 2) );
+    return v
+end
+
 function Vector3.negative(v)
     return Vector3.new(-v.x, -v.y, -v.z)
 end

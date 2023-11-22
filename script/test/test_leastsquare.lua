@@ -112,7 +112,7 @@ end
 
 GenerateFunc()
 
-local scrollbar = UI.ScrollBar.new( 'LeastSquare iteration_num', 10, 60, 200, 40, 10, 1000, 10)
+local scrollbar = UI.ScrollBar.new( 'LeastSquare iteration_num', 10, 60, 200, 40, 10, 2000, 10)
 scrollbar.Value = iteration_num
 scrollbar.ChangeEvent = function(v)
     iteration_num = v
