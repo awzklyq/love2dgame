@@ -97,6 +97,10 @@ Render.UIColorPlaneId = 48
 
 Render.MatrixsId = 49
 
+Render.Point2Id = 50
+
+Render.Point2DCollectId = 51
+
 Render.getRenderIdName = function(id)
     if Render.CircleId == id then
         return "Circle"
@@ -348,6 +352,12 @@ Render.RenderObject = function(obj)
         elseif obj.renderid == Render.LoveScreenTextId then
             love.graphics.setColor(obj.color._r, obj.color._g, obj.color._b);
             love.graphics.print(tostring(obj.text), obj.x, obj.y, obj.r, obj.sx, obj.sy, obj.ox, obj.oy, obj.kx, obj.ky)
+        elseif obj.renderid == Render.Point2Id then
+            love.graphics.setColor(obj.color._r, obj.color._g, obj.color._b);
+            love.graphics.points(obj.x, obj.y)
+        elseif obj.renderid == Render.Point2DCollectId then
+            love.graphics.setColor(obj.color._r, obj.color._g, obj.color._b);
+            love.graphics.points(obj.Datas)
         elseif obj.renderid == Render.UITextId then
             love.graphics.setColor(obj.color._r, obj.color._g, obj.color._b, obj.color._a or 1);
             love.graphics.draw(obj.obj, obj._x, obj._y, 0, obj._w / obj.obj:getWidth(), obj._h / obj.obj:getHeight())

@@ -11,8 +11,73 @@ local OffsetY = 100
 local RectsGroup
 local RectsGroupV 
 local RectsGroupM 
+local DebugLindes = {}
 
-local IsRenderv = false
+local GenerateMortonData
+GenerateMortonData = function(vs, MNum, Colors)
+    if MNum <= 1 then
+        local index = #RectsGroupM + 1
+        RectsGroupM[index] = {}
+        for i = 1, #vs  do
+            local v = vs[i]
+            local _rect = Rect.new(v.x + OffsetX, v.y + OffsetY, 5, 5)
+            if i == 1 then
+                _rect:setColor(255, 0, 0, Colors[index].a)
+            else
+                _rect:setColor(Colors[index].r, Colors[index].g, Colors[index].b, Colors[index].a)
+            end
+            
+            RectsGroupM[index][#RectsGroupM[index] + 1] = _rect
+        end
+        return
+    end
+    local RectsGroupM1 = {}
+    local RectsGroupM2 = {}
+    local v3 = {}
+    local m3 = {}
+    for i = 1, #vs do
+        v3[i] = Vector3.new(vs[i].x, vs[i].y, 0)
+        m3[i] = v3[i]:GetMortonCode3()
+    end
+
+    table.sort(m3, function(a, b)
+        return a < b
+    end)
+
+    local index = 1
+    local maxdis = 0
+    for i = 1, #vs - 1 do
+        local v1 = Vector3.GetReverseMortonCode(m3[i])
+        local v2 = Vector3.GetReverseMortonCode(m3[i + 1])
+        local dis = Vector3.distance(v1, v2)
+        if maxdis < dis then
+            maxdis = dis
+            index = i
+        end
+    end
+
+    _errorAssert(maxdis > 0, "maxdis == 0 #vs is :" .. tostring(#vs))
+
+    RectsGroupM1[1] = Vector3.GetReverseMortonCode(m3[index])
+    RectsGroupM2[1] = Vector3.GetReverseMortonCode(m3[index + 1])
+    
+    for i = 1, #m3 do
+        if i ~= index and  i ~= index + 1 then
+            local v = Vector3.GetReverseMortonCode(m3[i])
+            local d1 = Vector3.distance(v, RectsGroupM1[1])
+            local d2 = Vector3.distance(v, RectsGroupM2[1])
+           
+            if d1 >= d2 then
+                RectsGroupM2[#RectsGroupM2 + 1] = v
+            else
+                RectsGroupM1[#RectsGroupM1 + 1] = v
+            end
+        end
+    end
+
+    GenerateMortonData(RectsGroupM1, MNum / 2, Colors)
+    GenerateMortonData(RectsGroupM2, MNum / 2, Colors)
+end
 
 local GenerateData = function()
     local vs = {}
@@ -49,9 +114,10 @@ local GenerateData = function()
     end
 
     RectsGroupM = {}
+    DebugLindes = {}
     local v3 = {}
     local m3 = {}
-    for i = 1, Num do
+    for i = 1, #vs do
         v3[i] = Vector3.new(vs[i].x, vs[i].y, 0)
         m3[i] = v3[i]:GetMortonCode3()
     end
@@ -60,16 +126,25 @@ local GenerateData = function()
         return a < b
     end)
 
-    local ON = Num / SelectNum
+    for i = 1, #m3 - 1 do
+        local v1 = Vector3.GetReverseMortonCode(m3[i])
+        local v2 = Vector3.GetReverseMortonCode(m3[i + 1])
+        local line = Line.new(v1.x + OffsetX, v1.y + OffsetY, v2.x + OffsetX, v2.y + OffsetY, 1)
+        DebugLindes[#DebugLindes + 1] = line
+    end
+
+    local ON = #vs / SelectNum
     for i = 1, SelectNum do
         RectsGroupM[i] = {}
         for j = 1 + (i - 1) * ON, ON * i  do
-            local v = Vector3.GetReverseMortonCodeRGB(m3[j])
+            local v = Vector3.GetReverseMortonCode(m3[j])
             local _rect = Rect.new(v.x + OffsetX, v.y + OffsetY, 5, 5)
             _rect:setColor(Colors[i].r, Colors[i].g, Colors[i].b, Colors[i].a)
             RectsGroupM[i][#RectsGroupM[i] + 1] = _rect
         end
     end
+
+    -- GenerateMortonData(vs, SelectNum, Colors)
 end
 
 GenerateData()
@@ -82,16 +157,30 @@ btn.ClickEvent = function()
     GenerateData()
 end
 
-local checkb = UI.CheckBox.new( 10, 40, 20, 20, "IsRenderv" )
+local checkb = UI.CheckBox.new( 10, 40, 20, 20, "IsRenderMorton" )
 
-checkb.Value = IsRenderv
+local IsRenderMorton = false
+checkb.Value = IsRenderMorton
 checkb.ChangeEvent = function(Enable)
-    IsRenderv = Enable
+    IsRenderMorton = Enable
+end
+
+local checkb2 = UI.CheckBox.new( 10, 70, 20, 20, "IsRenderMortonDebugline" )
+local IsRenderMortonDebugline = false
+checkb2.Value = IsRenderMortonDebugline
+checkb2.ChangeEvent = function(Enable)
+    IsRenderMortonDebugline = Enable
 end
 
 app.render(function(dt)
+    if IsRenderMortonDebugline then
+        for i = 1, #DebugLindes do
+            DebugLindes[i]:draw()
+        end
+    end
+    
     for i = 1, SelectNum do
-        if IsRenderv then
+        if IsRenderMorton then
             for j = 1, #RectsGroupM[i] do
                 RectsGroupM[i][j]:draw()
             end
@@ -102,4 +191,5 @@ app.render(function(dt)
         end
         
     end
+
 end)

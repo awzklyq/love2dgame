@@ -138,7 +138,15 @@ RenderSet.getCanvasColor = function ()
     return CanvasColor
 end
 
+local NeedResizeCanva = true
 local DepthBuff = Canvas.new(love.graphics.getPixelWidth(), love.graphics.getPixelHeight(), {format = "depth32fstencil8", readable = true, msaa = 0, mipmaps="none"})
+RenderSet.ResetCanvasColor = function (w, h)
+    CanvasColor = Canvas.new(w, h, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
+    DepthBuff = Canvas.new(w, h, {format = "depth32fstencil8", readable = true, msaa = 0, mipmaps="none"})
+
+    NeedResizeCanva = false
+end
+
 
 RenderSet.GetDepthBuff = function ()
     return DepthBuff
@@ -158,8 +166,10 @@ RenderSet.ClearCanvasColorAndDepth = function ()
 end
 
 app.resizeWindow(function(w, h)
-    CanvasColor = Canvas.new(w, h, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
-    DepthBuff = Canvas.new(w, h, {format = "depth32fstencil8", readable = true, msaa = 0, mipmaps="none"})
+    if NeedResizeCanva then
+        CanvasColor = Canvas.new(w, h, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
+        DepthBuff = Canvas.new(w, h, {format = "depth32fstencil8", readable = true, msaa = 0, mipmaps="none"})
+    end
 end)
 
 RenderSet.screenwidth = love.graphics.getPixelWidth()

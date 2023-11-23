@@ -69,6 +69,56 @@ function Line:draw()
     end
 end
 
+--https://deepnight.net/tutorial/bresenham-magic-raycasting-line-of-sight-pathfinding/
+function Line:GeneratePoints()
+    local ps = {}
+    local x0 = self.x1
+    local y0 = self.y1
+
+    local x1 = self.x2
+    local y1 = self.y2
+
+    local swapXY = math.abs(y1 - y0) > math.abs(x1 - x0)
+    if swapXY then
+        x0 = self.y1
+        y0 = self.x1
+
+        x1 = self.y2
+        y1 = self.x2
+    end
+
+    if x0 > x1 then
+        local temp = x0
+        x0 = x1
+        x1 = temp
+
+        temp = y0
+        y0 = y1
+        y1 = temp
+    end
+
+    local deltax = x1 - x0
+    local deltay = math.floor( math.abs(y1 - y0) )
+    local _error = math.floor( deltax * 0.5 )
+    local y = y0
+    local ystep = y1 > y0 and 1 or -1
+    for x = x0 - 1, x1 do
+        if swapXY then
+            ps[#ps + 1] = Point2D.new(y, x)
+        else
+            ps[#ps + 1] = Point2D.new(x, y)
+        end
+
+        _error = _error - deltay
+        if _error < 0 then
+            y = y + ystep
+            _error = _error + deltax
+        end
+    end
+    local points = Point2DCollect.new(ps)
+    return points
+end
+
 _G.Lines = {}
 
 function Lines.new( )-- lw :line width
