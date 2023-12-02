@@ -21,13 +21,21 @@ function MovedEntity:AddTimeAndDistance(t, v)
         self.Time = t
     end
     
-    self.Data[#self.Data + 1] = {t = t, v = v}
+    self.Data[#self.Data + 1] = {t = t, v = v, ov = v}
     table.sort(self.Data, function(a, b)
          return a.t < b.t
     end)
 end
 
+function MovedEntity:ScaleDistace(scale)
+    for i = 1, #self.Data do
+        self.Data[i].v  = self.Data[i].ov * scale
+    end
+end
+
+
 function MovedEntity:GetMoveOffset(t)
+    t = t
     local st = 0
     local pred = 0
     for i = 1, #self.Data do
@@ -77,6 +85,8 @@ function MotionCircleEntity.new(circle, me)-- lw :line width
     mce.ErrorDis = 0
 
     mce.PreDistance = 0
+    mce.Speed = 1
+
 
     return mce;
 end
@@ -112,6 +122,10 @@ function MotionCircleEntity:Stop()
 
     self.Target = nil
     self.Dir = nil
+
+    if self.StopEvent then
+        self.StopEvent()
+    end
 end
 
 function MotionCircleEntity:IsMove()
@@ -149,7 +163,7 @@ function MotionCircleEntity:MoveActive(MoveDis)
 end
 
 function MotionCircleEntity:Update(e)
-    self.tick =  self.tick + e
+    self.tick =  self.tick + e * self.Speed
 
     self.ErrorDis = 0
     local tick = math.min(self.tick, self.ME.Time)

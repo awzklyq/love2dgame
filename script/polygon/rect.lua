@@ -14,13 +14,17 @@ function Rect.new(x, y, w, h, mode)
 
     rect.lw = 2
 
-    rect:GeneraOutCircle()
-
-    rect:GeneraLines()
+    rect:Reset()
 
     rect.renderid = Render.RectId;
     
     return rect;
+end
+
+function Rect:Reset()
+    self:GeneraOutCircle()
+
+    self:GeneraLines()
 end
 
 function Rect:SetColor(r, g, b, a)
@@ -48,14 +52,22 @@ function Rect:moveTo(x, y)
     end
 end
 
+function Rect:SetImage(name, ...)
+    self.img = ImageEx.new(name, ...)
+    self.img.renderWidth = self.w - 1
+    self.img.renderHeight = self.h - 1
+
+    self.img.x = self.x + 1
+    self.img.y = self.y + 1
+end
+
 function Rect:draw()
-    local r, g, b, a = love.graphics.getColor( );
     Render.RenderObject(self);
 
-    -- for i = 1, 4 do
-    --     self.Lines[i]:draw()
-    -- end
-    love.graphics.setColor(r, g, b, a );
+    if self.img then
+        self.img:draw()
+    end
+
     if self.box2d then
         self.box2d:draw()
     end
