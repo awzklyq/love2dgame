@@ -9,6 +9,7 @@ function MovedEntity.new()-- lw :line width
 
     me.Time = 0
     me.PreDistance = 0
+    me.Distance = 0
     return me;
 end
 
@@ -16,11 +17,16 @@ function MovedEntity:Reset()
     self.PreDistance = 0
 end
 
+function MovedEntity:GetDistance()
+    return self.Distance
+end
+
 function MovedEntity:AddTimeAndDistance(t, v)
     if t > self.Time then
         self.Time = t
     end
     
+    self.Distance = math.max(self.Distance, v)
     self.Data[#self.Data + 1] = {t = t, v = v, ov = v}
     table.sort(self.Data, function(a, b)
          return a.t < b.t
@@ -73,7 +79,7 @@ function MovedEntity:Log(info)
  end
 
 _G.MotionCircleEntity = {}
-function MotionCircleEntity.new(circle, me)-- lw :line width
+function MotionCircleEntity.new(circle, me, Colliders)-- lw :line width
     local mce = setmetatable({}, {__index = MotionCircleEntity});
     
     mce.Circle = circle
@@ -95,6 +101,13 @@ function MotionCircleEntity:SetTarget(v)
     self.Target = v
     self.IsArrived = false
     self.Dir = (self.Target - Vector.new(self.Circle.x, self.Circle.y)):normalize()
+end
+
+function MotionCircleEntity:SetDirection(dir)
+    self.IsArrived = false
+    self.Dir = dir:normalize()
+
+    self.Target = self.Dir * (self.Me:GetDistance() - self.PreDistance)
 end
 
 function MotionCircleEntity:Start()

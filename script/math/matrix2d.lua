@@ -3,11 +3,19 @@ _G.Matrix2D = {}
 local metatable_Matrix2D = {}
 metatable_Matrix2D.__index = Matrix2D
 
+metatable_Matrix2D.__mul = function(myvalue, value)
+    if value.renderid == Render.Vector2Id then
+        return myvalue:MulVector2(value)
+    else
+        _errorAssert(false, "metatable_Matrix2D.__mul")
+    end
+end
+
 function Matrix2D.new( )
 
     local mat = setmetatable({1,0,0,
     0,1,0,
-    0,0,0}, metatable_Matrix2D);
+    0,0,1}, metatable_Matrix2D);
     mat.renderid = Render.Matrix2DId;
 
     return mat
@@ -30,6 +38,19 @@ function Matrix2D:Log(sss)
 	log()
 end
 
+function Matrix2D:getData(i, j)
+    return self[(i - 1) * 3 + j]
+end
+
+function Matrix2D:MulVector2(v2)
+	local xx, yy = v2.x, v2.y
+	local rsult = Vector.new()
+	
+	rsult.x = xx * self:getData(1, 1) + yy * self:getData(2, 1) + self:getData(3, 1)
+	rsult.y = xx * self:getData(1, 2) + yy * self:getData(2, 2) + self:getData(3, 2)
+	return rsult
+end
+
 function Matrix2D:IsIdentity()
 
     return self[1] == 1 and self[2] == 0 and self[3] == 0 and
@@ -49,7 +70,7 @@ function Matrix2D:Reset( )
 
     self[7] = 0;
     self[8] = 0;
-    self[9] = 0;
+    self[9] = 1;
 end
     
 function Matrix2D:SetTranslation(x, y)

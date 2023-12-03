@@ -1,6 +1,5 @@
 _G.Rect = {}
 
-local EventRects = {}
 function Rect.new(x, y, w, h, mode)
     local rect = setmetatable({}, {__index = Rect});
     rect.x = x or 0;
@@ -98,6 +97,7 @@ function Rect:GeneraOutCircle()
     local center = Vector.new(self.x + self.w * 0.5,  self.y + self.h * 0.5)
 
     self.OutCircle = Circle.new(r, center.x , center.y, 50)
+    self.OutCircle.Center = center
 end
 
 function Rect:GeneraLines()
