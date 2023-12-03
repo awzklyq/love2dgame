@@ -35,11 +35,24 @@ scrollbar2.ChangeEvent = function(v)
 end
 
 Common.GenerateRects(BallDatas)
+local TempRect = Rect.new()
 
+TempRect.mode = 'line'
 app.render(function(dt)
     for i = 1, #BallDatas.Rects do
-        BallDatas.Rects[i]:draw()
-        -- BallDatas.Rects[i].OutCircle:draw()
+        local rect = BallDatas.Rects[i]
+        rect:draw()
+        TempRect.x = rect.x
+        TempRect.y = rect.y
+        TempRect.w = rect.w
+        TempRect.h = rect.h
+
+        if rect.IsDelete then
+            TempRect:SetColor(255,0,0,255)
+        else
+            TempRect:SetColor(255,255,255,255)
+        end
+        TempRect:draw()
     end
 
 
