@@ -72,7 +72,7 @@ function Circle:GetDirectionPoints(dir, angle, num)
             mat:MulRotationLeft(SubAngle)
         end
         
-        ps[#ps + 1] = mat * p1
+        ps[#ps + 1] = p1 * mat
     end
 
    

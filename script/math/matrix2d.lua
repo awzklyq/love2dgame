@@ -3,13 +3,13 @@ _G.Matrix2D = {}
 local metatable_Matrix2D = {}
 metatable_Matrix2D.__index = Matrix2D
 
-metatable_Matrix2D.__mul = function(myvalue, value)
-    if value.renderid == Render.Vector2Id then
-        return myvalue:MulVector2(value)
-    else
-        _errorAssert(false, "metatable_Matrix2D.__mul")
-    end
-end
+-- metatable_Matrix2D.__mul = function(myvalue, value)
+--     if value.renderid == Render.Vector2Id then
+--         return myvalue:MulVector2(value)
+--     else
+--         _errorAssert(false, "metatable_Matrix2D.__mul")
+--     end
+-- end
 
 function Matrix2D.new( )
 
@@ -42,7 +42,7 @@ function Matrix2D:getData(i, j)
     return self[(i - 1) * 3 + j]
 end
 
-function Matrix2D:MulVector2(v2)
+function Matrix2D:MulLeftVector2(v2)
 	local xx, yy = v2.x, v2.y
 	local rsult = Vector.new()
 	

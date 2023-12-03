@@ -20,7 +20,11 @@ metatable_vector.__sub = function(myvalue, value)
 end
 
 metatable_vector.__mul = function(myvalue, value)
-    return Vector.new(myvalue.x * value, myvalue.y * value)
+    if type(value) == 'table' and value.renderid == Render.Matrix2DId then
+        return value:MulLeftVector2(myvalue)
+    else
+        return Vector.new(myvalue.x * value, myvalue.y * value)
+    end
 end
 
 metatable_vector.__unm = function(myvalue)
