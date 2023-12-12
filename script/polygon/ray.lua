@@ -45,7 +45,87 @@ function Ray2D:IsintersectCircle(circle)
     local CosA = Vector.dot(v, self.dir);
 
     return CosA >= CosB
+end
 
+
+function Ray2D:FindNearestPointByCircle(circle, NeedReflectRay)
+    local IntersectCircleData = {}
+    IntersectCircleData.IsIntersect = false
+    if self:IsintersectCircle(circle) == false then
+        return IntersectCircleData
+    end
+
+    local k = self.dir.x == 0 and 0 or self.dir.y / self.dir.x
+
+    local kc =  self.orig.y - k * self.orig.x
+
+    local t = kc - circle.y
+    local a = k * k + 1
+    local b = 2 * k * t - 2 * circle.x
+    local c = circle.x * circle.x + t * t - circle.r * circle.r
+
+    local inva2 = a == 0 and 0 or 1 /(2 * a)
+    local xx1 = (-b + math.sqrt(b*b - 4 * a * c)) * inva2
+    local xx2 = (-b - math.sqrt(b*b - 4 * a * c)) * inva2
+
+    local yy1 = k * xx1 + kc
+    local yy2 = k * xx2 + kc
+
+    local v1 = Vector.new(xx1, yy1)
+    local v2 = Vector.new(xx2, yy2)
+    local dis1 = Vector.Distance(self.orig, v1)
+    local dis2 = Vector.Distance(self.orig, v2)
+    if dis1 < dis2 then
+        IntersectCircleData.IntersectPoint = v1
+    else
+        IntersectCircleData.IntersectPoint = v2
+    end
+    IntersectCircleData.IsIntersect = true
+
+    local SelectLineDir = (IntersectCircleData.IntersectPoint - self.orig):normalize()
+    local mat = Matrix2D.new()
+    mat:MulRotationLeft(90)
+    SelectLineDir = SelectLineDir * mat * 10
+    local p1 = IntersectCircleData.IntersectPoint + SelectLineDir
+    local p2 = IntersectCircleData.IntersectPoint + SelectLineDir
+
+    IntersectCircleData.Selectline = Line.new(p1.x, p1.y, p2.x, p2.y)
+
+    if NeedReflectRay then
+        IntersectCircleData.ReflectRay = self:ReflectByLine(IntersectCircleData.Selectline, IntersectCircleData.IntersectPoint)
+    end
+
+    return IntersectCircleData
+end
+
+function Ray2D:FindNearestPointByCircles(circles)
+    local ReturnIntersectCircleData = {}
+    ReturnIntersectCircleData.IsIntersect = false
+
+    local distance = math.MaxNumber
+
+    local SelectRect
+    for i = 1, #circles do
+        local IntersectCircleData = self:FindNearestPointByCircle(circles[i])
+        if IntersectCircleData.IsIntersect then
+            local dis = Vector.distance(self.orig, IntersectCircleData.IntersectPoint)
+            if distance > dis then
+                distance = dis
+
+                ReturnIntersectCircleData.IsIntersect = true
+                ReturnIntersectCircleData.IntersectPoint = IntersectCircleData.IntersectPoint
+                
+                ReturnIntersectCircleData.SelectCircle = circles[i]
+                ReturnIntersectCircleData.Selectline = IntersectCircleData.Selectline
+            end
+        end
+    end
+
+    if ReturnIntersectCircleData.IsIntersect == true then
+        ReturnIntersectCircleData.ReflectRay = self:ReflectByLine(ReturnIntersectCircleData.Selectline, ReturnIntersectCircleData.IntersectPoint)
+    end
+    
+    return ReturnIntersectCircleData
 end
 
 -- Return IntersectRectData

@@ -42,11 +42,13 @@ Collision2D.CheckMoveCircleAndRect = function(circle, rect, MoveDir, MoveDistanc
                     ReturnIntersectRectData.SelectRect = rect
                     ReturnIntersectRectData.Selectline = IntersectRectData.Selectline
 
+                    ReturnIntersectRectData.ErrorDis = MoveDistance - dis
                     GetRay.orig.x =  TempRay.orig.x 
                     GetRay.orig.y =  TempRay.orig.y 
 
                     GetRay.dir.x =  TempRay.dir.x 
-                    GetRay.dir.y =  TempRay.dir.y 
+                    GetRay.dir.y =  TempRay.dir.y
+                    
 
                 end
             end
