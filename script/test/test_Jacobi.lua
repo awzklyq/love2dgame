@@ -15,7 +15,7 @@ end
 
 local x1, x2, x3 = 3, 2, 1
 if CheckFunc1(x1, x2, x3) and CheckFunc1(x1, x2, x3) and CheckFunc1(x1, x2, x3) then
-    log('AAAAAAAAAAAAAAAAA', x1, x2, x3)
+    -- log('AAAAAAAAAAAAAAAAA', x1, x2, x3)
 end
 
 local GetX1 = function(x2k, x3k)
@@ -43,7 +43,7 @@ for i = 1, step do
     xk1, xk2, xk3 = xt1, xt2, xt3
 
     if i % 5 == 0 then
-        log('Jacobi ', i, xk1, xk2, xk3, x1 - xk1, x2 - xk2, x3 - xk3)
+        -- log('Jacobi ', i, xk1, xk2, xk3, x1 - xk1, x2 - xk2, x3 - xk3)
     end
 end
 
@@ -59,6 +59,33 @@ for i = 1, step do
     xk1, xk2, xk3 = xt1, xt2, xt3
 
     if i % 5 == 0 then
-        log('Gauss-Seide ', i, xk1, xk2, xk3, x1 - xk1, x2 - xk2, x3 - xk3)
+        -- log('Gauss-Seide ', i, xk1, xk2, xk3, x1 - xk1, x2 - xk2, x3 - xk3)
     end
+end
+
+local a = 2
+local b = -3
+local c = -9
+
+local GetTestFunction1 = function(x)
+    return (-c) / (a * x + b)
+end
+
+local inx = 0
+for i = 1, 20 do
+    inx = GetTestFunction1(inx)
+    -- log(inx)
+end
+
+a = 4
+b = 3
+c = -19
+
+local GetTestFunction2 = function(x)
+    return (-c) / (a * x + b)
+end
+inx = 0
+for i = 1, 50 do
+    inx = GetTestFunction2(inx)
+    log(inx)
 end

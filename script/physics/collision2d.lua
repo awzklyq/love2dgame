@@ -12,26 +12,51 @@ Collision2D.CheckCircleAndCircle = function(c1, c2)
     return Vector.Distance(c1, c2) <=  c1.r + c2.r 
 end
 
-Collision2D.CheckMoveCircleAndRect = function(circle, rect, MoveDir)
-    TempRay.orig.x = circle.x
-    TempRay.orig.y = circle.y
+local PointsNumber = 5
+local OffsetAngle = 45 
+Collision2D.CheckMoveCircleAndRect = function(circle, rect, MoveDir, MoveDistance)
+    local Points = circle:GetDirectionPoints(MoveDir, OffsetAngle, PointsNumber)
+    local distance = nil
 
-    TempRay.dir.x = dir.x
-    TempRay.dir.y = dir.x
+    local ReturnIntersectRectData = {}
+    ReturnIntersectRectData.IsIntersect = false
 
-    local IntersectRectData = TempRay:IsIntersectRect(rect)
+    local GetRay = Ray2D.new(Vector.new(), Vector.new())
+    for i = 1, PointsNumber do
+        TempRay.orig.x = Points[i].x
+        TempRay.orig.y = Points[i].y
 
-    if IntersectRectData.IsIntersect then
-        local dis = Vector.distance(self.orig, IntersectRectData.IntersectPoint)
-        if distance > dis then
-            distance = dis
+        TempRay.dir = (Points[i] - MoveDir):normalize()
 
-            ReturnIntersectRectData.IsIntersect = true
-            ReturnIntersectRectData.IntersectPoint = IntersectRectData.IntersectPoint
-            
-            ReturnIntersectRectData.SelectRect = rects[i]
-            ReturnIntersectRectData.Selectline = IntersectRectData.Selectline
-        end
+        local IntersectRectData = TempRay:IsIntersectRect(rect)
+
+        if IntersectRectData.IsIntersect then
+            local dis = Vector.distance(TempRay.orig, IntersectRectData.IntersectPoint)
+            if MoveDistance >= dis then
+                if not distance or distance > dis then
+                    distance = dis
+
+                    ReturnIntersectRectData.IsIntersect = true
+                    ReturnIntersectRectData.IntersectPoint = IntersectRectData.IntersectPoint
+                    
+                    ReturnIntersectRectData.SelectRect = rect
+                    ReturnIntersectRectData.Selectline = IntersectRectData.Selectline
+
+                    GetRay.orig.x =  TempRay.orig.x 
+                    GetRay.orig.y =  TempRay.orig.y 
+
+                    GetRay.dir.x =  TempRay.dir.x 
+                    GetRay.dir.y =  TempRay.dir.y 
+
+                end
+            end
+        end 
     end
+
+    if ReturnIntersectRectData.IsIntersect == true then
+        ReturnIntersectRectData.ReflectRay = GetRay:ReflectByLine(ReturnIntersectRectData.Selectline, ReturnIntersectRectData.IntersectPoint)
+    end
+
+    return ReturnIntersectRectData
 end
 

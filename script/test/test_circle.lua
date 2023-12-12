@@ -1,6 +1,6 @@
 local circle = Circle.new(100,300,300)
 local num = 5
-local angle = 25
+local angle = 45
 local PS = {} -- circle:GetDirectionPoints(Vector.new(1,1), 25, 5)
 local Rects = {}
 
