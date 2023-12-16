@@ -101,6 +101,8 @@ Render.Point2Id = 50
 
 Render.Point2DCollectId = 51
 
+Render.UIComboBoxId = 52
+
 Render.getRenderIdName = function(id)
     if Render.CircleId == id then
         return "Circle"
@@ -176,6 +178,8 @@ Render.getRenderIdName = function(id)
         return "Ray2DId"
     elseif  Render.UITextId == id then
         return "UITextId"
+    elseif Render.UIComboBoxId == id then
+        return "UIComboBox"
     end
     
     return "Null"

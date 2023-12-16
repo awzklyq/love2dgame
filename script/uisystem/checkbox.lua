@@ -1,9 +1,7 @@
 UI.CheckBox = {}
 local CheckBox = UI.CheckBox
 function CheckBox.new( x, y, w, h, text )
-    local cb = setmetatable({}, UI.GetMeta(CheckBox));
-
-    cb.TypeObject = CheckBox;--must be
+    local cb =  UI.CreateMetatable(CheckBox);
 
     cb._x = x or 0
     cb._y = y or 0

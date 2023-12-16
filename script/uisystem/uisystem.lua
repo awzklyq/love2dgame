@@ -11,6 +11,7 @@ dofile('script/uisystem/text.lua')
 dofile('script/uisystem/scrollbar.lua')
 dofile('script/uisystem/checkbox.lua')
 dofile('script/uisystem/ColorPlane.lua')
+dofile('script/uisystem/ComboBox.lua')
 
 local UISystem = UI.UISystem;
 UISystem.buttons = {};
@@ -20,6 +21,7 @@ UISystem.texts = {};
 UISystem.scrollbars = {};
 
 UISystem.checkboxs = {};
+UISystem.ComboBoxs = {};
 
 UISystem.uiviews = {}
 
@@ -43,6 +45,8 @@ UISystem.removeUI = function( ui )
 		UISystem.RemoveUIFormTarry(UISystem.scrollbars, ui)
 	elseif UISystem.IsCheckBox(ui) then
 		UISystem.RemoveUIFormTarry(UISystem.checkboxs, ui)
+	elseif UISystem.IsComboBox(ui) then
+		UISystem.RemoveUIFormTarry(UISystem.ComboBoxs, ui)
 	else
 		UISystem.RemoveUIFormTarry(UISystem.uiviews, ui)
 	end
@@ -58,6 +62,8 @@ UISystem.addUI = function( ui )
 		table.insert( UISystem.scrollbars, ui);
 	elseif UISystem.IsCheckBox(ui) then
 		table.insert( UISystem.checkboxs, ui)
+	elseif UISystem.IsComboBox(ui) then
+		table.insert(UISystem.ComboBoxs, ui)
 	else
 		table.insert( UISystem.uiviews, ui)
 	end
@@ -83,6 +89,10 @@ UISystem.render = function( e )
 	for i, v in ipairs(UISystem.uiviews) do
 		v:draw();
 	end
+
+	for i, v in ipairs(UISystem.ComboBoxs) do
+		v:draw();
+	end
 end
 
 _G.app.afterrender(function(e)
@@ -105,6 +115,10 @@ UISystem.IsCheckBox = function( obj )
 	return obj and obj.renderid and obj.renderid == Render.UICheckBoxId;
 end
 
+UISystem.IsComboBox = function( obj )
+	return obj and obj.renderid and obj.renderid == Render.UIComboBoxId;
+end
+
 UISystem.isTextArea = function( obj )
 	return obj and obj.type and obj.type == "TextArea";
 end
@@ -125,7 +139,7 @@ UISystem.isUIView = function( obj, isview )
 		end
 	end
 
-	return ( obj.type == "UIView" ) or UISystem.IsButton( obj ) or UISystem.IsText( obj ) or UISystem.isTextArea( obj ) or UISystem.isTextInput( obj );
+	return ( obj.type == "UIView" ) or UISystem.IsButton( obj ) or UISystem.IsText( obj ) or UISystem.isTextArea( obj ) or UISystem.isTextInput( obj ) or  UISystem.IsComboBox( obj );
 end
 
 UI.get__x = function( self )
@@ -260,6 +274,14 @@ UI.GetMeta = function(tabobj)
 	return UI.metas[tabobj];
 end
 
+UI.CreateMetatable = function(Obj)
+	local newobj = setmetatable({}, UI.GetMeta(Obj))
+
+	newobj.TypeObject = Obj
+
+	return newobj
+end
+
 -- function UIBase__call(tab, key, value)
 -- 	if ui['set__'..key] then
 -- 		ui['set__'..key](tab, value);
@@ -268,6 +290,12 @@ end
 
 local SelectedUI = {}
 UISystem.mouseDown = function( b, x, y )
+	
+	for i, v in ipairs(UISystem.ComboBoxs) do
+		if v.triggerMouseDown and v:triggerMouseDown( b, x, y ) then
+			SelectedUI[#SelectedUI + 1] = v
+		end
+	end
 	
 	for i, v in ipairs(UISystem.buttons) do
 		if v.triggerMouseDown and v:triggerMouseDown( b, x, y ) then
@@ -292,6 +320,7 @@ UISystem.mouseDown = function( b, x, y )
 			SelectedUI[#SelectedUI + 1] = v
 		end
 	end
+
 	return false;
 end
 

@@ -1,9 +1,7 @@
 UI.ScrollBar = {}
 local UIScrollBar = UI.ScrollBar
 function UIScrollBar.new( text, x, y, w, h, minv, maxv, offset )
-    local sb = setmetatable({}, UI.GetMeta(UIScrollBar));
-
-    sb.TypeObject = UIScrollBar;--must be
+    local sb = UI.CreateMetatable(UIScrollBar);
 
     sb._x = x or 0
     sb._y = y or 0

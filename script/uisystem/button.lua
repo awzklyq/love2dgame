@@ -2,10 +2,8 @@
 UI.Button = {}
 local Button = UI.Button;
 function Button.new( x, y, w, h, text, name )
-	local btn = setmetatable({}, UI.GetMeta(Button));
+	local btn = UI.CreateMetatable(Button);
 
-	btn.TypeObject = Button;--must be
-	-- UI.UISystem.removeUI( btn );
 	btn._x = x or 0;
 	btn._y = y or 0;
 	btn._w = w or 0;
@@ -34,11 +32,40 @@ function Button.new( x, y, w, h, text, name )
 
 	btn:reset( );
 	btn.type = "Button";
-
-	btn.renderid = Render.UIButtonId
+	btn.IsVisible = true
 	UI.UISystem.addUI( btn );
 
 	return btn;
+end
+
+function Button:SetNormalImage(img)
+	if type(img) == 'string' then
+		self.NormalImage = ImageEx.new(img)
+	end
+
+	if self.NormalImage then
+		self:ResetXYWH()
+	end
+end
+
+function Button:RemoveFormUISystem()
+	UI.UISystem.removeUI(self);
+end
+
+function Button:set___text(text)
+
+	if self.text then
+		self.text.text = text
+	end
+	self:ResetXYWH()
+end
+
+function Button:get___text( hh )
+	if self.text then
+		return self.text.text
+	end
+
+	return ''
 end
 
 function Button:set__w(ww)
@@ -140,6 +167,7 @@ function Button:release( )
 	end
 		
 	self:removeUI( self.text );
+	self:RemoveFormUISystem()
 end
 
 function Button:ResetXYWH()
@@ -166,6 +194,14 @@ function Button:ResetXYWH()
 		self.text.h = th
 
 	end
+
+	if self.NormalImage then
+		self.NormalImage.renderWidth = self._w
+		self.NormalImage.renderHeight = self._h
+
+		self.NormalImage.x = self._x
+		self.NormalImage.y = self._y
+	end
 end
 
 -- function Button:setRenderType( type )
@@ -189,11 +225,19 @@ function Button:reset( )
 end
 
 function Button:draw( )
-	--normal
-	if self.renderType == Button.Rect and self.rect then
-		
-		self.rect:SetColor( self.color );
-		self.rect:draw( );
+	if not self.IsVisible then
+		return
+	end
+
+	if self.NormalImage then
+		self.NormalImage:draw()
+	else
+		--normal
+		if self.renderType == Button.Rect and self.rect then
+			
+			self.rect:SetColor( self.color );
+			self.rect:draw( );
+		end
 	end
 
 	if self.text and self.text.text ~= "" then
@@ -215,6 +259,9 @@ function Button:triggerResizeXY( intervalx, intervaly )
 end
 
 function Button:triggerMouseDown( b, x, y )
+	if self.IsVisible == false then
+		return false
+	end
 	if self:IsInsert( x, y ) == false then
 		return false;
 	end
@@ -227,6 +274,10 @@ function Button:triggerMouseDown( b, x, y )
 end
 
 function Button:triggerMouseRelease( b, x, y )
+	if self.IsVisible == false then
+		return false
+	end
+
 	if self:IsInsert( x, y ) == false then
 		self:ChangeState(UI.State_Normal)
 		return false;
@@ -236,6 +287,9 @@ function Button:triggerMouseRelease( b, x, y )
 end
 
 function Button:triggerMouseMoved( x, y )
+	if self.IsVisible == false then
+		return false
+	end
 	if self:IsInsert( x, y ) == false then
 		if self:IsPressd() then
 			self:ChangeState(UI.State_Press)

@@ -3,8 +3,7 @@ local UIText = UI.Text
 local UISystem = UI.UISystem
 
 function UIText.new( text, x, y, w, h )
-	local uitext = setmetatable({}, UI.GetMeta(UIText));
-	uitext.TypeObject = UIText;--must be
+	local uitext = UI.CreateMetatable(UIText);
 
 	uitext.type = "Text";
 	uitext._x = x or 0;

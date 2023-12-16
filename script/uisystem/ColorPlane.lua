@@ -1,9 +1,7 @@
 UI.ColorPlane = {}
 local ColorPlane = UI.ColorPlane
 function ColorPlane.new( text, x, y, w, h)
-    local cp = setmetatable({}, UI.GetMeta(ColorPlane));
-
-    cp.TypeObject = ColorPlane;--must be
+    local cp = UI.CreateMetatable(ColorPlane);
 
     cp._x = x or 0
     cp._y = y or 0

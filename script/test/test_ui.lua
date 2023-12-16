@@ -1,4 +1,6 @@
 
+FileManager.addAllPath("assert")
+
 local btn = UI.Button.new( 10, 10, 100, 50, 'test', 'btn' )
 
 btn.x = 50
@@ -28,5 +30,14 @@ checkb.ChangeEvent = function(Enable)
     log("Test CheckBox Enable", Enable)
 end
 
-local cp = UI.ColorPlane.new( "Test ColorPlane", 50, 280, 30, 30)
-cp.Value = LColor.new(255, 122, 21, 254)
+local btnimg = UI.Button.new( 100, 300, 40, 40, 'test', 'btn' )
+btnimg:SetNormalImage("SJ1.png")
+btnimg.ClickEvent = function()
+    log('btnimg test')
+end
+
+local cb = UI.ComboBox.new(100, 350, 100, 40, {"Value1", "Value2", "Value3", "Value4", "Value5"})
+cb.Value = "Value4"
+cb.ChangeEvent = function(value)
+    log(' UI.ComboBox test', value)
+end
