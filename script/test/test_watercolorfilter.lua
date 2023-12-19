@@ -1,22 +1,10 @@
-
--- local meshquad = _G.MeshQuad.new( RenderSet.screenwidth,  RenderSet.screenheight, LColor.new(255, 255, 255, 255))
--- meshquad.w = RenderSet.screenwidth
--- meshquad.h = RenderSet.screenheight
-
---  local image = ImageEx.new("OriBA.png")
--- local image = ImageEx.new("yizi.png")
 local image = ImageEx.new("itgongzuo.jpg")
 
 image.renderWidth = RenderSet.screenwidth
 image.renderHeight = RenderSet.screenheight
---local image = ImageEx.new("xing.png")
-app.update(function(dt)
-   
-end)
 
-local IsRenderOri = false
+local IsRenderOri = true
 app.render(function(dt)
-    --image:draw()
     if IsRenderOri then
         image:draw()
     else
@@ -27,9 +15,6 @@ app.render(function(dt)
 end)
 
 app.resizeWindow(function(w, h)
-    -- meshquad = _G.MeshQuad.new( w,  h, LColor.new(255, 255, 255, 255))
-    -- meshquad.w = w
-    -- meshquad.h = h
     image.renderWidth = RenderSet.screenwidth
     image.renderHeight = RenderSet.screenheight
 end)
@@ -41,21 +26,19 @@ app.keypressed(function(key, scancode, isrepeat)
     end
 end)
 
-local checkb = UI.CheckBox.new( 10, 10, 20, 20, "IsRenderOri" )
-checkb.IsSelect = IsRenderOri
-checkb.ChangeEvent = function(Enable)
-    IsRenderOri = Enable
-end
-
-
-local checkb = UI.CheckBox.new( 10, 30, 20, 20, "Open:Type 1, Closed:Type 2" )
-checkb.IsSelect = WaterColorFilterNode.Type == 1 
-checkb.ChangeEvent = function(Enable)
-    if Enable then
+local cb = UI.ComboBox.new(10, 10, 120, 35, {"RenderOri", "OpenType1", "OpenType2"})
+cb.Value = "RenderOri"
+cb.ChangeEvent = function(value)
+    if value == "RenderOri" then
+        IsRenderOri = true
+    elseif value == "OpenType1" then
         WaterColorFilterNode.Type = 1
-    else
+        IsRenderOri = false
+    elseif value == "OpenType2" then
+        IsRenderOri = false
         WaterColorFilterNode.Type = 2
-    end 
+    end
+
 end
 
 local scrollbar1 = UI.ScrollBar.new( 'Offset', 10, 60, 200, 40, 0.1, 10, 0.1)
