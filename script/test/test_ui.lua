@@ -41,3 +41,10 @@ cb.Value = "Value4"
 cb.ChangeEvent = function(value)
     log(' UI.ComboBox test', value)
 end
+
+local cp = UI.ColorPlane.new( "test color", 300, 350, 60, 60)
+
+
+cp.ChangeEvent = function(value)
+    value:Log('test color')
+end

@@ -73,9 +73,6 @@ function ColorPlane.new( text, x, y, w, h)
     cp:ResetXYWH()
 
     UI.UISystem.addUI(cp)
-
-    log('aaaaaaaaaaaa', cp, cp.renderidr)
-
     return cp
 end
 
