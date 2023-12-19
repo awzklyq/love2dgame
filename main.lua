@@ -176,7 +176,7 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_watercolorfilter.lua')--test_IntersectLine  test_BezierCurve.lua
+	dofile('script/test/test_timer.lua')--test_IntersectLine  test_BezierCurve.lua
 	-- dofile('script/demo/ball/demo_ball.lua')
 end
 --dofile()
