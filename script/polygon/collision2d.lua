@@ -38,7 +38,7 @@ Collision2D.CheckMoveCircleAndRect = function(circle, rect, MoveDir, MoveDistanc
 
         if IntersectRectData.IsIntersect then
             local dis = Vector.distance(TempRay.orig, IntersectRectData.IntersectPoint)
-            -- if MoveDistance >= dis then
+            if MoveDistance >= dis then
                 if not distance or distance > dis then
                     distance = dis
                     debugi = i
@@ -56,16 +56,8 @@ Collision2D.CheckMoveCircleAndRect = function(circle, rect, MoveDir, MoveDistanc
                     GetRay.dir.x =  TempRay.dir.x 
                     GetRay.dir.y =  TempRay.dir.y
                 end
-            -- end
+            end
         end 
-    end
-
-    if ReturnIntersectRectData.IsIntersect == true then
-        -- log('bbbbbbbbbbb', ReturnIntersectRectData.MoveDistance, MoveDistance, ReturnIntersectRectData.SelectRect, debugi )
-        if MoveDistance < ReturnIntersectRectData.MoveDistance then
-            ReturnIntersectRectData.IsIntersect = false
-            -- log('ccccccccccccc', ReturnIntersectRectData.MoveDistance, MoveDistance )
-        end
     end
 
     if ReturnIntersectRectData.IsIntersect == true then
