@@ -56,8 +56,6 @@ function MovedEntity:GetMoveOffset(t)
             local curdis =  math.lerp(pred, self.Data[i].v, lerpt / (self.Data[i].t - st))--d.v * (t / d.t)
             local dis =  curdis - self.PreDistance
             self.PreDistance = curdis
-            -- log('bbbbbb', pred, self.Data[i].v, lerpt, t, st)
-            -- log('aaaaaa', self.PreDistance, curdis, dis)
             return dis
         end
    end
@@ -107,7 +105,7 @@ function MotionCircleEntity:SetDirection(dir)
     self.IsArrived = false
     self.Dir = dir:normalize()
 
-    self.Target = self.Dir * (self.Me:GetDistance() - self.PreDistance)
+    self.Target = self.Dir * (self.ME:GetDistance() - self.PreDistance)
 end
 
 function MotionCircleEntity:Start()
@@ -124,7 +122,6 @@ end
 
 function MotionCircleEntity:Stop()
     self.tick = 0
-
     local Circles = MotionManager.Circle
     for i = 1,  #Circles do
         if Circles[i] == self then
@@ -156,13 +153,23 @@ function MotionCircleEntity:MoveActive(MoveDis)
     local TargetDis = Vector.distance(Vector.new(self.Circle.x, self.Circle.y), self.Target) - self.Circle.r
 
     if MoveDis >= TargetDis then
-        if MoveDis > TargetDis then
-            self.ErrorDis = MoveDis - TargetDis
-        else
+        -- if MoveDis > TargetDis then
+        --     self.ErrorDis = MoveDis - TargetDis
+        -- else
             self.ErrorDis = 0
-        end
+        -- end
         MoveDis = TargetDis;
         self.IsArrived = true
+    end
+
+    local ReturnIntersectRectData
+    if self.MoveActiveEvent and self.IsArrived == false then
+        ReturnIntersectRectData = self.MoveActiveEvent(self, MoveDis, self.Dir)
+        if ReturnIntersectRectData.IsIntersect then
+            MoveDis = ReturnIntersectRectData.MoveDistance
+            self.ErrorDis = ReturnIntersectRectData.ErrorDis
+            self.IsArrived = true
+        end
     end
 
     local MoveOffset = self.Dir * MoveDis
@@ -170,8 +177,8 @@ function MotionCircleEntity:MoveActive(MoveDis)
     self.Circle.x = self.Circle.x + MoveOffset.x
     self.Circle.y = self.Circle.y + MoveOffset.y
 
-    if self.IsArrived and self.ArrviedEvent then
-        self.ArrviedEvent(self.Circle, self.Target, self.Dir)
+    if self.IsArrived and self.ArrviedEvent and ReturnIntersectRectData and ReturnIntersectRectData.IsIntersect then
+        self.ArrviedEvent(self.Circle, ReturnIntersectRectData)
     end
 end
 

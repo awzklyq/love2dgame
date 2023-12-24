@@ -75,6 +75,8 @@ dofile('script/3d/math/vector4.lua')
 dofile('script/3d/math/matrix3d.lua')
 dofile('script/3d/math/harmonics.lua')
 
+dofile('script/polygon/collision2d.lua')
+
 dofile('script/groupmanager.lua')
 
 dofile('script/physics/world.lua')
@@ -176,7 +178,7 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_timer.lua')--test_IntersectLine  test_BezierCurve.lua
-	-- dofile('script/demo/ball/demo_ball.lua')
+	-- dofile('script/test/test_collision2d.lua')--test_IntersectLine  test_BezierCurve.lua
+	dofile('script/demo/ball/demo_ball.lua')
 end
 --dofile()

@@ -33,6 +33,9 @@ function Ray2D:SetColor(r, g, b, a)
 end
 
 function Ray2D:IsintersectCircle(circle)
+    if circle:CheckPointIn(self.orig) then
+        return true
+    end
     local v = Vector.new(circle.x - self.orig.x, circle.y - self.orig.y)
     local a2 = v.x * v.x + v.y * v.y
     local r2 = circle.r * circle.r
@@ -145,6 +148,7 @@ function Ray2D:IsIntersectRect(rect)
                 IntersectRectData.IsIntersect = true
                 IntersectRectData.IntersectPoint = IntersectLineData.IntersectPoint
                 distance = dis
+                IntersectRectData.MoveDistance = distance
                 IntersectRectData.Selectline = rect.Lines[i]
             end
         end
@@ -229,7 +233,7 @@ function Ray2D:IsintersectLine(line)
         return IntersectLineData
     end
 
-    local k, c
+    local k, c = 0, 0
     local xx, yy
     local k1, c1
 

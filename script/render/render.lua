@@ -104,6 +104,9 @@ Render.Point2DCollectId = 51
 Render.UIComboBoxId = 52
 
 Render.getRenderIdName = function(id)
+    if type(id) == "table" then
+        id = id.renderid
+    end
     if Render.CircleId == id then
         return "Circle"
     elseif Render.RectId == id then

@@ -63,27 +63,38 @@ local InitEvent = function(BallDatas, rect)
 
     rect.MouseUpEvent = function(rect, x, y)
         rect._IsSelect = false
+        BallDatas.MCE:Stop()
         if BallDatas.MCE:IsMove() == false then
             local Index = 1
-            BallDatas.MCE.ArrviedEvent = function(Circle, Target, Dir)
-                Index = Index + 1
-                if Index <= #BallDatas.PointSeleted then
-                    BallDatas.MCE:SetTarget(BallDatas.PointSeleted[Index])
-                else
+            BallDatas.MCE.ArrviedEvent = function(Circle, IntersectRectData)
+
+                if math.abs(BallDatas.MCE.PreDistance - BallDatas.MCE.ME:GetDistance()) < 0.00001 then
                     BallDatas.MCE.ErrorDis = 0
+                end
+
+                if IntersectRectData.ReflectRay then
+                    BallDatas.MCE:SetDirection(IntersectRectData.ReflectRay.dir)
+                end
+
+                if IntersectRectData.SelectRect then
+                    Logic.ChangeRoleAndRect(Circle, IntersectRectData.SelectRect)
                 end
 
                 if BallDatas.MCE.ErrorDis ~= 0 then
                     BallDatas.MCE:MoveActive(BallDatas.MCE.ErrorDis)
                 end
+            end
 
-                Logic.ChangeRoleAndRect(Circle, BallDatas.RectSeleted[Index - 1])
+            BallDatas.MCE.MoveActiveEvent = function(mce, MoveDis, MoveDir)
+                return Collision2D.CheckMoveCircleAndRects(mce.Circle, BallDatas.Rects, MoveDir, MoveDis)
             end
 
             BallDatas.CircleRole.x = BallDatas.Rect1.x
             BallDatas.CircleRole.y = BallDatas.Rect1.y
 
-            BallDatas.MCE:SetTarget(BallDatas.PointSeleted[Index])
+            -- BallDatas.MCE:SetTarget(BallDatas.PointSeleted[Index])
+            local dir =  Vector.new(BallDatas.Rect2.x - BallDatas.Rect1.x, BallDatas.Rect2.y - BallDatas.Rect1.y )
+            BallDatas.MCE:SetDirection(dir)
             BallDatas.MCE:Start()
 
            

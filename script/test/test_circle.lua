@@ -39,3 +39,7 @@ app.render(function(dt)
     SelectRect:draw()
 
 end)
+
+app.resizeWindow(function(w, h)
+    GenerateData()
+end)

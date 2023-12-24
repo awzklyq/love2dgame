@@ -34,6 +34,13 @@ scrollbar2.ChangeEvent = function(v)
     VE:ScaleDistace(ScaleDistance)
 end
 
+local scrollbar3 = UI.ScrollBar.new( 'Scale Speed', 600, 10, 200, 40, 0.01, 1, 0.05)
+scrollbar3.Value = 1
+scrollbar3.ChangeEvent = function(v)
+    BallDatas.MCE.Speed = v
+end
+
+
 Common.GenerateRects(BallDatas)
 local TempRect = Rect.new()
 
