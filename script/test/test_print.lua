@@ -6,15 +6,23 @@
 -- end
 
 -- Create a ttf file font with a custom size of 20 pixels.
-mainFont = love.graphics.newFont(_G.FileManager.findFile"minijtls.ttf", 20)
+-- mainFont = love.graphics.newFont(_G.FileManager.findFile"minijtls.ttf", 20)
 
-contents, size = love.filesystem.read( "data", _G.FileManager.findFile"main.txt" )
+-- contents, size = love.filesystem.read( "data", _G.FileManager.findFile"main.txt" )
 
-print(contents:getString())
-function love.draw() 
-	-- Setting the font so that it is used when drawning the string.
-	love.graphics.setFont(mainFont)
+-- print(contents:getString())
+-- function love.draw() 
+-- 	-- Setting the font so that it is used when drawning the string.
+-- 	love.graphics.setFont(mainFont)
 
-	-- Draws "Hello world!" at position x: 100, y: 200 with the custom font applied.
-	love.graphics.print(contents:getString(), 100, 200)
-end
+-- 	-- Draws "Hello world!" at position x: 100, y: 200 with the custom font applied.
+-- 	love.graphics.print(contents:getString(), 100, 200)
+-- end
+
+os.execute("color B")
+print("test start")
+os.execute("color A")
+print("test startAAAA")
+-- os.execute("color @D")
+-- print("test resume")
+os.execute("pause")

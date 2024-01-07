@@ -77,7 +77,7 @@ end
 
 local screenwidth = love.graphics.getPixelWidth() 
 local screenheight = love.graphics.getPixelHeight()
-
+local BackRect = nil
 function love.update(dt)
     if RenderSet then
         RenderSet.frameToken = RenderSet.frameToken + 1
@@ -103,6 +103,8 @@ function love.update(dt)
             camera3d.aspectRatio = w/h
         end
         _G.app.resizeWindow(w, h)
+
+        BackRect = Rect.new(0, 0, screenwidth, screenheight)
     end
 
     if TimerManager then
@@ -110,9 +112,16 @@ function love.update(dt)
     end
 
     _G.app.update(dt);
-  end
+
+    if BackRect and RenderSet then
+        BackRect:SetColor(RenderSet.BGColor)
+    end
+end
 
 function love.draw()
+    if BackRect then
+        BackRect:draw()
+    end
     -- \
     -- _G.UIHelper.update(dt);
     -- _G.app.update(dt);
@@ -177,6 +186,8 @@ function love.mousepressed(x, y, button, istouch)
     _G.LightManager.load();
 
     love.window.setMode(800, 600, {resizable=true, vsync=false, minwidth=400, minheight=300})
+
+    BackRect = Rect.new(0, 0, love.graphics.getPixelWidth(), love.graphics.getPixelHeight())
  end
 
  _G.isKeyDown = function(...)

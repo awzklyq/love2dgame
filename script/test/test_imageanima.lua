@@ -12,18 +12,13 @@ imageanima1:Play()
 app.render(function(dt)
     imageanima:draw()
     imageanima1:draw()
-    love.graphics.print( "Press Key Space.  imageanima.Duration "..tostring(imageanima.Duration) , 10, 10)
 end)
 
-app.keypressed(function(key, scancode, isrepeat)
-    if key == "space" then
-        imageanima1.Tick = 0
-        imageanima.Tick = 0
-    elseif key == 'up' then
-        imageanima:SetDuration(imageanima.Duration + 1)
-        imageanima1:SetDuration(imageanima.Duration + 1)
-    elseif key == 'down' then
-        imageanima:SetDuration(imageanima.Duration - 1)
-        imageanima1:SetDuration(imageanima.Duration - 1)
-    end
-end)
+local scrollbar = UI.ScrollBar.new( 'Duration', 10, 10, 200, 40, 0.1, 24, 0.1)
+scrollbar.Value = imageanima.Duration
+scrollbar.ChangeEvent = function(v)
+    imageanima1.Tick = 0
+    imageanima.Tick = 0
+    imageanima:SetDuration(v)
+    imageanima1:SetDuration(v)
+end

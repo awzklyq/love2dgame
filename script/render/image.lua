@@ -13,18 +13,43 @@ function ImageEx.new(name, ...)
 
     image.filename = name
 
-    image.transform = Matrix.new()
-
-    image.renderid = Render.ImageId;
-
     image.w = image:getWidth()
     image.h = image:getHeight()
 
-    image.x = 0
-    image.y = 0
-
-    image.alpha = 1
+    image:InitData()
     return image;
+end
+
+function ImageEx.CreateFromImage(obj, x, y, w, h, ...)
+    local image = setmetatable({}, ImageEx);
+
+    if type(obj) == 'table' and obj.renderid == Render.ImageId then
+        image.obj = obj.obj
+        image.ImageData = obj.ImageData
+    else
+        image.obj = love.graphics.newImage(obj, ...)
+    end
+
+    image.filename = name
+
+    image.w = w or 0
+    image.h = h or 0
+
+    image.Quad = love.graphics.newQuad( x or 0, y or 0, w or 0, h or 0, image.obj);
+
+    image:InitData()
+    return image;
+end
+
+function ImageEx:InitData()
+    self.transform = Matrix.new()
+
+    self.renderid = Render.ImageId;
+
+    self.x = 0
+    self.y = 0
+
+    self.alpha = 1
 end
 
 ImageEx.__index = function(tab, key, ...)
@@ -84,13 +109,29 @@ end
 
 function ImageEx:SetPixel(x, y, r, g, b, a)
     local imgd = self:GetImageData()
-    local IsColor = not not g
-    if IsColor then
+    if not g then
         imgd:setPixel(x, y, r._r, r._g, r._b, r._a)
     else
         imgd:setPixel(x, y, r, g, b, a)
     end
-    
+    return imgd
+end
+
+function ImageEx:ErasurePixel(c)
+    local w = self:getWidth()
+    local h = self:getHeight()
+
+    local index = 0
+    for i = 0, w - 1 do
+        for j = 0, h - 1 do
+            local pc = self:GetPixel(i, j)
+            if math.abs(c:GetLuminance() - pc:GetLuminance()) < 0.2 then
+                self:SetPixel(i,j,pc._r,pc._g,pc._b,pc:GetLuminance() * 0.1)
+            end
+        end
+    end
+
+    return ImageEx.new(self:GetImageData())
 end
 
 

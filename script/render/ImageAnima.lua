@@ -41,11 +41,13 @@ ImageAnima.__newindex = function(tab, key, value)
 end
 
 
-function ImageAnima.new(name, xnum, ynum, Duration ,  ...)
+function ImageAnima.new(name, xnum, ynum, Duration, ...)
     local image = setmetatable({}, ImageAnima);
 
     if type(name) == 'string' then
         image.obj = love.graphics.newImage(_G.FileManager.findFile(name), ...)
+    elseif type(name) == 'string' and name.renderid == Render.ImageId then
+        image.obj = name.obj
     else
         image.obj = love.graphics.newImage(name, ...)
     end
@@ -53,16 +55,16 @@ function ImageAnima.new(name, xnum, ynum, Duration ,  ...)
     image.transform = Matrix.new()
 
     image.renderid = Render.ImageAnimaId;
+    image.Quads = {}
 
     image.w = image:getWidth()
     image.h = image:getHeight()
 
     image.x = 0
     image.y = 0
-
-    image.Quads = {}
     image.xsize = image.w / xnum
     image.ysize = image.h / ynum
+
     image.xnum = xnum
     image.ynum = ynum
     for j = 1, ynum do
@@ -70,7 +72,7 @@ function ImageAnima.new(name, xnum, ynum, Duration ,  ...)
             image.Quads[#image.Quads + 1] = love.graphics.newQuad( (i - 1) * image.xsize, (j - 1) * image.ysize, image.xsize, image.ysize, image.obj);
         end
     end
-
+    
     image.CurrentQuad = image.Quads[1]
     
     image.alpha = 1
@@ -85,7 +87,104 @@ function ImageAnima.new(name, xnum, ynum, Duration ,  ...)
     image.RenderType = ImageAnimaRenderType.ASMeshQuad
 
     image.MeshQuad = MeshQuad.new(image.xsize, image.ysize, LColor.new(255,255,255,255), image)
+
+    image.CurrentIndex = 1
+
     return image;
+end
+
+function ImageAnima.CreateFromImage(obj, x1, y1, x2, y2, xnum, ynum, Duration, ...)
+    local image = setmetatable({}, ImageAnima);
+
+    if type(obj) == 'table' and obj.renderid == Render.ImageId then
+        image.obj = obj.obj
+    else
+        image.obj = love.graphics.newImage(obj, ...)
+    end
+
+    image.transform = Matrix.new()
+
+    image.renderid = Render.ImageAnimaId;
+    image.Quads = {}
+
+    image.w = image:getWidth()
+    image.h = image:getHeight()
+    
+    image.x1 = x1 or 0
+    image.y1 = y1 or 0
+    image.x2 = x2 or 0
+    image.y2 = y2 or 0
+
+    image.xsize = image.w / xnum
+    image.ysize = image.h / ynum
+    for j = y1, y2 do
+        for i = x1, x2 do
+            image.Quads[#image.Quads + 1] = love.graphics.newQuad( (i - 1) * image.xsize, (j - 1) * image.ysize, image.xsize, image.ysize, image.obj);
+        end
+    end
+    image.CurrentQuad = image.Quads[1]
+    
+    image.alpha = 1
+
+    image.IsLoop = true;
+    image.IsPlaying = false;
+
+    image.Duration = Duration;
+    image.Tick = 0;
+    image.PageTime = image.Duration / #image.Quads
+
+    image.RenderType = ImageAnimaRenderType.ASMeshQuad
+
+    image.MeshQuad = MeshQuad.new(image.xsize, image.ysize, LColor.new(255,255,255,255), image)
+
+    image.CurrentIndex = 1
+    return image;
+end
+
+function ImageAnima.CreateFromImageAnima(obj, x1, y1, x2, y2,  Duration)
+    local image = setmetatable({}, ImageAnima);
+
+    image.obj = obj.obj
+
+    image.transform = Matrix.new()
+
+    image.renderid = Render.ImageAnimaId;
+
+    image.w = image:getWidth()
+    image.h = image:getHeight()
+
+    image.x = 0
+    image.y = 0
+
+    image.Quads = {}
+    image.xsize = obj.xsize
+    image.ysize = obj.ysize
+    image.xnum = obj.xnum
+    image.ynum = obj.ynum
+    for j = y1, y2 do
+        for i = x1, x2 do
+            image.Quads[#image.Quads + 1] = love.graphics.newQuad( (i - 1) * image.xsize, (j - 1) * image.ysize, image.xsize, image.ysize, image.obj);
+        end
+    end
+
+    image.CurrentQuad = image.Quads[1]
+    
+    image.alpha = obj.alpha
+
+    image.IsLoop = true;
+    image.IsPlaying = false;
+
+    image.Duration = Duration;
+    image.Tick = 0;
+    image.PageTime = image.Duration / #image.Quads
+
+    image.RenderType = obj.RenderType
+
+    image.MeshQuad = MeshQuad.new(image.xsize, image.ysize, LColor.new(255,255,255,255), image)
+    
+    image.CurrentIndex = 1
+
+    return image
 end
 
 function ImageAnima:SetDuration(Duration)
@@ -101,6 +200,12 @@ function ImageAnima:Play()
     self.IsPlaying = true
 
     table.insert(ImageAnimaManager.ImageAnimas, self)
+end
+
+function ImageAnima:SwitchNextFrame()
+    if self.IsPlaying then
+        return
+    end
 end
 
 function ImageAnima:Stop()

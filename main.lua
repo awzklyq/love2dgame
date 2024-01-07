@@ -179,7 +179,7 @@ app.load(function()
 end)
 
 else
-	-- dofile('script/test/test_shengyin.lua')--test_IntersectLine  test_BezierCurve.lua
-	dofile('script/demo/ball/demo_ball.lua')
+	dofile('script/test/test_pfxcircle.lua')--test_IntersectLine  test_BezierCurve.lua
+	-- dofile('script/demo/ball/demo_ball.lua')
 end
 --dofile()

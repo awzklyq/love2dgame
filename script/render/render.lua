@@ -347,7 +347,12 @@ Render.RenderObject = function(obj)
             love.graphics.draw( obj.obj, obj.x, obj.y, 0, obj.renderWidth / obj:getWidth(), obj.renderHeight / obj:getHeight())
         elseif obj.renderid == Render.ImageId then
             love.graphics.setColor(r * 0.9, g * 0.9, b * 0.9, obj.alpha);
-            love.graphics.draw( obj.obj, obj.x, obj.y, 0, obj.w / obj:getWidth(), obj.h / obj:getHeight())
+            if obj.Quad then
+                love.graphics.draw( obj.obj, obj.Quad, obj.x, obj.y, 0, obj.w / obj:getWidth(), obj.h / obj:getHeight())
+            else
+                love.graphics.draw( obj.obj, obj.x, obj.y, 0, obj.w / obj:getWidth(), obj.h / obj:getHeight())
+            end
+            
         elseif obj.renderid == Render.ImageAnimaId then
             if obj:IsRenderAsImage() then
                 love.graphics.setColor(r * 0.9, g * 0.9, b * 0.9, obj.alpha);

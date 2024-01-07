@@ -79,6 +79,10 @@ LColor.__newindex = function(tab, key, value)
     return rawset(tab, key, value);
 end
 
+LColor.__eq = function(myvalue, value)
+    return myvalue._r == value._r and  myvalue._g == value._g and  myvalue._b == value._b
+end
+
 function LColor:getBrightness()
     return 0.2126 * self._r + 0.7152 * self._g + 0.0722 *self._b
 end

@@ -12,23 +12,24 @@ function Circle.new(r, x ,y, segments)
 
     circle.mode = 'line';
 
+    circle.Visible = true
+
     circle.renderid = Render.CircleId;
     return circle;
 end
 
 function Circle:setColor(r, g, b, a)
-    self.color.r = r;
-    self.color.g = g;
-    self.color.b = b;
-    self.color.a = a;
+    if g then
+        self.color.r = r;
+        self.color.g = g;
+        self.color.b = b;
+        self.color.a = a;
+    else
+        self.color:Set(r)
+    end
 end
 
-function Circle:SetColor(r, g, b, a)
-    self.color.r = r;
-    self.color.g = g;
-    self.color.b = b;
-    self.color.a = a;
-end
+Circle.SetColor = Circle.setColor
 
 function Circle:CheckPointIn(p)
     return self:CheckPointInXY(p.x, p.y)
@@ -86,6 +87,8 @@ end
 
 
 function Circle:draw()
+    if not self.Visible then return end
+
     Render.RenderObject(self);
 
     if self.box2d then
