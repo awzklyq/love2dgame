@@ -92,6 +92,7 @@ function MotionCircleEntity.new(circle, me, Colliders)-- lw :line width
     mce.Speed = 1
 
 
+    mce.Audio = Audio.new("3.wav")
     return mce;
 end
 
@@ -166,6 +167,7 @@ function MotionCircleEntity:MoveActive(MoveDis)
     if self.MoveActiveEvent and self.IsArrived == false then
         ReturnIntersectRectData = self.MoveActiveEvent(self, MoveDis, self.Dir)
         if ReturnIntersectRectData.IsIntersect then
+            self.Audio:rePlay()
             MoveDis = ReturnIntersectRectData.MoveDistance
             self.ErrorDis = ReturnIntersectRectData.ErrorDis
             self.IsArrived = true

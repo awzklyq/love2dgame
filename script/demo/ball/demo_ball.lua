@@ -1,3 +1,4 @@
+FileManager.addAllPath("assert")
 dofile('script/demo/ball/demo_ball_motionmanager.lua')
 math.randomseed(os.time()%10000)
 
