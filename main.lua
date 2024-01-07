@@ -21,6 +21,7 @@ dofile('script/render/canvas.lua')
 dofile('script/render/image.lua')
 
 dofile('script/common/color.lua')
+dofile('script/common/audio.lua')
 dofile('script/common/filepath.lua')
 dofile('script/common/earclip.lua')
 dofile('script/common/voronoi.lua')
@@ -178,7 +179,7 @@ app.load(function()
 end)
 
 else
-	-- dofile('script/test/test_collision2d.lua')--test_IntersectLine  test_BezierCurve.lua
-	dofile('script/demo/ball/demo_ball.lua')
+	dofile('script/test/test_shengyin.lua')--test_IntersectLine  test_BezierCurve.lua
+	-- dofile('script/demo/ball/demo_ball.lua')
 end
 --dofile()
