@@ -1,47 +1,31 @@
  
- local SelectElements = {}
+ local SelectElements = setmetatable({}, {__mode = "kv"})
 
- local EventElements = {}
+ local EventElements = setmetatable({}, {__mode = "kv"})
  _G.AddEventToPolygonevent = function(self, enable)
 
     if enable then
-        local needadd = true
-        for i = 1, #EventElements do
-            if EventElements[i] == self then
-                needadd = false
-                break
-            end
-        end
-        if needadd then
-            EventElements[#EventElements + 1] = self
-        end
+        EventElements[self] = self
     else
-        for i = 1, #EventElements do
-            if EventElements[i] == self then
-                table.remove( EventElements, i)
-                break
-            end
-        end
+        EventElements[self] = nil
     end
 end
 
  app.mousepressed(function(x, y, button, istouch)
-     for i = 1, #EventElements do
-         if EventElements[i]:CheckPointInXY(x, y) then
-             local SelectElement = EventElements[i]
-             SelectElements[#SelectElements + 1] = SelectElement
+     for i, v in pairs(EventElements) do
+         if v:CheckPointInXY(x, y) then
+             SelectElements[v] = v
 
-             if SelectElement.MouseDownEvent then
+             if v.MouseDownEvent then
 
-                SelectElement.MouseDownEvent(SelectElement, x, y, button, istouch)
+                v.MouseDownEvent(v, x, y, button, istouch)
              end
          end
      end
  end)
  
  app.mousemoved(function(x, y, button, istouch)
-     for i = 1, #SelectElements do
-         local SelectElement = SelectElements[i]
+    for i, SelectElement in pairs(SelectElements) do
          if SelectElement.MouseMoveEvent then
             SelectElement.MouseMoveEvent(SelectElement, x, y, button, istouch)
          end
@@ -49,12 +33,16 @@ end
  end)
  
  app.mousereleased(function(x, y, button, istouch)
-     for i = 1, #SelectElements do
-         local SelectElement = SelectElements[i]
+    local NeedCreate = false
+    for i, SelectElement in pairs(SelectElements) do
          if SelectElement.MouseUpEvent then
             SelectElement.MouseUpEvent(SelectElement, x, y, button, istouch)
          end
+
+         NeedCreate = true
      end
- 
-     SelectElements = {}
+
+     if NeedCreate then
+        SelectElements = setmetatable({}, {__mode = "kv"})
+     end
  end)

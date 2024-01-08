@@ -1,5 +1,5 @@
-local Number = 200
-local duration = 3
+local PfxNumber = 200
+local pfxduration = 3
 local CR = 40
 local C1 = LColor.new(0, 0, 255, 255)
 local C2 = LColor.new(255, 0, 255, 255)
@@ -19,7 +19,7 @@ end
 
 local SwitchCircle = function(x, y)
     PlayCircle(NextIndex, x, y)
-    if NextIndex == Number then
+    if NextIndex == PfxNumber then
         NextIndex = 1
 
     else
@@ -29,8 +29,8 @@ local SwitchCircle = function(x, y)
 end
 
 local GenerateCircle = function()
-    CS = {}
-    Timers = {}
+    NextIndex = 1
+    -- CC:SetMouseEventEable(false)
     CC = Circle.new(CR, CC.x, CC.y)
     CC:SetColor(C1)
     CC.mode = 'fill'
@@ -57,9 +57,15 @@ local GenerateCircle = function()
         c.sx = nil
         c.sy = nil
     end
-
     
-    for i = 1, Number do
+    for i = 1, #Timers do
+        Timers[i]:Release()
+    end
+
+    CS = {}
+    Timers = {}
+   
+    for i = 1, PfxNumber do
         local c = Circle.new(CR, 200, 200)
         CS[i] = c
         
@@ -67,7 +73,7 @@ local GenerateCircle = function()
         c.mode = 'fill'
 
         c.Visible = false
-        Timers[i] = Timer.new(duration)
+        Timers[i] = Timer.new(pfxduration)
 
         Timers[i].TriggerFrame = function(tick, duration)
             local t = tick / duration
@@ -75,6 +81,7 @@ local GenerateCircle = function()
             c.color.r = math.lerp(C1.r, C2.r, t)
             c.color.g = math.lerp(C1.g, C2.g, t)
             c.color.b = math.lerp(C1.b, C2.b, t)
+            
         end
 
         Timers[i].TraggerEvent = function()
@@ -86,7 +93,7 @@ end
 GenerateCircle()
 
 app.render(function(dt)
-    for i = 1, Number do
+    for i = 1, PfxNumber do
         CS[i]:draw()
     end
 
@@ -94,16 +101,16 @@ app.render(function(dt)
 end)
 
 local scrollbar = UI.ScrollBar.new( 'Duration', 10, 10, 200, 40, 0.5, 10, 0.1)
-scrollbar.Value = duration
+scrollbar.Value = pfxduration
 scrollbar.ChangeEvent = function(v)
-    duration = v
+    pfxduration = v
     GenerateCircle()
 end
 
-local scrollbar = UI.ScrollBar.new( 'Number', 250, 10, 200, 40, 100, 1000, 10)
-scrollbar.Value = Number
+local scrollbar = UI.ScrollBar.new( 'PfxNumber', 250, 10, 200, 40, 100, 1000, 10)
+scrollbar.Value = PfxNumber
 scrollbar.ChangeEvent = function(v)
-    Number = v
+    PfxNumber = v
     GenerateCircle()
 end
 

@@ -27,6 +27,11 @@ function Timer:Stop()
     self.tick = 0
 end
 
+function Timer:Release()
+    self.TraggerEvent = nil
+    self.TriggerFrame = nil
+end
+
 function Timer:Tick(dt)
     if self.pause then return end
     
