@@ -119,6 +119,11 @@ function Camera3D:moveRadius( radius)
 	self.eye = Vector3.add(self.eye, dir:mul(radius))
 end
 
+function Camera3D:GetDirction()
+    local dir = Vector3.sub(self.look, self.eye)
+    return dir:normalize()
+end
+
 -- give the camera a point to look from and a point to look towards
 function Camera3D:setCameraAndLookAt(x,y,z, xAt,yAt,zAt)
     self.eye:setXYZ(x,y,z)
@@ -168,10 +173,6 @@ end)
 
 app.wheelmoved(function(x, y)
     _G.currentCamera3D:moveRadius(y * -0.1 * _G.currentCamera3D:getRadius())
-end)
-
-app.keypressed(function(key, scancode, isrepeat)
-    print(key)
 end)
 
 

@@ -136,6 +136,7 @@ function Scene3D:getFrustumResultNodes()
     --     end
     -- end
 
+    self.visiblenodes = {}
     self.octrees:getFrustumResultNodes(self.frustum, self.visiblenodes)
 
     self.cullednumber = #self.nodes - #self.visiblenodes
@@ -252,7 +253,7 @@ function Scene3D:draw(isdrawCanvaColor)
                 node.mesh:draw()
                 RenderSet.setshadowReceiver(false)
                 RenderSet.SetPBR(false)
-                if  self.isDrawBox then
+                if  self.IsDrawBox then
                     node:drawBoxMesh()
                 end
             end
@@ -286,8 +287,8 @@ function Scene3D:draw(isdrawCanvaColor)
         self:drawCanvaColor()
     end
 
-    -- must be last
-    self.visiblenodes = {}
+    -- -- must be last
+    -- self.visiblenodes = {}
 end
 
 function Scene3D:DrawAlphaTest(AlphaTestNodes)
@@ -702,5 +703,19 @@ function Scene3D:drawDirectionLightCSM(isdebug)
         end
     end
     
+end
+
+function Scene3D:Pick(x, y)
+
+    log('aaaaaaaaaaa', #self.visiblenodes)
+    local ray = Ray.BuildFromScreen(x, y)
+    for j = 1, #self.visiblenodes do
+        local node = self.visiblenodes[j]
+        local box = node:getWorldBox()
+        if ray:IsIntersectBox(box) then
+            log('sssssssssssss')
+            node.IsDrawBox = not node.IsDrawBox
+        end
+    end
 end
 

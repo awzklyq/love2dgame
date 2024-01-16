@@ -14,6 +14,40 @@ function Ray.new(orig, dir)
     return ray
 end
 
+function Ray.BuildFromScreen(x, y)
+	local xx = 2.0 * x / RenderSet.screenwidth - 1.0-- / RenderSet.screenwidth + 0.5
+	local yy =  2.0 * y / RenderSet.screenheight - 1.0-- / RenderSet.screenheight + 0.5
+	return Ray.BuildFromViewTransform(xx, yy,  RenderSet.getUseViewMatrix(), RenderSet.getUseProjectMatrix())
+end
+
+function Ray.BuildFromViewTransform(x, y, viewtrans, projtrans)
+	local v = Matrix3D.copy(viewtrans)
+	v = v:inverse()
+
+	local temp = Vector3.new(-x / projtrans:getMatrixXY(1,1), -y / projtrans:getMatrixXY(2,2), 1.0)
+
+	local orig = Vector3.new()
+	orig.x = v:getMatrixXY(4, 1)
+	orig.y = v:getMatrixXY(4, 2)
+	orig.z = v:getMatrixXY(4, 3)
+	-- orig:Log('orig')
+	-- local camera3d = _G.getGlobalCamera3D()
+	-- camera3d.eye:Log('eye')
+
+	local dir = Vector3.new() 
+	dir.x	= temp.x * v:getMatrixXY( 1, 1 ) + temp.y * v:getMatrixXY( 2, 1 ) + temp.z * v:getMatrixXY( 3, 1 );
+	dir.y	= temp.x * v:getMatrixXY( 1, 2 ) + temp.y * v:getMatrixXY( 2, 2 ) + temp.z * v:getMatrixXY( 3, 2 );
+	dir.z	= temp.x * v:getMatrixXY( 1, 3 ) + temp.y * v:getMatrixXY( 2, 3 ) + temp.z * v:getMatrixXY( 3, 3 );
+
+	dir:normalize()
+
+	dir = dir * -1;
+
+	-- dir:Log('origdir')
+	-- camera3d:GetDirction():Log('cameradir')
+	return Ray.new(orig, dir)
+end
+
 function Ray:IsIntersectPlane( p )
 	local dot = Vector3.dot( p:normal( ), self.dir );
 	if  math.abs( dot ) < math.cEpsilon then

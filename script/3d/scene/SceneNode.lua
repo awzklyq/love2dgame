@@ -5,7 +5,7 @@ function SceneNode3D.new()
 
     node.renderid = Render.SceneNode3DId
 
-    node.isDrawBox = false
+    node.IsDrawBox = false
 
     node.isFrustumChecked = false
 
@@ -72,7 +72,7 @@ function SceneNode3D:createOctreenodes()
 end
 
 function SceneNode3D:drawBoxMesh()
-    if self.isDrawBox and self.boxmesh then
+    if self.IsDrawBox and self.boxmesh then
         local cullmode = love.graphics.getMeshCullMode()
         love.graphics.setMeshCullMode("none")
         -- love.graphics.setWireframe( true )
