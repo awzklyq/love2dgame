@@ -103,6 +103,8 @@ Render.Point2DCollectId = 51
 
 Render.UIComboBoxId = 52
 
+Render.Triangle3DId = 36
+
 Render.getRenderIdName = function(id)
     if type(id) == "table" then
         id = id.renderid
@@ -183,6 +185,8 @@ Render.getRenderIdName = function(id)
         return "UITextId"
     elseif Render.UIComboBoxId == id then
         return "UIComboBox"
+    elseif Render.Triangle3DId == id then
+        return "Triangle3D"
     end
     
     return "Null"

@@ -157,6 +157,10 @@ function Vector3:GetMortonCode3()
     return Morton
 end
 
+function Vector3:GetVector4(w)
+    return Vector4.new(self.x, self.y, self.z, w or 0)
+end
+
 function Vector3.GetReverseMortonCode(x)
     local v = Vector3.new()
     v.x = math.ReverseMortonCode3( x );
@@ -214,6 +218,8 @@ Vector3.dot = function(v1, v2)
     return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
 end
 
+Vector3.Dot = Vector3.dot
+
 -- function SubtractVector(v1, v2)
 --     return {v1[1] - v2[1], v1[2] - v2[2], v1[3] - v2[3]}
 -- end
@@ -230,6 +236,8 @@ Vector3.cross = function(a,b)
 )
     return result
 end
+
+Vector3.Cross = Vector3.cross
 
 Vector3.lerp = function(a,b, lerp)
     local result = Vector3.new(

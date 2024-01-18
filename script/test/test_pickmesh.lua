@@ -27,26 +27,13 @@ local directionlight = DirectionLight.new((currentCamera3D.eye - currentCamera3D
 local TestRay
 app.render(function(dt)
     scene:update(dstlen)
-    scene:draw(true)
-
-    if TestRay then
-        TestRay:draw()
-    end
-   
-end)
-
-local EnablePick = true
-app.keypressed(function(key, scancode, isrepeat)
-    if key == "space" then
-        EnablePick = not EnablePick
-    end
+    scene:draw(true) 
 end)
 
 app.mousereleased(function(x, y, button, istouch)
-    if EnablePick then
-        scene:Pick(x, y)
-        local ray = Ray.BuildFromScreen(x, y)
-        TestRay =  ray:GetMeshLine(5000, LColor.new(255,0,0,255))
+    local PickNodes = scene:Pick(x, y)
+    if #PickNodes > 0 then
+        PickNodes[1].Node.IsDrawBox = not PickNodes[1].Node.IsDrawBox 
     end
 end)
 

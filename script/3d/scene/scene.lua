@@ -707,15 +707,17 @@ end
 
 function Scene3D:Pick(x, y)
 
-    log('aaaaaaaaaaa', #self.visiblenodes)
+    local PickMeshNode = {}
     local ray = Ray.BuildFromScreen(x, y)
     for j = 1, #self.visiblenodes do
         local node = self.visiblenodes[j]
-        local box = node:getWorldBox()
-        if ray:IsIntersectBox(box) then
-            log('sssssssssssss')
-            node.IsDrawBox = not node.IsDrawBox
+        local dis = node.mesh:PickByRay(ray)
+        if dis > 0 then
+            PickMeshNode[#PickMeshNode + 1] = {PickDistance = dis, Node = node}
         end
     end
+
+    table.sort(PickMeshNode, function(a, b) return a.PickDistance < b.PickDistance end)
+    return PickMeshNode
 end
 

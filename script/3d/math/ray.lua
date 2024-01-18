@@ -108,3 +108,50 @@ function Ray:GetMeshLine(dist, color)
 	return HelpLine
 
 end
+
+-- Return distance
+function Ray:IntersectTriangle(triangle, backcull )
+	local edge1 = triangle.P2 - triangle.P1;
+	local edge2 = triangle.P3 - triangle.P1;
+
+	local pvec = Vector3.Cross( self.dir, edge2 );
+
+	local tvec = Vector3.new()
+	local det = Vector3.Dot( edge1, pvec )
+
+	if det >= 0.0 then
+		tvec = self.orig - triangle.P1;
+	else
+		if  backcull then
+			return -1
+		end
+
+		tvec = triangle.P1 - self.orig;
+		det = -det;
+	end
+
+	if det < math.cEpsilon then
+		return -1
+	end
+
+
+	local u = Vector3.Dot( tvec, pvec );
+	if u < 0.0 or u > det then
+		return -1
+	end
+
+	local qvec = Vector3.Cross( tvec, edge1 );
+
+	local v = Vector3.Dot( self.dir, qvec );
+	if v < 0.0 or u + v > det then
+		return -1
+	end
+
+	local tdis = Vector3.Dot( edge2, qvec ) / det;
+	if  tdis < 0.0 then
+		return -1
+	end
+
+	dist = tdis;
+	return dist;
+end

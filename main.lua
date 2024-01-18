@@ -55,6 +55,7 @@ dofile('script/3d/mesh/aixs.lua')
 dofile('script/3d/mesh/aixs.lua')
 
 dofile('script/polygon/triangle.lua')
+dofile('script/polygon/triangle3d.lua')
 
 dofile('script/3d/terrain/tile.lua')
 dofile 'script/3d/terrain/tileshader.lua'

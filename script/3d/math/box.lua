@@ -142,6 +142,12 @@ function BoundBox:vectorInBox(v )
     return v.x >= self.min.x and v.x <= self.max.x and v.y >= self.min.y and v.y <= self.max.y and v.z >= self.min.z and v.z <= self.max.z;
 end
 
+BoundBox.VectorInBox = BoundBox.vectorInBox
+
+function BoundBox:TriangleInBox(triangle )
+    return self:VectorInBox(triangle.P1) and self:VectorInBox(triangle.P2) and self:VectorInBox(triangle.P3)
+end
+
 BoundBox.getIntersectBox = function(box1, box2)
     local box = BoundBox.new()
 

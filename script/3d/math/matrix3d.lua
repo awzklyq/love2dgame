@@ -38,6 +38,10 @@ metatable_Matrix3D.__mul = function(myvalue, value)
 			return mat--Matrix3D.matrixMult(myvalue, value)
 		elseif value.renderid == Render.Vector4Id then
 			return mat:mulVector4(value)--Matrix3D.matrixMult(myvalue, value
+		elseif value.renderid == Render.Vector3Id then
+			return mat:mulRightVector3(value)
+		elseif value.renderid ==  Render.Triangle3DId then
+			return mat:mulTrangle(value)
 		end
     else
         _errorAssert(false, "metatable_Matrix3D.__mul~")
@@ -131,7 +135,7 @@ Matrix3D.createLookAtRH = function(  eye, lookat, upaxis )
 end
 
 
-function Matrix3D:mulVector3(tab2, NeedNotW)
+function Matrix3D:mulLeftVector3(tab2, NeedNotW)
 	local xx, yy, zz = tab2.x, tab2.y, tab2.z
 	local mat = self
 	local w = xx * mat:getData(1,4) + yy * mat:getData(2,4) + zz * mat:getData(3,4) + mat:getData(4,4)
@@ -147,6 +151,36 @@ function Matrix3D:mulVector3(tab2, NeedNotW)
 		rsult.z = rsult.z * winv;
 	end
 	return rsult
+end
+
+function Matrix3D:mulRightVector3(tab2, NeedNotW)
+	local xx, yy, zz = tab2.x, tab2.y, tab2.z
+	local mat = self
+	local w = xx * mat:getData(4,1) + yy * mat:getData(4,2) + zz * mat:getData(4,3) + mat:getData(4,4)
+	
+	local rsult = Vector3.new()
+
+	rsult.x = xx * mat:getData(1,1) + yy * mat:getData(1,2) + zz * mat:getData(1,3) + mat:getData(1,4)
+	rsult.y = xx * mat:getData(2,1) + yy * mat:getData(2,2) + zz * mat:getData(2,3) + mat:getData(2,4)
+	rsult.z = xx * mat:getData(3,1) + yy * mat:getData(3,2) + zz * mat:getData(3,3) + mat:getData(3,4)
+
+	if  w ~= 0.0 and not NeedNotW then
+		local winv = 1.0 / w;
+		rsult.x = rsult.x * winv;
+		rsult.y = rsult.y * winv;
+		rsult.z = rsult.z * winv;
+	end
+	return rsult
+end
+
+function Matrix3D:mulTrangle(triangle)
+
+	local P1 = self * triangle.P1
+	local P2 = self * triangle.P2
+	local P3 = self * triangle.P3
+
+	local result = Triangle3D.new(P1, P2, P3)
+	return result
 end
 
 function Matrix3D:mulVector4(v4)
@@ -169,7 +203,7 @@ function Matrix3D:mulBoundBox(boundbox, NeedNotW)
 	local box = OrientedBox.buildFormBoundBox(boundbox)
 
 	for i = 1, 8 do
-		box.vs[i] = mat:mulVector3(box.vs[i], NeedNotW)
+		box.vs[i] = mat:mulLeftVector3(box.vs[i], NeedNotW)
 	end
 
 	return box:getBoundBox()
@@ -602,6 +636,8 @@ function Matrix3D.copy(mat)
 
 	return result;
 end
+
+Matrix3D.Copy =  Matrix3D.copy
 
 function Matrix3D.inverse(mat)
 	local m = Matrix3D.copy(mat)

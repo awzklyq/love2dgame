@@ -16,7 +16,7 @@ function SceneNode3D:bindMesh(mesh)
     assert(mesh.renderid and mesh.renderid == Render.Mesh3DId)
     self.mesh = mesh
 
-    self.box = BoundBox.buildFromMesh3D(mesh)
+    self.box = mesh.box--BoundBox.buildFromMesh3D(mesh)
     -- self.box = mesh.transform3d:mulBoundBox(self.box)
     self.boxmesh = self:getWorldBox():buildMeshLines()
     -- self.boxmesh:setTransform(mesh.transform3d)
@@ -32,7 +32,7 @@ end
 
 function SceneNode3D:getWorldBox()
     if self.mesh then
-        return self.mesh.transform3d:mulBoundBox(self.box)
+        return self.mesh:GetWorldBox()
         --return self.box
     end
     return BoundBox.new()

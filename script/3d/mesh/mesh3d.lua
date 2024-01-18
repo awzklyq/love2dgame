@@ -70,8 +70,14 @@ function Mesh3D.createFromPoints(datas)
 
     mesh.visible = true
 
+    mesh.box = BoundBox.buildFromMesh3D(mesh)
+
     mesh:setRenderType("normal")
     return mesh;
+end
+
+function Mesh3D:GetWorldBox()
+    return self.transform3d:mulBoundBox(self.box)
 end
 
 
@@ -107,7 +113,7 @@ end
 
 -- populate model's normals in model's mesh automatically
 function Mesh3D:makeNormals()
-    local Faces = {}
+    self.FacesInfos = {}
     for i=1, #self.verts, 3 do
         local vp = self.verts[i]
         local v = self.verts[i+1]
@@ -128,30 +134,36 @@ function Mesh3D:makeNormals()
         -- vn[7] = normal[2]
         -- vn[8] = normal[3]
 
-        if not vp.Faces then
-            vp.Faces = {} 
+        if not vp.FaceNormal then
+            vp.FaceNormal = {} 
         end
 
-        if not v.Faces then
-            v.Faces = {} 
+        if not v.FaceNormal then
+            v.FaceNormal = {} 
         end
 
-        if not vn.Faces then
-            vn.Faces = {} 
+        if not vn.FaceNormal then
+            vn.FaceNormal = {} 
         end
 
-        local face = Vector3.new(normal[1], normal[2], normal[3])
+        local FaceNormal = Vector3.new(normal[1], normal[2], normal[3])
 
-        vp.Faces[#vp.Faces + 1] = face
-        v.Faces[#v.Faces + 1] = face
-        vn.Faces[#vn.Faces + 1] = face
+        vp.FaceNormal[#vp.FaceNormal + 1] = FaceNormal
+        v.FaceNormal[#v.FaceNormal + 1] = FaceNormal
+        vn.FaceNormal[#vn.FaceNormal + 1] = FaceNormal
+
+        local FaceInfo = {}
+        FaceInfo.Normal = FaceNormal
+        FaceInfo.Triangle = Triangle3D.new(Vector3.new(vp[1], vp[2], vp[3]), Vector3.new(v[1], v[2], v[3]), Vector3.new(vn[1], vn[2], vn[3]))
+
+        self.FacesInfos[#self.FacesInfos + 1] = FaceInfo
     end
 
     for i=1, #self.verts, 1 do
         local v = self.verts[i]
         local nor = Vector3.new()
-        for f = 1, #v.Faces do
-            nor = nor + v.Faces[f]
+        for f = 1, #v.FaceNormal do
+            nor = nor + v.FaceNormal[f]
         end
 
         nor:normalize()
@@ -445,6 +457,31 @@ Mesh3D.loadObjFile = function(path)
     return compiled
 end
 
+-- Return distance
+function Mesh3D:PickByRay(ray)
+    local box = self:GetWorldBox()
+    if  ray:IsIntersectBox(box) then
+        return self:PickFaceByRay(ray)
+    end
+
+    return -1
+end
+
+-- Return distance
+function Mesh3D:PickFaceByRay(ray)
+    if #self.FacesInfos == 0 then
+        return -1
+    end
+    
+    for i = 1, #self.FacesInfos do
+        local dis = ray:IntersectTriangle(self.transform3d * self.FacesInfos[i].Triangle, true)
+        if dis ~= -1 then
+            return dis
+        end
+    end
+    return -1
+end
+
 _G.MeshLine = {}
 
 function MeshLine.new(startpos, endpos)
@@ -553,3 +590,4 @@ function MeshLines:draw()
         self.lines[i]:draw()
     end
 end
+

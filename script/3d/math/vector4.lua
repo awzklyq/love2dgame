@@ -75,6 +75,15 @@ function Vector4:mulMatrix(mat)
     return self
 end
 
+function Vector4:GetVector3()
+    return Vector3(self.x, self.y, self.z)
+end
+
+function Vector4:Log(sss)
+    log("Vector4 ", sss)
+    log(self.x, self.y, self.z, self.w)
+end
+
 Vector4.dot = function(v1, v2)
     return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w;
 end
