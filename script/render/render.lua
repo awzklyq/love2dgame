@@ -103,7 +103,9 @@ Render.Point2DCollectId = 51
 
 Render.UIComboBoxId = 52
 
-Render.Triangle3DId = 36
+Render.Triangle3DId = 53
+
+Render.OptionalId = 54
 
 Render.getRenderIdName = function(id)
     if type(id) == "table" then
@@ -187,6 +189,8 @@ Render.getRenderIdName = function(id)
         return "UIComboBox"
     elseif Render.Triangle3DId == id then
         return "Triangle3D"
+    elseif Render.OptionalId == id then
+        return "Optional"
     end
     
     return "Null"
