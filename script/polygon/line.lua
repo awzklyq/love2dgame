@@ -35,6 +35,8 @@ function Line:setColor(r, g, b, a)
     self.color.a = a;
 end
 
+Line.SetColor = Line.setColor
+
 function Line:IsEqual(line)
     if self.x1 == line.x1 and self.y1 == line.y1 and  self.x2 == line.x2 and self.y2 == line.y2 then
         return true

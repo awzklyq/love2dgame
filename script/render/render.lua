@@ -107,6 +107,8 @@ Render.Triangle3DId = 53
 
 Render.OptionalId = 54
 
+Render.MathFunctionDisplayId = 55
+
 Render.getRenderIdName = function(id)
     if type(id) == "table" then
         id = id.renderid
@@ -191,6 +193,8 @@ Render.getRenderIdName = function(id)
         return "Triangle3D"
     elseif Render.OptionalId == id then
         return "Optional"
+    elseif Render.MathFunctionDisplayId == id then
+        return "MathFunctionDisplay"
     end
     
     return "Null"

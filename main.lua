@@ -65,6 +65,7 @@ dofile('script/polygon/polygon.lua')
 dofile('script/uisystem/uisystem.lua')
 
 dofile('script/math/math.lua')
+dofile('script/math/MathFunctionDisplay.lua')
 dofile('script/math/vector.lua')
 dofile('script/math/point2d.lua')
 dofile('script/math/complex.lua')
@@ -180,7 +181,7 @@ app.load(function()
 end)
 
 else
-	dofile('script/test/test_pickmesh.lua')--test_IntersectLine  test_BezierCurve.lua
+	dofile('script/test/test_MathFunctionDisplay.lua')--test_IntersectLine  test_BezierCurve.lua
 	-- dofile('script/demo/ball/demo_ball.lua')
 end
 --dofile()
