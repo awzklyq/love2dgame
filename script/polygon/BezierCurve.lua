@@ -8,7 +8,7 @@ function BezierCurve.new(p1, p2, p3, p4, seg)
     bz.P3 = p3
 
     if not p1 or not p2 or not p3 then
-        errorAssert(false, "BezierCurve : not p1 or not p2 or not p3 ")
+        _errorAssert(false, "BezierCurve : not p1 or not p2 or not p3 ")
     end
 
     bz.P4 = p4

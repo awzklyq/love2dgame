@@ -12,6 +12,7 @@ dofile('script/uisystem/scrollbar.lua')
 dofile('script/uisystem/checkbox.lua')
 dofile('script/uisystem/ColorPlane.lua')
 dofile('script/uisystem/ComboBox.lua')
+dofile('script/uisystem/CurveDataPlane.lua')
 
 local UISystem = UI.UISystem;
 UISystem.buttons = {};
@@ -22,6 +23,8 @@ UISystem.scrollbars = {};
 
 UISystem.checkboxs = {};
 UISystem.ComboBoxs = {};
+
+UISystem.CurveDataPlanes = {};
 
 UISystem.uiviews = {}
 
@@ -47,6 +50,8 @@ UISystem.removeUI = function( ui )
 		UISystem.RemoveUIFormTarry(UISystem.checkboxs, ui)
 	elseif UISystem.IsComboBox(ui) then
 		UISystem.RemoveUIFormTarry(UISystem.ComboBoxs, ui)
+	elseif UISystem.IsCurveDataPlane(ui) then
+		UISystem.RemoveUIFormTarry(UISystem.CurveDataPlanes, ui)
 	else
 		UISystem.RemoveUIFormTarry(UISystem.uiviews, ui)
 	end
@@ -64,6 +69,8 @@ UISystem.addUI = function( ui )
 		table.insert( UISystem.checkboxs, ui)
 	elseif UISystem.IsComboBox(ui) then
 		table.insert(UISystem.ComboBoxs, ui)
+	elseif UISystem.IsCurveDataPlane(ui) then
+		table.insert(UISystem.CurveDataPlanes, ui)
 	else
 		table.insert( UISystem.uiviews, ui)
 	end
@@ -91,6 +98,10 @@ UISystem.render = function( e )
 	end
 
 	for i, v in ipairs(UISystem.ComboBoxs) do
+		v:draw();
+	end
+
+	for i, v in ipairs(UISystem.CurveDataPlanes) do
 		v:draw();
 	end
 end
@@ -131,6 +142,10 @@ UISystem.isUIList = function( obj )
 	return obj and obj.type and obj.type == "UIList";
 end
 
+UISystem.IsCurveDataPlane = function( obj )
+	return obj and obj.renderid and obj.renderid == Render.CurveDataPlaneId;
+end
+
 UISystem.isUIView = function( obj, isview )
 
 	if ( isview == true ) then
@@ -139,7 +154,7 @@ UISystem.isUIView = function( obj, isview )
 		end
 	end
 
-	return ( obj.type == "UIView" ) or UISystem.IsButton( obj ) or UISystem.IsText( obj ) or UISystem.isTextArea( obj ) or UISystem.isTextInput( obj ) or  UISystem.IsComboBox( obj );
+	return ( obj.type == "UIView" ) or UISystem.IsButton( obj ) or UISystem.IsText( obj ) or UISystem.isTextArea( obj ) or UISystem.isTextInput( obj ) or  UISystem.IsComboBox( obj ) or  UISystem.IsCurveDataPlane( obj );
 end
 
 UI.get__x = function( self )
@@ -309,6 +324,12 @@ UISystem.mouseDown = function( b, x, y )
 		end
 	end
 
+	for i, v in ipairs(UISystem.CurveDataPlanes) do
+		if v.triggerMouseDown and v:triggerMouseDown( b, x, y ) then
+			SelectedUI[#SelectedUI + 1] = v
+		end
+	end
+
 	for i, v in ipairs(UISystem.checkboxs) do
 		if v.triggerMouseDown then
 			v:triggerMouseDown( b, x, y )
@@ -372,6 +393,15 @@ UISystem.mousemoved = function(x, y )
 	if not MouseMovedSelectedUI then
 		for i, v in ipairs(UISystem.scrollbars) do
 			if v.triggerMouseMoved and v:triggerMouseMoved(x, y ) then
+				MouseMovedSelectedUI = v
+				break
+			end
+		end
+	end
+
+	if not MouseMovedSelectedUI then
+		for i, v in ipairs(UISystem.CurveDataPlanes) do
+			if v.triggerMouseMoved and v:triggerMouseMoved( x, y ) then
 				MouseMovedSelectedUI = v
 				break
 			end

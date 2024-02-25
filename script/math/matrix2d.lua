@@ -417,6 +417,19 @@ function Matrix2D:Determinant( )
     -- return m[0][0] * m[1][1] * m[2][2] + m[0][1] * m[1][2] * m[2][0] + m[0][2] * m[1][0] * m[2][1]
 	-- 	 - m[0][0] * m[1][2] * m[2][1] - m[0][1] * m[1][0] * m[2][2] - m[0][2] * m[1][1] * m[2][0];
 end
+
+
+function Matrix2D:use(obj)
+    if not self.transform then
+        self.transform = love.math.newTransform()
+    end
+
+    self.transform:setMatrix(self[1], self[2], self[3],
+    self[4], self[5], self[6],
+    self[7], self[8], self[9])
+
+    love.graphics.applyTransform(self.transform);
+end
     
     
     --     this.getRotation( )

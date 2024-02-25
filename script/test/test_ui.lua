@@ -1,6 +1,8 @@
 
 FileManager.addAllPath("assert")
 
+RenderSet.BGColor = LColor.new(128,128,128,255)
+
 local btn = UI.Button.new( 10, 10, 100, 50, 'test', 'btn' )
 
 btn.x = 50
@@ -48,3 +50,7 @@ local cp = UI.ColorPlane.new( "test color", 300, 350, 60, 60)
 cp.ChangeEvent = function(value)
     value:Log('test color')
 end
+
+
+local cdp = UI.CurvelDataPlane.new(450, 200, 200, 200, 255)
+cdp:SetLineColor(0,0,255,255)

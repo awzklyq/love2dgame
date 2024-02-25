@@ -30,6 +30,8 @@ function Button.new( x, y, w, h, text, name )
 	btn.renderType = Button.Rect;
 	btn.tick = 0;
 
+	btn.renderid = Render.UIButtonId
+	
 	btn:reset( );
 	btn.type = "Button";
 	btn.IsVisible = true

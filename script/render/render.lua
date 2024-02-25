@@ -109,6 +109,8 @@ Render.OptionalId = 54
 
 Render.MathFunctionDisplayId = 55
 
+Render.CurvelDataPlaneId = 56
+
 Render.getRenderIdName = function(id)
     if type(id) == "table" then
         id = id.renderid
@@ -195,6 +197,8 @@ Render.getRenderIdName = function(id)
         return "Optional"
     elseif Render.MathFunctionDisplayId == id then
         return "MathFunctionDisplay"
+    elseif Render.CurvelDataPlaneId == id then
+        return "CurvelDataPlane"
     end
     
     return "Null"
@@ -205,6 +209,8 @@ Render.RenderObject = function(obj)
     love.graphics.push();
     if obj.transform and obj.transform.renderid == Render.MatrixId and obj.renderid ~= Render.EntityBodyId then
         obj.transform:use(obj);
+    elseif obj.transform and obj.transform.renderid == Render.Matrix2DId then
+
     end
 
     if obj.shader then
