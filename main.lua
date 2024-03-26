@@ -29,6 +29,7 @@ dofile('script/common/pbr.lua')
 dofile('script/common/radarfrustum.lua')
 dofile('script/common/SpaceSplit.lua')
 dofile('script/common/psnr.lua')
+dofile('script/common/optional.lua')
 
 dofile('script/file/file.lua')
 
@@ -154,7 +155,7 @@ dofile('script/shader/ImageAnimaShader.lua')
 
 dofile('script/render/imageanima.lua')
 
-
+dofile('script/raytrace/CPURaytraceUseDDA.lua')
 dofile 'script/ballgame/collision/collisionmanager.lua'
 dofile 'script/ballgame/collision/collisionbinder.lua'
 dofile 'script/ballgame/collision/collisiongroup.lua'
@@ -176,12 +177,15 @@ end
 
 _G.TEST = true
 if not _G.TEST then
-app.load(function()
-	_G.GroupManager.loadGroup("Login");
-end)
+
+	app.load(function()
+		_G.GroupManager.loadGroup("Login");
+	end)
 
 else
-	dofile('script/test/test_MathFunctionDisplay.lua')--test_IntersectLine  test_BezierCurve.lua
+	dofile('script/test/test_dda2d2.lua')--test_IntersectLine  test_BezierCurve.lua
 	-- dofile('script/demo/ball/demo_ball.lua')
 end
 --dofile()
+
+ 

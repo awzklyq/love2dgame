@@ -47,6 +47,13 @@ metatable_vector3.__eq = function(myvalue, value)
     return (myvalue.x == value.x and  myvalue.y == value.y and myvalue.z == value.z)
 end
 
+metatable_vector3.__call = function(mytable, x, y, z)
+    _errorAssert(type(x) == 'number' and type(y) == 'number' and type(z) == 'number',  'metatable_vector3.__call x, y, z ')
+    mytable.x = x
+    mytable.y = y
+    mytable.z = z
+end
+
 function Vector3.new(x ,y, z)
     local v = setmetatable({}, metatable_vector3);
     v.x = x or 0;
@@ -173,6 +180,10 @@ function Vector3.negative(v)
     return Vector3.new(-v.x, -v.y, -v.z)
 end
 
+function Vector3:IsZero()
+    return self.x == 0 and self.y == 0 and self.z == 0 
+end
+
 -- Vector3& Vector3::Cartesian2Cylindrical( )
 -- {
 -- 	_float xx = Math::Atan( y / x );
@@ -245,6 +256,11 @@ Vector3.lerp = function(a,b, lerp)
         math.lerp(a.y, b.y, math.clamp(lerp, 0, 1)),
         math.lerp(a.z, b.z, math.clamp(lerp, 0, 1))
 )
+    return result
+end
+
+Vector3.abs = function(v)
+    local result = Vector3.new(math.abs(v.x), math.abs(v.y), math.abs(v.z))
     return result
 end
 

@@ -111,6 +111,10 @@ Render.MathFunctionDisplayId = 55
 
 Render.CurvelDataPlaneId = 56
 
+Render.DDAStateFor2DId = 57
+
+Render.DDAStateFor3DId = 58
+
 Render.getRenderIdName = function(id)
     if type(id) == "table" then
         id = id.renderid
@@ -199,6 +203,10 @@ Render.getRenderIdName = function(id)
         return "MathFunctionDisplay"
     elseif Render.CurvelDataPlaneId == id then
         return "CurvelDataPlane"
+    elseif Render.DDAStateFor2DId == id then
+        return "DDAStateFor2D"
+    elseif Render.DDAStateFor3DId == id then
+        return "DDAStateFor3D"
     end
     
     return "Null"

@@ -1,6 +1,6 @@
 UI.CurvelDataPlane = {}
 local CurvelDataPlane = UI.CurvelDataPlane;
-function CurvelDataPlane.new( x, y, w, h, InNumber )
+function CurvelDataPlane.new( x, y, w, h, InNumber, text )
 	local CDP = UI.CreateMetatable(CurvelDataPlane);
 
 	CDP._x = x or 0;
@@ -19,6 +19,12 @@ function CurvelDataPlane.new( x, y, w, h, InNumber )
     CDP.PointDatas = {}
     CDP.PointDatas[#CDP.PointDatas + 1] = Vector.new(0, 0)
     CDP.PointDatas[#CDP.PointDatas + 1] = Vector.new(1, 1)
+
+    if text then
+        CDP.text =  UI.Text.new(text, 0, 0, 0, 0)---UI.Text.new( text, x, y, w, h );
+		CDP.text.text = text;
+		UI.UISystem.removeUI( CDP.text );
+    end
 
 	CDP:reset( );
     
@@ -129,6 +135,15 @@ function CurvelDataPlane:reset()
 end
 
 function CurvelDataPlane:ResetXYWH()
+    if self.text then
+
+        self.text.x = self._x
+        self.text.y = self._y - 25
+
+        self.text.h = 25
+
+        self.text.w = self.text.ow
+    end
     self.BackRect.x =  self._x
     self.BackRect.y =  self._y
     self.BackRect.w =  self._w
@@ -248,5 +263,9 @@ function CurvelDataPlane:draw()
 
     for i = 2, #self.PointDatas - 1 do
         self.PointDatas[i].Rect:draw()
+    end
+
+    if self.text then
+        self.text:draw()
     end
 end

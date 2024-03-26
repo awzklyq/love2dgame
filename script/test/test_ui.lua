@@ -52,5 +52,5 @@ cp.ChangeEvent = function(value)
 end
 
 
-local cdp = UI.CurvelDataPlane.new(450, 200, 200, 200, 255)
+local cdp = UI.CurvelDataPlane.new(450, 200, 200, 200, 255, "test CurvelDataPlane")
 cdp:SetLineColor(0,0,255,255)

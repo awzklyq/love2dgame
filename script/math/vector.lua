@@ -20,8 +20,14 @@ metatable_vector.__sub = function(myvalue, value)
 end
 
 metatable_vector.__mul = function(myvalue, value)
-    if type(value) == 'table' and value.renderid == Render.Matrix2DId then
-        return value:MulLeftVector2(myvalue)
+    if type(value) == 'table' then
+        if value.renderid == Render.Matrix2DId then
+            return value:MulLeftVector2(myvalue)
+        elseif value.renderid == Render.Vector2Id then
+            return Vector.new(myvalue.x * value.x, myvalue.y * value.y)
+        else
+            _errorAssert(false, 'function metatable_vector.__mul')
+        end
     else
         return Vector.new(myvalue.x * value, myvalue.y * value)
     end
@@ -37,6 +43,12 @@ end
 
 metatable_vector.__eq = function(myvalue, value)
     return myvalue.x == value.x and myvalue.y == value.y
+end
+
+metatable_vector.__call = function(mytable, x, y)
+    _errorAssert(type(x) == 'number' and type(y) == 'number',  'metatable_vector.__call x, y')
+    mytable.x = x
+    mytable.y = y
 end
 
 function Vector.new(x ,y)
@@ -83,6 +95,10 @@ function Vector:draw()
     end
 
     self.rect:draw()
+end
+
+function Vector:IsZero()
+    return self.x == 0 and self.y == 0
 end
     
 Vector.distance = function(v1, v2)
@@ -134,6 +150,10 @@ end
 
 Vector.copy = function(v)
     return Vector.new(v.x, v.y)
+end
+
+Vector.abs = function(v)
+    return Vector.new(math.abs(v.x), math.abs(v.y))
 end
 
 Vector.Copy = Vector.copy  

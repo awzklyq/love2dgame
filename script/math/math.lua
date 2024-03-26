@@ -243,6 +243,11 @@ end
 
 math.LeftMove = function(x, offset)
     assert(offset)
+
+    if luabit then
+        return luabit.lshift(x, offset)
+    end
+
     if offset < 1 then
         return x
     end
@@ -254,6 +259,11 @@ end
 
 math.RightMove = function(x, offset)
     assert(offset)
+
+    if luabit then
+        return luabit.rshift(x, offset)
+    end
+
     if offset < 1 then
         return x
     end
@@ -264,7 +274,11 @@ math.RightMove = function(x, offset)
     return r
 end
 
-math.BitXor = function(v1, v2, type)
+math.BitXor = function(v1, v2)
+    if luabit then
+        return luabit.bxor(v1, v2)
+    end
+
     local Step = 0
     local result = 0
 
@@ -286,7 +300,11 @@ math.BitXor = function(v1, v2, type)
     return result
 end
 
-math.BitAnd = function(v1, v2, type)
+math.BitAnd = function(v1, v2)
+    if luabit then
+        return luabit.band(v1, v2)
+    end
+
     local Step = 0
     local result = 0
 
@@ -308,7 +326,11 @@ math.BitAnd = function(v1, v2, type)
     return result
 end
 
-math.BitOr = function(v1, v2, type)
+math.BitOr = function(v1, v2)
+    if luabit then
+        return luabit.bor(v1, v2)
+    end
+
     local Step = 0
     local result = 0
 
