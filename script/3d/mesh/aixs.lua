@@ -30,6 +30,13 @@ function Aixs.new(x, y, z, length)-- lw :line width
     return aixs
 end
 
+function Aixs:SetTransform(transform3d)
+    self.transform3d = transform3d
+    self.x_aix.transform3d = self.transform3d
+    self.y_aix.transform3d = self.transform3d
+    self.z_aix.transform3d = self.transform3d
+end
+
 function Aixs:draw()
     self.x_aix:draw()
     self.y_aix:draw()

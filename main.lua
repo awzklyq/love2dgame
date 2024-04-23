@@ -73,6 +73,7 @@ dofile('script/math/complex.lua')
 dofile('script/math/matrix.lua')
 dofile('script/math/matrix2d.lua')
 dofile('script/math/matrixs.lua')
+dofile('script/math/RotationMatrix.lua')
 dofile 'script/math/kmeans.lua'
 dofile('script/3d/math/vector3.lua')
 dofile('script/3d/math/vector4.lua')
@@ -183,7 +184,7 @@ if not _G.TEST then
 	end)
 
 else
-	dofile('script/test/test_dda2d2.lua')--test_IntersectLine  test_BezierCurve.lua
+	dofile('script/test/test_rotationmatrix.lua')--test_IntersectLine  test_BezierCurve.lua
 	-- dofile('script/demo/ball/demo_ball.lua')
 end
 --dofile()

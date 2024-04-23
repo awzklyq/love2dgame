@@ -88,6 +88,8 @@ function Vector3:normalize()
     return self
 end
 
+Vector3.Normalize = Vector3.normalize
+
 function Vector3:getShaderValue()
     return{self.x, self.y, self.z}
 end

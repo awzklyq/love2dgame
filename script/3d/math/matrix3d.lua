@@ -75,6 +75,16 @@ Matrix3D.createFromNumbers = function(...)
     return mat;
 end
 
+Matrix3D.createFromVectors = function(XAxis, YAxis, ZAxis, WAxis)
+	return Matrix3D.createFromNumbers(
+		XAxis.x, XAxis.y, XAxis.z, 0,
+		YAxis.x, YAxis.y, YAxis.z, 0,
+		ZAxis.x, ZAxis.y, ZAxis.z, 0,
+		WAxis.x, WAxis.y, WAxis.z, 1
+
+	);
+end
+
 function Matrix3D:getMatrixXY(x,y)
     return self[x + (y-1)*4]
 end
@@ -212,9 +222,15 @@ end
 			
 function Matrix3D:mulTranslationRight(x, y, z)
 	local mm = Matrix3D.new()
-    mm[13] = x
-    mm[14] = y
-    mm[15] = z
+	if type(x) == "table" and x.renderid == Render.Vector3Id then
+		mm[13] = x.x
+		mm[14] = x.y
+		mm[15] = x.z
+	else
+		mm[13] = x
+		mm[14] = y
+		mm[15] = z
+	end
 	self:mulLeft(Matrix3D.transpose(mm))
 end
 

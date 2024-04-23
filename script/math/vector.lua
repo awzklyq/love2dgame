@@ -83,6 +83,8 @@ function Vector:normalize()
     return self
 end
 
+Vector.Normalize = Vector.normalize
+
 function Vector:mul(value)
     self.x = self.x  * value;
     self.y = self.y  * value;

@@ -648,6 +648,11 @@ math.ArrayIdentity = function(v)
     return Result
 end
 
+math.IsNearlyEqual = function(A, B, SMALL_NUMBER)
+    local ErrorTolerance = SMALL_NUMBER or math.SMALL_NUMBER
+    return math.abs( A - B ) <= ErrorTolerance;
+end
+
 math.defaulttransform =  love.math.newTransform( );
 math.MinNumber = 0.000001;
 math.MaxNumber = 999999.0;
@@ -655,6 +660,9 @@ math.cEpsilon = 0.000001;
 
 math.maxFloat	=  3.402823466e+38;
 math.minFloat	= -3.402823466e+38;
+
+math.KINDA_SMALL_NUMBER	 = 1.e-4
+math.SMALL_NUMBER = 1.e-8
 
 math.c2pi = math.pi * 2
 math.invpi = 1 / math.pi
