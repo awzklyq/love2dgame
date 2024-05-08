@@ -143,7 +143,7 @@ dofile 'script/postprocess/VelocityBuff.lua'
 dofile 'script/postprocess/depthoffield.lua'
 dofile 'script/postprocess/godray.lua'
 dofile 'script/postprocess/watercolorfilter.lua'
-
+dofile 'script/postprocess/fog.lua'
 dofile 'script/3d/effect/motionvector.lua'
 
 dofile 'script/3d/math/edge3d.lua'
@@ -184,7 +184,7 @@ if not _G.TEST then
 	end)
 
 else
-	dofile('script/test/test_rotationmatrix.lua')--test_IntersectLine  test_BezierCurve.lua
+	dofile('script/test/test_fog.lua')--test_IntersectLine  test_BezierCurve.lua
 	-- dofile('script/demo/ball/demo_ball.lua')
 end
 --dofile()

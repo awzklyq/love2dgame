@@ -39,6 +39,7 @@ function Scene3D.new()
     scene.needSimpleSSGI = false;
     scene.needSSAO = false
     scene.needSSDO = false
+    scene.needFog = false
     scene.needToneMapping = false;
 
     scene.needVelocityBuff = false;
@@ -473,6 +474,10 @@ function Scene3D:drawCanvaColor()
 
     if self.needOutLine then
         rendercolor = OutLine.Execute(rendercolor)
+    end
+
+    if self.needFog then
+        rendercolor = FogNode.Execute(rendercolor, self.canvasdepth)
     end
 
     rendercolor:draw()

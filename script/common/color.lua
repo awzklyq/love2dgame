@@ -10,6 +10,10 @@ function LColor.new(r, g, b, a)
     return color;
 end
 
+function LColor:GetShaderValue()
+    return {self._r, self._g, self._b, self._a}
+end
+
 function LColor:GetMortonCodeRGB()
     local Morton = math.MortonCode3( self.r / 255 * 1023 );
     Morton = math.BitOr(Morton, math.LeftMove(math.MortonCode3( self.g / 255 * 1023) ,1));

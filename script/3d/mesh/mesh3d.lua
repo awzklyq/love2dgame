@@ -194,19 +194,17 @@ function Mesh3D:useLights(alphatest)
     end
     local directionlights = _G.Lights.getDirectionLights()
 
-    if #directionlights == 0 then
-        return
-    end
-
-    for i = 1, #directionlights do
-        local light = directionlights[i]
-        if self.shader:hasUniform( "directionlight"..i) then
-            self.shader:send("directionlight"..i, {light.dir.x, light.dir.y, light.dir.z, 1})
+    if #directionlights > 0 then
+        for i = 1, #directionlights do
+            local light = directionlights[i]
+            if self.shader:hasUniform( "directionlight"..i) then
+                self.shader:send("directionlight"..i, {light.dir.x, light.dir.y, light.dir.z, 1})
+            end
+            if self.shader:hasUniform( "directionlightcolor"..i) then
+                self.shader:send("directionlightcolor"..i, {light.color._r, light.color._g, light.color._b, light.color._a})
+            end
+            self.shader:setShadowParam()
         end
-        if self.shader:hasUniform( "directionlightcolor"..i) then
-            self.shader:send("directionlightcolor"..i, {light.color._r, light.color._g, light.color._b, light.color._a})
-        end
-        self.shader:setShadowParam()
     end
 end
 

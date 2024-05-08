@@ -208,18 +208,18 @@ function Shader.GetBase3DPSShaderCode(AlphaTest, PBR)
             local light = directionlights[i]
             pixelcode = pixelcode .. " vec3 lightdir = normalize(directionlight"..i..".xyz);\n";
             pixelcode = pixelcode .. " vec3 lightcolor = normalize(directionlightcolor"..i..".xyz);\n";
-            pixelcode = pixelcode .. " dotn = clamp(dot(lightdir, normal.xyz), 0.1, 10);\n ";
+            pixelcode = pixelcode .. " dotn = clamp(dot(lightdir, normal.xyz), 0.2, 10);\n ";
             -- pixelcode = pixelcode .. " texcolor.xyz = texcolor.xyz * directionlightcolor"..i..".xyz * dotn; ";
             if PBRData.IsUsePBR(PBR) then
                 pixelcode = pixelcode .. " texcolor.xyz = ".._G.ShaderFunction.PBRFunctionName.."(Roughness, Metallic, F0, texcolor.xyz, viewdir.xyz, lightdir, normal.xyz);\n";
             else
                 pixelcode = pixelcode .. [[
                 vec3 _Specluar = lightcolor;//vec3(1,1,1);
-                float _Intensity = 1;
+                float _Intensity = 2;
                 float _Gloss = 1.5;
                 vec3 reflectDir = normalize(reflect(-lightdir.xyz,normal.xyz));
-                vec3 specular = _Specluar * _Intensity * pow(clamp(dot(reflectDir, viewdir.xyz), 0, 1),_Gloss);
-                texcolor.xyz = texcolor.xyz * lightcolor * dotn + specular;
+                vec3 specular = _Specluar * pow(clamp(dot(reflectDir, viewdir.xyz), 0, 1),_Gloss);
+                texcolor.xyz = texcolor.xyz * lightcolor * dotn * _Intensity + specular;
                 
             ]]
             end
