@@ -94,6 +94,8 @@ function Vector3:getShaderValue()
     return{self.x, self.y, self.z}
 end
 
+Vector3.GetShaderValue = Vector3.getShaderValue
+
 function Vector3:mulSelf(value)
     self.x = self.x  * value;
     self.y = self.y  * value;

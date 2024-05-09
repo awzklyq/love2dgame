@@ -43,7 +43,7 @@ function Scene3D.new()
     scene.needToneMapping = false;
 
     scene.needVelocityBuff = false;
-
+    scene.needLights = false;
     VelocityBuffNode.InitDynamicMeshs()
     return scene
 end
@@ -217,12 +217,12 @@ end
 function Scene3D:draw(isdrawCanvaColor)
     self:drawDepth()
 
-    for i = 1, #self.lights do
-        local light = self.lights[i]
-        if light.directionLight then            
-            _G.useLight(light.directionLight)
-        end
-    end
+    -- for i = 1, #self.lights do
+    --     local light = self.lights[i]
+    --     if light.directionLight then            
+    --         _G.useLight(light.directionLight)
+    --     end
+    -- end
 
     MotionVectorNode:BeforeExecute()
 
@@ -277,9 +277,9 @@ function Scene3D:draw(isdrawCanvaColor)
         self:DrawAlphaTest2(AlphaTestNodes)
     end
 
-    for i = 1, #self.lights do
-        _G.popLight()
-    end
+    -- for i = 1, #self.lights do
+    --     _G.popLight()
+    -- end
 
     self:drawNormalmap()
 
@@ -419,6 +419,9 @@ function Scene3D:drawCanvaColor()
     --     rendercolor = ToneMapping.Execute(rendercolor)
     -- end
 
+    if self.needLights then
+        rendercolor = LightNode.Execute(rendercolor, self.canvasdepth, self.canvasnormal)
+    end
     if self.needVelocityBuff then
         VelocityBuffNode.Execute(self.screenwidth, self.screenheight)
 

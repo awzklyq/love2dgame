@@ -61,3 +61,30 @@ _G.ShaderFunction.GetESMValue = [[
         return 1 - Shadow;
     }
 ]]
+
+_G.ShaderFunction.ScreenAndViewPortFunc = [[
+vec2 ViewportUVToScreenPos(vec2 ViewportUV)
+{
+    return vec2(2 * ViewportUV.x - 1, 1 - 2 * ViewportUV.y);
+}
+
+vec2 ScreenPosToViewportUV(vec2 ScreenPos)
+{
+    return vec2(0.5 + 0.5 * ScreenPos.x, 0.5 - 0.5 * ScreenPos.y);
+}
+]]
+
+_G.ShaderFunction.LightFunc = [[
+vec3 LightDiffuseColor(vec3 LightColor, vec3 LightDir, vec3 WorldNormal)
+{
+    return LightColor * max(0, dot(-LightDir, WorldNormal));
+} 
+
+vec3 LightSpecularColorPhong(vec3 LightColor, vec3 LightDir, vec3 WorldNormal, vec3 Viewdir)
+{
+    vec3 RL = reflect(-LightDir, WorldNormal);  //Reflection vector
+    float spec = pow(max(dot(Viewdir, RL), 0.0), 32);
+    vec3 SpecularColor = LightColor * spec;
+    return SpecularColor;
+} 
+]]

@@ -173,6 +173,7 @@ function Shader.GeNormal3DShader(projectionMatrix, viewMatrix, modelMatrix)
     end
     
     pixelcode = pixelcode .. [[
+        uniform mat4 ModelMatrixRotation;
         vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
         {
             ]]
@@ -181,11 +182,16 @@ function Shader.GeNormal3DShader(projectionMatrix, viewMatrix, modelMatrix)
             --pixelcode = pixelcode .. "vec4 normal = (texture2D(normalmap, texture_coords) - vec4(0.5, 0.5, 0.5, 0.5)) * 2;\n";
             pixelcode = pixelcode .. "vec4 normal = texture2D(normalmap, texture_coords);\n";
         elseif Shader.neednormal > 0 then
-            pixelcode = pixelcode.."vec4 normal = normalize(vnormal);\n";
+            pixelcode = pixelcode.."vec4 normal = vnormal;\n";
             
         else
             pixelcode = pixelcode.."vec4 normal = vec4(0 ,0, 0, 0); \n"
         end
+
+        pixelcode = pixelcode .. [[
+            normal = normalize(ModelMatrixRotation * normal);
+        ]]
+
         if normalmap then
             pixelcode = pixelcode .. [[
                 return vec4(normal.x, normal.y, normal.z,1);
@@ -193,7 +199,7 @@ function Shader.GeNormal3DShader(projectionMatrix, viewMatrix, modelMatrix)
             ]]
         else
             pixelcode = pixelcode .. [[
-                return (vec4(normal.x, normal.y, normal.z,1) + vec4(1,1,1,1)) * 0.5;
+                return (vec4(normal.x, normal.y, normal.z, 1) + vec4(1,1,1,1)) * 0.5;
                 }
             ]]
         end
@@ -206,7 +212,6 @@ function Shader.GeNormal3DShader(projectionMatrix, viewMatrix, modelMatrix)
     if not normalmap and Shader.neednormal > 0 then
         vertexcode = vertexcode .. "varying vec4 vnormal; \n"
     end
-    vertexcode = vertexcode .. "\n"
     vertexcode = vertexcode..[[
         vec4 position(mat4 transform_projection, vec4 vertex_position)
         {
@@ -232,6 +237,7 @@ function Shader.GeNormal3DShader(projectionMatrix, viewMatrix, modelMatrix)
 
         if modelMatrix then
             obj:send('modelMatrix', modelMatrix)
+            shader:sendValue('ModelMatrixRotation', modelMatrix:GetRotationMatrix())
         end
 
         if viewMatrix then
@@ -253,6 +259,7 @@ function Shader.GeNormal3DShader(projectionMatrix, viewMatrix, modelMatrix)
  
      if modelMatrix then
          shader:send('modelMatrix', modelMatrix)
+         shader:sendValue('ModelMatrixRotation', modelMatrix:GetRotationMatrix())
      end
  
      if viewMatrix then

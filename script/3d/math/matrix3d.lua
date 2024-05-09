@@ -89,6 +89,20 @@ function Matrix3D:getMatrixXY(x,y)
     return self[x + (y-1)*4]
 end
 
+function Matrix3D:GetRotationMatrix()
+    local rx = Vector3.new(self[1], self[2], self[3]):Normalize()
+	local ry = Vector3.new(self[5], self[6], self[7]):Normalize()
+	local rz = Vector3.new(self[9], self[10], self[11]):Normalize()
+
+	return Matrix3D.createFromNumbers(
+		rx.x, rx.y, rx.z, 0,
+		ry.x, ry.y, ry.z, 0,
+		rz.x, rz.y, rz.z, 0,
+		0, 0, 0, 1
+
+	);
+end
+
 
 -- return the matrix that results from the two given matrices multiplied together
 function Matrix3D.matrixMult(a,b)
