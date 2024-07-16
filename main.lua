@@ -57,6 +57,7 @@ dofile('script/3d/mesh/aixs.lua')
 
 dofile('script/polygon/triangle.lua')
 dofile('script/polygon/triangle3d.lua')
+dofile('script/polygon/MeshVolum.lua')
 
 dofile('script/3d/terrain/tile.lua')
 dofile 'script/3d/terrain/tileshader.lua'
@@ -185,7 +186,7 @@ if not _G.TEST then
 	end)
 
 else
-	dofile('script/test/test_PointLight.lua')--test_IntersectLine  test_BezierCurve.lua
+	dofile('script/test/test_MeshVolume.lua')--test_IntersectLine  test_BezierCurve.lua
 	-- dofile('script/demo/ball/demo_ball.lua')
 end
 --dofile()

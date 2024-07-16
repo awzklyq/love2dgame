@@ -155,6 +155,8 @@ function Mesh3D:makeNormals()
         local FaceInfo = {}
         FaceInfo.Normal = FaceNormal
         FaceInfo.Triangle = Triangle3D.new(Vector3.new(vp[1], vp[2], vp[3]), Vector3.new(v[1], v[2], v[3]), Vector3.new(vn[1], vn[2], vn[3]))
+        FaceInfo.TriangleCenter = (FaceInfo.Triangle.P1 + FaceInfo.Triangle.P2 + FaceInfo.Triangle.P3) / 3
+        FaceInfo.TriangleMortonCode = FaceInfo.TriangleCenter:GetMortonCode3()
 
         self.FacesInfos[#self.FacesInfos + 1] = FaceInfo
     end
@@ -171,6 +173,84 @@ function Mesh3D:makeNormals()
         v[6] = nor.x
         v[7] = nor.y
         v[8] = nor.z
+    end
+
+    table.sort(self.FacesInfos, function(v1,v2)
+        if v1.TriangleMortonCode > v2.TriangleMortonCode then
+            return false
+        end
+        return true
+    end)
+
+    self:BuildBVHFormFacesInfos();
+end
+
+function Mesh3D:BuildBVHFormFacesInfos()
+    self.FacesInfosBVH = {}
+    local _Len =  #self.FacesInfos
+    for i = 1, #self.FacesInfos + 4, 4 do
+        local _box = BoundBox.new()
+        local _IndexArray = {}
+        if i <= _Len then
+            _box = _box + self.FacesInfos[i].Triangle.P1
+            _box = _box + self.FacesInfos[i].Triangle.P2
+            _box = _box + self.FacesInfos[i].Triangle.P3
+            _IndexArray[#_IndexArray + 1] = i
+        end
+
+        if i + 1 <= _Len then
+            _box = _box + self.FacesInfos[i + 1].Triangle.P1
+            _box = _box + self.FacesInfos[i + 1].Triangle.P2
+            _box = _box + self.FacesInfos[i + 1].Triangle.P3
+            _IndexArray[#_IndexArray + 1] = i + 1
+        end
+
+        if i + 2 <= _Len then
+            _box = _box + self.FacesInfos[i + 2].Triangle.P1
+            _box = _box + self.FacesInfos[i + 2].Triangle.P2
+            _box = _box + self.FacesInfos[i + 2].Triangle.P3
+            _IndexArray[#_IndexArray + 1] = i + 2
+        end
+
+        if i + 3 <= _Len then
+            _box = _box + self.FacesInfos[i + 3].Triangle.P1
+            _box = _box + self.FacesInfos[i + 3].Triangle.P2
+            _box = _box + self.FacesInfos[i + 3].Triangle.P3
+            _IndexArray[#_IndexArray + 1] = i + 3
+        end
+
+        -- if i + 4 <= _Len then
+        --     _box = _box + self.FacesInfos[i + 4].Triangle.P1
+        --     _box = _box + self.FacesInfos[i + 4].Triangle.P2
+        --     _box = _box + self.FacesInfos[i + 4].Triangle.P3
+        --     _IndexArray[#_IndexArray + 1] = i + 4
+        -- end
+
+        -- if i + 5 <= _Len then
+        --     _box = _box + self.FacesInfos[i + 5].Triangle.P1
+        --     _box = _box + self.FacesInfos[i + 5].Triangle.P2
+        --     _box = _box + self.FacesInfos[i + 5].Triangle.P3
+        --     _IndexArray[#_IndexArray + 1] = i + 5
+        -- end
+
+        -- if i + 6 <= _Len then
+        --     _box = _box + self.FacesInfos[i + 6].Triangle.P1
+        --     _box = _box + self.FacesInfos[i + 6].Triangle.P2
+        --     _box = _box + self.FacesInfos[i + 6].Triangle.P3
+        --     _IndexArray[#_IndexArray + 1] = i + 6
+        -- end
+
+        -- if i + 7 <= _Len then
+        --     _box = _box + self.FacesInfos[i + 7].Triangle.P1
+        --     _box = _box + self.FacesInfos[i + 7].Triangle.P2
+        --     _box = _box + self.FacesInfos[i + 7].Triangle.P3
+        --     _IndexArray[#_IndexArray + 1] = i + 7
+        -- end
+
+        if #_IndexArray > 0 then
+            self.FacesInfosBVH[#self.FacesInfosBVH + 1] = {Box = _box, IndexArray = _IndexArray}
+        end
+       
     end
 end
 
@@ -392,10 +472,6 @@ Mesh3D.loadObjFile = function(path)
                 store[#store+1] = tonumber(num)
             end
 
-            -- log("aaaaa", #store)
-            -- for jjj = 1, #store do
-            --     log('bbbbbbbbbbb', store[jjj])
-            -- end
             faces[#faces+1] = store
         end
     end
@@ -422,28 +498,33 @@ Mesh3D.loadObjFile = function(path)
     local compiled = {}
     for i,face in pairs(faces) do
         if NeedCreateNormal then
-            compiled[#compiled +1] = concatTables(verts[face[1]], uvs[face[2]], normals[i])
             compiled[#compiled +1] = concatTables(verts[face[3]], uvs[face[4]], normals[i])
+            compiled[#compiled +1] = concatTables(verts[face[1]], uvs[face[2]], normals[i])
+           -- compiled[#compiled +1] = concatTables(verts[face[3]], uvs[face[4]], normals[i])
             compiled[#compiled +1] = concatTables(verts[face[5]], uvs[face[6]], normals[i])
         else
             if #uvs > 0 then
-                compiled[#compiled +1] = concatTables(verts[face[1]], uvs[face[2]], normals[face[3]])
                 compiled[#compiled +1] = concatTables(verts[face[4]], uvs[face[5]], normals[face[6]])
+                compiled[#compiled +1] = concatTables(verts[face[1]], uvs[face[2]], normals[face[3]])
+                --compiled[#compiled +1] = concatTables(verts[face[4]], uvs[face[5]], normals[face[6]])
                 compiled[#compiled +1] = concatTables(verts[face[7]], uvs[face[8]], normals[face[9]])
             else
                 if #face > 6 then
-                    compiled[#compiled +1] = concatTables(verts[face[1]], nil, normals[face[2]])
                     compiled[#compiled +1] = concatTables(verts[face[3]], nil, normals[face[4]])
+                    compiled[#compiled +1] = concatTables(verts[face[1]], nil, normals[face[2]])
+                    --compiled[#compiled +1] = concatTables(verts[face[3]], nil, normals[face[4]])
                     compiled[#compiled +1] = concatTables(verts[face[5]], nil, normals[face[6]])
                     
                     
+                    compiled[#compiled +1] = concatTables(verts[face[7]], nil, normals[face[8]])
                     -- compiled[#compiled +1] = concatTables(verts[face[3]], nil, normals[face[4]])
                     compiled[#compiled +1] = concatTables(verts[face[5]], nil, normals[face[6]])
-                    compiled[#compiled +1] = concatTables(verts[face[7]], nil, normals[face[8]])
+                    --compiled[#compiled +1] = concatTables(verts[face[7]], nil, normals[face[8]])
                     compiled[#compiled +1] = concatTables(verts[face[1]], nil, normals[face[2]])
                 else
-                    compiled[#compiled +1] = concatTables(verts[face[1]], nil, normals[face[2]])
                     compiled[#compiled +1] = concatTables(verts[face[3]], nil, normals[face[4]])
+                    compiled[#compiled +1] = concatTables(verts[face[1]], nil, normals[face[2]])
+                    --compiled[#compiled +1] = concatTables(verts[face[3]], nil, normals[face[4]])
                     compiled[#compiled +1] = concatTables(verts[face[5]], nil, normals[face[6]])                    
                 end
 
@@ -473,11 +554,50 @@ function Mesh3D:PickFaceByRay(ray)
     
     for i = 1, #self.FacesInfos do
         local dis = ray:IntersectTriangle(self.transform3d * self.FacesInfos[i].Triangle, true)
-        if dis ~= -1 then
+        if dis > 0 then
             return dis
         end
     end
     return -1
+end
+
+function Mesh3D:PickFaceAndBVHByRay(ray, backcull)
+    if #self.FacesInfos == 0 or #self.FacesInfosBVH == 0 then
+        return -1
+    end
+
+    for i = 1, #self.FacesInfosBVH do
+        local _FaceBVH = self.FacesInfosBVH[i]
+       if ray:IsIntersectBox(self.transform3d * _FaceBVH.Box) then
+            for _, index in ipairs(_FaceBVH.IndexArray) do
+                local dis = ray:IntersectTriangle(self.transform3d * self.FacesInfos[index].Triangle, backcull)
+                if dis > 0 then
+                    return dis
+                end
+            end
+       end
+    end
+
+    return -1
+end
+
+function Mesh3D:IntersectFaceAndBVHByBox(InBox)
+    if #self.FacesInfos == 0 or #self.FacesInfosBVH == 0 then
+        return false
+    end
+
+    for i = 1, #self.FacesInfosBVH do
+        local _FaceBVH = self.FacesInfosBVH[i]
+        if BoundBox.checkIntersectBox(InBox, self.transform3d * _FaceBVH.Box) then
+            for _, index in ipairs(_FaceBVH.IndexArray) do
+                if InBox:IntersectTriangleSimilar(self.transform3d * self.FacesInfos[index].Triangle) then
+                    return true
+                end
+            end
+        end
+    end
+
+    return false
 end
 
 _G.MeshLine = {}

@@ -193,19 +193,19 @@ function Scene3D:reseizeScreen(w, h)
     self.canvasnormal.renderWidth = w
     self.canvasnormal.renderHeight = h
 
-    self.normal_depth_buffer = Canvas.new(w, h, {format = "depth32fstencil8", readable = true, msaa = 0, mipmaps="none"})
+    self.normal_depth_buffer = Canvas.new(w, h, {format = "depth24stencil8", readable = true, msaa = 0, mipmaps="none"})
     self.normal_depth_buffer.renderWidth = w
     self.normal_depth_buffer.renderHeight = h
 
-    self.depthmap_depth_buffer = Canvas.new(w, h, {format = "depth32fstencil8", readable = true, msaa = 0, mipmaps="none"})
+    self.depthmap_depth_buffer = Canvas.new(w, h, {format = "depth24stencil8", readable = true, msaa = 0, mipmaps="none"})
     self.depthmap_depth_buffer.renderWidth = w
     self.depthmap_depth_buffer.renderHeight = h
 
-    self.normalmap_depth_buffer = Canvas.new(w, h, {format = "depth32fstencil8", readable = true, msaa = 0, mipmaps="none"})
+    self.normalmap_depth_buffer = Canvas.new(w, h, {format = "depth24stencil8", readable = true, msaa = 0, mipmaps="none"})
     self.normalmap_depth_buffer.renderWidth = w
     self.normalmap_depth_buffer.renderHeight = h
 
-    self.alphatest_depth_buffer = Canvas.new(w, h, {format = "depth32fstencil8", readable = true, msaa = 0, mipmaps="none"})
+    self.alphatest_depth_buffer = Canvas.new(w, h, {format = "depth24stencil8", readable = true, msaa = 0, mipmaps="none"})
     self.alphatest_depth_buffer.renderWidth = w
     self.alphatest_depth_buffer.renderHeight = h
 
@@ -227,7 +227,7 @@ function Scene3D:draw(isdrawCanvaColor)
     MotionVectorNode:BeforeExecute()
 
     local AlphaTestNodes = {}
-    love.graphics.setMeshCullMode("front")
+    love.graphics.setMeshCullMode("back")
     love.graphics.setDepthMode("less", true)
     love.graphics.setCanvas({self.CanvasColor.obj, depthstencil = self.depthmap_depth_buffer.obj})
     love.graphics.clear(self.bgColor._r, self.bgColor._g, self.bgColor._b, self.bgColor._a)
@@ -295,7 +295,7 @@ end
 function Scene3D:DrawAlphaTest(AlphaTestNodes)
     if #AlphaTestNodes == 0 then return end
 
-    love.graphics.setMeshCullMode("front")
+    love.graphics.setMeshCullMode("back")
     love.graphics.setDepthMode("less", true)
     love.graphics.setCanvas({self.CanvasColor.obj, depthstencil = self.depthmap_depth_buffer.obj})
     for i = 1, #AlphaTestNodes do
@@ -313,7 +313,7 @@ function Scene3D:DrawAlphaTest(AlphaTestNodes)
     love.graphics.setMeshCullMode("none")
 
     -------------------------------------
-    love.graphics.setMeshCullMode("front")
+    love.graphics.setMeshCullMode("back")
     love.graphics.setDepthMode("less", false)
     love.graphics.setCanvas({self.AlphaTestDepth.obj})
     love.graphics.clear(0,0,0)
@@ -373,7 +373,7 @@ function Scene3D:drawNormalmap()
 
     Shader.neednormal = 1
     love.graphics.setCanvas({self.canvasnormal.obj, depthstencil = self.normalmap_depth_buffer.obj})
-    love.graphics.setMeshCullMode("front")
+    love.graphics.setMeshCullMode("back")
     love.graphics.setDepthMode("less", true)
     love.graphics.clear(0, 0, 0, 0)
 
@@ -393,7 +393,7 @@ end
 
 function Scene3D:drawDepth()
     love.graphics.setCanvas({self.canvasdepth.obj, depthstencil = self.depthmap_depth_buffer.obj})
-    love.graphics.setMeshCullMode("front")
+    love.graphics.setMeshCullMode("back")
     love.graphics.setDepthMode("less", true)
     love.graphics.clear(1,1,1,1)
 
@@ -420,7 +420,7 @@ function Scene3D:drawCanvaColor()
     -- end
 
     if self.needLights then
-        rendercolor = LightNode.Execute(rendercolor, self.canvasdepth, self.canvasnormal)
+        rendercolor = LightNode.Execute(rendercolor, self.depthmap_depth_buffer, self.canvasnormal)
     end
     if self.needVelocityBuff then
         VelocityBuffNode.Execute(self.screenwidth, self.screenheight)
@@ -429,24 +429,24 @@ function Scene3D:drawCanvaColor()
     end
 
     if self.needSimpleSSGI then
-        rendercolor = SimpleSSGINode.Execute(rendercolor, self.canvasnormal, self.canvasdepth)
+        rendercolor = SimpleSSGINode.Execute(rendercolor, self.canvasnormal, self.depthmap_depth_buffer)
     end
 
     if self.needSSDO then
-        rendercolor = SSDONode.Execute(rendercolor, self.canvasnormal, self.canvasdepth, self)
+        rendercolor = SSDONode.Execute(rendercolor, self.canvasnormal, self.depthmap_depth_buffer, self)
     end
 
     if self.needSSAO then
-        rendercolor = SSAONode.Execute(rendercolor, self.canvasnormal, self.canvasdepth)
+        rendercolor = SSAONode.Execute(rendercolor, self.canvasnormal, self.depthmap_depth_buffer)
     elseif self.needHBAO then
-        rendercolor = HBAONode.Execute(rendercolor, self.canvasdepth)
+        rendercolor = HBAONode.Execute(rendercolor, self.depthmap_depth_buffer)
     elseif self.needGTAO then
         local camera3d = _G.getGlobalCamera3D()
-        rendercolor = GTAONode.Execute(rendercolor, self.canvasnormal, self.canvasdepth, camera3d.eye)
+        rendercolor = GTAONode.Execute(rendercolor, self.canvasnormal, self.depthmap_depth_buffer, camera3d.eye)
     end
 
     if self.needTAA then
-        rendercolor = TAANode.Execute(canvas1, self.canvasnormal, self.canvasdepth)
+        rendercolor = TAANode.Execute(canvas1, self.canvasnormal, self.depthmap_depth_buffer)
     end
 
     if self.needFXAA then
@@ -480,7 +480,7 @@ function Scene3D:drawCanvaColor()
     end
 
     if self.needFog then
-        rendercolor = FogNode.Execute(rendercolor, self.canvasdepth)
+        rendercolor = FogNode.Execute(rendercolor, self.depthmap_depth_buffer)
     end
 
     rendercolor:draw()
@@ -496,7 +496,7 @@ function Scene3D:drawDirectionLightShadow(isdebug)
         local directionLight = lightnode.directionLight
         if directionLight and lightnode.needshadow then
             love.graphics.setCanvas({lightnode.shadowmap.obj, depthstencil = lightnode.depth_buffer.obj})
-            love.graphics.setMeshCullMode("front")
+            love.graphics.setMeshCullMode("back")
             love.graphics.setDepthMode("less", true)
             love.graphics.clear(1,1,1,1)
             -- love.graphics.clear(0,0,0)
@@ -654,7 +654,7 @@ function Scene3D:drawDirectionLightCSM(isdebug)
                 RenderSet.pushProjectMatrix(Matrix3D.transpose(shadowmapproj))
                 
                 love.graphics.setCanvas({lightnode.shadowmap.obj, depthstencil = lightnode.depth_buffer.obj, ViewportX = RenderSet.getShadowMapSize() * (CSMIndex - 1), ViewportY = 0, ViewportW = RenderSet.getShadowMapSize(), ViewportH = RenderSet.getShadowMapSize()})--RenderSet.getShadowMapSize() * (CSMIndex - 1)
-                love.graphics.setMeshCullMode("front")
+                love.graphics.setMeshCullMode("back")
                 love.graphics.setDepthMode("less", true)
                 if CSMIndex == 1 then
                     love.graphics.clear(1,1,1,1)

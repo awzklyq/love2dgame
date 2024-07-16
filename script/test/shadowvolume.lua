@@ -36,13 +36,13 @@ local clearcolor = false
 
 local baseshader = Shader.GetBase3DShader()
 plane:setBaseColor(LColor.new(125, 125,125, 255))
-local depth_buffer = Canvas.new(width, height, {format = "depth32fstencil8", readable = true, msaa = 0, mipmaps="none"})
+local depth_buffer = Canvas.new(width, height, {format = "depth24stencil8", readable = true, msaa = 0, mipmaps="none"})
 local depth_buffer1 = Canvas.new(width, height, {format = "depth24", readable = true, msaa = 0, mipmaps="none"})	
 local color_buffer = Canvas.new(width, height, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
 local color_buffer1= Canvas.new(width, height, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
 local function renderShadowVolumeFront()
     -- love.graphics.setCanvas({depthstencil = depth_front.obj})
-    love.graphics.setMeshCullMode("front")
+    love.graphics.setMeshCullMode("back")
     love.graphics.setDepthMode("less", false)
     for i = 1, #cubevolumes do
         cubevolumes[i]:draw()
@@ -64,7 +64,7 @@ end
 local meshshader = Shader.GetBase3DShader();
 local function renderMesh()
 
-    love.graphics.setMeshCullMode("front")
+    love.graphics.setMeshCullMode("back")
     love.graphics.setDepthMode("less", true)
     for i = 1, #cubes do
         -- cubes[i].shader = baseshader

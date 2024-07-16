@@ -27,7 +27,7 @@ function BoundBox.new()
     box.min = Vector3.new(math.maxFloat, math.maxFloat, math.maxFloat)
     box.max = Vector3.new(-math.maxFloat, -math.maxFloat, -math.maxFloat)
 
-    box.center = Vector3.new(0.5, 0.5, 0.5)
+    box.center = Vector3.new(0.0, 0.0, 0.0)
 
     BoundBox.renderid = Render.BoundBoxId
     return box
@@ -138,6 +138,74 @@ function BoundBox:buildMeshLines()
     return MeshLines.new(points)
 end
 
+function BoundBox:BuildRenderMesh()
+    local xsize = self.max.x - self.min.x
+    local ysize = self.max.y - self.min.y
+    local zsize = self.max.z - self.min.z
+
+    local StartV = Vector3.Copy(self.min)
+    local EndV = Vector3.Copy(self.max)
+
+    local Data = {}
+
+    --A +
+    Data[#Data + 1] = {StartV.x, StartV.y, StartV.z, 0, 0, 0, 0, 1}
+    Data[#Data + 1] = {StartV.x, StartV.y + ysize, StartV.z, 0, 0, 0, 0, 1}
+    Data[#Data + 1] = {StartV.x, StartV.y + ysize, StartV.z + zsize, 0, 0, 0, 0, 1}
+
+    Data[#Data + 1] = {StartV.x, StartV.y, StartV.z, 0, 0, 0, 0, 1}
+    Data[#Data + 1] = {StartV.x, StartV.y, StartV.z + zsize, 0, 0, 0, 0, 1}
+    Data[#Data + 1] = {StartV.x, StartV.y + ysize, StartV.z + zsize, 0, 0, 0, 0, 1}
+
+     --A -
+     Data[#Data + 1] = {StartV.x + xsize, StartV.y, StartV.z, 0, 0, 0, 0, 1}
+     Data[#Data + 1] = {StartV.x + xsize, StartV.y + ysize, StartV.z, 0, 0, 0, 0, 1}
+     Data[#Data + 1] = {StartV.x + xsize, StartV.y + ysize, StartV.z + zsize, 0, 0, 0, 0, 1}
+ 
+     Data[#Data + 1] = {StartV.x + xsize, StartV.y, StartV.z, 0, 0, 0, 0, 1}
+     Data[#Data + 1] = {StartV.x + xsize, StartV.y + ysize, StartV.z + zsize, 0, 0, 0, 0, 1}
+     Data[#Data + 1] = {StartV.x + xsize, StartV.y, StartV.z + zsize, 0, 0, 0, 0, 1}
+
+
+    --B +
+    Data[#Data + 1] = {StartV.x, StartV.y, StartV.z, 0, 0, 0, 0, 1}
+    Data[#Data + 1] = {StartV.x + xsize, StartV.y, StartV.z, 0, 0, 0, 0, 1}
+    Data[#Data + 1] = {StartV.x + xsize, StartV.y, StartV.z + zsize, 0, 0, 0, 0, 1}
+
+    Data[#Data + 1] = {StartV.x, StartV.y, StartV.z, 0, 0, 0, 0, 1}
+    Data[#Data + 1] = {StartV.x + xsize, StartV.y, StartV.z + zsize, 0, 0, 0, 0, 1}
+    Data[#Data + 1] = {StartV.x, StartV.y, StartV.z + zsize, 0, 0, 0, 0, 1}
+
+    --B -
+    Data[#Data + 1] = {StartV.x, StartV.y + ysize, StartV.z, 0, 0, 0, 0, 1}
+    Data[#Data + 1] = {StartV.x + xsize, StartV.y + ysize, StartV.z, 0, 0, 0, 0, 1}
+    Data[#Data + 1] = {StartV.x + xsize, StartV.y + ysize, StartV.z + zsize, 0, 0, 0, 0, 1}
+
+    Data[#Data + 1] = {StartV.x, StartV.y + ysize, StartV.z, 0, 0, 0, 0, 1}
+    Data[#Data + 1] = {StartV.x + xsize, StartV.y + ysize, StartV.z + zsize, 0, 0, 0, 0, 1}
+    Data[#Data + 1] = {StartV.x, StartV.y + ysize, StartV.z + zsize, 0, 0, 0, 0, 1}
+
+    --C +
+    Data[#Data + 1] = {StartV.x, StartV.y, StartV.z, 0, 0, 0, 0, 1}
+    Data[#Data + 1] = {StartV.x + xsize, StartV.y, StartV.z, 0, 0, 0, 0, 1}
+    Data[#Data + 1] = {StartV.x + xsize, StartV.y + ysize, StartV.z, 0, 0, 0, 0, 1}
+    Data[#Data + 1] = {StartV.x, StartV.y, StartV.z, 0, 0, 0, 0, 1}
+    Data[#Data + 1] = {StartV.x + xsize, StartV.y + ysize, StartV.z, 0, 0, 0, 0, 1}
+    Data[#Data + 1] = {StartV.x , StartV.y + ysize, StartV.z, 0, 0, 0, 0, 1}
+
+    --C -
+    Data[#Data + 1] = {StartV.x, StartV.y, StartV.z + zsize, 0, 0, 0, 0, 1}
+    Data[#Data + 1] = {StartV.x + xsize, StartV.y, StartV.z + zsize, 0, 0, 0, 0, 1}
+    Data[#Data + 1] = {StartV.x + xsize, StartV.y + ysize, StartV.z + zsize, 0, 0, 0, 0, 1}
+    Data[#Data + 1] = {StartV.x, StartV.y, StartV.z + zsize, 0, 0, 0, 0, 1}
+    Data[#Data + 1] = {StartV.x + xsize, StartV.y + ysize, StartV.z + zsize, 0, 0, 0, 0, 1}
+    Data[#Data + 1] = {StartV.x , StartV.y + ysize, StartV.z + zsize, 0, 0, 0, 0, 1}
+
+
+
+    return Mesh3D.createFromPoints(Data)
+end
+
 function BoundBox:vectorInBox(v )
     return v.x >= self.min.x and v.x <= self.max.x and v.y >= self.min.y and v.y <= self.max.y and v.z >= self.min.z and v.z <= self.max.z;
 end
@@ -146,6 +214,27 @@ BoundBox.VectorInBox = BoundBox.vectorInBox
 
 function BoundBox:TriangleInBox(triangle )
     return self:VectorInBox(triangle.P1) and self:VectorInBox(triangle.P2) and self:VectorInBox(triangle.P3)
+end
+
+function BoundBox:IntersectTriangleSimilar(triangle )
+    if self:VectorInBox(triangle.P1) or self:VectorInBox(triangle.P2) or self:VectorInBox(triangle.P3) then
+        return true
+    end
+
+    local cc = (triangle.P1 + triangle.P2 + triangle.P3) / 3.0
+    if self:VectorInBox(triangle.P1) then
+        return true
+    end
+
+    local c1 = (cc + triangle.P2 + triangle.P3) / 3.0
+    local c2 = (cc + triangle.P1 + triangle.P3) / 3.0
+    local c3 = (cc + triangle.P1 + triangle.P2) / 3.0
+
+    if self:VectorInBox(c1) or self:VectorInBox(c2) or self:VectorInBox(c3) then
+        return true
+    end
+
+    return false
 end
 
 BoundBox.getIntersectBox = function(box1, box2)

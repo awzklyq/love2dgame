@@ -59,7 +59,7 @@ function SceneNode3D:bindDirectionLight(light)
     local height = RenderSet.getShadowMapSize()--love.graphics.getPixelHeight()--love.graphics.getHeight() * 2
     self.shadowmap = Canvas.new(width * _G.GConfig.CSMNumber, height, {format = "rgba32f", readable = true, msaa = 0, mipmaps="none"})
     self.shadowmap:setWrap("clampone", "clampone")
-    self.depth_buffer = Canvas.new(width * _G.GConfig.CSMNumber, height, {format = "depth32fstencil8", readable = true, msaa = 0, mipmaps="none"})
+    self.depth_buffer = Canvas.new(width * _G.GConfig.CSMNumber, height, {format = "depth24stencil8", readable = true, msaa = 0, mipmaps="none"})
 
     self.CSMMatrix = {}
     self.CSMDistance = {}

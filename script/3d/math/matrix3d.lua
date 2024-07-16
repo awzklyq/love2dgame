@@ -40,8 +40,10 @@ metatable_Matrix3D.__mul = function(myvalue, value)
 			return mat:mulVector4(value)--Matrix3D.matrixMult(myvalue, value
 		elseif value.renderid == Render.Vector3Id then
 			return mat:mulRightVector3(value)
-		elseif value.renderid ==  Render.Triangle3DId then
+		elseif value.renderid == Render.Triangle3DId then
 			return mat:mulTrangle(value)
+		elseif value.renderid == Render.BoundBoxId then
+			return mat:mulBoundBox(value)
 		end
     else
         _errorAssert(false, "metatable_Matrix3D.__mul~")
@@ -158,6 +160,21 @@ Matrix3D.createLookAtRH = function(  eye, lookat, upaxis )
 		   xeye,    yeye,    zeye, 1.0 );
 end
 
+Matrix3D.createLookAtLH = function(eye, lookat, upaxis )
+	local zaxis = ( lookat - eye ):normalize( );
+	local xaxis = Vector3.cross( upaxis, zaxis ):normalize( );
+	local yaxis = Vector3.cross( zaxis, xaxis );
+
+	local xeye = - Vector3.dot( xaxis, eye );
+	local yeye = - Vector3.dot( yaxis, eye );
+	local zeye = - Vector3.dot( zaxis, eye );
+
+	return Matrix3D.createFromNumbers(
+		xaxis.x, yaxis.x, zaxis.x, 0.0,
+		xaxis.y, yaxis.y, zaxis.y, 0.0,
+		xaxis.z, yaxis.z, zaxis.z, 0.0,
+		   xeye,    yeye,    zeye, 1.0 );
+end
 
 function Matrix3D:mulLeftVector3(tab2, NeedNotW)
 	local xx, yy, zz = tab2.x, tab2.y, tab2.z
@@ -495,86 +512,6 @@ Matrix3D.getTransformationMatrix = function(translation, rotation, scale)
     return ret
 end
 
--- returns a standard projection matrix
--- (things farther away appear smaller)
--- all arguments are scalars aka normal numbers
--- aspectRatio is defined as window width divided by window height
-Matrix3D.getProjectionMatrix = function(fov, near, far, aspectRatio)
-    local top = near * math.tan(fov/2)
-    local bottom = -1*top
-    local right = top * aspectRatio
-    local left = -1*right
-    return Matrix3D.createFromNumbers(
-        2*near/(right-left), 0, (right+left)/(right-left), 0,
-        0, 2*near/(top-bottom), (top+bottom)/(top-bottom), 0,
-        0, 0, -1*(far+near)/(far-near), -2*far*near/(far-near),
-        0, 0, -1, 0
-)
-end
-
--- returns an orthographic projection matrix
--- (things farther away are the same size as things closer)
--- all arguments are scalars aka normal numbers
--- aspectRatio is defined as window width divided by window height
-Matrix3D.getOrthoMatrix = function(fov, size, near, far, aspectRatio)
-    local top = size * math.tan(fov/2)
-    local bottom = -1*top
-    local right = top * aspectRatio
-    local left = -1*right
-    return Matrix3D.createFromNumbers(
-        2/(right-left), 0, 0, -1*(right+left)/(right-left),
-        0, 2/(top-bottom), 0, -1*(top+bottom)/(top-bottom),
-        0, 0, -2/(far-near), -(far+near)/(far-near),
-        0, 0, 0, 1
-)
-end
-
-Matrix3D.createOrthoOffCenterLH = function(left, right, bottom, top, znear, zfar )
-	local xs1 = 2.0 / ( right - left );
-	local xs2 = ( left + right ) / ( left - right );
-	local ys1 = 2.0 / ( top - bottom );
-	local ys2 = ( bottom + top ) / ( bottom - top );
-	local zf  = 1.0 / ( zfar - znear );
-	local zn  = - znear * zf;
-
-	return Matrix3D.createFromNumbers(
-		 xs1, 0.0, 0.0, 0.0,
-		0.0,  ys1, 0.0, 0.0,
-		0.0, 0.0,   zf, 0.0,
-         xs2,  ys2,   zn, 1.0);
-end
-
-Matrix3D.createOrthoOffCenterRH = function( left, right, bottom, top, znear, zfar )
-	local xs1 = 2.0 / ( right - left );
-	local xs2 = ( left + right ) / ( left - right );
-	local ys1 = 2.0 / ( top - bottom );
-	local ys2 = ( bottom + top ) / ( bottom - top );
-	local zf  = 1.0 / ( znear - zfar );
-	local zn  = znear * zf;
-
-	return Matrix3D.createFromNumbers(
-		 xs1, 0.0, 0.0, 0.0,
-		0.0,  ys1, 0.0, 0.0,
-		0.0, 0.0,   zf, 0.0,
-		 xs2,  ys2,   zn, 1.0 );
-end
-
-Matrix3D.createLookAtLH = function(eye, lookat, upaxis )
-	local zaxis = ( lookat - eye ):normalize( );
-	local xaxis = Vector3.cross( upaxis, zaxis ):normalize( );
-	local yaxis = Vector3.cross( zaxis, xaxis );
-
-	local xeye = - Vector3.dot( xaxis, eye );
-	local yeye = - Vector3.dot( yaxis, eye );
-	local zeye = - Vector3.dot( zaxis, eye );
-
-	return Matrix3D.createFromNumbers(
-		xaxis.x, yaxis.x, zaxis.x, 0.0,
-		xaxis.y, yaxis.y, zaxis.y, 0.0,
-		xaxis.z, yaxis.z, zaxis.z, 0.0,
-		   xeye,    yeye,    zeye, 1.0 );
-end
-
 function Matrix3D:getData(i, j)
     return self[(i - 1) * 4 + j]
 end
@@ -708,6 +645,71 @@ function Matrix3D.createPerspectiveFovLH( fovy, aspect, znear, zfar )
 		0.0,   ys, 0.0, 0.0,
 		0.0, 0.0,   zf, 1.0,
 		0.0, 0.0,   zn, 0.0 );
+end
+
+
+-- returns a standard projection matrix
+-- (things farther away appear smaller)
+-- all arguments are scalars aka normal numbers
+-- aspectRatio is defined as window width divided by window height
+Matrix3D.getProjectionMatrix = function(fov, near, far, aspectRatio)
+    local top = near * math.tan(fov/2)
+    local bottom = -1*top
+    local right = top * aspectRatio
+    local left = -1*right
+    return Matrix3D.createFromNumbers(
+        2*near/(right-left), 0, (right+left)/(right-left), 0,
+        0, 2*near/(top-bottom), (top+bottom)/(top-bottom), 0,
+        0, 0, -1*(far+near)/(far-near), -2*far*near/(far-near),
+        0, 0, -1, 0
+)
+end
+
+-- returns an orthographic projection matrix
+-- (things farther away are the same size as things closer)
+-- all arguments are scalars aka normal numbers
+-- aspectRatio is defined as window width divided by window height
+Matrix3D.getOrthoMatrix = function(fov, size, near, far, aspectRatio)
+    local top = size * math.tan(fov/2)
+    local bottom = -1*top
+    local right = top * aspectRatio
+    local left = -1*right
+    return Matrix3D.createFromNumbers(
+        2/(right-left), 0, 0, -1*(right+left)/(right-left),
+        0, 2/(top-bottom), 0, -1*(top+bottom)/(top-bottom),
+        0, 0, -2/(far-near), -(far+near)/(far-near),
+        0, 0, 0, 1
+)
+end
+
+Matrix3D.createOrthoOffCenterLH = function(left, right, bottom, top, znear, zfar )
+	local xs1 = 2.0 / ( right - left );
+	local xs2 = ( left + right ) / ( left - right );
+	local ys1 = 2.0 / ( top - bottom );
+	local ys2 = ( bottom + top ) / ( bottom - top );
+	local zf  = 1.0 / ( zfar - znear );
+	local zn  = - znear * zf;
+
+	return Matrix3D.createFromNumbers(
+		 xs1, 0.0, 0.0, 0.0,
+		0.0,  ys1, 0.0, 0.0,
+		0.0, 0.0,   zf, 0.0,
+         xs2,  ys2,   zn, 1.0);
+end
+
+Matrix3D.createOrthoOffCenterRH = function( left, right, bottom, top, znear, zfar )
+	local xs1 = 2.0 / ( right - left );
+	local xs2 = ( left + right ) / ( left - right );
+	local ys1 = 2.0 / ( top - bottom );
+	local ys2 = ( bottom + top ) / ( bottom - top );
+	local zf  = 1.0 / ( znear - zfar );
+	local zn  = znear * zf;
+
+	return Matrix3D.createFromNumbers(
+		 xs1, 0.0, 0.0, 0.0,
+		0.0,  ys1, 0.0, 0.0,
+		0.0, 0.0,   zf, 0.0,
+		 xs2,  ys2,   zn, 1.0 );
 end
 
 function Matrix3D:Log(sss)

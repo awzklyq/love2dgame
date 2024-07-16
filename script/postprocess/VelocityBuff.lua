@@ -15,7 +15,7 @@ VelocityBuffNode.VelocityBuff = Canvas.new(1, 1, {format = "rg32f", readable = t
 VelocityBuffNode.VelocityBuff.renderWidth = 1
 VelocityBuffNode.VelocityBuff.renderHeight = 1
 
-local normal_depth_buffer = Canvas.new(1, 1, {format = "depth32fstencil8", readable = true, msaa = 0, mipmaps="none"})
+local normal_depth_buffer = Canvas.new(1, 1, {format = "depth24stencil8", readable = true, msaa = 0, mipmaps="none"})
 normal_depth_buffer.renderWidth = 1
 normal_depth_buffer.renderHeight = 1
 
@@ -26,14 +26,14 @@ VelocityBuffNode.Execute = function(renderWidth, renderHeight)
         VelocityBuffNode.VelocityBuff.renderWidth = renderWidth
         VelocityBuffNode.VelocityBuff.renderHeight = renderHeight
 
-        normal_depth_buffer = Canvas.new(renderWidth, renderHeight, {format = "depth32fstencil8", readable = true, msaa = 0, mipmaps="none"})
+        normal_depth_buffer = Canvas.new(renderWidth, renderHeight, {format = "depth24stencil8", readable = true, msaa = 0, mipmaps="none"})
         normal_depth_buffer.renderWidth = renderWidth
         normal_depth_buffer.renderHeight = renderHeight
 
         VelocityBuffNode.meshquad = _G.MeshQuad.new(VelocityBuffNode.VelocityBuff.renderWidth, VelocityBuffNode.VelocityBuff.renderHeight , LColor.new(255, 255, 255, 255))
     end
 
-    love.graphics.setMeshCullMode("front")
+    love.graphics.setMeshCullMode("back")
     love.graphics.setDepthMode("less", true)
     love.graphics.setCanvas({VelocityBuffNode.VelocityBuff.obj, depthstencil = normal_depth_buffer.obj})
     love.graphics.clear(0,0,0,1)

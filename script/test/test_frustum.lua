@@ -13,7 +13,7 @@ local frustummeshlines
 
 local width = love.graphics.getPixelWidth() * 1.5 -- love.graphics.getWidth() * 2
 local height = love.graphics.getPixelHeight()  * 1.5--love.graphics.getHeight() * 2
-local depth_buffer = Canvas.new(width, height, {format = "depth32fstencil8", readable = true, msaa = 0, mipmaps="none"})
+local depth_buffer = Canvas.new(width, height, {format = "depth24stencil8", readable = true, msaa = 0, mipmaps="none"})
 local color_buffer = Canvas.new(width, height, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
 app.render(function(dt)
 
@@ -77,7 +77,7 @@ app.keypressed(function(key, scancode, isrepeat)
 
     local width = love.graphics.getPixelWidth()
 local height = love.graphics.getPixelHeight()
-    depth_buffer = Canvas.new(width, height, {format = "depth32fstencil8", readable = true, msaa = 0, mipmaps="none"})
+    depth_buffer = Canvas.new(width, height, {format = "depth24stencil8", readable = true, msaa = 0, mipmaps="none"})
     color_buffer = Canvas.new(width, height, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
 end)
 

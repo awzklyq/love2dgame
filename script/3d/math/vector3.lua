@@ -73,6 +73,8 @@ function Vector3.copy(v)
     return Vector3.new(v.x, v.y, v.z)
 end
 
+Vector3.Copy = Vector3.copy
+
 function Vector3:length()
     return math.sqrt(math.pow(self.x, 2) + math.pow(self.y, 2) + math.pow(self.z, 2));
 end

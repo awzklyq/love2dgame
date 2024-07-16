@@ -39,7 +39,8 @@ end
 RenderSet.getDefaultViewMatrix = function()
     local camera3d = _G.getGlobalCamera3D()
     -- return  Matrix3D.transpose(Matrix3D.createLookAtRH(camera3d.eye, camera3d.look, -camera3d.up))
-    return Matrix3D.getViewMatrix(camera3d.eye, camera3d.look, camera3d.up)
+    --return Matrix3D.getViewMatrix(camera3d.eye, camera3d.look, camera3d.up)
+  return Matrix3D.transpose(Matrix3D.createLookAtRH(camera3d.eye, camera3d.look, -camera3d.up))
 end
 
 RenderSet.getDefaultProjectMatrix = function()
@@ -139,10 +140,10 @@ RenderSet.getCanvasColor = function ()
 end
 
 local NeedResizeCanva = true
-local DepthBuff = Canvas.new(love.graphics.getPixelWidth(), love.graphics.getPixelHeight(), {format = "depth32fstencil8", readable = true, msaa = 0, mipmaps="none"})
+local DepthBuff = Canvas.new(love.graphics.getPixelWidth(), love.graphics.getPixelHeight(), {format = "depth24stencil8", readable = true, msaa = 0, mipmaps="none"})
 RenderSet.ResetCanvasColor = function (w, h)
     CanvasColor = Canvas.new(w, h, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
-    DepthBuff = Canvas.new(w, h, {format = "depth32fstencil8", readable = true, msaa = 0, mipmaps="none"})
+    DepthBuff = Canvas.new(w, h, {format = "depth24stencil8", readable = true, msaa = 0, mipmaps="none"})
 
     NeedResizeCanva = false
 end
@@ -153,7 +154,7 @@ RenderSet.GetDepthBuff = function ()
 end
 
 RenderSet.UseCanvasColorAndDepth = function ()
-    love.graphics.setMeshCullMode("front")
+    love.graphics.setMeshCullMode("back")
     love.graphics.setDepthMode("less", true)
     love.graphics.setCanvas({CanvasColor.obj, depthstencil = DepthBuff.obj})
     love.graphics.clear(RenderSet.BGColor._r, RenderSet.BGColor._g, RenderSet.BGColor._b, RenderSet.BGColor._a)
@@ -168,7 +169,7 @@ end
 app.resizeWindow(function(w, h)
     if NeedResizeCanva then
         CanvasColor = Canvas.new(w, h, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
-        DepthBuff = Canvas.new(w, h, {format = "depth32fstencil8", readable = true, msaa = 0, mipmaps="none"})
+        DepthBuff = Canvas.new(w, h, {format = "depth24stencil8", readable = true, msaa = 0, mipmaps="none"})
     end
 end)
 

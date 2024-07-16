@@ -67,6 +67,10 @@ end
 
 function Ray:IsIntersectBox( box ) --BoundBox
 	
+	if box:vectorInBox(self.orig) then
+		return true
+	end
+	
 	local d3 = Vector3.new( 1.0 / self.dir.x, 1.0 / self.dir.y, 1.0 / self.dir.z)
 
 	local VMin = Vector3.new()
