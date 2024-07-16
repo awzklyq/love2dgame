@@ -352,6 +352,20 @@ math.BitOr = function(v1, v2)
     return result
 end
 
+math.BitEquationRightNumber = function(v1, v2)
+    local BaseD = 0x80000000;
+
+    for i = 1, 32 do
+        if math.BitAnd(BaseD, v1) ~= math.BitAnd(BaseD, v2) then
+            return i - 1
+        else
+            BaseD =  math.RightMove(BaseD, 1)
+        end
+    end
+
+    return 32
+end
+
 math.MortonCode3 = function(x)
     x = math.BitAnd(0x000003ff, x);
 
@@ -393,6 +407,7 @@ math.RadixSort32 = function(Src, SortKey)
 
     -- Parallel histogram generation pass
     for i = 1, Num do
+        
         local Key = SortKey( Src[i] );
 
         local key1 =  math.BitAnd(math.RightMove( Key,  0 ), 1023) + 1
@@ -440,8 +455,9 @@ math.RadixSort32 = function(Src, SortKey)
     end
 
     local Dst = {}
-    for i = 1, Num do
+    for i = 1, #Src do
         local Value = Src[i];
+        
         local Key = SortKey( Value );
         local key1 =  math.BitAnd(math.RightMove( Key,  0 ), 1023) + 1
         Dst[ Histogram0[ key1 ] ] = Value;
@@ -452,8 +468,9 @@ math.RadixSort32 = function(Src, SortKey)
 
     Src = Dst
     Dst = {}
-    for i = 1, Num do
+    for i = 1, #Src do
         local Value = Src[i];
+       
         local Key = SortKey( Value );
         local key2 =  math.BitAnd(math.RightMove( Key,  10 ), 2047) + 1
         Dst[ Histogram1[ key2 ] ] = Value;
@@ -462,7 +479,7 @@ math.RadixSort32 = function(Src, SortKey)
 
     Src = Dst
     Dst = {}
-    for i = 1, Num do
+    for i = 1, #Src do
         local Value = Src[i];
         local Key = SortKey( Value );
         local key3 =  math.BitAnd(math.RightMove( Key,  21 ), 2047) + 1
@@ -473,6 +490,61 @@ math.RadixSort32 = function(Src, SortKey)
 
 	return Dst
 
+end
+
+math.SortLargeArray = function(Datas, SortFunc)
+    local LimiteNum = 5120
+    if #Datas < LimiteNum then
+        table.sort(Datas, SortFunc)
+    end
+
+    local SubDatas = {}
+    local CurrentIndex = 1
+
+    local Num = #Datas
+    for i = 1, Num do
+        if not SubDatas[CurrentIndex] then
+            SubDatas[CurrentIndex] = {}
+        end
+
+        local SubData =  SubDatas[CurrentIndex]
+        SubData[#SubData + 1] = Datas[i]
+        if #SubDatas[CurrentIndex] == LimiteNum then
+            CurrentIndex = CurrentIndex + 1
+        end
+    end
+
+    local IndexArray = {}
+    for i = 1, #SubDatas do
+        table.sort(SubDatas[i], SortFunc)
+        IndexArray[i] = 1
+    end
+
+    local TempDatas = {}
+    math.ArrayCopy(Datas, TempDatas)
+
+    for i = 1, Num do
+        local IndexJ = 1
+        for j = 2, #SubDatas do
+            if not SortFunc(SubDatas[IndexJ][IndexArray[IndexJ]], SubDatas[j][IndexArray[j]]) then
+                IndexJ = j
+            end
+        end
+
+        Datas[i] = SubDatas[IndexJ][IndexArray[IndexJ]]
+
+        IndexArray[IndexJ] = IndexArray[IndexJ] + 1
+        if IndexArray[IndexJ] > #SubDatas[IndexJ] then
+            table.remove(IndexArray, IndexJ)
+            table.remove(SubDatas, IndexJ)
+        end
+    end
+end
+
+math.AppendArray = function(DesArray, SourceArray)
+    for i = 1, #SourceArray do
+        DesArray[#DesArray + 1] = SourceArray[i]
+    end
 end
 
 -- Encode for normal map.
@@ -646,6 +718,12 @@ math.ArrayIdentity = function(v)
     end
 
     return Result
+end
+
+math.ArrayCopy = function(SourceArray, DesArray)
+    for i, v in ipairs(SourceArray) do
+        DesArray[i] = v
+    end
 end
 
 math.IsNearlyEqual = function(A, B, SMALL_NUMBER)

@@ -114,6 +114,7 @@ end
 -- populate model's normals in model's mesh automatically
 function Mesh3D:makeNormals()
     self.FacesInfos = {}
+    local _MeshBox = BoundBox.new()
     for i=1, #self.verts, 3 do
         local vp = self.verts[i]
         local v = self.verts[i+1]
@@ -156,7 +157,10 @@ function Mesh3D:makeNormals()
         FaceInfo.Normal = FaceNormal
         FaceInfo.Triangle = Triangle3D.new(Vector3.new(vp[1], vp[2], vp[3]), Vector3.new(v[1], v[2], v[3]), Vector3.new(vn[1], vn[2], vn[3]))
         FaceInfo.TriangleCenter = (FaceInfo.Triangle.P1 + FaceInfo.Triangle.P2 + FaceInfo.Triangle.P3) / 3
-        FaceInfo.TriangleMortonCode = FaceInfo.TriangleCenter:GetMortonCode3()
+        _MeshBox = _MeshBox + FaceInfo.Triangle.P1
+        _MeshBox = _MeshBox + FaceInfo.Triangle.P2
+        _MeshBox = _MeshBox + FaceInfo.Triangle.P3
+        -- FaceInfo.TriangleMortonCode = FaceInfo.TriangleCenter:GetMortonCode3()
 
         self.FacesInfos[#self.FacesInfos + 1] = FaceInfo
     end
@@ -175,11 +179,19 @@ function Mesh3D:makeNormals()
         v[8] = nor.z
     end
 
-    table.sort(self.FacesInfos, function(v1,v2)
+    local _Size = _MeshBox.max - _MeshBox.min 
+    for i = 1, #self.FacesInfos do
+        local VM = Vector3.Copy(self.FacesInfos[i].TriangleCenter)
+        VM = (VM - _MeshBox.min) / _Size * 1023;
+        self.FacesInfos[i].TriangleMortonCode = VM:GetMortonCode3()
+    end
+
+
+    math.SortLargeArray(self.FacesInfos, function(v1,v2)
         if v1.TriangleMortonCode > v2.TriangleMortonCode then
-            return false
+            return true
         end
-        return true
+        return false
     end)
 
     self:BuildBVHFormFacesInfos();
@@ -188,71 +200,121 @@ end
 function Mesh3D:BuildBVHFormFacesInfos()
     self.FacesInfosBVH = {}
     local _Len =  #self.FacesInfos
-    for i = 1, #self.FacesInfos + 4, 4 do
-        local _box = BoundBox.new()
-        local _IndexArray = {}
-        if i <= _Len then
+
+    local _box = BoundBox.new()
+    local _IndexArray = {}
+
+    for i = 1, #self.FacesInfos do
+        if i == 1 then
             _box = _box + self.FacesInfos[i].Triangle.P1
             _box = _box + self.FacesInfos[i].Triangle.P2
             _box = _box + self.FacesInfos[i].Triangle.P3
             _IndexArray[#_IndexArray + 1] = i
+        
+        elseif i ==  #self.FacesInfos then
+            _errorAssert(#self.FacesInfos > 2, "BuildBVHFormFacesInfos self.FacesInfos <= 2")
+
+            if #_IndexArray > 1 then
+                self.FacesInfosBVH[#self.FacesInfosBVH + 1] = {Box = _box, IndexArray = _IndexArray}
+            end
+
+            _box = BoundBox.new()
+            _IndexArray = {}
+            _box = _box + self.FacesInfos[i].Triangle.P1
+            _box = _box + self.FacesInfos[i].Triangle.P2
+            _box = _box + self.FacesInfos[i].Triangle.P3
+            _IndexArray[#_IndexArray + 1] = i
+
+            if #_IndexArray > 0 then
+                self.FacesInfosBVH[#self.FacesInfosBVH + 1] = {Box = _box, IndexArray = _IndexArray}
+            end
+            
+        else
+            local LeftNum = math.BitEquationRightNumber(self.FacesInfos[i].TriangleMortonCode,  self.FacesInfos[i - 1].TriangleMortonCode)
+            local RightNum = math.BitEquationRightNumber(self.FacesInfos[i].TriangleMortonCode,  self.FacesInfos[i + 1].TriangleMortonCode)
+            if LeftNum >= RightNum  then
+                _box = _box + self.FacesInfos[i].Triangle.P1
+                _box = _box + self.FacesInfos[i].Triangle.P2
+                _box = _box + self.FacesInfos[i].Triangle.P3
+                _IndexArray[#_IndexArray + 1] = i
+            else
+                if #_IndexArray > 0 then
+                    self.FacesInfosBVH[#self.FacesInfosBVH + 1] = {Box = _box, IndexArray = _IndexArray}
+                end
+
+                _box = BoundBox.new()
+                _IndexArray = {}
+                _box = _box + self.FacesInfos[i].Triangle.P1
+                _box = _box + self.FacesInfos[i].Triangle.P2
+                _box = _box + self.FacesInfos[i].Triangle.P3
+                _IndexArray[#_IndexArray + 1] = i
+            end
         end
-
-        if i + 1 <= _Len then
-            _box = _box + self.FacesInfos[i + 1].Triangle.P1
-            _box = _box + self.FacesInfos[i + 1].Triangle.P2
-            _box = _box + self.FacesInfos[i + 1].Triangle.P3
-            _IndexArray[#_IndexArray + 1] = i + 1
-        end
-
-        if i + 2 <= _Len then
-            _box = _box + self.FacesInfos[i + 2].Triangle.P1
-            _box = _box + self.FacesInfos[i + 2].Triangle.P2
-            _box = _box + self.FacesInfos[i + 2].Triangle.P3
-            _IndexArray[#_IndexArray + 1] = i + 2
-        end
-
-        if i + 3 <= _Len then
-            _box = _box + self.FacesInfos[i + 3].Triangle.P1
-            _box = _box + self.FacesInfos[i + 3].Triangle.P2
-            _box = _box + self.FacesInfos[i + 3].Triangle.P3
-            _IndexArray[#_IndexArray + 1] = i + 3
-        end
-
-        -- if i + 4 <= _Len then
-        --     _box = _box + self.FacesInfos[i + 4].Triangle.P1
-        --     _box = _box + self.FacesInfos[i + 4].Triangle.P2
-        --     _box = _box + self.FacesInfos[i + 4].Triangle.P3
-        --     _IndexArray[#_IndexArray + 1] = i + 4
-        -- end
-
-        -- if i + 5 <= _Len then
-        --     _box = _box + self.FacesInfos[i + 5].Triangle.P1
-        --     _box = _box + self.FacesInfos[i + 5].Triangle.P2
-        --     _box = _box + self.FacesInfos[i + 5].Triangle.P3
-        --     _IndexArray[#_IndexArray + 1] = i + 5
-        -- end
-
-        -- if i + 6 <= _Len then
-        --     _box = _box + self.FacesInfos[i + 6].Triangle.P1
-        --     _box = _box + self.FacesInfos[i + 6].Triangle.P2
-        --     _box = _box + self.FacesInfos[i + 6].Triangle.P3
-        --     _IndexArray[#_IndexArray + 1] = i + 6
-        -- end
-
-        -- if i + 7 <= _Len then
-        --     _box = _box + self.FacesInfos[i + 7].Triangle.P1
-        --     _box = _box + self.FacesInfos[i + 7].Triangle.P2
-        --     _box = _box + self.FacesInfos[i + 7].Triangle.P3
-        --     _IndexArray[#_IndexArray + 1] = i + 7
-        -- end
-
-        if #_IndexArray > 0 then
-            self.FacesInfosBVH[#self.FacesInfosBVH + 1] = {Box = _box, IndexArray = _IndexArray}
-        end
-       
+               
     end
+
+    self:BuildBVHFormFacesInfosAgain()
 end
+
+
+function Mesh3D:BuildBVHFormFacesInfosAgain()
+    if not self.FacesInfosBVH then
+        return
+    end
+
+    local _Len =  #self.FacesInfosBVH
+
+    local TempFacesInfosBVH = {}
+    local _box = BoundBox.new()
+    local _IndexArray = {}
+
+    log('aaaaa1111', #self.FacesInfos,  #self.FacesInfosBVH)
+    for i = 1, _Len do
+        if i == 1 then
+            _box = _box + self.FacesInfosBVH[i].Box
+            math.AppendArray( _IndexArray, self.FacesInfosBVH[i].IndexArray)
+        
+        elseif i ==  _Len then
+            _errorAssert(_Len > 2, "BuildBVHFormFacesInfos self.FacesInfosBVH <= 2")
+
+            if #_IndexArray > 1 then
+                TempFacesInfosBVH[#TempFacesInfosBVH + 1] = {Box = _box, IndexArray = _IndexArray}
+            end
+
+            _box = BoundBox.new()
+            _IndexArray = {}
+            _box = _box + self.FacesInfosBVH[i].Box
+            math.AppendArray( _IndexArray, self.FacesInfosBVH[i].IndexArray)
+
+            if #_IndexArray > 0 then
+                TempFacesInfosBVH[#TempFacesInfosBVH + 1] = {Box = _box, IndexArray = _IndexArray}
+            end
+            
+        else
+            local LeftNum = math.BitEquationRightNumber(self.FacesInfos[self.FacesInfosBVH[i].IndexArray[1]].TriangleMortonCode,  self.FacesInfos[self.FacesInfosBVH[i - 1].IndexArray[1]].TriangleMortonCode)
+            local RightNum = math.BitEquationRightNumber(self.FacesInfos[self.FacesInfosBVH[i].IndexArray[1]].TriangleMortonCode,  self.FacesInfos[self.FacesInfosBVH[i + 1].IndexArray[1]].TriangleMortonCode)
+            if LeftNum >= RightNum  then
+                _box = _box + self.FacesInfosBVH[i].Box
+                math.AppendArray( _IndexArray, self.FacesInfosBVH[i].IndexArray)
+            else
+                if #_IndexArray > 0 then
+                    TempFacesInfosBVH[#TempFacesInfosBVH + 1] = {Box = _box, IndexArray = _IndexArray}
+                end
+
+                _box = BoundBox.new()
+                _IndexArray = {}
+                _box = _box + self.FacesInfosBVH[i].Box
+                math.AppendArray( _IndexArray, self.FacesInfosBVH[i].IndexArray)
+            end
+        end
+               
+    end
+
+    self.FacesInfosBVH = TempFacesInfosBVH
+
+    log('aaaaa2222', #self.FacesInfos,  #self.FacesInfosBVH)
+end
+
 
 function Mesh3D:useLights(alphatest)
     self.shader = Shader.GetBase3DShader(nil, nil, nil, nil, alphatest, self.PBRData);

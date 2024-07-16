@@ -1,6 +1,6 @@
 FileManager.addAllPath("assert")
 
-local sphere = Mesh3D.new("SM_RailingStairs_Internal.OBJ") -- Sphere_Internal
+local sphere = Mesh3D.new("SM_RailingStairs_Internal.OBJ") -- S_BuildingSetA_Tree_02  SM_RailingStairs_Internal
 
 local BoxLines = sphere.box:buildMeshLines()
 -- local BoxMesh = sphere.box:BuildRenderMesh()
