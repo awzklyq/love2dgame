@@ -4,12 +4,13 @@ local sphere = Mesh3D.new("SM_RailingStairs_Internal.OBJ") -- S_BuildingSetA_Tre
 
 local BoxLines = sphere.box:buildMeshLines()
 -- local BoxMesh = sphere.box:BuildRenderMesh()
-local _Boxs = _G.MeshVolumNode.Process(sphere)
-
+-- local _Boxs = _G.MeshVolumNode.Process(sphere)
+local _Boxs = {}
+-- MeshVolumNode.ProcessCoroutine(sphere, function(_InnerBoxs)
+--     _Boxs = _InnerBoxs
+-- end)
 local _BoxsLines = {}
--- for i = 1, #_Boxs do
---     _BoxsLines[#_BoxsLines + 1] = _Boxs[i]:buildMeshLines()
--- end
+
 
 for i = 1, #sphere.FacesInfosBVH do
     _BoxsLines[#_BoxsLines + 1] = sphere.FacesInfosBVH[i].Box:buildMeshLines()
@@ -47,4 +48,16 @@ checkb.ChangeEvent = function(Enable)
 end
 
 local text = UI.Text.new( "Area", 0, 70, 60, 50 )
-text.text = tostring(_Boxs.VolumPro)
+
+local FinalFunc = function(_InnerBoxs)
+    _Boxs = _InnerBoxs
+    text.text = tostring(_Boxs.VolumPro)
+end
+
+local CurrentFunc = function(v)
+    local cv = math.modf(v * 100) 
+    text.text = " 正在计算 .. %" .. tostring(cv)
+    log(text.text)
+end
+
+MeshVolumNode.ProcessCoroutine(sphere, FinalFunc, CurrentFunc)

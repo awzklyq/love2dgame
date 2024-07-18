@@ -311,8 +311,6 @@ function Mesh3D:BuildBVHFormFacesInfosAgain()
     end
 
     self.FacesInfosBVH = TempFacesInfosBVH
-
-    log('aaaaa2222', #self.FacesInfos,  #self.FacesInfosBVH)
 end
 
 

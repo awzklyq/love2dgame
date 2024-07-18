@@ -66,10 +66,14 @@ local PickMeshFromBoxs = function(mesh, SliceBoxs)
         if num >= LimitNum then
             InnerBoxs[#InnerBoxs + 1] = SliceBoxs[i]
         end
+        coroutine.yield(1 / #SliceBoxs)
     end
     return InnerBoxs
 end
 
+local CurrentMesh = nil
+local CurrentFunc = nil
+local FinalFunc = nil
 MeshVolumNode.Process = function(mesh)
     local _MeshBox = mesh.box
     local _Boxs = GenerateBoxs(_MeshBox)
@@ -80,5 +84,32 @@ MeshVolumNode.Process = function(mesh)
 
     local InnerNum = #_InnerBoxs
     _InnerBoxs.VolumPro =  InnerNum / AllBoxsNumber
+    if FinalFunc then
+        FinalFunc(_InnerBoxs)
+    end
     return _InnerBoxs
 end
+
+local CoroutineObj = nil
+MeshVolumNode.ProcessCoroutine = function(mesh, _finalfunc, func)
+    if CoroutineObj then
+        _errorAssert(false, "MeshVolumNode CoroutineObj is not nil")  
+    end
+
+    CurrentFunc = func
+    CurrentMesh = mesh
+    FinalFunc = _finalfunc
+    CoroutineObj = coroutine.create(MeshVolumNode.Process)
+end
+
+app.update(function(dt)
+    if CoroutineObj then
+        if "dead" ~= coroutine.status(CoroutineObj) then
+        
+            local _, result = coroutine.resume(CoroutineObj, CurrentMesh)
+            CurrentFunc(result)
+        else
+            CoroutineObj = nil
+        end
+    end
+end)
