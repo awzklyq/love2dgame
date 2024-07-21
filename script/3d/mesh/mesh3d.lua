@@ -268,7 +268,6 @@ function Mesh3D:BuildBVHFormFacesInfosAgain()
     local _box = BoundBox.new()
     local _IndexArray = {}
 
-    log('aaaaa1111', #self.FacesInfos,  #self.FacesInfosBVH)
     for i = 1, _Len do
         if i == 1 then
             _box = _box + self.FacesInfosBVH[i].Box

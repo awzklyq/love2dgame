@@ -15,6 +15,8 @@ metatable_BoundBox.__add = function(myvalue, v)
             box.max.z = math.max( myvalue.max.z, v.z );
             box.center = Vector3.new((box.min.x + box.max.x) * 0.5, (box.min.y + box.max.y) * 0.5, (box.min.z + box.max.z) * 0.5)
             return box
+        elseif  v.renderid == Render.BoundBoxId then
+            return BoundBox.add(myvalue, v)
         end
     end
     return  BoundBox.add(myvalue, v)

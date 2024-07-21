@@ -274,6 +274,10 @@ math.RightMove = function(x, offset)
     return r
 end
 
+math.round = function(v)
+    return math.floor(v + 0.5)
+end
+
 math.BitXor = function(v1, v2)
     if luabit then
         return luabit.bxor(v1, v2)
@@ -366,6 +370,17 @@ math.BitEquationRightNumber = function(v1, v2)
     return 32
 end
 
+math.MortonCode2 = function(x)
+    x = math.BitAnd(0x0000ffff, x);
+   
+    x = math.BitAnd(math.BitXor(x, math.LeftMove(x, 8)), 0x00ff00ff);
+    x = math.BitAnd(math.BitXor(x, math.LeftMove(x, 4)), 0x0f0f0f0f);
+    x = math.BitAnd(math.BitXor(x, math.LeftMove(x, 2)), 0x33333333);
+    x = math.BitAnd(math.BitXor(x, math.LeftMove(x, 1)), 0x55555555);
+
+    return x
+end
+
 math.MortonCode3 = function(x)
     x = math.BitAnd(0x000003ff, x);
 
@@ -375,6 +390,15 @@ math.MortonCode3 = function(x)
     x = math.BitAnd(math.BitXor(x, math.LeftMove(x, 4)), 0x030c30c3);
     x = math.BitAnd(math.BitXor(x, math.LeftMove(x, 2)), 0x09249249);
 
+    return x
+end
+
+math.ReverseMortonCode2 = function( x )
+    x = math.BitAnd(0x55555555, x);
+    x = math.BitAnd(math.BitXor(x, math.RightMove(x, 1)), 0x33333333)
+    x = math.BitAnd(math.BitXor(x, math.RightMove(x, 2)), 0x0f0f0f0f)
+    x = math.BitAnd(math.BitXor(x, math.RightMove(x, 4)), 0x00ff00ff)
+    x = math.BitAnd(math.BitXor(x, math.RightMove(x, 8)), 0x0000ffff)
     return x
 end
 

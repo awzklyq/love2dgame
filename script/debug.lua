@@ -33,7 +33,7 @@ _G._errorAssert = function(a, ...)
     assert(a, "Error : ".. ...)
 end
 
-_G.logbit = function(v)
+_G.logbit = function(v, num)
     assert(type(v) == 'number')
     v = math.modf(v)
     local temp = v
@@ -45,7 +45,7 @@ _G.logbit = function(v)
             str[#str +1] = "1"
         end
 
-        v = math.RightMove(v)
+        v = math.RightMove(v, 1)
     end
 
     local result = ""
@@ -53,7 +53,14 @@ _G.logbit = function(v)
         result = result .. str[i]
     end
     
+    if num and type(num) == "number"  and num > #str then
+        local Need = num - #str
+        for i = 1, Need do
+            result = '0' .. result
+        end
+    end
     log("Bit: ", temp, result)
+    log()
 end
 
 --deubg

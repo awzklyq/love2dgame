@@ -164,9 +164,9 @@ function Vector3:negativeSelf(v)
 end
 
 function Vector3:GetMortonCode3()
-    local Morton = math.MortonCode3( self.x );
-    Morton = math.BitOr(Morton, math.LeftMove(math.MortonCode3( self.y ) ,1));
-    Morton = math.BitOr(Morton, math.LeftMove(math.MortonCode3( self.z ) ,2));
+    local Morton = math.MortonCode3( math.round(self.x) );
+    Morton = math.BitOr(Morton, math.LeftMove(math.MortonCode3( math.round(self.y) ) ,1));
+    Morton = math.BitOr(Morton, math.LeftMove(math.MortonCode3( math.round(self.z) ) ,2));
     return Morton
 end
 
@@ -268,6 +268,15 @@ end
 Vector3.abs = function(v)
     local result = Vector3.new(math.abs(v.x), math.abs(v.y), math.abs(v.z))
     return result
+end
+
+
+Vector3.modf = function(v)
+    local x1, x2 = math.modf(v.x)
+    local y1, y2 = math.modf(v.y)
+    local z1, z2 = math.modf(v.z)
+
+    return Vector3.new(x1, y1, z1), Vector3.new(x2, y2, z2)
 end
 
 function Vector3:Log(sss)

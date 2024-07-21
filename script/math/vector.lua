@@ -102,6 +102,12 @@ end
 function Vector:IsZero()
     return self.x == 0 and self.y == 0
 end
+
+function Vector:GetMortonCode2()
+    local Morton = math.MortonCode2( math.round(self.x) );
+    Morton = math.BitOr(Morton, math.LeftMove(math.MortonCode2( math.round(self.y) ) ,1));
+    return Morton
+end
     
 Vector.distance = function(v1, v2)
     return math.sqrt(math.pow(v1.x - v2.x, 2) + math.pow(v1.y - v2.y, 2))

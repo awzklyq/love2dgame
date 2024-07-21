@@ -10,6 +10,7 @@ _G.TEST = false
 _G.log = require "script/log"
 dofile('script/class.lua')
 dofile('script/debug.lua')
+dofile('script/GlobalFunction.lua')
 
 _G.lovector = require "lovector"
 dofile 'script/render/cameramanager.lua'
@@ -58,6 +59,7 @@ dofile('script/3d/mesh/aixs.lua')
 dofile('script/polygon/triangle.lua')
 dofile('script/polygon/triangle3d.lua')
 dofile('script/polygon/MeshVolum.lua')
+dofile('script/polygon/MortonCluster.lua')
 
 dofile('script/3d/terrain/tile.lua')
 dofile 'script/3d/terrain/tileshader.lua'
@@ -186,7 +188,7 @@ if not _G.TEST then
 	end)
 
 else
-	dofile('script/test/test_MeshVolume.lua')--test_MeshVolume  test_BezierCurve.lua
+	dofile('script/test/test_morton.lua')--test_MeshVolume  test_BezierCurve.lua
 	-- dofile('script/demo/ball/demo_ball.lua') test_SpaceSplit.lua
 end
 --dofile()

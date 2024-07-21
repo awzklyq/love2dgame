@@ -1,73 +1,52 @@
-math.randomseed(os.time()%10000)
 
+local GenerateRects = function(Rects, x, y, w, h, Str)
+    local SizeX = w * 0.5
+    local SizeY = h * 0.5
+    Rects[#Rects + 1] = Rect.new(x, y, SizeX, SizeY, 'line')
+    Rects[#Rects].PickName = Str .. "00"
+
+    local StartIndex = #Rects
+
+    Rects[#Rects + 1] = Rect.new(x + SizeX, y, SizeX, SizeY, 'line')
+    Rects[#Rects].PickName = Str .. "01"
+
+    Rects[#Rects + 1] = Rect.new(x, y + SizeY, SizeX, SizeY, 'line')
+    Rects[#Rects].PickName = Str .. "10"
+
+    Rects[#Rects + 1] = Rect.new(x + SizeX, y + SizeY, SizeX, SizeY, 'line')
+    Rects[#Rects].PickName = Str .. "11"
+
+    local EndIndex = #Rects
+
+    for i = StartIndex, EndIndex do
+        Rects[i].Center = Vector.new(Rects[i].x +  Rects[i].w * 0.5, Rects[i].y +  Rects[i].h * 0.5)
+        Rects[i]:SetMouseEventEable(true)
+
+        Rects[i].MouseDownEvent = function(rect, x, y)
+            log('bbbbbbb', rect.PickName)
+        end
+    end
+end
 
 local Rects = {}
-local Colors = {}
-local NumRectsX = 20
-local NumRectsY = 20
-local RectSize = 40
-
-local GenerateRects = function()
-    Rects = {}
-    for y = 0, NumRectsY do
-        for x = 0, NumRectsX do
-            local rect = Rect.new(x * RectSize, y * RectSize, RectSize, RectSize)
-            local color = LColor.new(math.random() * 255, math.random() * 255 , math.random() * 255, 255)
-            Colors[#Colors +1] = color
-            rect:setColor(Colors[#Colors].r, Colors[#Colors].g, Colors[#Colors].b, 255)
-            Rects[#Rects + 1] = rect
-        end
-    end
-
-end
-
-local SortRects = function()
-    table.sort(Colors, function(a, b)
-        return a:GetMortonCodeRGB() > b:GetMortonCodeRGB()
-    end)
-    
-    Rects = {}
-    local index = 1
-    for y = 0, NumRectsY do
-        for x = 0, NumRectsX do
-            local rect = Rect.new(x * RectSize, y * RectSize, RectSize, RectSize)
-            rect:setColor(Colors[index].r, Colors[index].g, Colors[index].b, 255)
-            Rects[#Rects + 1] = rect
-            index = index + 1
-        end
-    end
-end
-
-local SortRects2 = function()
-    table.sort(Colors, function(a, b)
-        return a:GetLuminance() > b:GetLuminance()
-    end)
-    
-    Rects = {}
-    local index = 1
-    for y = 0, NumRectsY do
-        for x = 0, NumRectsX do
-            local rect = Rect.new(x * RectSize, y * RectSize, RectSize, RectSize)
-            rect:setColor(Colors[index].r, Colors[index].g, Colors[index].b, 255)
-            Rects[#Rects + 1] = rect
-            index = index + 1
-        end
-    end
-end
+local w = RenderSet.screenwidth * 0.5
+local h = RenderSet.screenheight * 0.5
+GenerateRects(Rects, 0, 0, w, h, "00")
+GenerateRects(Rects, w, 0, w, h, "01")
+GenerateRects(Rects, 0, h, w, h, "10")
+GenerateRects(Rects, w, h, w, h, "11")
 
 app.render(function(dt)
     for i = 1, #Rects do
         Rects[i]:draw()
     end
 end)
+app.mousepressed(function(x, y, button, istouch)
+    local Pos = Vector.new(x, y)
+    -- log('aaa', Pos.x, Pos.y, RenderSet.screenwidth, RenderSet.screenheight)
+    Pos.x = Pos.x / RenderSet.screenwidth
+    Pos.y = Pos.y / RenderSet.screenheight
 
-GenerateRects()
-app.keypressed(function(key, scancode, isrepeat)
-    if key == "space" then
-        GenerateRects()
-    elseif key == "a" then
-        SortRects()
-    elseif key == "s" then
-        SortRects2()
-    end
+    Pos= Pos * math.pow(2, 16)
+    logbit(Pos:GetMortonCode2(), 32)
 end)

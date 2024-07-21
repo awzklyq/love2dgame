@@ -66,7 +66,7 @@ local PickMeshFromBoxs = function(mesh, SliceBoxs)
         if num >= LimitNum then
             InnerBoxs[#InnerBoxs + 1] = SliceBoxs[i]
         end
-        coroutine.yield(1 / #SliceBoxs)
+        coroutine.yield(i / #SliceBoxs)
     end
     return InnerBoxs
 end
@@ -107,7 +107,9 @@ app.update(function(dt)
         if "dead" ~= coroutine.status(CoroutineObj) then
         
             local _, result = coroutine.resume(CoroutineObj, CurrentMesh)
-            CurrentFunc(result)
+            if type(result) == 'number' then
+                CurrentFunc(result)
+            end
         else
             CoroutineObj = nil
         end

@@ -1,5 +1,9 @@
 FileManager.addAllPath("assert")
 
+local font = Font.new"FZZJ-JYTJW.TTF"
+font:Use()
+
+
 local sphere = Mesh3D.new("SM_RailingStairs_Internal.OBJ") -- S_BuildingSetA_Tree_02  SM_RailingStairs_Internal
 
 local BoxLines = sphere.box:buildMeshLines()
@@ -47,7 +51,7 @@ checkb.ChangeEvent = function(Enable)
     IsDrawMesh = Enable
 end
 
-local text = UI.Text.new( "Area", 0, 70, 60, 50 )
+local text = UI.Text.new( "Area", 0, 70, 120, 50 )
 
 local FinalFunc = function(_InnerBoxs)
     _Boxs = _InnerBoxs
@@ -55,9 +59,10 @@ local FinalFunc = function(_InnerBoxs)
 end
 
 local CurrentFunc = function(v)
-    local cv = math.modf(v * 100) 
-    text.text = " 正在计算 .. %" .. tostring(cv)
-    log(text.text)
+    if v then
+        local cv = math.modf(v * 10000) 
+        text.text = " Doing .. %" .. tostring(cv / 100)
+    end
 end
 
 MeshVolumNode.ProcessCoroutine(sphere, FinalFunc, CurrentFunc)
