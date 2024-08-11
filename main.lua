@@ -31,6 +31,7 @@ dofile('script/common/radarfrustum.lua')
 dofile('script/common/SpaceSplit.lua')
 dofile('script/common/psnr.lua')
 dofile('script/common/optional.lua')
+dofile('script/common/MehGenusGenerate.lua')
 
 dofile('script/file/file.lua')
 
@@ -188,7 +189,7 @@ if not _G.TEST then
 	end)
 
 else
-	dofile('script/test/test_morton.lua')--test_MeshVolume  test_BezierCurve.lua
+	dofile('script/test/test_meshgenus.lua')--test_MeshVolume  test_BezierCurve.lua
 	-- dofile('script/demo/ball/demo_ball.lua') test_SpaceSplit.lua
 end
 --dofile()

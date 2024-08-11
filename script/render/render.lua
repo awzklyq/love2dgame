@@ -117,6 +117,8 @@ Render.DDAStateFor3DId = 58
 
 Render.ImageDataId = 59
 
+Render.Edge3DId = 60
+
 Render.getRenderIdName = function(id)
     if type(id) == "table" then
         id = id.renderid
@@ -209,8 +211,10 @@ Render.getRenderIdName = function(id)
         return "DDAStateFor2D"
     elseif Render.DDAStateFor3DId == id then
         return "DDAStateFor3D"
-    elseif Render.ImageDataId == id then
+	elseif Render.ImageDataId == id then
         return "ImageDataId"
+    elseif Render.Edge3DId == id then
+        return "Edge3D"
     end
     
     return "Null"

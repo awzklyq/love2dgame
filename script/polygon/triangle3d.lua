@@ -13,6 +13,10 @@ function Triangle3D.new(p1, p2, p3, linewidth)-- Vector2 or Vector3...
 
     tri.mode = "line"
 
+    tri.Edge1 = Edge3D.new(tri.P2, tri.P3)
+    tri.Edge2 = Edge3D.new(tri.P1, tri.P3)
+    tri.Edge3 = Edge3D.new(tri.P1, tri.P2)
+
     tri.renderid = Render.Triangle3DId;
 
     return tri

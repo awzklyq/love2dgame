@@ -15,5 +15,7 @@ function Edge3D.new(p1, p2)
     edge.P1 = p1
     edge.P2 = p2
 
+    edge.renderid = Render.Edge3DId
+    
     return edge
 end

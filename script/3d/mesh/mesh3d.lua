@@ -455,7 +455,7 @@ Mesh3D.loadObjFile = function(path)
     local faces = {}
     local uvs = {}
     local normals = {}
-
+    local edges = {}
     local NeedCreateNormal = true
     -- go line by line through the file
     for line in love.filesystem.lines(path) do
@@ -481,6 +481,8 @@ Mesh3D.loadObjFile = function(path)
             normals[#normals+1] = {tonumber(words[2]), tonumber(words[3]), tonumber(words[4])}
             NeedCreateNormal = false
         end
+
+       
 
         -- if the first word in this line is a "f", then this is a face
         -- a face takes three arguments which refer to points, each of those points take three arguments
@@ -535,7 +537,6 @@ Mesh3D.loadObjFile = function(path)
         end
     end
 
-    
     if NeedCreateNormal then
         assert(#verts %3 == 0, "verts number is error : " .. tostring(#verts))
         for i = 1, #verts, 3 do
