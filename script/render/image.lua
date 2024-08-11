@@ -142,3 +142,32 @@ end
 function ImageEx:Release()
     self.ImageData = nil
 end
+
+_G.ImageDataEx = {}
+
+function ImageDataEx.new(w, h, format, rawdata)
+local imageData = setmetatable({}, {__index = ImageDataEx});
+    imageData.obj = love.image.newImageData( w, h, format, rawdata )
+
+    imageData.renderid = Render.ImageDataId;
+
+    return imageData
+end
+
+function ImageDataEx:GetPixel(x, y)
+    local r, g, b, a = self.obj:getPixel(x, y)
+    return LColor.new(r * 255, g * 255, b * 255, a * 255)
+end
+
+function ImageDataEx:SetPixel(x, y, r, g, b, a)
+    if not g then
+        self.obj:setPixel(x, y, r._r, r._g, r._b, r._a)
+    else
+        self.obj:setPixel(x, y, r, g, b, a)
+    end
+    return self.obj
+end
+
+function ImageDataEx:GetImage()
+    return ImageEx.new(self.obj)
+end
