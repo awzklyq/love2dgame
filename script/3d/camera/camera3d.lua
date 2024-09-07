@@ -121,7 +121,8 @@ end
 
 function Camera3D:GetDirction()
     local dir = Vector3.sub(self.look, self.eye)
-    return dir:normalize()
+    -- return dir:normalize()
+    return dir:normalize() 
 end
 
 -- give the camera a point to look from and a point to look towards

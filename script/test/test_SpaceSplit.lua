@@ -4,7 +4,7 @@ FileManager.addAllPath("assert")
 local width = love.graphics.getPixelWidth() 
 local height = love.graphics.getPixelHeight()
 
-local meshobj = Mesh3D.new("SM_RailingStairs_Internal.obj")
+local meshobj = Mesh3D.new("S_BuildingSetA_Tree_02.obj")
 meshobj:setBaseColor(LColor.new(125,125,125, 255))
 
 

@@ -62,6 +62,8 @@ function BillBoard.new(w, h)-- lw :line width
     mesh.bcolor = LColor.new(255,255,255,255)
     mesh.renderid = Render.BillBoardId;
 
+    mesh.Scale = Vector3.new(1, 1, 1)
+
     AddToUpdate(mesh)
 
     return mesh
@@ -76,10 +78,15 @@ function BillBoard:SetImage(image)
 end
 
 function BillBoard:UpdateTransform(CameraDir)
-    local mat = RotationMatrixs.MakeFromY(CameraDir)
+    local mat = RotationMatrixs.MakeFromYZ(CameraDir, currentCamera3D.up)
     -- local mat = RotationMatrixs.MakeFromYZ(CameraDir, currentCamera3D.up)
-    mat:SetTranslation(self.Position)
+    -- mat[4] = self.Position.x
+    -- mat[8] = self.Position.y
+    -- mat[12] = self.Position.z
 
+    mat:mulScalingLeft(self.Scale.x, self.Scale.y, self.Scale.z)
+
+    mat:mulTranslationRight(self.Position.x, self.Position.y, self.Position.z)
     self.transform3d:Set(mat)
 end
 

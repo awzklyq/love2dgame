@@ -17,6 +17,10 @@ app.keypressed(function(key, scancode, isrepeat)
     if key == "space" then
         log(currentCamera3D.eye.x, currentCamera3D.eye.y, currentCamera3D.eye.z)
         log(currentCamera3D.look.x, currentCamera3D.look.y, currentCamera3D.look.z)
+    elseif key == 'left' then
+        TestBillBoard.Position.x = TestBillBoard.Position.x + 10
+    elseif key == 'right' then
+        TestBillBoard.Position.x = TestBillBoard.Position.x - 10
     end
 end)
 

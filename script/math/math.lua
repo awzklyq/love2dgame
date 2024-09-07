@@ -772,3 +772,5 @@ math.c2pi = math.pi * 2
 math.invpi = 1 / math.pi
 math.invc2pi = 1 / math.c2pi
 -- math.ARC = math.PI * 2;
+
+math.UE_KINDA_SMALL_NUMBER = 1.e-4

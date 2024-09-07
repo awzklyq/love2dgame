@@ -110,6 +110,8 @@ function Vector3:set(value)
     self.z = value.z 
 end
 
+Vector3.Set = Vector3.set
+
 function Vector3:setXYZ(x, y, z)
     self.x = x
     self.y = y
@@ -287,3 +289,4 @@ end
 
 
 Vector3.cOrigin = Vector3.new(0, 0, 0)
+Vector3.ZAxis = Vector3.new(0, 0, 1)
