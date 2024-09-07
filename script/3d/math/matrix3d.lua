@@ -78,11 +78,19 @@ Matrix3D.createFromNumbers = function(...)
 end
 
 Matrix3D.createFromVectors = function(XAxis, YAxis, ZAxis, WAxis)
+	-- return Matrix3D.createFromNumbers(
+	-- 	XAxis.x, XAxis.y, XAxis.z, 0,
+	-- 	YAxis.x, YAxis.y, YAxis.z, 0,
+	-- 	ZAxis.x, ZAxis.y, ZAxis.z, 0,
+	-- 	WAxis.x, WAxis.y, WAxis.z, 1
+
+	-- );
+
 	return Matrix3D.createFromNumbers(
-		XAxis.x, XAxis.y, XAxis.z, 0,
-		YAxis.x, YAxis.y, YAxis.z, 0,
-		ZAxis.x, ZAxis.y, ZAxis.z, 0,
-		WAxis.x, WAxis.y, WAxis.z, 1
+		XAxis.x, YAxis.x, ZAxis.x, WAxis.x,
+		XAxis.y, YAxis.y, ZAxis.y, WAxis.y,
+		XAxis.z, YAxis.z, ZAxis.z, WAxis.z,
+		0, 0, 0, 1
 
 	);
 end
@@ -250,9 +258,8 @@ function Matrix3D:mulBoundBox(boundbox, NeedNotW)
 	return box:getBoundBox()
 end
 		
-			
-function Matrix3D:mulTranslationRight(x, y, z)
-	local mm = Matrix3D.new()
+function Matrix3D:SetTranslation(x, y, z)
+	local mm = self
 	if type(x) == "table" and x.renderid == Render.Vector3Id then
 		mm[13] = x.x
 		mm[14] = x.y
@@ -262,6 +269,11 @@ function Matrix3D:mulTranslationRight(x, y, z)
 		mm[14] = y
 		mm[15] = z
 	end
+end
+			
+function Matrix3D:mulTranslationRight(x, y, z)
+	local mm = Matrix3D.new()
+	mm:SetTranslation(x, y, z)
 	self:mulLeft(Matrix3D.transpose(mm))
 end
 
@@ -578,9 +590,8 @@ function Matrix3D:adjoint( )
 	return self
 end
 
-function Matrix3D.copy(mat)
-	local result = Matrix3D.new()
-	
+function Matrix3D:Set(mat)
+	local result = self
 	result[1] = mat[1]
 	result[2] = mat[2]
 	result[3] = mat[3]
@@ -602,6 +613,12 @@ function Matrix3D.copy(mat)
 	result[16] = mat[16]
 
 	return result;
+end
+
+function Matrix3D.copy(mat)
+	local result = Matrix3D.new()
+	
+	return result:Set(mat);
 end
 
 Matrix3D.Copy =  Matrix3D.copy

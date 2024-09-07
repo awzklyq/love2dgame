@@ -92,3 +92,38 @@ RotationMatrixs.MakeFromZX = function(ZAxis, XAxis)
 
 	return Matrix3D.createFromVectors(NewX, NewY, NewZ, Vector3.cOrigin)
 end
+
+
+RotationMatrixs.MakeFromYZ = function(YAxis, ZAxis)
+	local NewY = YAxis:Normalize();
+	local Norm = ZAxis:Normalize();
+
+	-- if they're almost same, we need to find arbitrary vector
+	if math.IsNearlyEqual(math.abs(Vector3.dot(NewY ,Norm)), 1.0) then
+	
+		--// make sure we don't ever pick the same as NewX
+		Norm = (math.abs(NewY.z) < (1.0 - math.UE_KINDA_SMALL_NUMBER))  and Vector3.new(0,0,1) or Vector3.new(1.0,0,0);
+	end
+
+	local NewX = Vector3.cross(NewY, Norm):Normalize();
+	local NewZ = Vector3.cross(NewX, NewY);
+
+	return Matrix3D.createFromVectors(NewX, NewY, NewZ, Vector3.cOrigin)
+end
+
+RotationMatrixs.MakeFromZY = function(ZAxis, YAxis)
+	local NewZ = ZAxis:Normalize();
+	local Norm = YAxis:Normalize();
+
+	-- if they're almost same, we need to find arbitrary vector
+	if math.IsNearlyEqual(math.abs(Vector3.dot(NewZ ,Norm)), 1.0) then
+	
+		--// make sure we don't ever pick the same as NewX
+		Norm = (math.abs(NewZ.z) < (1.0 - math.UE_KINDA_SMALL_NUMBER))  and Vector3.new(0,0,1) or Vector3.new(1.0,0,0);
+	end
+
+	local NewX = Vector3.cross(Norm, NewZ):Normalize();
+	local NewY = Vector3.cross(NewZ, NewX);
+
+	return Matrix3D.createFromVectors(NewX, NewY, NewZ, Vector3.cOrigin)
+end

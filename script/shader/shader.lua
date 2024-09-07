@@ -11,6 +11,9 @@ dofile('script/shader/line3d.lua')
 dofile('script/shader/pbr.lua')
 dofile('script/shader/mesh3d.lua')
 
+dofile('script/shader/TestSunPlane.lua')
+dofile('script/shader/billboard.lua')
+
 Shader.neednormal = 1
 function Shader.new(pixelcode, vertexcode)
     local shader = setmetatable({}, Shader);

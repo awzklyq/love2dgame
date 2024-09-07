@@ -119,6 +119,8 @@ Render.ImageDataId = 59
 
 Render.Edge3DId = 60
 
+Render.BillBoardId = 61
+
 Render.getRenderIdName = function(id)
     if type(id) == "table" then
         id = id.renderid
@@ -215,6 +217,8 @@ Render.getRenderIdName = function(id)
         return "ImageDataId"
     elseif Render.Edge3DId == id then
         return "Edge3D"
+    elseif Render.BillBoardId == id then
+        return "BillBoard"
     end
     
     return "Null"
@@ -372,6 +376,8 @@ Render.RenderObject = function(obj)
             end
             
         elseif obj.renderid == Render.Mesh3DId then
+            love.graphics.draw( obj.obj )
+        elseif obj.renderid == Render.BillBoardId then
             love.graphics.draw( obj.obj )
         elseif obj.renderid == Render.MeshLineId then
             love.graphics.draw( obj.obj )

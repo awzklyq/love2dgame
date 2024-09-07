@@ -39,6 +39,9 @@ dofile('script/xml/xmlload.lua')
 
 dofile('script/map/terrain/tiled.lua')
 
+
+dofile('script/3d/mesh/billboard.lua')
+
 dofile('script/shader/shader.lua')
 dofile('script/shader/shaderfunction.lua')
 dofile('script/shader/shader_octahedralmap.lua')
@@ -54,7 +57,6 @@ dofile('script/polygon/edge.lua')
 dofile('script/polygon/box.lua')
 dofile('script/polygon/mesh.lua')
 dofile('script/3d/mesh/mesh3d.lua')
-dofile('script/3d/mesh/aixs.lua')
 dofile('script/3d/mesh/aixs.lua')
 
 dofile('script/polygon/triangle.lua')
@@ -149,6 +151,7 @@ dofile 'script/postprocess/godray.lua'
 dofile 'script/postprocess/watercolorfilter.lua'
 dofile 'script/postprocess/fog.lua'
 dofile 'script/postprocess/lightnode.lua'
+
 dofile 'script/3d/effect/motionvector.lua'
 
 dofile 'script/3d/math/edge3d.lua'
@@ -189,7 +192,7 @@ if not _G.TEST then
 	end)
 
 else
-	dofile('script/test/test_meshgenus.lua')--test_MeshVolume  test_BezierCurve.lua
+	dofile('script/test/test_sunplane.lua')--test_MeshVolume  test_BezierCurve.lua
 	-- dofile('script/demo/ball/demo_ball.lua') test_SpaceSplit.lua
 end
 --dofile()
