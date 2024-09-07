@@ -8,7 +8,7 @@ function Shader.GetBillBoardBaseShader(projectionMatrix, modelMatrix, viewMatrix
          local pixelcode = [[
              vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
              {
-                 return vec4(1, 0, 1, 1);
+                 return texture2D(tex, texture_coords) ;
              }
          ]]
      
@@ -25,6 +25,10 @@ function Shader.GetBillBoardBaseShader(projectionMatrix, modelMatrix, viewMatrix
  
          shader = Shader.new(pixelcode, vertexcode)
  
+         shader.SetBillboardValue = function()
+         
+        end
+
          shader.setCameraAndMatrix3D = function(obj, modelMatrix, projectionMatrix, viewMatrix, mesh)
              if projectionMatrix then
                  obj:send('projectionMatrix', projectionMatrix)

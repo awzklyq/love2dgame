@@ -1,4 +1,5 @@
-_G.BillBoard = {}
+_G.__createClassFromLoveObj("BillBoard")
+
 local BillBoardNumber = 0
 local BillBoardTransformUpdata = setmetatable({}, {__mode = "v"})  
 
@@ -30,7 +31,7 @@ local QuadData =
     {-0.5, 0, 0.5, 0, 1, 0, 1, 0}
 }
 function BillBoard.new(w, h)-- lw :line width
-    local mesh = setmetatable({}, {__index = BillBoard});
+    local mesh = setmetatable({}, BillBoard);
 
     mesh.transform3d = Matrix3D.new();
 
@@ -64,6 +65,14 @@ function BillBoard.new(w, h)-- lw :line width
     AddToUpdate(mesh)
 
     return mesh
+end
+
+function BillBoard:SetCanvas(canvas)
+    self:setTexture(canvas.obj)
+end
+
+function BillBoard:SetImage(image)
+    self:setTexture(image.obj)
 end
 
 function BillBoard:UpdateTransform(CameraDir)
