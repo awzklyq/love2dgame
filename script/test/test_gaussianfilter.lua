@@ -1,7 +1,7 @@
 FileManager.addAllPath("assert")
 math.randomseed(os.time()%10000)
 
-local img = ImageEx.new("qq1.png")
+local img = ImageEx.new("testnoise.png")
 img.w  = love.graphics.getPixelWidth()
 img.h = love.graphics.getPixelHeight()
 

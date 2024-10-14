@@ -55,9 +55,9 @@ local CacleDirection = function()
         Num = Num + math.pow(2,  i);
         Lensflare[i].Position:Set(SunPlane.Position + MoveDir * OffsetDis * Num)
        
-        Lensflare[i].Scale.x = i / LensflareCount
-        Lensflare[i].Scale.y = i / LensflareCount
-        Lensflare[i].Scale.z = i / LensflareCount
+        Lensflare[i].Scale.x = Num / NOC
+        Lensflare[i].Scale.y = Num / NOC
+        Lensflare[i].Scale.z = Num / NOC
         -- Lensflare[i].Position:Set(CenterPos)
     end
 

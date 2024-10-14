@@ -152,6 +152,9 @@ dofile 'script/postprocess/watercolorfilter.lua'
 dofile 'script/postprocess/fog.lua'
 dofile 'script/postprocess/lightnode.lua'
 
+dofile 'script/postprocess/BlurFilter.lua'
+dofile 'script/postprocess/KuwaharaFilter.lua'
+
 dofile 'script/3d/effect/motionvector.lua'
 
 dofile 'script/3d/math/edge3d.lua'
@@ -192,7 +195,7 @@ if not _G.TEST then
 	end)
 
 else
-	dofile('script/test/test_Lensflare.lua')--test_MeshVolume  test_BezierCurve.lua
+	dofile('script/test/test_Kuwahara_filter.lua')--test_MeshVolume  test_BezierCurve.lua
 	-- dofile('script/demo/ball/demo_ball.lua') test_SpaceSplit.lua
 end
 --dofile()
