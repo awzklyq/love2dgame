@@ -1,4 +1,8 @@
-local TestBillBoard = BillBoard.GetDefaultSunPlane(200, 200, 20)--BillBoard.new(100, 100)
+RenderSet.BGColor = LColor.new(80,80,80,255)
+
+local TestBillBoard = BillBoard.GetDefaultSunPlane(400, 400, 20)--BillBoard.new(100, 100)
+
+TestBillBoard.TestLerp = 0.8
 
 local aixs = Aixs.new(0,0,0, 200)
 aixs:SetTransform(TestBillBoard.transform3d)
@@ -29,7 +33,7 @@ checkb.ChangeEvent = function(Enable)
     end
 end
 
-local scrollbarR = UI.ScrollBar.new( 'Radius', 10, 40, 200, 40, 10, 100, 1)
+local scrollbarR = UI.ScrollBar.new( 'Radius', 10, 40, 200, 40, 10, 500, 1)
 scrollbarR.Value = 20
 scrollbarR.ChangeEvent = function(v)
     TestBillBoard.Radius = v
@@ -39,4 +43,17 @@ local scrollbarP = UI.ScrollBar.new( 'Power', 10, 100, 200, 40, 0.1, 50, 0.1)
 scrollbarP.Value = 1
 scrollbarP.ChangeEvent = function(v)
     TestBillBoard.LightPower = v
+end
+
+local scrollbarL = UI.ScrollBar.new( 'TestLerp', 10, 150, 200, 40, 0, 1, 0.01)
+scrollbarL.Value = 0.8
+scrollbarL.ChangeEvent = function(v)
+    TestBillBoard.TestLerp = v
+end
+
+local cp = UI.ColorPlane.new( "test color", 10, 200, 60, 60)
+
+
+cp.ChangeEvent = function(value)
+    RenderSet.BGColor:Set(value)
 end

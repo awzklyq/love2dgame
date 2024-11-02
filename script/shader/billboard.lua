@@ -6,9 +6,12 @@ function Shader.GetBillBoardBaseShader(projectionMatrix, modelMatrix, viewMatrix
     end
     if not shader then
          local pixelcode = [[
+            uniform float AlphaValua;
              vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
              {
-                 return texture2D(tex, texture_coords) ;
+                vec4 BaseColor = texture2D(tex, texture_coords);
+                BaseColor.a *= AlphaValua;
+                return BaseColor;
              }
          ]]
      
@@ -25,8 +28,8 @@ function Shader.GetBillBoardBaseShader(projectionMatrix, modelMatrix, viewMatrix
  
          shader = Shader.new(pixelcode, vertexcode)
  
-         shader.SetBillboardValue = function()
-         
+         shader.SetBillboardValue = function(obj, AlphaValua)
+            obj:sendValue("AlphaValua", AlphaValua)
         end
 
          shader.setCameraAndMatrix3D = function(obj, modelMatrix, projectionMatrix, viewMatrix, mesh)

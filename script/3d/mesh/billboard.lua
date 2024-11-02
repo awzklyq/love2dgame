@@ -50,7 +50,6 @@ function BillBoard.new(w, h)-- lw :line width
     
     mesh.verts = datas
     mesh.shader = Shader.GetBillBoardBaseShader()
-
     mesh.obj = love.graphics.newMesh(vertexFormat, mesh.verts, "triangles")
 
     mesh.box = BoundBox.buildFromMesh3D(mesh)
@@ -63,6 +62,8 @@ function BillBoard.new(w, h)-- lw :line width
     mesh.renderid = Render.BillBoardId;
 
     mesh.Scale = Vector3.new(1, 1, 1)
+
+    mesh.Alpha = 1.0
 
     AddToUpdate(mesh)
 
@@ -96,6 +97,7 @@ function BillBoard:draw()
     local camera3d = _G.getGlobalCamera3D()
   
 
+    --self.shader:SetBillboardValue(self.Alpha)
     self.shader:setCameraAndMatrix3D(self.transform3d, RenderSet.getUseProjectMatrix(), RenderSet.getUseViewMatrix(), camera3d.eye, self)
     
  
