@@ -757,6 +757,109 @@ math.IsNearlyEqual = function(A, B, SMALL_NUMBER)
     return math.abs( A - B ) <= ErrorTolerance;
 end
 
+-- Returns <0 if C is left of A-B
+math.ComputeDeterminant2D = function(A, B, C)
+    local u1 = B.x - A.x;
+    local v1 = B.y - A.y;
+    local u2 = C.x - A.x;
+    local v2 = C.y - A.y;
+
+    return u1 * v2 - v1 * u2;
+end
+
+--Alternate simple implementation that was found to work correctly for points that are very close together (inside the 0-1 range).
+math.ComputeConvexHull2 = function(InPoints, OutIndices)
+    if #InPoints <= 1 then
+        return
+    end
+
+    --Jarvis march implementation
+    local LeftMostIndex = 1
+    local LeftMostVec = InPoints[1]
+    for i = 2, #InPoints do
+        if InPoints[i].x < LeftMostVec.x or (InPoints[i].x == LeftMostVec.x and InPoints[i].y < LeftMostVec.y) then
+            LeftMostVec = InPoints[i]
+            LeftMostIndex = i
+        end
+    end
+
+    local PointOnHullIndex = LeftMostIndex
+	local EndPointIndex = -1;
+
+    while EndPointIndex ~= LeftMostIndex do
+        OutIndices[#OutIndices + 1] = PointOnHullIndex
+        EndPointIndex = 1
+
+        for j = 2, #InPoints do
+            if EndPointIndex == PointOnHullIndex or math.ComputeDeterminant2D(InPoints[EndPointIndex], InPoints[PointOnHullIndex], InPoints[j]) < 0 then
+                EndPointIndex = j
+            end
+        end
+
+        PointOnHullIndex = EndPointIndex
+    end
+
+end
+
+function IsValidUV(InUV)
+
+	return InUV.x >= 0.0 and InUV.x <= 1.0 and InUV.y >= 0.0 and InUV.y <= 1.0
+end
+
+math.ComputePointIntersectionBetweenLines2D = function(ray2d0, ray2d1, OutIntersectPoint)
+    local d = Vector.cross(ray2d0.dir, ray2d1.dir)
+
+    if math.abs(d) < math.SMALL_NUMBER then
+        return false
+    end
+
+    local t = Vector.cross(ray2d1.dir, ray2d0.orig - ray2d1.orig) / d;
+
+    if t < 0.5 then
+		return false;
+    end
+
+    local result = ray2d0.orig + t * ray2d0.dir
+    OutIntersectPoint:Set(result)
+    return true
+end
+
+--InTargetVertexCount Must be 4, 6, 8
+function FindOptimalPolygonInner(InTargetVertexCount, InRay2Ds, InStartIndex, InPreIndex, InUVTable, InCount, OutData)
+    for i = InStartIndex, #InRay2Ds do
+        local V = Vector.new()
+        if math.ComputePointIntersectionBetweenLines2D(Lines[InPreIndex], Lines[i], V) and IsValidUV(V) then
+            InUVTable[#InUVTable + 1] = V
+
+            if InCount == InTargetVertexCount then
+      
+            else
+                FindOptimalPolygonInner(InTargetVertexCount, InRay2Ds, i + 1, i, InUVTable, InCount + 1)
+            end
+
+            table.remove(InUVTable, #InUVTable)
+        end
+    end
+end
+
+--TargetVertexCount Must be 4, 6, 8
+math.FindOptimalPolygon = function(TargetVertexCount, ConvexHullIndices, PotentialHullVertices, OutBoundingVertices)
+    local VertexCount = math.min(TargetVertexCount, #ConvexHullIndices)
+
+    local Ray2Ds = {}
+    for i = 1, #ConvexHullIndices do
+        local i1 = i
+        local i2 = i + 1
+        if i2 > #ConvexHullIndices then
+            i2 = 1
+        end
+
+        local v1 = PotentialHullVertices[ConvexHullIndices[i1]]
+        local v2 = PotentialHullVertices[ConvexHullIndices[i2]]
+        Ray2Ds[#Ray2Ds + 1] = Ray2D.new(v1, v2 - v1)
+    end
+end
+
 math.defaulttransform =  love.math.newTransform( );
 math.MinNumber = 0.000001;
 math.MaxNumber = 999999.0;
