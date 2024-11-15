@@ -38,7 +38,14 @@ metatable_vector.__unm = function(myvalue)
 end
 
 metatable_vector.__div = function(myvalue, value)
-    return Vector.new(myvalue.x / value, myvalue.y / value)
+    if type(value) == "number" then
+        return Vector.new(myvalue.x / value, myvalue.y / value)
+    elseif  type(value) == "table" and value.renderid == Render.Vector2Id then
+        return Vector.new(myvalue.x / value.x, myvalue.y / value.y)
+    else
+        _errorAssert(false, "metatable_vector2.__div~")
+    end  
+   
 end
 
 metatable_vector.__eq = function(myvalue, value)
@@ -108,7 +115,13 @@ function Vector:GetMortonCode2()
     Morton = math.BitOr(Morton, math.LeftMove(math.MortonCode2( math.round(self.y) ) ,1));
     return Morton
 end
-    
+
+function Vector:Set(v)
+    self.x = v.x
+    self.y = v.y
+end
+
+Vector.set = Vector.Set
 Vector.distance = function(v1, v2)
     return math.sqrt(math.pow(v1.x - v2.x, 2) + math.pow(v1.y - v2.y, 2))
 end

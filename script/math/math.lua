@@ -801,9 +801,9 @@ math.ComputeConvexHull2 = function(InPoints, OutIndices)
 
 end
 
-function IsValidUV(InUV)
+function IsValidUV(InUV, w, h)
 
-	return InUV.x >= 0.0 and InUV.x <= 1.0 and InUV.y >= 0.0 and InUV.y <= 1.0
+	return InUV.x >= 0 and InUV.x <= w and InUV.y >= 0.0 and InUV.y <= h
 end
 
 math.ComputePointIntersectionBetweenLines2D = function(ray2d0, ray2d1, OutIntersectPoint)
@@ -819,22 +819,78 @@ math.ComputePointIntersectionBetweenLines2D = function(ray2d0, ray2d1, OutInters
 		return false;
     end
 
-    local result = ray2d0.orig + t * ray2d0.dir
+    local result = ray2d0.orig + ray2d0.dir * t
     OutIntersectPoint:Set(result)
     return true
 end
 
 --InTargetVertexCount Must be 4, 6, 8
-function FindOptimalPolygonInner(InTargetVertexCount, InRay2Ds, InStartIndex, InPreIndex, InUVTable, InCount, OutData)
+function FindOptimalPolygonInner(w, h, InTargetVertexCount, InRay2Ds, InStartIndex, InPreIndex, InFirstIndex, InUVTable, InCount, OutData)
     for i = InStartIndex, #InRay2Ds do
         local V = Vector.new()
-        if math.ComputePointIntersectionBetweenLines2D(Lines[InPreIndex], Lines[i], V) and IsValidUV(V) then
-            InUVTable[#InUVTable + 1] = V
 
-            if InCount == InTargetVertexCount then
-      
+        local IsIntersect = math.ComputePointIntersectionBetweenLines2D(InRay2Ds[InStartIndex - 1], InRay2Ds[i], V)
+
+        if IsIntersect and IsValidUV(V, w, h) then
+            InUVTable[#InUVTable + 1] = V
+          
+            local VV = Vector.new()
+            local IsLast = InCount == (InTargetVertexCount - 1)
+            IsIntersect = IsLast and math.ComputePointIntersectionBetweenLines2D(InRay2Ds[i], InRay2Ds[InFirstIndex], VV)
+           
+            if IsIntersect and IsValidUV(VV, w, h) then
+                InUVTable[#InUVTable + 1] = VV
+                local Area =  OutData.MinArea + 1
+                if InTargetVertexCount == 4 then
+                    local U0 = InUVTable[2] - InUVTable[1];
+                    local U1 = InUVTable[3] - InUVTable[1];
+                    local U2 = InUVTable[4] - InUVTable[1];
+
+                    Area =
+                        (U0.y * U1.x - U0.x * U1.y) +
+                        (U1.y * U2.x - U1.x * U2.y);
+                elseif InTargetVertexCount == 6 then
+                    local U0 = InUVTable[2] - InUVTable[1];
+                    local U1 = InUVTable[3] - InUVTable[1];
+                    local U2 = InUVTable[4] - InUVTable[1];
+                    local U3 = InUVTable[5] - InUVTable[1];
+                    local U4 = InUVTable[6] - InUVTable[1];
+
+                    Area =
+                        (U0.y * U1.x - U0.x * U1.y) +
+                        (U1.y * U2.x - U1.x * U2.y) + 
+                        (U2.y * U3.x - U2.x * U3.y) +
+                        (U3.y * U4.x - U3.x * U4.y);
+
+                elseif InTargetVertexCount == 8 then
+                        local U0 = InUVTable[2] - InUVTable[1];
+                        local U1 = InUVTable[3] - InUVTable[1];
+                        local U2 = InUVTable[4] - InUVTable[1];
+                        local U3 = InUVTable[5] - InUVTable[1];
+                        local U4 = InUVTable[6] - InUVTable[1];
+                        local U5 = InUVTable[7] - InUVTable[1];
+                        local U6 = InUVTable[8] - InUVTable[1];
+    
+                        Area =
+                            (U0.y * U1.x - U0.x * U1.y) +
+                            (U1.y * U2.x - U1.x * U2.y) + 
+                            (U2.y * U3.x - U2.x * U3.y) +
+                            (U3.y * U4.x - U3.x * U4.y) +
+                            (U4.y * U5.x - U4.x * U5.y) +
+                            (U5.y * U6.x - U5.x * U6.y);
+                end
+
+                if Area < OutData.MinArea then
+                    OutData.MinArea = Area;
+                    local Size = Vector.new(w, h)
+                    for VNIndex = 1, #InUVTable do
+                        OutData.OutBoundingVertices[VNIndex] = InUVTable[VNIndex];
+                    end
+                end
+                
+                table.remove(InUVTable, #InUVTable)
             else
-                FindOptimalPolygonInner(InTargetVertexCount, InRay2Ds, i + 1, i, InUVTable, InCount + 1)
+                FindOptimalPolygonInner(w, h, InTargetVertexCount, InRay2Ds, i + 1, i, InFirstIndex, InUVTable, InCount + 1, OutData)
             end
 
             table.remove(InUVTable, #InUVTable)
@@ -843,21 +899,38 @@ function FindOptimalPolygonInner(InTargetVertexCount, InRay2Ds, InStartIndex, In
 end
 
 --TargetVertexCount Must be 4, 6, 8
-math.FindOptimalPolygon = function(TargetVertexCount, ConvexHullIndices, PotentialHullVertices, OutBoundingVertices)
+math.FindOptimalPolygon = function(w, h, TargetVertexCount, ConvexHullIndices, PotentialHullVertices, OutData)
     local VertexCount = math.min(TargetVertexCount, #ConvexHullIndices)
 
     local Ray2Ds = {}
+    local Size = Vector.new(w,h)
     for i = 1, #ConvexHullIndices do
         local i1 = i
         local i2 = i + 1
         if i2 > #ConvexHullIndices then
             i2 = 1
+           
         end
 
-        local v1 = PotentialHullVertices[ConvexHullIndices[i1]]
+        local v1 = PotentialHullVertices[ConvexHullIndices[i1]] 
         local v2 = PotentialHullVertices[ConvexHullIndices[i2]]
-        Ray2Ds[#Ray2Ds + 1] = Ray2D.new(v1, v2 - v1)
+        -- v1.y = h - v1.y
+        -- local vv = v1 / Size
+        -- log('hhhhhhhhhhhhhh', vv.x, vv.y )
+        Ray2Ds[#Ray2Ds + 1] = Ray2D.new(v1 , v2 - v1)
     end
+    
+    OutData.MinArea = math.FLT_MAX - 2
+
+    local UVTable = {}
+    local Count = 0
+    for i = 1, #Ray2Ds do
+        FindOptimalPolygonInner(w, h, VertexCount, Ray2Ds, i + 1, i, i, UVTable, Count + 1, OutData)
+    end
+
+    -- for i = 1, #ConvexHullIndices do
+    --     OutData.OutBoundingVertices[i] = PotentialHullVertices[ConvexHullIndices[i]] 
+    -- end
 end
 
 math.defaulttransform =  love.math.newTransform( );
@@ -875,5 +948,5 @@ math.c2pi = math.pi * 2
 math.invpi = 1 / math.pi
 math.invc2pi = 1 / math.c2pi
 -- math.ARC = math.PI * 2;
-
+math.FLT_MAX = 3.402823466e+38
 math.UE_KINDA_SMALL_NUMBER = 1.e-4
