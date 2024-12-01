@@ -80,7 +80,8 @@ dofile('script/math/matrix.lua')
 dofile('script/math/matrix2d.lua')
 dofile('script/math/matrixs.lua')
 dofile('script/math/RotationMatrix.lua')
-dofile 'script/math/kmeans.lua'
+dofile('script/math/kmeans.lua')
+dofile('script/math/formula.lua')
 dofile('script/3d/math/vector3.lua')
 dofile('script/3d/math/vector4.lua')
 dofile('script/3d/math/matrix3d.lua')
@@ -195,7 +196,7 @@ if not _G.TEST then
 	end)
 
 else
-	dofile('script/test/test_OptimalPolygon.lua')--test_MeshVolume  test_BezierCurve.lua
+	dofile('script/test/test_formula.lua')--test_MeshVolume  test_BezierCurve.lua
 	-- dofile('script/demo/ball/demo_ball.lua') test_SpaceSplit.lua
 end
 --dofile()
