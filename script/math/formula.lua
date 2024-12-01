@@ -9,11 +9,11 @@ OperatorTyoe.Mul = 4
 OperatorTyoe.Div = 5
 OperatorTyoe.Pow = 6
 
-_G.RealTyoe = {}
-RealTyoe.Number = 0
-RealTyoe.Formula = 1
-RealTyoe.Parameter = 2
-RealTyoe.FormulaOperator = 3
+_G.RealType = {}
+RealType.Number = 0
+RealType.Formula = 1
+RealType.Parameter = 2
+RealType.FormulaOperator = 3
 
 local metatable_Formula = {}
 metatable_Formula.__index = Formula
@@ -31,9 +31,9 @@ end
 function GetRealType(Real)
     local RType
     if IsNumber(Real) then
-        RType = RealTyoe.Number
+        RType = RealType.Number
     elseif IsFormulaOperator(Real) then
-        RType = RealTyoe.FormulaOperator
+        RType = RealType.FormulaOperator
     else
         log('FormulaError', Real)
         _errorAssert(false, "GetRealType is Not Right Type")
@@ -45,9 +45,9 @@ end
 function GetParameType(ParameValue)
     local PType
     if IsString(ParameValue) then
-        PType = RealTyoe.Parameter
+        PType = RealType.Parameter
     elseif IsFormulaOperator(ParameValue) then
-        PType = RealTyoe.FormulaOperator
+        PType = RealType.FormulaOperator
     else
         _errorAssert(false, "GetParameType is Not Right Type")
     end
@@ -56,9 +56,9 @@ function GetParameType(ParameValue)
 end
 
 function CopyReal(RType, Real)
-    if RType == RealTyoe.Number then
+    if RType == RealType.Number then
         return Real
-    elseif RType == RealTyoe.FormulaOperator then
+    elseif RType == RealType.FormulaOperator then
         return FormulaOperator.Copy(Real)
     end
 
@@ -66,13 +66,45 @@ function CopyReal(RType, Real)
 end
 
 function CopyParame(PType, Parame)
-    if PType == RealTyoe.Parameter then
+    if PType == RealType.Parameter then
         return Parame
-    elseif PType == RealTyoe.FormulaOperator then
+    elseif PType == RealType.FormulaOperator then
         return FormulaOperator.Copy(Parame)
     end
 
     _errorAssert(false, "FormulaOperator CopyParame Error")
+end
+
+function IsNeedBracket(FO)
+    return FO.OType == OperatorTyoe.Add or  FO.OType == OperatorTyoe.Sub
+end
+
+function ToStringReal(FO)
+    if FO.RType == RealType.Number then
+        return tostring(FO.Real)
+    elseif  FO.RType == RealType.FormulaOperator then
+        if IsNeedBracket(FO.Real) then
+            return " (" .. FO.Real:ToString() .. ")"
+        else
+            return FO.Real:ToString()
+        end
+    end
+
+    _errorAssert(false, "FormulaOperator ToStringReal Error")
+end
+
+function ToStringParame(FO)
+    if FO.PType == RealType.Parameter then
+        return FO.PName.."(" .. tostring(FO.Parame)..") "
+    elseif  FO.PType == RealType.FormulaOperator then
+        if IsNeedBracket(FO.Parame) then
+            return " (" .. FO.Parame:ToString() .. ")"
+        else
+            return FO.Parame:ToString()
+        end
+    end
+
+    _errorAssert(false, "FormulaOperator ToStringParame Error")
 end
 
 function FormulaOperator.new(OType, RType, Real, PType, Parame, PName)
@@ -105,7 +137,7 @@ function FormulaOperator.Copy(FO)
 end
 
 function FormulaOperator.CreateFromDiffParame(OType, RType, Real, PType, Parame)
-    if PType == RealTyoe.FormulaOperator then
+    if PType == RealType.FormulaOperator then
         return FormulaOperator.new(OType, RType, Real, PType, Parame)
     else
         return FormulaOperator.new(OType, RType, Real, PType, nil, Parame)
@@ -151,9 +183,9 @@ end
 function FormulaOperator:GetRealValue()
     local RealValue
 
-    if self.RType == RealTyoe.FormulaOperator then
+    if self.RType == RealType.FormulaOperator then
         RealValue = self.Real:GetParameValue()
-    elseif self.RType == RealTyoe.Number then
+    elseif self.RType == RealType.Number then
         RealValue = self.Real
     else
         _errorAssert(false, "Operator GetRealValue PType is not Right")
@@ -164,12 +196,12 @@ end
 
 function FormulaOperator:GetParameValue()
     local ParameValue
-    if self.PType == RealTyoe.FormulaOperator then
+    if self.PType == RealType.FormulaOperator then
         ParameValue = self.Parame:GetParameValue()
-    elseif self.PType == RealTyoe.Parameter then
+    elseif self.PType == RealType.Parameter then
         _errorAssert(self.Parame, "Operator GetParameValue PType Parameter is not Value")
         ParameValue = self.Parame
-    elseif self.PType == RealTyoe.Number then
+    elseif self.PType == RealType.Number then
         ParameValue = self.Real
     else
         _errorAssert(false, "Operator GetParameValue PType is not Right")
@@ -196,31 +228,31 @@ function FormulaOperator:GetParameValue()
 end
 
 function FormulaOperator:SetParameValue(PName, PValue)
-    if  self.PType == RealTyoe.Parameter and self.PName == PName then
+    if  self.PType == RealType.Parameter and self.PName == PName then
         self.Parame = PValue
-    elseif self.PType == RealTyoe.FormulaOperator then
+    elseif self.PType == RealType.FormulaOperator then
         self.Parame:SetParameValue(PName, PValue)
     end
 
-    if self.RType == RealTyoe.FormulaOperator then
+    if self.RType == RealType.FormulaOperator then
         self.Real:SetParameValue(PName, PValue)
     end
 end
 
 function FormulaOperator:HasParame(PName)
     local IsHas = false
-    if  self.PType == RealTyoe.Parameter and self.PName == PName then
+    if  self.PType == RealType.Parameter and self.PName == PName then
         IsHas = true
     end
 
     if IsHas == false then
-        if self.PType == RealTyoe.FormulaOperator then
+        if self.PType == RealType.FormulaOperator then
             IsHase = self.Parame:HasParame(PName)
         end
     end
 
     if IsHas == false then
-        if self.RType == RealTyoe.FormulaOperator then
+        if self.RType == RealType.FormulaOperator then
             IsHas = self.Real:HasParame(PName)
         end
     end
@@ -230,18 +262,18 @@ end
 
 function FormulaOperator:IsHasParame(PName)
     local IsHas = false
-    if  self.PType == RealTyoe.Parameter then
+    if  self.PType == RealType.Parameter then
         IsHas = true
     end
 
     if IsHas == false then
-        if self.PType == RealTyoe.FormulaOperator then
+        if self.PType == RealType.FormulaOperator then
             IsHase = self.Parame:IsHasParame(PName)
         end
     end
 
     if IsHas == false then
-        if self.RType == RealTyoe.FormulaOperator then
+        if self.RType == RealType.FormulaOperator then
             IsHas = self.Real:IsHasParame(PName)
         end
     end
@@ -251,18 +283,18 @@ end
 
 function FormulaOperator:IsHasOtherParame(PName)
     local IsHas = false
-    if  self.PType == RealTyoe.Parameter then
+    if  self.PType == RealType.Parameter then
         IsHas = self.PName ~= PName
     end
 
     if IsHas == false then
-        if self.PType == RealTyoe.FormulaOperator then
+        if self.PType == RealType.FormulaOperator then
             IsHase = self.Parame:IsHasParame(PName)
         end
     end
 
     if IsHas == false then
-        if self.RType == RealTyoe.FormulaOperator then
+        if self.RType == RealType.FormulaOperator then
             IsHas = self.Real:IsHasParame(PName)
         end
     end
@@ -273,14 +305,14 @@ end
 function FormulaOperator:ReplaceParamWithFormula(PName, FO)
     _errorAssert(IsFormulaOperator(FO), "ReplaceParamWithFormula FO is not Right")
 
-    if  self.PType == RealTyoe.Parameter and self.PName == PName then
+    if  self.PType == RealType.Parameter and self.PName == PName then
         self.Parame = FormulaOperator.Copy(FO)
-        self.PType = RealTyoe.FormulaOperator
-    elseif self.PType == RealTyoe.FormulaOperator then
+        self.PType = RealType.FormulaOperator
+    elseif self.PType == RealType.FormulaOperator then
         self.Parame:ReplaceParamWithFormula(PName, FO)
     end
 
-    if self.RType == RealTyoe.FormulaOperator then
+    if self.RType == RealType.FormulaOperator then
         self.Real:ReplaceParamWithFormula(PName, FO)
     end
 end
@@ -320,6 +352,34 @@ function FormulaOperator:Derivative(PName, PValue)
        return (V1 - V2) / math.MinNumber
 
     end
+end
+
+function FormulaOperator:IsHasSubFormula()
+    return not (self.RType == RealType.Number and self.PType == RealType.Parameter)
+end
+
+function FormulaOperator:ToString()
+    local RealStr = ToStringReal(self)
+    local ParameStr = ToStringParame(self)
+    local OperatorStr = ""
+
+    local str = ""
+    if self.OType == OperatorTyoe.Add then
+        str = RealStr .. " + " .. ParameStr
+    elseif self.OType == OperatorTyoe.Sub then
+        str = RealStr .. " - " .. ParameStr
+    elseif self.OType == OperatorTyoe.Mul then
+        str = RealStr .. "*" .. ParameStr
+    elseif self.OType == OperatorTyoe.Div then
+        str = RealStr .. "/" .. ParameStr
+    elseif self.OType == OperatorTyoe.Pow then
+        str = ParameStr .. "^".. RealStr
+    else
+        _errorAssert(false, "ToString OType is not Right")
+    end
+
+    return str
+
 end
 
 function Formula.new()
