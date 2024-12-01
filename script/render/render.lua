@@ -121,6 +121,11 @@ Render.Edge3DId = 60
 
 Render.BillBoardId = 61
 
+Render.BillBoardId = 61
+
+Render.FormulaOperatorId = 62
+Render.FormulaId = 63
+
 Render.getRenderIdName = function(id)
     if type(id) == "table" then
         id = id.renderid
