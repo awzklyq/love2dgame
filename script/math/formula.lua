@@ -1,13 +1,13 @@
 _G.Formula = {}
 _G.FormulaOperator = {}
 
-_G.OperatorTyoe = {}
-OperatorTyoe.None = 0 
-OperatorTyoe.Add = 2
-OperatorTyoe.Sub = 3
-OperatorTyoe.Mul = 4
-OperatorTyoe.Div = 5
-OperatorTyoe.Pow = 6
+_G.OperatorType = {}
+OperatorType.None = 0 
+OperatorType.Add = 2
+OperatorType.Sub = 3
+OperatorType.Mul = 4
+OperatorType.Div = 5
+OperatorType.Pow = 6
 
 _G.RealType = {}
 RealType.Number = 0
@@ -76,7 +76,7 @@ function CopyParame(PType, Parame)
 end
 
 function IsNeedBracket(FO)
-    return FO.OType == OperatorTyoe.Add or  FO.OType == OperatorTyoe.Sub
+    return FO.OType == OperatorType.Add or  FO.OType == OperatorType.Sub
 end
 
 function ToStringReal(FO)
@@ -145,40 +145,43 @@ function FormulaOperator.CreateFromDiffParame(OType, RType, Real, PType, Parame)
 end
 
 function FormulaOperator.NewAdd(Real, Parame)
-    local OType = OperatorTyoe.Add
+    local OType = OperatorType.Add
     local RType = GetRealType(Real)
     local PType = GetParameType(Parame)
     return FormulaOperator.CreateFromDiffParame(OType, RType, Real, PType, Parame)
 end
 
 function FormulaOperator.NewSub(Real, Parame)
-    local OType = OperatorTyoe.Sub
+    local OType = OperatorType.Sub
     local RType = GetRealType(Real)
     local PType = GetParameType(Parame)
     return FormulaOperator.CreateFromDiffParame(OType, RType, Real, PType, Parame)
 end
 
 function FormulaOperator.NewMul(Real, Parame)
-    local OType = OperatorTyoe.Mul
+    local OType = OperatorType.Mul
     local RType = GetRealType(Real)
     local PType = GetParameType(Parame)
     return FormulaOperator.CreateFromDiffParame(OType, RType, Real, PType, Parame)
 end
 
 function FormulaOperator.NewDiv(Real, Parame)
-    local OType = OperatorTyoe.Div
+    local OType = OperatorType.Div
     local RType = GetRealType(Real)
     local PType = GetParameType(Parame)
     return FormulaOperator.CreateFromDiffParame(OType, RType, Real, PType, Parame)
 end
 
 function FormulaOperator.NewPow(Real, Parame)
-    local OType = OperatorTyoe.Pow
+    local OType = OperatorType.Pow
     local RType = GetRealType(Real)
     local PType = GetParameType(Parame)
     return FormulaOperator.CreateFromDiffParame(OType, RType, Real, PType, Parame)
 end
 
+function FormulaOperator.IsSampleParameByName(FO1, FO2)
+    return FO1.PName ~= "" and FO1.PName == FO2.PName
+end
 
 function FormulaOperator:GetRealValue()
     local RealValue
@@ -210,15 +213,15 @@ function FormulaOperator:GetParameValue()
     local RealValue = self:GetRealValue()
 
     local Result
-    if self.OType == OperatorTyoe.Add then
+    if self.OType == OperatorType.Add then
         Result = RealValue + ParameValue
-    elseif self.OType == OperatorTyoe.Sub then
+    elseif self.OType == OperatorType.Sub then
         Result = RealValue - ParameValue
-    elseif self.OType == OperatorTyoe.Mul then
+    elseif self.OType == OperatorType.Mul then
         Result = RealValue * ParameValue
-    elseif self.OType == OperatorTyoe.Div then
+    elseif self.OType == OperatorType.Div then
         Result = RealValue / ParameValue
-    elseif self.OType == OperatorTyoe.Pow then
+    elseif self.OType == OperatorType.Pow then
         Result = math.pow(ParameValue, RealValue)
     else
         _errorAssert(false, "Operator GetParameValue OType is not Right")
@@ -358,21 +361,92 @@ function FormulaOperator:IsHasSubFormula()
     return not (self.RType == RealType.Number and self.PType == RealType.Parameter)
 end
 
+function FormulaOperator:MergeOperatorAddInner(RealFormula, ParameFormula, IsReverse)
+    local IsNeedReverse = not not IsReverse
+    if RealFormula.OType == OperatorType.Mul then
+        if not RealFormula.IsHasSubFormula() then
+            -- a*x + b*x
+            if not IsNeedReverse and ParameFormula.OType == OperatorType.Mul and not ParameFormula.IsHasSubFormula() and FormulaOperator.IsSampleParameByName(RealFormula, ParameFormula) then
+                if self.OType == OperatorType.Add  then
+                    return FormulaOperator.NewMul(RealFormula.Real + ParameFormula.Real, ParameFormula.PName)
+                elseif self.OType == OperatorType.Sub then
+                    return FormulaOperator.NewMul(RealFormula.Real - ParameFormula.Real, ParameFormula.PName)
+                end
+            -- a*x + (c + b*x)
+            elseif ParameFormula.OType == OperatorType.Add or ParameFormula.OType == OperatorType.Sub then
+                if ParameFormula.RType == RealType.Number and ParameFormula.PType == RealType.FormulaOperator and ParameFormula.Parame.OType == OperatorType.Mul and Not ParameFormula.Parame:IsHasSubFormula() then
+                    if FormulaOperator.IsSampleParameByName(RealFormula, ParameFormula.Parame) then
+                        if self.OType == OperatorType.Add  then
+                            local FO1
+                            --a*x + (c + b*x)
+                            if ParameFormula.OType == OperatorType.Add then
+                                FO1 = FormulaOperator.NewMul(RealFormula.Real + ParameFormula.Parame.Real, RealFormula.PName)
+                            else -- ParameFormula.OType == OperatorType.Sub
+                                --a*x + (c - b*x)
+                                FO1 = FormulaOperator.NewMul(RealFormula.Real - ParameFormula.Parame.Real, RealFormula.PName)
+                            end
+
+                            local FO2  = FormulaOperator.NewAdd(ParameFormula.Real, FO1)
+                            return FO2
+                        else --if self.OType == OperatorType.Sub  then
+                            local K = 1.0
+                            if  IsNeedReverse then
+                                K = -1.0
+                            end
+
+                            local FO1
+                            --a*x - (c + b*x)
+                            if ParameFormula.OType == OperatorType.Add then
+                                FO1 = FormulaOperator.NewMul(K*(RealFormula.Real - ParameFormula.Parame.Real), RealFormula.PName)
+                            else
+                                --a*x - (c - b*x)
+                                FO1 = FormulaOperator.NewMul(K*(RealFormula.Real + ParameFormula.Parame.Real), RealFormula.PName)
+                            end
+                            local FO2  = FormulaOperator.NewAdd(-1 * k * ParameFormula.Real, FO1)
+                            return FO2
+                           
+                        end
+                    end
+                end
+            end
+        end 
+    end
+
+    return nil
+end
+
+function FormulaOperator:MergeOperatorAdd()
+    if self.OType ~= OperatorType.Add or self.OType ~= OperatorType.Sub then
+        return nil
+    end
+
+    if self.RType ~= RealType.FormulaOperator or self.PType ~= RealType.FormulaOperator then
+        return nil
+    end
+
+    local Result = self:MergeOperatorAddInner(self.Real, self.Parame)
+    if not Result then
+        Result = self:MergeOperatorAddInner(self.Parame, self.Real, true)
+    end
+   
+    return Result
+end
+
 function FormulaOperator:ToString()
     local RealStr = ToStringReal(self)
     local ParameStr = ToStringParame(self)
     local OperatorStr = ""
 
     local str = ""
-    if self.OType == OperatorTyoe.Add then
+    if self.OType == OperatorType.Add then
         str = RealStr .. " + " .. ParameStr
-    elseif self.OType == OperatorTyoe.Sub then
+    elseif self.OType == OperatorType.Sub then
         str = RealStr .. " - " .. ParameStr
-    elseif self.OType == OperatorTyoe.Mul then
+    elseif self.OType == OperatorType.Mul then
         str = RealStr .. "*" .. ParameStr
-    elseif self.OType == OperatorTyoe.Div then
+    elseif self.OType == OperatorType.Div then
         str = RealStr .. "/" .. ParameStr
-    elseif self.OType == OperatorTyoe.Pow then
+    elseif self.OType == OperatorType.Pow then
         str = ParameStr .. "^".. RealStr
     else
         _errorAssert(false, "ToString OType is not Right")
