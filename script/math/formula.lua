@@ -362,23 +362,23 @@ function FormulaOperator:IsHasSubFormula()
     return not (self.RType == RealType.Number and self.PType == RealType.Parameter)
 end
 
-function FormulaOperator:MergeOperatorAddInner(RealFormula, ParameFormula, IsReverse)
+function FormulaOperator:MergeOperatorAddInner(RealFormula, ParameFormula, InOType, IsReverse)
     local IsNeedReverse = not not IsReverse
     if RealFormula.OType == OperatorType.Mul then
         if not RealFormula:IsHasSubFormula() then
             -- a*x + b*x
             if not IsNeedReverse and ParameFormula.OType == OperatorType.Mul and (not ParameFormula:IsHasSubFormula()) and FormulaOperator.IsSampleParameByName(RealFormula, ParameFormula) then
                 
-                if self.OType == OperatorType.Add  then
+                if InOType == OperatorType.Add  then
                     return FormulaOperator.NewMul(RealFormula.Real + ParameFormula.Real, ParameFormula.PName)
-                elseif self.OType == OperatorType.Sub then
+                elseif InOType == OperatorType.Sub then
                     return FormulaOperator.NewMul(RealFormula.Real - ParameFormula.Real, ParameFormula.PName)
                 end
             -- a*x + (c + b*x)
             elseif ParameFormula.OType == OperatorType.Add or ParameFormula.OType == OperatorType.Sub then
                 if ParameFormula.RType == RealType.Number and ParameFormula.PType == RealType.FormulaOperator and ParameFormula.Parame.OType == OperatorType.Mul and (not ParameFormula.Parame:IsHasSubFormula()) then
                     if FormulaOperator.IsSampleParameByName(RealFormula, ParameFormula.Parame) then
-                        if self.OType == OperatorType.Add  then
+                        if InOType == OperatorType.Add  then
                             local FO1
                             --a*x + (c + b*x)
                             if ParameFormula.OType == OperatorType.Add then
@@ -416,29 +416,36 @@ function FormulaOperator:MergeOperatorAddInner(RealFormula, ParameFormula, IsRev
             
             local NewFO 
             if RealFormula.OType == OperatorType.Add then
-                NewFO = self:MergeOperatorAddInner(RealFormula.Parame, ParameFormula, IsReverse)
+                if InOType == OperatorType.Sub then
+                    local CFO = FormulaOperator.Copy(ParameFormula)
+                    -- CFO:MulNumber(-1)
+                    -- log('ssss5555', CFO:ToString())
+                    NewFO = self:MergeOperatorAddInner(RealFormula.Parame, CFO, InOType)
+                else
+                    NewFO = self:MergeOperatorAddInner(RealFormula.Parame, ParameFormula, InOType)
+                end
+                
             else --RealFormula.OType == OperatorType.Sub
                 local RP = FormulaOperator.Copy(RealFormula.Parame)
                 RP.Real = -1 * RP.Real
-                NewFO = self:MergeOperatorAddInner(RP, ParameFormula)
+                if InOType == OperatorType.Sub then
+                    local CFO = FormulaOperator.Copy(ParameFormula)
+                    -- CFO:MulNumber(-1)
+                    NewFO = self:MergeOperatorAddInner(RP, CFO, InOType)
+                else
+                    NewFO = self:MergeOperatorAddInner(RP, ParameFormula, InOType)
+                end
+               
             end
             
             if NewFO then
-              
-                local FO1
-                if self.OType == OperatorType.Add then
-                    FO1 = FormulaOperator.NewAdd(RealFormula.Real + NewFO.Real, NewFO.Parame)
-                elseif self.OType == OperatorType.Sub then
-                    FO1 = FormulaOperator.NewSub(RealFormula.Real - NewFO.Real, NewFO.Parame)
-                    if  IsNeedReverse then
-                        FO1:MulNumber(-1)
-                    end
+                NewFO.Real = NewFO.Real + RealFormula.Real
+                if  IsNeedReverse then
+                    NewFO:MulNumber(-1)
                 end
-                return FO1
+                return NewFO
             end
         end
---        log('ddddddd', RealFormula:ToString())
-  --      log('ccccccc', RealFormula:IsHasSubFormula(), RealFormula.PType == RealType.FormulaOperator)
     end
 
     return nil
@@ -446,38 +453,39 @@ end
 
 function FormulaOperator:MergeOperatorAdd()
 
-    local Result = nil
     if self.RType == RealType.FormulaOperator then
-        local RealFormula = self.Real:MergeOperatorAdd()
-        if RealFormula then
-            self.Real = RealFormula
-            Result = self
-        end
+        self.Real:MergeOperatorAdd()
     end
 
     if self.PType == RealType.FormulaOperator then
-        
-        local ParameFormula = self.Parame:MergeOperatorAdd()
-        if ParameFormula then
-            self.Parame = ParameFormula
-            Result = self
-        end
+        self.Parame:MergeOperatorAdd()
     end
 
     if self.OType ~= OperatorType.Add and self.OType ~= OperatorType.Sub then
-        return Result
+        return self
     end
   
     if self.RType ~= RealType.FormulaOperator or self.PType ~= RealType.FormulaOperator then
-        return Result
+        return self
     end
     
-    Result = self:MergeOperatorAddInner(self.Real, self.Parame)
+    local Result = self:MergeOperatorAddInner(self.Real, self.Parame, self.OType)
     if not Result then
-        Result = self:MergeOperatorAddInner(self.Parame, self.Real, true)
+        Result = self:MergeOperatorAddInner(self.Parame, self.Real, self.OType, true)
     end
    
-    return Result
+    if Result then
+        self:Set(FormulaOperator.Copy(Result))
+    end
+
+    return self
+end
+
+function FormulaOperator:MergeParame()
+    self:MergeOperatorMul()
+    self:MergeOperatorAdd()
+
+    return self
 end
 
 function FormulaOperator:Set(FO)
@@ -492,26 +500,58 @@ end
 
 function FormulaOperator:MulNumber(n)
     _errorAssert(IsNumber(n), "MulNumber Operate is Error")
+
+    local Result = false
     if self.RType == RealType.Number then
-        if self.OType == OperatorType.OperatorType.Add or self.OType == OperatorType.OperatorType.Sub or self.OType == OperatorType.OperatorType.Mul or self.OType == OperatorType.OperatorType.Div then
+        if self.OType == OperatorType.Add or self.OType == OperatorType.Sub or self.OType == OperatorType.Mul or self.OType == OperatorType.Div then
             self.Real = self.Real * n
-        elseif self.OType == OperatorType.OperatorType.Pow then
+            Result = true
+        elseif self.OType == OperatorType.Pow then
             local FO = FormulaOperator.NewMul(n, FormulaOperator.Copy(self))
             self:Set(FO)
+            Result = true
         end
     else
-        self.Real:MulNumber(n)
+        Result = self.Real:MulNumber(n)
     end
 
     if self.PType == RealType.Parameter then
-        if self.OType == OperatorType.OperatorType.Add or self.OType == OperatorType.OperatorType.Sub then
+        if self.OType == OperatorType.Add or self.OType == OperatorType.Sub then
             local FO = FormulaOperator.NewMul(n, self.PName)
             self:Set(FO)
+            Result = true
         end
     else
-        self.Parame:MulNumber(n)
+        if self.Parame:MulNumber(n) then
+            Result = true
+        end
     end
 
+    return Result
+end
+
+function FormulaOperator:MergeOperatorMul()
+    local Result = nil
+    
+    if self.PType == RealType.FormulaOperator then
+        self.Parame:MergeOperatorMul()
+    end
+
+    if self.RType == RealType.FormulaOperator then
+        self.Real:MergeOperatorMul()
+    end
+
+    if self.RType == RealType.Number then
+        if self.OType == OperatorType.Mul then
+            if self.PType == RealType.FormulaOperator then
+                if self.Parame:MulNumber(self.Real) then
+                    self:Set(FormulaOperator.Copy(self.Parame))
+                end
+            end
+        end
+    else
+        self.Real:MergeOperatorMul()
+    end
 end
 
 function FormulaOperator:ToString()
