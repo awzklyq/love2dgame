@@ -17,4 +17,15 @@ if FO5 then
     log('ttttt', FO5:ToString())
 end
 
+local ParamesName = FO5:ExtractParamesName()
+for i = 1, #ParamesName do
+    log('Has Paraame Name: ', i, ParamesName[i])
+end
+
+local OutOparator = FO5:ConvertParameToLeft('x')
+
+if OutOparator then
+    log('OutOparator: ', OutOparator:ToString())
+end
+
 

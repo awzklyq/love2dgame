@@ -15,6 +15,13 @@ RealType.Formula = 1
 RealType.Parameter = 2
 RealType.FormulaOperator = 3
 
+_G.EquationType = {}
+EquationType.Equation = 0
+EquationType.Greater = 1
+EquationType.Less = 2
+EquationType.GreaterAndEquation = 3
+EquationType.LessAndEquation = 4
+
 local metatable_Formula = {}
 metatable_Formula.__index = Formula
 
@@ -251,7 +258,7 @@ function FormulaOperator:HasParame(PName)
 
     if IsHas == false then
         if self.PType == RealType.FormulaOperator then
-            IsHase = self.Parame:HasParame(PName)
+            IsHas = self.Parame:HasParame(PName)
         end
     end
 
@@ -264,7 +271,7 @@ function FormulaOperator:HasParame(PName)
     return IsHas
 end
 
-function FormulaOperator:IsHasParame(PName)
+function FormulaOperator:IsHasParame()
     local IsHas = false
     if  self.PType == RealType.Parameter then
         IsHas = true
@@ -272,13 +279,13 @@ function FormulaOperator:IsHasParame(PName)
 
     if IsHas == false then
         if self.PType == RealType.FormulaOperator then
-            IsHase = self.Parame:IsHasParame(PName)
+            IsHase = self.Parame:IsHasParame()
         end
     end
 
     if IsHas == false then
         if self.RType == RealType.FormulaOperator then
-            IsHas = self.Real:IsHasParame(PName)
+            IsHas = self.Real:IsHasParame()
         end
     end
 
@@ -522,8 +529,10 @@ function FormulaOperator:MulNumber(n)
             Result = true
         end
     else
-        if self.Parame:MulNumber(n) then
-            Result = true
+        if self.OType == OperatorType.Add or self.OType == OperatorType.Sub then
+            if self.Parame:MulNumber(n) then
+                Result = true
+            end
         end
     end
 
@@ -552,6 +561,201 @@ function FormulaOperator:MergeOperatorMul()
     else
         self.Real:MergeOperatorMul()
     end
+end
+
+function FormulaOperator:CheckAndAddParameName(InParameName, OutParames)
+    local IsNeedAdd = true
+    for i = 1, #OutParames do
+        if OutParames[i] == InParameName then
+            IsNeedAdd = false
+            break
+        end
+    end
+    
+    if IsNeedAdd then
+        OutParames[#OutParames + 1] = InParameName
+    end
+end
+
+function FormulaOperator:ExtractParamesNameInner(Parames)
+    if self.RType == RealType.FormulaOperator then
+        self.Real:ExtractParamesNameInner(Parames)
+    end
+
+    if self.PType == RealType.FormulaOperator then
+        self.Parame:ExtractParamesNameInner(Parames)
+    else
+        self:CheckAndAddParameName(self.PName, Parames)
+    end
+    
+end
+
+function FormulaOperator:ExtractParamesName()
+    local Parames = {}
+    self:ExtractParamesNameInner(Parames)
+    return Parames
+end
+
+function FormulaOperator:CheckParameName(InParameName)
+    local ExtraParames = self:ExtractParamesName()
+    local IsHas = false
+    for i = 1, #ExtraParames do
+        if ExtraParames == InParameName then
+            IsHas = true
+            break
+        end
+    end
+    
+    return IsHas
+end
+
+function FormulaOperator:InvertOperatorParame(OutOparator)
+    InOType = self.OType
+
+    local InParame
+    if self.PType == RealType.FormulaOperator then
+        InParame = FormulaOperator.Copy(self.Parame)
+    else
+        InParame = self.PName
+    end 
+
+    if InOType == OperatorType.Add then
+        Result = (not OutOparator)  and FormulaOperator.NewMul(-1, InParame) or FormulaOperator.NewSub(OutOparator, InParame)
+    elseif  InOType == OperatorType.Sub then
+        Result = (not OutOparator)  and FormulaOperator.NewMul(-1, InParame) or FormulaOperator.NewAdd(OutOparator, InParame)
+    elseif InOType == OperatorType.Mul then
+        Result = (not OutOparator)  and FormulaOperator.NewDiv(1, InParame) or  FormulaOperator.NewDiv(OutOparator, InParame)
+    elseif InOType == OperatorType.Div then
+        Result = (not OutOparator)  and FormulaOperator.NewMul(1, InParame) or FormulaOperator.NewMul(OutOparator, InParame)
+    elseif InOType == OperatorType.Pow then
+        Result = FormulaOperator.NewPow(FormulaOperator.NewDiv(1, self.Real), OutOparator)
+       
+    end
+
+    _errorAssert(not not Result , "Operator InvertOperatorParame OType is not Right")
+
+    return Result
+end
+
+function FormulaOperator:InvertOperatorReal(OutOparator)
+    InOType = self.OType
+
+    local InReal
+    if self.RType == RealType.FormulaOperator then
+        InReal = FormulaOperator.Copy(self.Real)
+    else
+        InReal = self.Real
+    end 
+
+    -- log('aaaa', OutOparator, InReal, InOType)
+    local Result
+    if InOType == OperatorType.Add then
+      --  Result = (not OutOparator) and InReal or FormulaOperator.NewSub(OutOparator, InReal)
+        if not OutOparator then
+            Result = InReal
+        else
+            if IsNumber(InReal) then
+                Result = FormulaOperator.NewAdd(-1 * InReal, OutOparator)
+            else
+                InReal:MulNumber(-1)
+                Result = FormulaOperator.NewAdd(InReal, OutOparator)
+            end
+        end
+    elseif InOType == OperatorType.Sub then
+        Result = (not OutOparator)  and InReal or FormulaOperator.NewSub(InReal, OutOparator)
+    elseif InOType == OperatorType.Mul then
+        --Result = (not OutOparator)  and FormulaOperator.NewDiv(1, InReal) or  FormulaOperator.NewDiv(OutOparator, InReal)
+        if not OutOparator then
+            if IsNumber(InReal) then
+                Result = 1 / InReal
+            else
+                Result = FormulaOperator.NewDiv(1, InReal)
+            end
+        else
+            if IsNumber(InReal) then
+                if IsNumber(OutOparator) then
+                    Result = OutOparator / InReal
+                else
+                    OutOparator:MulNumber(1 / InReal)
+                    Result = OutOparator
+                end
+            else
+                Result = FormulaOperator.NewDiv(OutOparator, InReal)
+            end
+        end
+    elseif InOType == OperatorType.Div then
+        Result = (not OutOparator)  and InReal or FormulaOperator.NewDiv(InReal, OutOparator)
+    elseif InOType == OperatorType.Pow then
+        Result = FormulaOperator.NewPow(FormulaOperator.NewDiv(1, self.Real), OutOparator)       
+    end
+  
+    _errorAssert(not not Result , "Operator InvertOperatorReal OType is not Right")
+
+    return Result
+end
+
+function FormulaOperator:ConvertRealParameToLeft(PName, OutOparator, IsFindParame)
+
+    if IsFindParame then
+        if self.RType == RealType.FormulaOperator then
+            _errorAssert(not self.Parame:HasParame(PName), "Now only support one parame c") 
+        end
+
+        OutOparator = self:InvertOperatorReal(OutOparator)
+    else
+        if self.RType == RealType.FormulaOperator then
+            if self.Real:HasParame(PName) then
+                OutOparator = self.Real:ConvertParameToLeft(PName, OutOparator)
+            else
+                OutOparator = self:InvertOperatorReal(OutOparator)
+            end
+        else
+            OutOparator = self:InvertOperatorReal(OutOparator)
+        end
+    end
+
+    return OutOparator
+end
+
+function FormulaOperator:ConvertParameParameToLeft(PName, OutOparator, IsFindParame)
+    if IsFindParame then
+        if self.PType == RealType.FormulaOperator then
+            _errorAssert(not self.Parame:HasParame(PName), "Now only support one parame c") 
+        end
+
+        OutOparator = self:InvertOperatorParame(OutOparator)
+    else
+        if self.PType == RealType.FormulaOperator then
+            if self.Parame:HasParame(PName) then
+                OutOparator = self.Parame:ConvertParameToLeft(PName, OutOparator)
+            else
+                OutOparator = self:InvertOperatorParame(OutOparator)
+            end
+        else
+            log('ConvertParameToLeft Find Parame', PName )
+        end
+    end
+    return OutOparator
+end
+
+function FormulaOperator:ConvertParameToLeft(PName, OutOparator)
+    local IsParameInOParame = false
+    if self.PType == RealType.FormulaOperator then
+        IsParameInOParame = self.Parame:HasParame(PName)
+    else
+        --IsParameInOParame = self.PName == PName
+        OutOparator = self:InvertOperatorReal(OutOparator)
+        return OutOparator
+    end
+
+    if IsParameInOParame then
+        OutOparator = self:ConvertRealParameToLeft(PName, OutOparator, true)
+        OutOparator = self:ConvertParameParameToLeft(PName, OutOparator, false)
+    else
+        OutOparator = self:ConvertParameParameToLeft(PName, OutOparator, true)
+        OutOparator = self:ConvertRealParameToLeft(PName, OutOparator, false)
+    end
+    return OutOparator
 end
 
 function FormulaOperator:ToString()
@@ -583,14 +787,35 @@ function Formula.new()
 
     v.renderid = Render.FormulaId
 
-    v.Operator = {}
+    v.Operators = {}
+    v.ParameNames = {}
     return v;
 end
 
-function Formula:AddOperator(p)
-    self.Operator[#Operator + 1] = p
+function Formula:CheckAndAddParameName(InParameName)
+    local IsNeedAdd = true
+    for i = 1, #self.ParameNames do
+        if self.ParameNames[i] == InParameName then
+            IsNeedAdd = false
+            break
+        end
+    end
+    
+    if IsNeedAdd then
+        self.ParameNames[#self.ParameNames + 1] = InParameName
+    end
 end
 
-function Formula:Compute()
-    
+function Formula:ExtractParamesName(p)
+    local ParameNames = p:ExtractParamesName()
+    for i = 1, #ParameNames do
+        self:CheckAndAddParameName(ParameNames[i])
+    end
+end
+
+function Formula:AddOperator(p)
+    _errorAssert(IsFormulaOperator(p))
+    self.Operators[#self.Operators + 1] = p:MergeParame()
+
+    self:ExtractParamesName(p)
 end
