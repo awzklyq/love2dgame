@@ -524,8 +524,8 @@ function FormulaOperator:MulNumber(n)
 
     if self.PType == RealType.Parameter then
         if self.OType == OperatorType.Add or self.OType == OperatorType.Sub then
-            local FO = FormulaOperator.NewMul(n, self.PName)
-            self:Set(FO)
+            self.Parame = FormulaOperator.NewMul(n, self.PName)
+            self.PType = RealType.FormulaOperator
             Result = true
         end
     else
@@ -652,17 +652,38 @@ function FormulaOperator:InvertOperatorReal(OutOparator)
     if InOType == OperatorType.Add then
       --  Result = (not OutOparator) and InReal or FormulaOperator.NewSub(OutOparator, InReal)
         if not OutOparator then
-            Result = InReal
+            Result = -InReal
         else
             if IsNumber(InReal) then
-                Result = FormulaOperator.NewAdd(-1 * InReal, OutOparator)
+                if IsNumber(OutOparator) then
+                    Result = OutOparator - InReal
+                else
+                    Result = FormulaOperator.NewAdd(-1 * InReal, OutOparator)
+                end
             else
                 InReal:MulNumber(-1)
-                Result = FormulaOperator.NewAdd(InReal, OutOparator)
+                Result = FormulaOperator.NewAdd(OutOparator, InReal)
             end
         end
     elseif InOType == OperatorType.Sub then
-        Result = (not OutOparator)  and InReal or FormulaOperator.NewSub(InReal, OutOparator)
+        --Result = (not OutOparator)  and InReal or FormulaOperator.NewSub(InReal, OutOparator)
+        if not OutOparator then
+            Result = -InReal
+        else
+            if IsNumber(InReal) then
+                if IsNumber(OutOparator) then
+                    Result = InReal - OutOparator
+                else
+                    Result = FormulaOperator.NewSub(InReal, OutOparator)
+                end
+            else
+                if IsNumber(OutOparator) then
+                    Result = FormulaOperator.NewAdd(-OutOparator, InReal)
+                else
+                    Result = FormulaOperator.NewSub(InReal, OutOparator)
+                end
+            end
+        end
     elseif InOType == OperatorType.Mul then
         --Result = (not OutOparator)  and FormulaOperator.NewDiv(1, InReal) or  FormulaOperator.NewDiv(OutOparator, InReal)
         if not OutOparator then
@@ -698,7 +719,7 @@ function FormulaOperator:ConvertRealParameToLeft(PName, OutOparator, IsFindParam
 
     if IsFindParame then
         if self.RType == RealType.FormulaOperator then
-            _errorAssert(not self.Parame:HasParame(PName), "Now only support one parame c") 
+            _errorAssert(not self.Real:HasParame(PName), "Now only support one parame c") 
         end
 
         OutOparator = self:InvertOperatorReal(OutOparator)
@@ -743,9 +764,11 @@ function FormulaOperator:ConvertParameToLeft(PName, OutOparator)
     if self.PType == RealType.FormulaOperator then
         IsParameInOParame = self.Parame:HasParame(PName)
     else
-        --IsParameInOParame = self.PName == PName
-        OutOparator = self:InvertOperatorReal(OutOparator)
-        return OutOparator
+        IsParameInOParame = self.PName == PName
+        if IsParameInOParame then
+            OutOparator = self:InvertOperatorReal(OutOparator)
+            return OutOparator
+        end
     end
 
     if IsParameInOParame then
@@ -789,6 +812,7 @@ function Formula.new()
 
     v.Operators = {}
     v.ParameNames = {}
+    v.ParameValue = {}
     return v;
 end
 
@@ -818,4 +842,53 @@ function Formula:AddOperator(p)
     self.Operators[#self.Operators + 1] = p:MergeParame()
 
     self:ExtractParamesName(p)
+end
+
+function Formula:CalculateParameterByJacobi()
+    log(#self.ParameNames, #self.Operators)
+    _errorAssert(#self.ParameNames == #self.Operators)
+
+    local TempOperators = {}
+    local TempValue = {}
+    for i = 1, #self.Operators do
+        TempOperators[i] = {PName = self.ParameNames[i], Operator = self.Operators[i]:ConvertParameToLeft(self.ParameNames[i])}
+        TempValue[self.ParameNames[i]] = 0
+    end
+
+    -- for i = 1, #TempOperators do
+    --     log('aaaaaaaa', TempOperators[i].PName, TempOperators[i].Operator:ToString() )
+    -- end
+
+    local Iter = 10
+    for i = 1, Iter do
+        for j = 1, #TempOperators do
+            for p, v in pairs(TempValue) do
+                if p ~= TempOperators[j].PName then
+                    log('bbbbbb', p,  v, TempOperators[j].Operator:ToString() )
+                    TempOperators[j].Operator:SetParameValue(p, v)
+                end
+            end
+
+            -- log('ccccc', TempOperators[j].PName, TempValue[TempOperators[j].PName] )
+            TempValue[TempOperators[j].PName] = TempOperators[j].Operator:GetParameValue()
+             log('ccccc', TempOperators[j].PName, TempValue[TempOperators[j].PName] )
+            log()
+        end
+    end
+
+    for i, v in pairs(TempValue) do
+        log(i, v)
+    end
+
+    local FO1 = FormulaOperator.Copy(self.Operators[1])
+    local FO2 = FormulaOperator.Copy(self.Operators[2])
+
+    local NewFO1 = FO1:ConvertParameToLeft('y')
+    local NewFO2 = FO2:ConvertParameToLeft('y')
+
+    local NewFO = FormulaOperator.NewSub(NewFO1, NewFO2) -- == 0
+    NewFO:MergeParame()
+    NewFO = NewFO:ConvertParameToLeft('x')
+    log('x', NewFO)
+
 end

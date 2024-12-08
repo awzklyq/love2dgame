@@ -29,8 +29,8 @@ _G._warn = function(...)
     log("waring: ", ...)
 end
 
-_G._errorAssert = function(a, ...)
-    assert(a, "Error : ".. ...)
+_G._errorAssert = function(a, b)
+    assert(a, "Error : ".. tostring(b))
 end
 
 _G.logbit = function(v, num)
