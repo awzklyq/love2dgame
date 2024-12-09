@@ -845,7 +845,6 @@ function Formula:AddOperator(p)
 end
 
 function Formula:CalculateParameterByJacobi()
-    log(#self.ParameNames, #self.Operators)
     _errorAssert(#self.ParameNames == #self.Operators)
 
     local TempOperators = {}
@@ -855,40 +854,87 @@ function Formula:CalculateParameterByJacobi()
         TempValue[self.ParameNames[i]] = 0
     end
 
-    -- for i = 1, #TempOperators do
-    --     log('aaaaaaaa', TempOperators[i].PName, TempOperators[i].Operator:ToString() )
-    -- end
-
-    local Iter = 10
+    local Iter = 1000
     for i = 1, Iter do
         for j = 1, #TempOperators do
             for p, v in pairs(TempValue) do
                 if p ~= TempOperators[j].PName then
-                    log('bbbbbb', p,  v, TempOperators[j].Operator:ToString() )
                     TempOperators[j].Operator:SetParameValue(p, v)
                 end
             end
 
-            -- log('ccccc', TempOperators[j].PName, TempValue[TempOperators[j].PName] )
             TempValue[TempOperators[j].PName] = TempOperators[j].Operator:GetParameValue()
-             log('ccccc', TempOperators[j].PName, TempValue[TempOperators[j].PName] )
-            log()
         end
     end
 
     for i, v in pairs(TempValue) do
-        log(i, v)
+        self.ParameValue[i] = v
+        log(i,v)
+    end
+end
+
+function Formula:CalculateParameterByEliminationInner(InOperators, InParameNames)
+    if #InOperators == 1 then
+        local x = InOperators[1]:ConvertParameToLeft(InParameNames[1])
+        self.ParameValue[InParameNames[1]] = IsNumber(x) and x or x:GetParameValue()
+        return
     end
 
-    local FO1 = FormulaOperator.Copy(self.Operators[1])
-    local FO2 = FormulaOperator.Copy(self.Operators[2])
+    local TempOperators = {}
+    local TempParameName = {}
+    for i = 1, #InOperators do
+        TempOperators[i] = FormulaOperator.Copy(InOperators[i])
+        TempParameName[i] = InParameNames[i]
+    end
 
-    local NewFO1 = FO1:ConvertParameToLeft('y')
-    local NewFO2 = FO2:ConvertParameToLeft('y')
+    while #TempOperators > 1 do
+        local Temp = {}
+        
+        local NewFO = TempOperators[1]:ConvertParameToLeft(TempParameName[1])
+        for i = 2, #TempParameName do
+            local NeedMergeFO = TempOperators[i]:ConvertParameToLeft(TempParameName[1])
+            
+            local FO = FormulaOperator.NewSub(FormulaOperator.Copy(NewFO), FormulaOperator.Copy(NeedMergeFO))
+            FO:MergeParame();
+            Temp[#Temp + 1] = FO
+        end
 
-    local NewFO = FormulaOperator.NewSub(NewFO1, NewFO2) -- == 0
-    NewFO:MergeParame()
-    NewFO = NewFO:ConvertParameToLeft('x')
-    log('x', NewFO)
+        TempOperators = Temp
+        table.remove(TempParameName, 1)
+    end
 
+   
+    local x = TempOperators[1]:ConvertParameToLeft(TempParameName[1])
+    self.ParameValue[TempParameName[1]] = x
+    table.remove(InOperators, 1)
+    for i = 1, #InParameNames do
+        if InParameNames[i] == TempParameName[1] then
+            table.remove(InParameNames, i)
+            break
+        end
+    end
+    
+    for i = 1, #InOperators do
+        InOperators[i]:SetParameValue(TempParameName[1], x)
+    end
+
+    self:CalculateParameterByEliminationInner(InOperators, InParameNames)
+end
+
+function Formula:CalculateParameterByElimination()
+    _errorAssert(#self.ParameNames == #self.Operators)
+
+    local TempParameName = {}
+    local TempOperators = {}
+    for i = 1, #self.Operators do
+        TempOperators[i] = FormulaOperator.Copy(self.Operators[i])
+        TempParameName[i] = self.ParameNames[i]
+    end
+
+    self.ParameValue = {}
+    self:CalculateParameterByEliminationInner(TempOperators, TempParameName)
+
+    for i, v in pairs(self.ParameValue) do
+        log(i,v)
+    end
 end
