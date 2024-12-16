@@ -56,6 +56,7 @@ dofile('script/polygon/BezierCurve.lua')
 dofile('script/polygon/edge.lua')
 dofile('script/polygon/box.lua')
 dofile('script/polygon/mesh.lua')
+dofile('script/polygon/cone2d.lua')
 dofile('script/3d/mesh/mesh3d.lua')
 dofile('script/3d/mesh/aixs.lua')
 
@@ -196,7 +197,7 @@ if not _G.TEST then
 	end)
 
 else
-	dofile('script/test/test_formula.lua')--test_MeshVolume  test_BezierCurve.lua
+	dofile('script/test/test_cone2d.lua')--test_MeshVolume  test_BezierCurve.lua
 	-- dofile('script/demo/ball/demo_ball.lua') test_SpaceSplit.lua
 end
 --dofile()

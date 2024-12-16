@@ -126,6 +126,8 @@ Render.BillBoardId = 61
 Render.FormulaOperatorId = 62
 Render.FormulaId = 63
 
+Render.Cone2DId = 64
+
 Render.getRenderIdName = function(id)
     if type(id) == "table" then
         id = id.renderid
@@ -224,6 +226,8 @@ Render.getRenderIdName = function(id)
         return "Edge3D"
     elseif Render.BillBoardId == id then
         return "BillBoard"
+    elseif Render.Cone2DId == id then
+        return "Cone2D"
     end
     
     return "Null"
@@ -255,6 +259,12 @@ Render.RenderObject = function(obj)
                 love.graphics.setColor(obj.color._r, obj.color._g, obj.color._b, obj.color._a);
             end
             love.graphics.circle( obj.mode, obj.x, obj.y, obj.r, obj.seg);
+        elseif obj.renderid == Render.Cone2DId then
+            if obj.color then
+                love.graphics.setColor(obj.color._r, obj.color._g, obj.color._b, obj.color._a);
+            end
+            love.graphics.arc( obj.mode, 'pie', obj.pos.x, obj.pos.y, obj.r, obj.angle1, obj.angle2, obj.seg )
+
         elseif obj.renderid == Render.RectId then
             if obj.color then
                 love.graphics.setColor(obj.color._r, obj.color._g, obj.color._b, obj.color._a);
