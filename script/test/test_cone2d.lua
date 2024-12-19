@@ -30,6 +30,8 @@ app.mousepressed(function(x, y, button, istouch)
     if button == 1 then
         rect.x = x
         rect.y = y
-        CacleCone(rect, c, c2d)
+        -- CacleCone(rect, c, c2d)
+        c2d = math.GetTangentCone2D(Vector.new(rect.x, rect.y), c)
+        c2d:SetColor(255,255,0,255)
     end
 end)

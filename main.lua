@@ -25,6 +25,7 @@ dofile('script/common/color.lua')
 dofile('script/common/audio.lua')
 dofile('script/common/filepath.lua')
 dofile('script/common/earclip.lua')
+dofile('script/common/VelocityObstacles.lua')
 dofile('script/common/voronoi.lua')
 dofile('script/common/pbr.lua')
 dofile('script/common/radarfrustum.lua')
@@ -197,8 +198,8 @@ if not _G.TEST then
 	end)
 
 else
-	-- dofile('script/test/test_vo.lua')--test_MeshVolume  test_BezierCurve.lua
-	dofile('script/demo/VelocityObstacles/demo_vo.lua')
+	dofile('script/test/test_cone2d.lua')--test_MeshVolume  test_BezierCurve.lua
+	-- dofile('script/demo/VelocityObstacles/demo_vo.lua')
 end
 --dofile()
 

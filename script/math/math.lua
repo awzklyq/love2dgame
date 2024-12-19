@@ -933,6 +933,25 @@ math.FindOptimalPolygon = function(w, h, TargetVertexCount, ConvexHullIndices, P
     -- end
 end
 
+math.GetTangentCone2D = function(InVector, InCircle, OutOCone2d)
+    local CPos = Vector.new(InCircle.x, InCircle.y)
+    local R = InCircle.r
+
+    local dis = Vector.Distance(InVector, CPos)
+    local sina = math.asin(R / dis)
+
+    if OutOCone2d then
+        OutOCone2d.pos = Vector.copy(InVector)
+        OutOCone2d.angle = sina * 2
+        OutOCone2d.dir = (CPos - InVector):normalize()
+        OutOCone2d.r = R + dis
+    else
+        
+        OutOCone2d = Cone2D.new(InVector, (CPos - InVector):normalize(), R + dis,  math.deg(sina * 2))
+    end
+    return OutOCone2d
+end
+
 math.defaulttransform =  love.math.newTransform( );
 math.MinNumber = 0.000001;
 math.MaxNumber = 999999.0;

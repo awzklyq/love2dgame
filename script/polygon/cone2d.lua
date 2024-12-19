@@ -2,10 +2,10 @@ _G.Cone2D = {}
 
 function Cone2D.new(InPostion, InDirection, InRadius, InAngle, InSegments, InMode)
     local c2d = setmetatable({}, {__index = Cone2D});
-    c2d.dir = InDirection;
-    c2d.pos = InPostion
-    c2d.r = InRadius;
-    c2d.angle = math.rad(InAngle);
+    c2d.dir = InDirection or Vector.new(1, 0)
+    c2d.pos = InPostion or Vector.new(0, 0)
+    c2d.r = InRadius or 1;
+    c2d.angle = math.rad(InAngle or 0);
 
     
     c2d.seg = InSegments or 100;
@@ -39,6 +39,16 @@ function Cone2D:ResetRenderParame()
     local angle = Vector.angleClockwise(self.DefaultDirection, dir)
     self.angle1 = angle - self.angle * 0.5
     self.angle2 = angle + self.angle * 0.5
+end
+
+function Cone2D:CheckPointInXY(x, y)
+    return self.CheckPointInVec(Vector.new(x, y))
+end
+
+function Cone2D:CheckPointInVec(InVec)
+    local TargetDir = (InVec - self.pos):Normalize()
+    local angle = Vector.angleClockwise(self.dir, TargetDir)
+    return self.angle * 0.5 > angle
 end
 
 function Cone2D:draw()

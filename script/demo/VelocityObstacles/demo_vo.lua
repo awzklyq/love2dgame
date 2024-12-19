@@ -1,4 +1,5 @@
 FileManager.addAllPath("assert")
+
 dofile('script/demo/VelocityObstacles/demo_VOMoveObject.lua')
 
 local mo1 = DemoVOMoveObject.new(200, 200, 50, Vector.new(1, 0))
