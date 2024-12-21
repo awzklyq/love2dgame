@@ -198,8 +198,8 @@ if not _G.TEST then
 	end)
 
 else
-	dofile('script/test/test_cone2d.lua')--test_MeshVolume  test_BezierCurve.lua
-	-- dofile('script/demo/VelocityObstacles/demo_vo.lua')
+	-- dofile('script/test/test_cone2d.lua')--test_MeshVolume  test_BezierCurve.lua
+	dofile('script/demo/VelocityObstacles/demo_vo.lua')
 end
 --dofile()
 

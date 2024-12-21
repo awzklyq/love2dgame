@@ -81,6 +81,7 @@ local BackRect = nil
 function love.update(dt)
     if RenderSet then
         RenderSet.frameToken = RenderSet.frameToken + 1
+        RenderSet.FrameInterval = dt
     end
     --_G.UIHelper.update(dt);
     _G.CameraManager.update(dt)

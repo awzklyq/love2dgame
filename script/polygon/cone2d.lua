@@ -51,6 +51,10 @@ function Cone2D:CheckPointInVec(InVec)
     return self.angle * 0.5 > angle
 end
 
+function Cone2D:MoveVec(InVec)
+    self.pos = self.pos + InVec
+end
+
 function Cone2D:draw()
     if not self.Visible then return end
 

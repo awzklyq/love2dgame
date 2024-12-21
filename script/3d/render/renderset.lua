@@ -179,6 +179,7 @@ RenderSet.isNeedFrustum = true
 RenderSet.AlphaTestBlend = 0.5
 RenderSet.AlphaTestMode = 2
 RenderSet.frameToken = 1
+RenderSet.FrameInterval = 0
 
 RenderSet.HDR = false
 

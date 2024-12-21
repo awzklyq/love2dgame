@@ -121,6 +121,24 @@ function Vector:Set(v)
     self.y = v.y
 end
 
+function Vector:RotateClockwise(angle)
+    local radianAngle = math.rad(angle)
+
+    local cosTheta = math.cos(-angle)
+    local sinTheta = math.sin(-angle)
+
+    local x = self.x
+    local y = self.y
+
+    local xRotated = x * cosTheta - y * sinTheta
+    local yRotated = x * sinTheta + y * cosTheta
+
+    self.x = xRotated
+    self.y = yRotated
+
+    return self
+end
+
 Vector.set = Vector.Set
 Vector.distance = function(v1, v2)
     return math.sqrt(math.pow(v1.x - v2.x, 2) + math.pow(v1.y - v2.y, 2))

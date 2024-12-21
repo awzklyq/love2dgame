@@ -97,12 +97,23 @@ function DemoVOMoveObject:MoveToXY(InX, InY)
     self.IsMove = true
 end
 
-function DemoVOMoveObject:SetDirection(InDirection)
-    self.dir = Vector.copy(InDirection):Normalize()
-    self:BuildRenderDirectionLine()
+function DemoVOMoveObject:GetCircle()
+    return self.circle
 end
 
-function DemoVOMoveObject:UpdateMove(e)
+function DemoVOMoveObject:GetDirection()
+    return self.dir
+end
+
+function DemoVOMoveObject:GetVelocity()
+    return self.Velocity
+end
+
+function DemoVOMoveObject:GetPosition()
+    return self.CurPos
+end
+
+function DemoVOMoveObject:GetNextFrameMoveTarget(e)
     local movedir = self.TargePos - self.CurPos
     movedir:Normalize()
 
@@ -121,7 +132,31 @@ function DemoVOMoveObject:UpdateMove(e)
         self.IsMove = false
     end
    
+end
 
+function DemoVOMoveObject:GetVelocityTargetFromParame(e, InDirection, InVelocity, OutPosition)
+    InDirection:Normalize()
+
+    local vdis = InVelocity * e
+   
+    local TDis = Vector.distance(self.TargePos, self.CurPos)
+    if TDis < vdis then
+        vdis = TDis
+    end
+
+    local MoveDis = InDirection * vdis
+    OutPosition:Set(self.CurPos + MoveDis)
+    return OutPosition
+   
+end
+
+function DemoVOMoveObject:SetDirection(InDirection)
+    self.dir = Vector.copy(InDirection):Normalize()
+    self:BuildRenderDirectionLine()
+end
+
+function DemoVOMoveObject:UpdateMove(e)
+    self:GetNextFrameMoveTarget(e)
     self:BuildRenderDirectionLine()
 
 end
