@@ -941,9 +941,9 @@ math.GetTangentCone2D = function(InVector, InCircle, OutOCone2d)
     local sina = math.asin(R / dis)
 
     if OutOCone2d then
-        OutOCone2d.pos = Vector.copy(InVector)
+        OutOCone2d.pos:Set(InVector)
         OutOCone2d.angle = sina * 2
-        OutOCone2d.dir = (CPos - InVector):normalize()
+        OutOCone2d.dir:Set((CPos - InVector):normalize())
         OutOCone2d.r = R + dis
     else
         

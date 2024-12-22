@@ -55,6 +55,10 @@ function Cone2D:MoveVec(InVec)
     self.pos = self.pos + InVec
 end
 
+function Cone2D:GetAngle()
+    return self.angle
+end
+
 function Cone2D:draw()
     if not self.Visible then return end
 

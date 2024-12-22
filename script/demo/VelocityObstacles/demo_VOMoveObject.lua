@@ -12,11 +12,13 @@ function DemoVOMoveObject.new(x, y, r, InFace, InVelocity)
     obj.len = r + 50
     obj.dir = InFace
 
-    obj.Velocity = InVelocity or 15
+    obj.Velocity = InVelocity or 0
 
     obj.IsMove = false
     obj.TargePos = Vector.new(0, 0)
     obj.CurPos = Vector.new(x, y)
+
+    obj.IsUseFixDirection = false
 
     obj:BuildRenderDirectionLine()
 
@@ -105,6 +107,14 @@ function DemoVOMoveObject:GetDirection()
     return self.dir
 end
 
+function DemoVOMoveObject:GetTargetDirection()
+    if self.IsMove then
+        return (self.TargePos - self.CurPos):Normalize()
+    else
+        return self:GetDirection()
+    end
+end
+
 function DemoVOMoveObject:GetVelocity()
     return self.Velocity
 end
@@ -113,13 +123,29 @@ function DemoVOMoveObject:GetPosition()
     return self.CurPos
 end
 
+function DemoVOMoveObject:IsMoving()
+    return self.IsMove
+end
+
+
+function DemoVOMoveObject:SetFixDirection(InDir)
+    self.dir:Set(InDir)
+    self.IsUseFixDirection = true
+end
+
 function DemoVOMoveObject:GetNextFrameMoveTarget(e)
     local movedir = self.TargePos - self.CurPos
-    movedir:Normalize()
+    if self.IsUseFixDirection == false then
+        movedir:Normalize()
 
-    self.dir.x = movedir.x
-    self.dir.y = movedir.y
+        self.dir.x = movedir.x
+        self.dir.y = movedir.y
+    else
+        self.dir:Normalize()
+        movedir:Set(self.dir)
+    end
 
+    self.IsUseFixDirection = false
     local vdis = self.Velocity * e
    
 
@@ -131,14 +157,23 @@ function DemoVOMoveObject:GetNextFrameMoveTarget(e)
         self.CurPos.y =  self.TargePos.y
         self.IsMove = false
     end
+
+    if self.IsMove == false and self.ArrivedTargetCallFunc then
+        self.ArrivedTargetCallFunc(self, self.CurPos.x, self.CurPos.y)
+    end
    
 end
 
 function DemoVOMoveObject:GetVelocityTargetFromParame(e, InDirection, InVelocity, OutPosition)
+    if InVelocity == 0 or InDirection:IsZero() or self.IsMove == false then
+        OutPosition:Set(self.CurPos)
+        return
+    end
+    
     InDirection:Normalize()
 
     local vdis = InVelocity * e
-   
+
     local TDis = Vector.distance(self.TargePos, self.CurPos)
     if TDis < vdis then
         vdis = TDis

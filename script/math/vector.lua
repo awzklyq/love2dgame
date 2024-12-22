@@ -124,8 +124,8 @@ end
 function Vector:RotateClockwise(angle)
     local radianAngle = math.rad(angle)
 
-    local cosTheta = math.cos(-angle)
-    local sinTheta = math.sin(-angle)
+    local cosTheta = math.cos(-radianAngle)
+    local sinTheta = math.sin(-radianAngle)
 
     local x = self.x
     local y = self.y
