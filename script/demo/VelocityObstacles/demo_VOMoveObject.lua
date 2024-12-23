@@ -1,5 +1,6 @@
 _G.DemoVOMoveObject = {}
 
+DemoVOMoveObject.IsStop = false
 local DemoVOMoveObjectManager = setmetatable({}, {__mode = "kv"})
 --InFace 2d vector
 function DemoVOMoveObject.new(x, y, r, InFace, InVelocity)
@@ -19,6 +20,7 @@ function DemoVOMoveObject.new(x, y, r, InFace, InVelocity)
     obj.CurPos = Vector.new(x, y)
 
     obj.IsUseFixDirection = false
+    obj.IsSkipOneFrame = false
 
     obj:BuildRenderDirectionLine()
 
@@ -133,6 +135,12 @@ function DemoVOMoveObject:SetFixDirection(InDir)
     self.IsUseFixDirection = true
 end
 
+function DemoVOMoveObject:SetCurrentPositionAndSkipOneFrame(InPoisition)
+    self.CurPos:Set(InPoisition)
+    self.IsSkipOneFrame = true
+end
+
+
 function DemoVOMoveObject:GetNextFrameMoveTarget(e)
     local movedir = self.TargePos - self.CurPos
     if self.IsUseFixDirection == false then
@@ -165,9 +173,9 @@ function DemoVOMoveObject:GetNextFrameMoveTarget(e)
 end
 
 function DemoVOMoveObject:GetVelocityTargetFromParame(e, InDirection, InVelocity, OutPosition)
+    OutPosition:Set(self.CurPos)
     if InVelocity == 0 or InDirection:IsZero() or self.IsMove == false then
-        OutPosition:Set(self.CurPos)
-        return
+        return OutPosition
     end
     
     InDirection:Normalize()
@@ -191,9 +199,12 @@ function DemoVOMoveObject:SetDirection(InDirection)
 end
 
 function DemoVOMoveObject:UpdateMove(e)
-    self:GetNextFrameMoveTarget(e)
-    self:BuildRenderDirectionLine()
+    if self.IsSkipOneFrame == false then
+        self:GetNextFrameMoveTarget(e)
+        self:BuildRenderDirectionLine()
+    end
 
+    self.IsSkipOneFrame = false
 end
 
 function DemoVOMoveObject:update(e)
@@ -209,6 +220,7 @@ end
 
 
 app.update(function(dt)
+    if DemoVOMoveObject.IsStop then return end
     for i = 1, #DemoVOMoveObjectManager do
         if DemoVOMoveObjectManager[i] then
             DemoVOMoveObjectManager[i]:update(dt)

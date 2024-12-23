@@ -51,6 +51,14 @@ function Rect:moveTo(x, y)
     end
 end
 
+function Rect:SetCenterPosition(x, y)
+    self.x = x - self.w * 0.5; 
+    self.y = y - self.h * 0.5;
+    if self.box2d then
+        self.box2d:setPosition(self.x, self.y);
+    end
+end
+
 function Rect:SetImage(name, ...)
     self.img = ImageEx.new(name, ...)
     self.img.renderWidth = self.w - 1

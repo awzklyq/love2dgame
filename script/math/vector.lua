@@ -81,7 +81,7 @@ end
 function Vector:normalize()
     local w =  math.sqrt(math.pow(self.x, 2) + math.pow(self.y, 2));
     if not w or w == 0 then
-        return;
+        return self;
     end
 
     self.x = self.x  / w;
@@ -119,6 +119,24 @@ end
 function Vector:Set(v)
     self.x = v.x
     self.y = v.y
+end
+
+function Vector:GetNearPoint(v1, v2)
+
+    if Vector.distance(self, v1) < Vector.distance(self, v2) then
+        return v1
+    else
+        return v2
+    end
+end
+
+function Vector:GetFarPoint(v1, v2)
+
+    if Vector.distance(self, v1) < Vector.distance(self, v2) then
+        return v2
+    else
+        return v1
+    end
 end
 
 function Vector:RotateClockwise(angle)

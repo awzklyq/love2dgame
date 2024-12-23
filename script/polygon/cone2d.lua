@@ -42,12 +42,15 @@ function Cone2D:ResetRenderParame()
 end
 
 function Cone2D:CheckPointInXY(x, y)
-    return self.CheckPointInVec(Vector.new(x, y))
+    return self:CheckPointInVec(Vector.new(x, y))
 end
 
 function Cone2D:CheckPointInVec(InVec)
     local TargetDir = (InVec - self.pos):Normalize()
     local angle = Vector.angleClockwise(self.dir, TargetDir)
+    if angle > math.pi then
+        angle = math.pi * 2 - angle
+    end
     return self.angle * 0.5 > angle
 end
 
@@ -57,6 +60,49 @@ end
 
 function Cone2D:GetAngle()
     return self.angle
+end
+
+function Cone2D:BuildRays()
+    local ODir = Vector.copy(self.dir)
+    local angle = self.angle * 0.5
+
+    ODir:RotateClockwise(angle)
+    self.Ray1 =  Ray2D.new(Vector.copy(self.pos), ODir)
+
+    ODir:Set(self.dir)
+    ODir:RotateClockwise(-angle)
+    self.Ray2 =  Ray2D.new(Vector.copy(self.pos), ODir)
+end
+
+function Cone2D:FindNearestPoint(InStartPoint, InEndPoint)
+    local InLine = Line.new(InStartPoint.x, InStartPoint.y, InEndPoint.x, InEndPoint.y)
+    local IsintersectLine = {IsIntersect = false}
+    if not self.Ray1 or not self.Ray2 then
+        return IsintersectLine
+    end
+
+    local IntersectLine1 = self.Ray1:IsintersectLine(InLine)
+    local IntersectLine2 = self.Ray2:IsintersectLine(InLine)
+
+    IsintersectLine.IsIntersect = IntersectLine1.IsIntersect or IntersectLine2.IsIntersect
+    if not IsintersectLine.IsIntersect then
+        return IsintersectLine
+    end
+
+    if IntersectLine1.IsIntersect then
+        IsintersectLine.IntersectPoint = IntersectLine1.IntersectPoint
+    end
+
+    if IsintersectLine.IntersectPoint then
+        if Vector.distance(IsintersectLine.IntersectPoint, InStartPoint) < Vector.distance(IntersectLine2.IntersectPoint, InStartPoint) then
+            IsintersectLine.IntersectPoint = IntersectLine2.IntersectPoint
+        end
+    else
+        IsintersectLine.IntersectPoint = IntersectLine2.IntersectPoint
+    end
+
+    return IsintersectLine
+
 end
 
 function Cone2D:draw()

@@ -18,7 +18,7 @@ function GetRandomPosition()
     return Vector.new(x, y)
 end
 
-local NumnerMO = 3
+local NumnerMO = 4
 local MOS = {}
 local function GenenrateMVO(InNumber)
     MOS = {}
@@ -58,5 +58,11 @@ end)
 app.mousepressed(function(x, y, button, istouch)
     if button == 1 then
         mo1:MoveToXY(x, y)
+    end
+end)
+
+app.keypressed(function(key, scancode, isrepeat)
+    if key == "space" then
+        DemoVOMoveObject.IsStop = not DemoVOMoveObject.IsStop 
     end
 end)
