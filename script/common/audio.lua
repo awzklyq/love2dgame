@@ -81,7 +81,7 @@ function Audio.new(name, AudioType)
     local audio = setmetatable({}, Audio);
     
     --AudioType: static or stream
-    audio.Source = love.audio.newSource(_G.FileManager.findFile(name), AudioType or "static")
+    audio.Source =audio.newSource(_G.FileManager.findFile(name), AudioType or "static")
 
     return audio;
 end

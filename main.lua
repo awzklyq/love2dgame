@@ -54,6 +54,7 @@ dofile('script/polygon/line.lua')
 dofile('script/polygon/ray.lua')
 dofile('script/polygon/HermiteCurve.lua')
 dofile('script/polygon/BezierCurve.lua')
+dofile('script/polygon/BSplineCurve.lua')
 dofile('script/polygon/edge.lua')
 dofile('script/polygon/box.lua')
 dofile('script/polygon/mesh.lua')
@@ -198,8 +199,8 @@ if not _G.TEST then
 	end)
 
 else
-	-- dofile('script/test/test_cone2d.lua')--test_MeshVolume  test_BezierCurve.lua
-	dofile('script/demo/VelocityObstacles/demo_vo.lua')
+	dofile('script/test/test_BSplineCurve.lua')--test_MeshVolume  test_BezierCurve.lua
+	-- dofile('script/demo/VelocityObstacles/demo_vo.lua')
 end
 --dofile()
 
