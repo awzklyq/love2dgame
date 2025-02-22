@@ -90,3 +90,18 @@ end
 function LColor:getBrightness()
     return 0.2126 * self._r + 0.7152 * self._g + 0.0722 *self._b
 end
+
+function LColor:AdjustGray(InNewGray)
+    local gray = self:GetGray()
+
+    local scale = InNewGray / gray
+    -- log('aaaaaaaa', scale, 'tttttt',  InNewGray, 'yyyyyy', gray)
+    self.r = math.min(255, math.max(0, self.r * scale))
+    self.g = math.min(255, math.max(0, self.g * scale))
+    self.b = math.min(255, math.max(0, self.b * scale))
+
+end
+
+function LColor:GetGray()
+    return self:GetLuminance()
+end

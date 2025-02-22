@@ -169,6 +169,69 @@ function ImageEx:ErasurePixel(c)
     return ImageEx.new(self:GetImageData())
 end
 
+function ImageEx:CacleCDF(InHistogramData)
+    local NumHistogram = #InHistogramData
+    local NumberData = 0
+    for i = 1, NumHistogram do
+        NumberData = NumberData + #InHistogramData[i]
+    end
+
+    local cdf_normalized = {}
+    local CurrentNumberData = 0
+    local cdf_min = 0
+    for i = 1, NumHistogram do
+        CurrentNumberData = CurrentNumberData + #InHistogramData[i]
+        cdf_normalized[i] = CurrentNumberData / NumberData
+        if cdf_normalized[i] > 0 and cdf_min == 0 then
+            cdf_min = cdf_normalized[i]
+        end
+    end
+
+    local NewColorDatas = {}
+    for i = 1, NumHistogram do
+        NewColorDatas[i] = {}
+        local NewL = ((cdf_normalized[i] - cdf_min) / (1 - cdf_min)) --* 255
+        -- NewL = math.round(NewL)
+        
+        for j = 1, #InHistogramData[i] do
+            local HD = InHistogramData[i][j]
+            local c = LColor.new()
+            c:Set(HD.C)
+            c:AdjustGray(NewL)
+
+            -- c.r = 255
+            -- c.g = 0
+            -- c.b = 0
+            -- c.a = 255 
+            NewColorDatas[i][j] = {x = HD.x, y = HD.y, C = c}
+        end
+    end
+
+    return NewColorDatas
+end
+
+function ImageEx:HistogramEqualization()
+    local ImageColors = self:GetPixels()
+    local Num = 255
+
+    local Result = {}
+    for i = 1, Num do
+        Result[i] = {}
+    end
+
+    --Floor
+    for i = 1, #ImageColors do
+        for j = 1, #ImageColors[i] do
+            local L = ImageColors[i][j]:GetLuminance()
+            local Index = math.floor(L * Num) + 1
+            local CurrentH = Result[Index]
+            CurrentH[#CurrentH + 1] = {x = i, y = j, L = L, C = ImageColors[i][j]}
+        end
+    end 
+
+    local NewColorDatas = self:CacleCDF(Result)
+    return NewColorDatas
+end
 
 function ImageEx:draw()
     Render.RenderObject(self)
@@ -186,6 +249,9 @@ local imageData = setmetatable({}, {__index = ImageDataEx});
 
     imageData.renderid = Render.ImageDataId;
 
+    imageData._w = w
+    imageData._h = h
+
     return imageData
 end
 
@@ -201,6 +267,16 @@ function ImageDataEx:SetPixel(x, y, r, g, b, a)
         self.obj:setPixel(x, y, r, g, b, a)
     end
     return self.obj
+end
+
+--InDatas:x, y, C
+function ImageDataEx:SetPixelsFromDatas(InDatas)
+    for i = 1, #InDatas do
+        for j = 1, #InDatas[i] do
+            local d = InDatas[i][j]
+            self:SetPixel(d.x - 1, d.y - 1, d.C)
+        end
+    end
 end
 
 function ImageDataEx:GetImage()
