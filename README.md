@@ -128,3 +128,4 @@ Include：
 	script/test/test_voxel.lua
 	script/test/test_water.lua
 	script/test/test_watercolorfilter.lua
+ 	script/test/test_BSpLineCurve.lua
