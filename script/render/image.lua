@@ -107,6 +107,41 @@ function ImageEx:GetPixel(x, y)
     return LColor.new(r * 255, g * 255, b * 255, a * 255)
 end
 
+function ImageEx:GetPixels()
+    local imgd = self:GetImageData()
+    local index = 0
+    local ImageColors = {}
+    for i = 0, self.w - 1 do
+        ImageColors[#ImageColors + 1] = {}
+        for j = 0, self.h - 1 do
+            local r, g, b, a = imgd:getPixel(i, j)
+            ImageColors[#ImageColors][j + 1] = LColor.new(r * 255, g * 255, b * 255, a * 255)
+        end
+    end
+    return ImageColors
+end
+
+function ImageEx:Histogram()
+    local ImageColors = self:GetPixels()
+    local Num = 255
+
+    local Result = {}
+    for i = 1, Num do
+        Result[i] = {}
+    end
+
+    --Floor
+    for i = 1, #ImageColors do
+        for j = 1, #ImageColors[i] do
+            local L = ImageColors[i][j]:GetLuminance()
+            local Index = math.floor(L * Num) + 1
+            local CurrentH = Result[Index]
+            CurrentH[#CurrentH + 1] = {x = i, y = j, L = L}
+        end
+    end 
+    return Result
+end
+
 function ImageEx:SetPixel(x, y, r, g, b, a)
     local imgd = self:GetImageData()
     if not g then

@@ -20,6 +20,7 @@ dofile('script/application.lua')
 dofile('script/render/render.lua')
 dofile('script/render/canvas.lua')
 dofile('script/render/image.lua')
+dofile('script/render/HistogramRender.lua')
 
 dofile('script/common/color.lua')
 dofile('script/common/audio.lua')
@@ -199,7 +200,7 @@ if not _G.TEST then
 	end)
 
 else
-	dofile('script/test/test_BSplineCurve.lua')--test_MeshVolume  test_BezierCurve.lua
+	dofile('script/test/test_ImagehHistogram.lua')--test_MeshVolume  test_BezierCurve.lua
 	-- dofile('script/demo/VelocityObstacles/demo_vo.lua')
 end
 --dofile()

@@ -128,6 +128,8 @@ Render.FormulaId = 63
 
 Render.Cone2DId = 64
 
+Render.HistogramId = 65
+
 Render.getRenderIdName = function(id)
     if type(id) == "table" then
         id = id.renderid
@@ -228,6 +230,8 @@ Render.getRenderIdName = function(id)
         return "BillBoard"
     elseif Render.Cone2DId == id then
         return "Cone2D"
+    elseif Render.HistogramId == id then
+        return "Histogram"
     end
     
     return "Null"
