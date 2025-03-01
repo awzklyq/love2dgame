@@ -381,6 +381,52 @@ function Matrixs:GetUVMats()
     return U, V, MZ
 end
 
+function Matrixs:GetMaxValue()
+    local _MaxV = self[1][1]
+    for i = 1, self.Row do
+        for j = 1, self.Column do
+            _MaxV = math.max(_MaxV, self[i][j])
+        end
+    end
+
+    return _MaxV
+end
+
+function Matrixs:GenerateDrawGrayDatas(x, y, w, h)
+    local _MaxV = self:GetMaxValue()
+    self._DrawGrayDatas = {}
+
+    local StartX = x
+    local StartY = y
+
+    local NeedW = w / self.Row
+    local NeedH = h / self.Column
+
+    local RW = NeedW - 2
+    local RH = NeedH - 2
+    for i = 1, self.Row do
+        self._DrawGrayDatas[i] = {}
+        for j = 1, self.Column do
+            local r = Rect.new(StartX + (i - 1) * NeedW + 1, StartY + (j - 1) * NeedH + 1, RW, RH)
+
+            local gray = (self[i][j] / _MaxV) * 255
+            r:SetColor(gray, gray, gray, 255)
+
+            self._DrawGrayDatas[i][j] = r
+        end
+    end
+end
+
+function Matrixs:DrawGrayDatas()
+    if not self._DrawGrayDatas or #self._DrawGrayDatas == 0 then return end
+
+    for i = 1, self.Row do
+        for j = 1, self.Column do
+            self._DrawGrayDatas[i][j]:draw()
+        end
+    end
+end
+
 function Matrixs:Log(info)
     local str = "Matrixs "
     if info ~= nil then
