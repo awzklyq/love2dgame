@@ -427,6 +427,10 @@ function Matrixs:DrawGrayDatas()
     end
 end
 
+function Matrixs:GetDrawGrayDatas()
+    return self._DrawGrayDatas
+end
+
 function Matrixs:Log(info)
     local str = "Matrixs "
     if info ~= nil then

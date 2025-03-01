@@ -130,3 +130,4 @@ Include：
 	script/test/test_watercolorfilter.lua
  	script/test/test_BSpLineCurve.lua
 	script/test/test_MatrixsDrawGray.lua
+	script/test/test_BinaryImage_Matrixs.lua
