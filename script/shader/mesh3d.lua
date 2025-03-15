@@ -365,9 +365,9 @@ function Shader.GetBase3DShader(color, projectionMatrix, modelMatrix, viewMatrix
     end
 
     if not color then
-        shader:send('bcolor', {1,1,1,1})
+        shader:sendValue('bcolor', {1,1,1,1})
     else
-        shader:send('bcolor', {color._r,color._g, color._b, color._a})
+        shader:sendValue('bcolor', {color._r,color._g, color._b, color._a})
     end
     
     shader.SetPBRValue = function(obj, PBRData)

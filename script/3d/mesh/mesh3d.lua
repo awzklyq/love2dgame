@@ -76,6 +76,69 @@ function Mesh3D.createFromPoints(datas)
     return mesh;
 end
 
+function Mesh3D.CreateCube()
+    local Datas = {}
+    Datas[1] = {-0.5, -0.5, -0.5, 0.0, 0.0}
+
+    Datas[2] = {0.5, -0.5, -0.5, 1.0, 0.0}
+
+    Datas[3] = {0.5,  0.5, -0.5, 1.0, 1.0}
+
+    Datas[4] = {-0.5,  0.5, -0.5, 0.0, 1.0}
+
+    Datas[5] = {-0.5, -0.5,  0.5, 0.0, 0.0}
+
+    Datas[6] = {0.5, -0.5,  0.5, 1.0, 0.0}
+
+    Datas[7] = {0.5,  0.5,  0.5, 1.0, 1.0}
+
+    Datas[8] = {-0.5,  0.5,  0.5, 0.0, 1.0}
+
+    --Generate Normal
+    for i = 1, #Datas do
+        local v = Vector3.new(Datas[i][1], Datas[i][2], Datas[i][3])
+        v:normalize()
+
+        Datas[i][6] = v.x
+        Datas[i][7] = v.y
+        Datas[i][8] = v.z
+
+    end
+
+    local indices = {
+        -- 前
+        0, 1, 2,
+        0, 2, 3,
+    
+        -- 后
+        4, 6, 5,
+        4, 7, 6,
+    
+        -- 左
+        4, 0, 3,
+        4, 3, 7,
+    
+        -- 右
+        1, 5, 6,
+        1, 6, 2,
+    
+        -- 下
+        4, 5, 1,
+        4, 1, 0,
+    
+        -- 上
+        3, 2, 6,
+        3, 6, 7
+    }
+
+    local Verts = {}
+    for i = 1, #indices do
+        Verts[i] = Datas[indices[i] + 1]
+    end
+
+    return Mesh3D.createFromPoints(Verts)
+end
+
 function Mesh3D:GetWorldBox()
     return self.transform3d:mulBoundBox(self.box)
 end
@@ -102,6 +165,8 @@ function Mesh3D:setBaseColor(color)
     self.bcolor = color
     
 end
+
+Mesh3D.SetBaseColor = Mesh3D.setBaseColor
 
 function Mesh3D:GetPositions()
     local result = {}
@@ -358,9 +423,9 @@ function Mesh3D:draw()
 
     self.shader:setCameraAndMatrix3D(self.transform3d, RenderSet.getUseProjectMatrix(), RenderSet.getUseViewMatrix(), camera3d.eye, self)
     
-    if self.shader:hasUniform( "bcolor") and self.bcolor then
-        self.shader:send('bcolor',{self.bcolor._r, self.bcolor._g, self.bcolor._b, self.bcolor._a})
-    end
+    -- if self.shader:hasUniform( "bcolor") and self.bcolor then
+        self.shader:sendValue('bcolor',{self.bcolor._r, self.bcolor._g, self.bcolor._b, self.bcolor._a})
+    -- end
     Render.RenderObject(self)
     RenderSet.setNormalMap()
 
@@ -399,9 +464,9 @@ function Mesh3D:DrawAlphaTest(DepthTexture, ColorTexture, BlendCoef)
     self.shader:setCameraAndMatrix3D(self.transform3d, RenderSet.getUseProjectMatrix(), RenderSet.getUseViewMatrix(), camera3d.eye)
 
     self.shader:SetAlpahTestValue(DepthTexture, ColorTexture, BlendCoef)
-    if self.shader:hasUniform( "bcolor") and self.bcolor then
-        self.shader:send('bcolor',{self.bcolor._r, self.bcolor._g, self.bcolor._b, self.bcolor._a})
-    end
+    -- if self.shader:hasUniform( "bcolor") and self.bcolor then
+        self.shader:sendValue('bcolor',{self.bcolor._r, self.bcolor._g, self.bcolor._b, self.bcolor._a})
+    -- end
     Render.RenderObject(self)
     RenderSet.setNormalMap()
 end
@@ -416,9 +481,9 @@ function Mesh3D:DrawAlphaTest2(ColorTexture, BlendCoef)
     self.shader:setCameraAndMatrix3D(self.transform3d, RenderSet.getUseProjectMatrix(), RenderSet.getUseViewMatrix(), camera3d.eye)
 
     self.shader:SetAlpahTestValue(nil, ColorTexture, BlendCoef)
-    if self.shader:hasUniform( "bcolor") and self.bcolor then
-        self.shader:send('bcolor',{self.bcolor._r, self.bcolor._g, self.bcolor._b, self.bcolor._a})
-    end
+    -- if self.shader:hasUniform( "bcolor") and self.bcolor then
+        self.shader:sendValue('bcolor',{self.bcolor._r, self.bcolor._g, self.bcolor._b, self.bcolor._a})
+    -- end
     Render.RenderObject(self)
     RenderSet.setNormalMap()
 end
@@ -607,13 +672,17 @@ function Mesh3D:PickByRay(ray)
 end
 
 -- Return distance
-function Mesh3D:PickFaceByRay(ray)
+function Mesh3D:PickFaceByRay(ray, backcull)
     if #self.FacesInfos == 0 then
         return -1
     end
     
+    if backcull == nil then
+        backcull = true
+    end
+
     for i = 1, #self.FacesInfos do
-        local dis = ray:IntersectTriangle(self.transform3d * self.FacesInfos[i].Triangle, true)
+        local dis = ray:IntersectTriangle(self.transform3d * self.FacesInfos[i].Triangle, backcull)
         if dis > 0 then
             return dis
         end
@@ -624,6 +693,10 @@ end
 function Mesh3D:PickFaceAndBVHByRay(ray, backcull)
     if #self.FacesInfos == 0 or #self.FacesInfosBVH == 0 then
         return -1
+    end
+
+    if backcull == nil then
+        backcull = true
     end
 
     for i = 1, #self.FacesInfosBVH do
@@ -733,9 +806,9 @@ end
 function MeshLine:draw()
     self.shader:setCameraAndMatrix3D(self.transform3d, RenderSet.getUseProjectMatrix(), RenderSet.getUseViewMatrix())
 
-    if self.shader:hasUniform( "bcolor") and self.bcolor then
-        self.shader:send('bcolor',{self.bcolor._r, self.bcolor._g, self.bcolor._b, self.bcolor._a})
-    end
+    -- if self.shader:hasUniform( "bcolor") and self.bcolor then
+        self.shader:sendValue('bcolor',{self.bcolor._r, self.bcolor._g, self.bcolor._b, self.bcolor._a})
+    -- end
     Render.RenderObject(self);
 end
 

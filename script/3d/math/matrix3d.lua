@@ -590,6 +590,21 @@ function Matrix3D:adjoint( )
 	return self
 end
 
+function Matrix3D:Scale(InX, InY, InZ)
+	self[1] = self[1] * InX
+	self[2] = self[2] * InX
+	self[3] = self[3] * InX
+
+	self[5] = self[5] * InY
+	self[6] = self[6] * InY
+	self[7] = self[7] * InY
+
+	self[9] = self[9] * InZ
+	self[10] = self[10] * InZ
+	self[11] = self[11] * InZ
+	return self
+end
+
 function Matrix3D:Set(mat)
 	local result = self
 	result[1] = mat[1]
