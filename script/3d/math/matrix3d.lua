@@ -269,6 +269,8 @@ function Matrix3D:SetTranslation(x, y, z)
 		mm[14] = y
 		mm[15] = z
 	end
+
+	return self
 end
 			
 function Matrix3D:mulTranslationRight(x, y, z)

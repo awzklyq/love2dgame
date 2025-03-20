@@ -662,10 +662,10 @@ Mesh3D.loadObjFile = function(path)
 end
 
 -- Return distance
-function Mesh3D:PickByRay(ray)
+function Mesh3D:PickByRay(ray, backcull)
     local box = self:GetWorldBox()
     if  ray:IsIntersectBox(box) then
-        return self:PickFaceByRay(ray)
+        return self:PickFaceByRay(ray, backcull)
     end
 
     return -1
@@ -733,6 +733,17 @@ function Mesh3D:IntersectFaceAndBVHByBox(InBox)
     return false
 end
 
+function Mesh3D:GenerateTrangle3D()
+    local Trangles = {}
+    for i = 1, #self.FacesInfos do
+        local f = self.FacesInfos[i]
+        local t = self.transform3d * f.Triangle
+        Trangles[#Trangles + 1] = t
+    end
+
+    return Trangles
+end
+
 _G.MeshLine = {}
 
 function MeshLine.new(startpos, endpos)
@@ -743,11 +754,11 @@ function MeshLine.new(startpos, endpos)
     
     mesh.bcolor = LColor.new(255,255,255,255)
 
-    startpos = startpos or Vector3.new(0,0,0)
-    endpos = endpos or Vector3.new(0,0,0)
+    mesh.startpos = startpos or Vector3.new(0,0,0)
+    mesh.endpos = endpos or Vector3.new(0,0,0)
 
-    mesh.verts = {{startpos.x, startpos.y, startpos.z, 0, 0, 1,1,1,1}, 
-    {endpos.x, endpos.y, endpos.z, 1, 1, 1,1,1,1}}
+    mesh.verts = {{mesh.startpos.x, mesh.startpos.y, mesh.startpos.z, 0, 0, 1,1,1,1}, 
+    {mesh.endpos.x, mesh.endpos.y, mesh.endpos.z, 1, 1, 1,1,1,1}}
 
     mesh.obj = love.graphics.newMesh(vertexFormat, mesh.verts, "lines")
 
@@ -774,6 +785,8 @@ end
 function MeshLine:setBaseColor(color)
     self.bcolor = color
 end
+
+MeshLine.SetBaseColor = MeshLine.setBaseColor
 
 
 MeshLine.__index = function(tab, key, ...)

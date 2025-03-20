@@ -9,7 +9,7 @@ function Camera3D.new(x1, y1, x2, y2, lw)-- lw :line width
 
     camera.eye = Vector3.new(0,0,0)
 
-    camera.up = Vector3.new(0,1,0)
+    camera.up = Vector3.new(0,0,-1)
 
     camera.look = Vector3.new(0,0,-1)
 

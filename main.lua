@@ -34,6 +34,7 @@ dofile('script/common/SpaceSplit.lua')
 dofile('script/common/psnr.lua')
 dofile('script/common/optional.lua')
 dofile('script/common/MehGenusGenerate.lua')
+dofile('script/common/Indicator.lua')
 
 dofile('script/file/file.lua')
 
@@ -200,7 +201,7 @@ if not _G.TEST then
 	end)
 
 else
-	dofile('script/test/test_CreateCube.lua')--test_MeshVolume  test_BezierCurve.lua
+	dofile('script/test/test_Indicator.lua')--test_MeshVolume  test_BezierCurve.lua
 	-- dofile('script/demo/VelocityObstacles/demo_vo.lua')
 end
 --dofile()
