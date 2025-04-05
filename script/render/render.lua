@@ -130,6 +130,8 @@ Render.Cone2DId = 64
 
 Render.HistogramId = 65
 
+Render.PathGridId = 67
+
 Render.getRenderIdName = function(id)
     if type(id) == "table" then
         id = id.renderid
@@ -232,6 +234,8 @@ Render.getRenderIdName = function(id)
         return "Cone2D"
     elseif Render.HistogramId == id then
         return "Histogram"
+    elseif Render.PathGridId == id then
+        return "PathGridData"
     end
     
     return "Null"

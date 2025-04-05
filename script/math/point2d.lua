@@ -1,8 +1,16 @@
 
 _G.Point2D = {}
 
+Point2D.Meta = {}
+
+Point2D.Meta.__index = Point2D
+
+Point2D.Meta.__eq = function(myvalue, value)
+    return myvalue.x == value.x and myvalue.y == value.y
+end
+
 function Point2D.new(x, y, lw)-- lw :line width
-    local p = setmetatable({}, {__index = Point2D});
+    local p = setmetatable({}, Point2D.Meta);
 
     p.x = x or 0
     p.y = y or 0

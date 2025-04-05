@@ -105,3 +105,8 @@ end
 function LColor:GetGray()
     return self:GetLuminance()
 end
+
+LColor.Red = LColor.new(255, 0, 0, 255)
+LColor.Green = LColor.new(0, 255, 0, 255)
+LColor.Blue = LColor.new(0, 0, 255, 255)
+LColor.Black = LColor.new(0, 0, 0, 255)

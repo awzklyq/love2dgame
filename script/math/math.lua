@@ -18,6 +18,11 @@ math.clamp = function(v, v1, v2)
     return v;
 end
 
+math.clamp_min_max = function(InV, InMin, InMax)
+    return  math.min(math.max(InV, InMin), InMax)
+end
+
+
 math.noise = function(...)
     local value = love.math.noise( ... )
     return value--2 * value - 1
