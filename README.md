@@ -132,3 +132,4 @@ Include：
 	script/test/test_MatrixsDrawGray.lua
 	script/test/test_BinaryImage_Matrixs.lua
 	script/test/test_AStartPathFinder.lua
+	script/test/test_Line.lua

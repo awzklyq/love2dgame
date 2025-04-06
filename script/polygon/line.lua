@@ -1,20 +1,64 @@
 _G.Line = {}
 
-function Line.new(x1, y1, x2, y2, lw)-- lw :line width
-    local line = setmetatable({}, {__index = Line});
-    if type(x1) == "table" and type(y1) == "table" then
-        line.x1 = x1.x
-        line.y1 = x1.y
+local LocalLine = Line
+LocalLine.Meta = {}
+LocalLine.Meta.__index = function(InTable, InKey)
+    if InKey == 'x1' then
+        return InTable._StartPoint.x
+    elseif InKey == 'y1' then
+        return InTable._StartPoint.y
+    elseif InKey == 'x2' then
+        return InTable._EndPoint.x
+    elseif InKey == 'y2' then
+        return InTable._EndPoint.y
+    end
 
-        line.x2 = y1.x
-        line.y2 = y1.y
+    if LocalLine[InKey] then
+        return LocalLine[InKey];
+    end
+
+
+    return rawget(InTable, InKey)
+end
+
+LocalLine.Meta.__newindex = function(InTable, key, value)
+    if value then
+        if key == 'x1' then
+            InTable._StartPoint.x = value
+        elseif key == 'y1' then
+            nTable._StartPoint.y = value
+        elseif key == 'x2' then
+            InTable._EndPoint.x = value
+        elseif key == 'y2' then
+            InTable._EndPoint.y =  value
+        end
+    end
+
+    rawset(InTable, key, value);
+end
+
+LocalLine.Meta.__eq = function(myvalue, value)
+    return myvalue:IsEqual(value)
+end
+
+
+function Line.new(x1, y1, x2, y2, lw)-- lw :line width
+    local line = setmetatable({}, LocalLine.Meta);
+
+    line._StartPoint = Vector.new()
+    line._EndPoint = Vector.new()
+
+    if type(x1) == "table" and type(y1) == "table" then
+        line._StartPoint = x1
+
+        line._EndPoint = y1
 
         line.lw = x2 or 2;
     else
-        line.x1 = x1 or 0;
-        line.y1 = y1 or 0;
-        line.x2 = x2 or 1;
-        line.y2 = y2 or 1;
+        line._StartPoint.x = x1 or 0;
+        line._StartPoint.y = y1 or 0;
+        line._EndPoint.x = x2 or 1;
+        line._EndPoint.y = y2 or 1;
     
         line.lw = lw or 2;
     end
@@ -25,6 +69,9 @@ function Line.new(x1, y1, x2, y2, lw)-- lw :line width
     line.renderid = Render.LineId ;
 
     line.IsDrawOutCircle = false
+
+    line._Visible = false
+
     return line;
 end
 
@@ -38,13 +85,14 @@ end
 Line.SetColor = Line.setColor
 
 function Line:IsEqual(line)
-    if self.x1 == line.x1 and self.y1 == line.y1 and  self.x2 == line.x2 and self.y2 == line.y2 then
+    if self._StartPoint == line.c and self._EndPoint == line._StartPoint then
         return true
     end
 
-    if self.x1 == line.x2 and self.y1 == line.y2 and  self.x2 == line.x1 and self.y2 == line.y1 then
+    if self._StartPoint == line._StartPoint and self._EndPoint == line._EndPoint then
         return true
     end
+    
     return false
 end
 
@@ -52,14 +100,30 @@ end
 Line.SetColor = Line.setColor
 
 function Line:GeneraOutCircle()
-    local x =  self.x2 - self.x1
-    local y =  self.y2 - self.y1
+    local x =  self._EndPoint.x - self._StartPoint.x
+    local y =  self._EndPoint.y - self._StartPoint.y
 
     local r = math.sqrt(x * x + y * y) * 0.5
 
-    local center = Vector.new((self.x2 + self.x1) * 0.5, (self.y2 + self.y1) * 0.5)
+    local center = (self._StartPoint + self._EndPoint) * 0.5
 
     self.OutCircle = Circle.new(r, center.x ,center.y, 50)
+end
+
+function Line:SetVisible(InVisible)
+    self._Visible = InVisible
+end
+
+function Line:IsVisible()
+    return self._Visible
+end
+
+function Line:GetSizeX()
+    return math.abs(self._EndPoint.x - self._StartPoint.x)
+end
+
+function Line:GetSizeY()
+    return math.abs(self._EndPoint.y - self._StartPoint.y)
 end
 
 function Line:draw()
