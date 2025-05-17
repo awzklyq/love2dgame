@@ -198,6 +198,14 @@ function AStartPathFinder:GetCenter()
     return Center
 end
 
+function AStartPathFinder:GenerateBlockByCircle(InCircle)
+    self:ForeachGrids(function(InGrid)
+        if InCircle:CheckPointIn(InGrid:GetCenter()) then
+            InGrid:SetCanReach(false)
+        end
+    end)
+end
+
 function AStartPathFinder:draw()
     for i, v in ipairs(self._PathGrids) do
         for j, p in ipairs(v) do
