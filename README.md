@@ -5,8 +5,9 @@ The entry point for running the algorithm is the main.lua file, which changes th
 2D & 3D。
 
 Include：
+
 	script/test/test_InverseMatrixs.lua （Inverse By Gauss Jordan）
-	script/test/test_MRP.lua （Markov reward Process(马尔可夫奖励过程)）
+	script/test/test_MRP.lua （Markov reward Process(马尔可夫奖励过程)
 	script/test/fxaa.lua
 	script/test/line3d.lua
 	script/test/renderdepth.lua
