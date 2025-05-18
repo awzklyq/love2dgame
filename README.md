@@ -133,5 +133,5 @@ Include：
 	script/test/test_BinaryImage_Matrixs.lua
 	script/test/test_AStartPathFinder.lua
 	script/test/test_Line.lua
-	script/test/test_MRP.lua
+	script/test/test_InverseMatrixs.lua （Inverse By Gauss Jordan）
 	script/test/test_MRP.lua （Markov reward Process(马尔可夫奖励过程)）
