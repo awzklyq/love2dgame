@@ -39,6 +39,9 @@ end
 
 function MarkovState:SetTermination(InValue)
     self._Termination = InValue
+    if InValue then
+        self:AddLinkStateAndProbability(self, 1)
+    end
 end
 
 function MarkovState:ForeachLinkStates(InFunc)
@@ -62,24 +65,17 @@ function MarkovProcess.new(InDiscountFactor)
 end
 
 function MarkovProcess:AddMarkovState(InState)
-    self._MarkovStates[#self._MarkovStates + 1] = InState
+    self._State_N = self._State_N + 1
+    self._MarkovStates[self._State_N] = InState
+
+    self._IsHastData = true
 end
 
 function MarkovProcess:SetDiscountFactor(InValue)
     self._DiscountFactor = InValue or 0
 end
 
-function MarkovProcess:GenerateData()
-    self._State_N = #self._MarkovStates
-    self._IsHastData = self._State_N > 0
-
-    if self._IsHastData == false then return end
-
-    self:GenerateSTM()
-end
-
---Generate state transition matrix
-function MarkovProcess:GenerateSTM()
+function MarkovProcess:GenerateStateValues()
     if self._IsHastData == false then return end
 
     --Sort from index
@@ -87,16 +83,34 @@ function MarkovProcess:GenerateSTM()
         return a:GetIndex() < b:GetIndex()
     end)
 
-    --state transition matrix
+    --state transition matrixs
     self._P = Matrixs.new(self._State_N, self._State_N, 0)
 
+    --Generate state transition matrixs
     local _Holder = self
     for i = 1, self._State_N do
         local s = self._MarkovStates[i]
         s:ForeachLinkStates(function (InSelfState, InLinkState, InP)
-            _Holder:SetStateProbability(InLinkState:GetIndex(), InSelfState:GetIndex(), InP)
+            _Holder:SetStateProbability(InSelfState:GetIndex(), InLinkState:GetIndex(), InP)
         end)
     end
+
+    local NewP = self._P * self._DiscountFactor
+    local _IMat = Matrixs.new(self._P.Row, self._P.Column)
+    _IMat:Identity()
+    NewP = _IMat - NewP
+
+    -- Get reward
+    local _reward = {}
+    for i = 1, #self._MarkovStates do
+        _reward[i] = self._MarkovStates[i]:GetReward()
+    end
+
+    local InverseMat = NewP:GetInverseByGaussJordan()
+    InverseMat:FixValues()
+    local _V = InverseMat * _reward
+
+    return _V
 end
 
 -- Form State InJ To State InI

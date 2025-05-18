@@ -207,7 +207,7 @@ if not _G.TEST then
 	end)
 
 else
-	dofile('script/test/test_InverseMatrixs.lua')--test_MeshVolume  test_BezierCurve.lua
+	dofile('script/test/test_MRP.lua')--test_MeshVolume  test_BezierCurve.lua
 	-- dofile('script/demo/VelocityObstacles/demo_vo.lua')
 end
 --dofile()
