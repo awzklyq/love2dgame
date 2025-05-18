@@ -177,6 +177,8 @@ dofile('script/PathFinder/PathGridData.lua')
 dofile('script/PathFinder/PathFinderHelper.lua')
 dofile('script/PathFinder/AStartPathFinder.lua')
 
+dofile('script/DeepLearning/MarkovProcess.lua')
+
 dofile('script/raytrace/CPURaytraceUseDDA.lua')
 dofile 'script/ballgame/collision/collisionmanager.lua'
 dofile 'script/ballgame/collision/collisionbinder.lua'
@@ -205,7 +207,7 @@ if not _G.TEST then
 	end)
 
 else
-	dofile('script/test/test_MAB.lua')--test_MeshVolume  test_BezierCurve.lua
+	dofile('script/test/test_InverseMatrixs.lua')--test_MeshVolume  test_BezierCurve.lua
 	-- dofile('script/demo/VelocityObstacles/demo_vo.lua')
 end
 --dofile()

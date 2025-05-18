@@ -5,14 +5,18 @@ metatable_Matrixs.__index = Matrixs
 
 metatable_Matrixs.__mul = function(myvalue, value)
 
-    if  type(value) == "table" and value.renderid == Render.MatrixsId then
-        return myvalue:MulRight(value)
+    if  type(value) == "table" then
+        if value.renderid == Render.MatrixsId then
+            return myvalue:MulRight(value)
+        elseif #value == myvalue.Column then
+            return myvalue:MulVector(value)
+        end
     elseif type(value) == "number" then
         local mat = myvalue:Copy()
         return mat:MulNumber(value)
-    else
-        _errorAssert(false, "metatable_Matrixs.__mul~")
     end
+
+    _errorAssert(false, "metatable_Matrixs.__mul~")
 end
 
 metatable_Matrixs.__add = function(myvalue, value)
@@ -56,13 +60,26 @@ function Matrixs.new(row, column, v)
     return mat
 end
 
+function Matrixs:SetDatas(InDatas)
+    for i = 1, #InDatas do
+        for j = 1, #InDatas[i] do
+             self[i][j] = InDatas[i][j]
+        end
+    end
+end
+
 function Matrixs:SetValue(i, j, v)
     _errorAssert(i <= self.Row and j <= self.Column and tonumber(v) ~= nil, "Matrixs SetValue i <= self.Row and j <= self.Column")
     self[i][j] = v or 0
 end
 
+function Matrixs:GetValue(i, j)
+    _errorAssert(i <= self.Row and j <= self.Column, "Matrixs GetValue i <= self.Row and j <= self.Column")
+    return self[i][j]
+end
+
 function Matrixs:Set(mat)
-    _errorAssert(mat.Row == self.Row and mat.Column == self.Column, "Matrixs:Set i <= self.Row and j <= self.Column")
+    _errorAssert(mat.Row <= self.Row and mat.Column <= self.Column, "Matrixs:Set i <= self.Row and j <= self.Column")
     
     for i = 1, mat.Row do
         for j = 1, mat.Column do
@@ -197,6 +214,160 @@ function Matrixs:MulRight(mat)
         end
     end
     return ResultMat
+end
+
+local function MulVectersTemp(InV1, InV2)
+    _errorAssert(#InV1 == #InV2, "MulVectersTemp  #InV1 == #InV2")
+    local result = 0
+    for i = 1, #InV1 do
+        result = result + InV1[i] * InV2[i]
+    end
+    return result
+end
+
+-- Return vectors 
+-- InV is Column
+function Matrixs:MulVector(InV)
+    local Result = {}
+    for i = 1, self.Row do
+        local _row = self:GetRow(i)
+
+        Result[#Result + 1] = MulVectersTemp(_row, InV)
+    end
+
+    return Result
+end
+
+function Matrixs:FindMaxAbsFromColumn(InColumn, InStartRow)
+    _errorAssert(self.Column >= InColumn and InColumn >= 1 and InStartRow <= self.Row , "Matrixs.FindMaxFromColumn self.Column >= InColumn and InColumn >= 1")
+
+    if not InStartRow then
+        InStartRow = 1
+    end
+
+    local _v = self[InStartRow][InColumn]
+    local _row = InStartRow
+    for i = InStartRow + 1, self.Row do
+        if math.abs(_v) < math.abs(self[i][InColumn]) then
+            _v = self[i][InColumn]
+            _row = i
+        end
+    end
+
+    return _row, _v
+end
+
+function Matrixs:MulNumberByRow(InRow, InV)
+     _errorAssert(self.Row >= InRow and InRow >= 1 , "Matrixs.MulNumberByRow self.Row >= InRow and InRow >= 11")
+     for i = 1, self.Column do
+       self[InRow][i] = self[InRow][i] * InV
+    end
+end
+
+function Matrixs:DivNumberByRow(InRow, InV)
+     _errorAssert(self.Row >= InRow and InRow >= 1 , "Matrixs.MulNumberByRow self.Row >= InRow and InRow >= 11")
+     for i = 1, self.Column do
+       self[InRow][i] = self[InRow][i] / InV
+    end
+end
+
+--InRow1 = InRow1 / InV - InRow2
+function Matrixs:SubAndDivByRow(InRow1, InRow2, InV)
+    _errorAssert(self.Row >= InRow1 and InRow1 >= 1 and self.Row >= InRow2 and InRow2 >= 1, "Matrixs.SubRowByROw self.Row >= InRow and InRow >= 11")
+    for i = 1, self.Column do
+        self[InRow1][i] = self[InRow1][i] / InV - self[InRow2][i]
+        if self[InRow1][i] == 0 or self[InRow1][i] == -0 then
+            self[InRow1][i] = 0
+        end
+    end
+end
+
+function Matrixs:SwapRow(InI, InJ)
+    for i = 1, self.Column do
+        local temp = self[InI][i]
+        self[InI][i] = self[InJ][i] 
+        self[InJ][i] = temp
+    end
+end
+
+function Matrixs:GaussJordanElimination(InLimitColumn)
+    _errorAssert(self.Column >= InLimitColumn and InLimitColumn > 1 , "Matrixs.GaussJordanElimination self.Column >= InLimitColumn and InLimitColumn > 1")
+
+    for j = 1, InLimitColumn do
+        local _row, _v = self:FindMaxAbsFromColumn(j, j)
+
+        if _row ~= 0 then
+            self:DivNumberByRow(_row, _v)
+
+            if j ~= _row then
+                self:SwapRow(j, _row)
+            end
+
+            for i = 1, self.Row do
+                if i ~= j and self[i][j] ~= 0 then
+                    self:SubAndDivByRow(i, j, self[i][j])
+                end
+            end
+        end
+    end
+
+    if self[InLimitColumn][InLimitColumn] ~= 0 then
+        self:DivNumberByRow(InLimitColumn, self[InLimitColumn][InLimitColumn])
+    end
+
+     for j = 1, InLimitColumn do
+        self:DivNumberByRow(j, self[j][j])
+     end
+end
+
+function Matrixs:ForeachValues(InFunc)
+    for i = 1, self.Row do
+        for j = 1, self.Column do
+            InFunc(i, j, self[i][j])
+        end
+    end
+end
+
+function Matrixs:GetInverseByGaussJordan()
+    _errorAssert(self.Column == self.Row , "Matrixs.GetInverseByGaussJordan self.Column == self.Row")
+
+    local _IMat = Matrixs.new(self.Row, self.Column)
+    _IMat:Identity()
+
+    local _TempMat = Matrixs.ComposeColumn(self, _IMat)
+    _TempMat:GaussJordanElimination(self.Column)
+
+    local NewMat = Matrixs.new(self.Row, self.Column)
+
+    local _StartColumn = self.Column
+    NewMat:ForeachValues(function (InRow, InColumn, InV)
+        NewMat:SetValue(InRow, InColumn, _TempMat:GetValue(InRow, InColumn + _StartColumn))
+    end)
+
+    return NewMat
+end
+
+function Matrixs:FixValues()
+    self:ForeachValues(function (InRow, InColumn, InV)
+        if math.abs(InV) <= math.SMALL_NUMBER then
+            self[InRow][InColumn] = 0
+        end
+    end)
+end
+
+--Compose matrixs Column
+function Matrixs.ComposeColumn(mat1, mat2)
+    _errorAssert(mat1.Row == mat2.Row, "Matrixs.ComposeColumn  mat1.Row == mat2.Row")
+     local ResultMat = Matrixs.new(mat1.Row, mat1.Column + mat2.Column)
+
+     ResultMat:Set(mat1)
+     for i = 1, ResultMat.Row do
+        for j = mat1.Column + 1, ResultMat.Column do
+            ResultMat:SetValue(i, j, mat2:GetValue(i, j - mat1.Column))
+        end
+     end
+
+     return ResultMat
 end
 
 -- Not Self
