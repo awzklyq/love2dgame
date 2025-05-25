@@ -35,7 +35,7 @@ mp:AddMarkovState(State4)
 mp:AddMarkovState(State5)
 mp:AddMarkovState(State6)
 
-local _V = mp:GenerateStateValues()
+local _V = mp:GenerateStateValuesNoAction()
 for i = 1, #_V do
     log('aaaa', i, _V[i])
 end
