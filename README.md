@@ -52,6 +52,7 @@ Include：
 	script/test/test_complex_filter.lua
 	script/test/test_cone2d.lua
 	script/test/test_coroutine.lua
+	script/test/test_coroutine_traverse.lua
 	script/test/test_cpmplex.lua
 	script/test/test_csm.lua
 	script/test/test_dda2d.lua
