@@ -1,3 +1,12 @@
+-- Load the debugger module
+local dbg = require('emmy_core')
+
+-- Start the TCP debug server
+dbg.tcpListen('localhost', 9966)
+
+-- Wait for IDE connection
+-- dbg.waitIDE()
+
 _G.lovedebug = {}
 _G.lovedebug.logtab = function(tab)
     print("lovedebug.logtab :")
@@ -30,6 +39,9 @@ _G._warn = function(...)
 end
 
 _G._errorAssert = function(a, b)
+    if not a then
+       dbg:breakHere() 
+    end
     assert(a, "Error : ".. tostring(b))
 end
 
