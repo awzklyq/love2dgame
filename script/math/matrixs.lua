@@ -496,12 +496,16 @@ end
 function Matrixs:Eigenvalues()
     _errorAssert(self.Column == self.Row, "Matrixs:Eigenvalues:  " .. tostring(self.Row) .. ' ' .. tostring(self.Column))
 
-    local mat = self
+    local mat = self:Copy()
     local QMat = {}
-    for i = 1, math.max(self.Row, 10) do
+    for i = 1, math.max(self.Row, 50) do
         local R, Q = mat:HouseHolder()
+        -- R:FixValues()
+        -- Q:FixValues()
         mat = R * Q
         QMat[#QMat + 1] = Q
+
+        -- mat:FixValues()
     end
 
     local QT = QMat[#QMat]:Transpose()
@@ -531,6 +535,56 @@ function Matrixs:Eigenvalues()
     end
 
     return values, QRMat
+end
+Matrixs.EigenValues = Matrixs.Eigenvalues 
+
+function Matrixs:EigenVectors()
+    _errorAssert(self.Column == self.Row, "Matrixs:EigenVectors:  " .. tostring(self.Row) .. ' ' .. tostring(self.Column))
+
+    local _EigenValues, _ = self:EigenValues()
+
+    for i = 1, #_EigenValues do
+        log('_EigenValue' .. tostring(i), _EigenValues[i])
+        self:EigenVectorFormValue(_EigenValues[i])
+    end
+end
+
+function Matrixs:EigenVectorFormValue(InValue)
+    _errorAssert(self.Column == self.Row, "Matrixs:EigenVectorFormValue:  " .. tostring(self.Row) .. ' ' .. tostring(self.Column))
+    -- local _Temp = self:Copy()
+    local _NewMat = Matrixs.new(self.Row, self.Column, 0)
+    for i = 1, self.Row do
+        _NewMat:SetValue(i, i, InValue)
+    end
+
+    log()
+
+    -- _NewMat:Log('_NewMat11111')
+    -- self:Log('bbbbbbb')
+    _NewMat = self - _NewMat
+    -- _NewMat:Log('_NewMat2222')
+    local _F = Formula.new()
+    for i = 1, self.Row do
+        local _FormulaOp = {}
+        for j = 1, self.Column do
+            _FormulaOp[j] = FormulaOperator.NewMul(_NewMat:GetValue(i, j), "Parame"..tostring(j))
+        end
+
+        local _NewOp = nil
+        for N = 2, #_FormulaOp do
+            if _NewOp then
+                _NewOp = FormulaOperator.NewAdd(_NewOp, _FormulaOp[N])
+            else
+                _NewOp = FormulaOperator.NewAdd(_FormulaOp[1], _FormulaOp[2])
+            end
+        end
+
+         _errorAssert(_NewOp ~= nil)
+         --log('tttttttttt', _NewOp:ToString())
+        _F:AddOperator(_NewOp)
+    end
+
+    _F:CalculateParameterByElimination();
 end
 
 function Matrixs:GetUVMats()
