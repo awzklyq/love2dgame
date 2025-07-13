@@ -20,6 +20,10 @@ function Rect.new(x, y, w, h, mode)
     return rect;
 end
 
+Rect.CreatFromCenter = function(InX, InY, InSizeX, InSizeY, InMode)
+    return Rect.new(InX - InSizeX * 0.5, InY - InSizeY * 0.5, InSizeX, InSizeY, InMode)
+end
+
 function Rect:Reset()
     self:GeneraOutCircle()
 

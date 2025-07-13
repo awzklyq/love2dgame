@@ -595,6 +595,7 @@ function FormulaOperator:MergeParame()
 
     self:ConvertOperationSubToAdd()
     self:Remove_Real_Zero_OnlyAddOp()
+    
     return self
 end
 

@@ -95,7 +95,7 @@ BoundBox.buildFromMinMax = function(min, max)
     return box
 end
 
-function BoundBox:buildMeshLines()
+function BoundBox:buildMeshLines(InFormMatrix)
     local xsize = self.max.x - self.min.x
     local ysize = self.max.y - self.min.y
     local zsize = self.max.z - self.min.z
@@ -137,6 +137,11 @@ function BoundBox:buildMeshLines()
     points[#points + 1] = Vector3.new(self.min.x, self.min.y + ysize, self.min.z+ zsize)
     points[#points + 1] = Vector3.new(self.min.x+ xsize, self.min.y + ysize, self.min.z+ zsize)
 
+    if InFormMatrix then 
+        for i = 1, #points do
+            points[i] = InFormMatrix * points[i]
+        end
+    end
     return MeshLines.new(points)
 end
 
