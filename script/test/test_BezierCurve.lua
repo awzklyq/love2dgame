@@ -6,6 +6,32 @@ local hc = nil
 
 local Rects = {}
 
+local PointRects = {}
+
+local NumberPoints = 50
+
+local SelectIndex = 1
+local GeneratePointsData = function()
+    local _Result = nil
+     if SelectIndex == 1 then
+        _Result = bz1
+    elseif SelectIndex == 2 then
+        _Result = bz2
+    elseif SelectIndex == 3 then
+        _Result = hc
+    end
+
+    _errorAssert(_Result ~= nil)
+
+    local _Size = 2
+    PointRects = {}
+    for i = 1, NumberPoints do
+        local p = _Result:GetPoint(i / NumberPoints)
+        PointRects[i] = Rect.CreatFromCenter(p.x, p.y, _Size, _Size)
+        PointRects[i]:SetColor(0, 0, 255, 255)
+    end
+end
+
 local GenerateData = function()
     local width = love.graphics.getPixelWidth()
     local height = love.graphics.getPixelHeight()
@@ -86,8 +112,12 @@ local GenerateData = function()
 
         Rects[i].MouseUpEvent = function(rect, x, y)
             rect._IsSelect = false
+
+            GeneratePointsData()
         end
     end
+
+    GeneratePointsData()
 end
 
 GenerateData()
@@ -97,16 +127,24 @@ GenerateData()
 
 -- local edge = DelaunayTriangles[1]:FindOneEdge(DelaunayTriangles[2])
 -- edge:Log("test")
-
-local SelectIndex = 1
+local _IsDrawPoints = false
 local SelectName = "BezierCurve"
 app.render(function(dt)
-    if SelectIndex == 1 then
-        bz1:draw()
-    elseif SelectIndex == 2 then
-        bz2:draw()
-    elseif SelectIndex == 3 then
-        hc:draw()
+    if _IsDrawPoints == false then
+        if SelectIndex == 1 then
+            bz1:draw()
+            SelectName = "BezierCurve"
+        elseif SelectIndex == 2 then
+            bz2:draw()
+            SelectName = "BezierCurve"
+        elseif SelectIndex == 3 then
+            hc:draw()
+            SelectName = "HermiteCurve"
+        end
+    else
+        for i = 1, NumberPoints do
+            PointRects[i]:draw()
+        end
     end
 
     for i = 1, #Rects do
@@ -144,3 +182,14 @@ end)
 --     end
 -- end)
 
+local scrollbar = UI.ScrollBar.new( 'test', 0, 70, 200, 40, 10, 100, 1)
+scrollbar:SetValue(NumberPoints)
+scrollbar.ChangeEvent = function(v)
+    log('test scrollbar', v)
+end
+
+local checkb = UI.CheckBox.new( 0, 50, 20, 20, "IsDrawPoints" )
+checkb.IsSelect = _IsDrawPoints
+checkb.ChangeEvent = function(Enable)
+    _IsDrawPoints = Enable
+end
