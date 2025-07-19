@@ -196,7 +196,7 @@ if not _G.TEST then
 	end)
 
 else
-	dofile('script/test/test_CovarianceMatrix.lua')--test_MeshVolume  test_BezierCurve.lua
+	dofile('script/test/test_obb.lua')--test_MeshVolume  test_BezierCurve.lua
 	-- dofile('script/demo/ball/demo_ball.lua') test_SpaceSplit.lua
 end
 --dofile()
