@@ -90,4 +90,14 @@ log('aaaaa', F07:ToString())
 -- F07:MergeParame()
 
 F07:MergeParame()
+
 log('bbbbbb', F07:ToString())
+
+local OutResult = {}
+F07:GetAllParameCoefficient(OutResult)
+for i, v in pairs(OutResult) do
+    log('aaaaaa', i, #v)
+end
+
+F07:MergeSameParameCoefficient(OutResult)
+log('cccccccc', F07:ToString())

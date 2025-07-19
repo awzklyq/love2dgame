@@ -913,6 +913,102 @@ function FormulaOperator:ConvertParameToLeft(PName, OutOparator)
     return OutOparator:MergeParame()
 end
 
+function FormulaOperator:MergeSameParameCoefficientInner(InParameInfos)
+     if self.RType == RealType.FormulaOperator then
+        self.Real:MergeSameParameCoefficientInner(InParameInfos)
+    end
+
+    if self.PType == RealType.FormulaOperator then
+        self.Parame:MergeSameParameCoefficientInner(InParameInfos)
+    elseif self.PType == RealType.Parameter then
+        if #InParameInfos[self.PName] > 1 then
+            self.Real = 0
+        end
+    end
+end
+function FormulaOperator:MergeSameParameCoefficient(InParameInfos)
+   
+end
+
+function FormulaOperator:GetAllParameCoefficient(OutParameInfos)
+    if self.RType == RealType.FormulaOperator then
+        self.Real:GetAllParameCoefficient(OutParameInfos)
+    end
+
+    if self.PType == RealType.FormulaOperator then
+        self.Parame:GetAllParameCoefficient(OutParameInfos)
+    elseif self.PType == RealType.Parameter then
+        if self.OType == OperatorType.Mul then
+            if not OutParameInfos[self.PName] then
+                OutParameInfos[self.PName] = {}
+            end
+
+            local PNameTab = OutParameInfos[self.PName]
+            PNameTab[#PNameTab + 1] = self.Real
+        end
+    end
+end
+
+--判断Op里面的系数是不是0， 仅限乘法操作
+function FormulaOperator:IsHasZeroCoefficient()
+    if self.OType == OperatorType.Mul then
+        if self.RType == RealType.Number and self.Real == 0 then
+            return true
+        end
+    end
+
+    return false
+end
+
+--判断Op里面是不是只剩数字了
+function FormulaOperator:IsOnlyHasNumber()
+    if self.OType == OperatorType.Add or self.OType == OperatorType.Sub then
+        if self.RType == RealType.Number then
+            if self.PType == RealType.FormulaOperator then
+                if self.Parame:IsHasZeroCoefficient() or self.Parame:IsOnlyHasNumber() then
+                    return true     
+                end
+            end
+        end
+    end
+
+    return false
+end
+
+--判断 这个op简化后结果是否为0
+function FormulaOperator:IsZero()
+    if self:IsOnlyHasNumber()  then
+        return self.Real == 0
+    elseif self.OType == OperatorType.Mul or self.OType == OperatorType.Div then
+        if self.RType == RealType.Number then
+            return self.Real == 0
+        end
+    end
+
+    return false
+end
+
+function FormulaOperator:Remove_Zero_Parame()
+    local IsRealHasZeroCoefficient = false
+    local IsParameHasZeroCoefficient = false
+    if self.RType == RealType.FormulaOperator then
+        IsRealHasZeroCoefficient = self.Real:IsHasZeroCoefficient()
+        if IsRealHasZeroCoefficient == false then
+            self.Real:Remove_Zero_Parame()
+        end
+    end
+
+    if self.PType == RealType.FormulaOperator then
+        IsParameHasZeroCoefficient = self.Parame:IsHasZeroCoefficient()
+        if IsParameHasZeroCoefficient == false then
+            self.Parame:Remove_Zero_Parame()
+        end
+    end
+
+
+    
+end
+
 function FormulaOperator:ToString()
     local RealStr = ToStringReal(self)
     local ParameStr = ToStringParame(self)
