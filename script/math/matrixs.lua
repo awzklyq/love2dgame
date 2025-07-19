@@ -320,6 +320,52 @@ function Matrixs:GaussJordanElimination(InLimitColumn)
      end
 end
 
+--求解 AX = 0， X为未知向量 A为矩阵self
+function Matrixs:Elimination(OutResult)
+    _errorAssert(self.Column == self.Row and OutResult ~= nil)
+
+    if self.Row == 2 then
+        local _Row = self:GetRow(1)
+        OutResult[2] =  _Row[1] == 0 and 0 or (-1 * _Row[2] / _Row[1])
+        OutResult[1] = 1
+        return 
+    end
+
+    local _NewMat = Matrixs.new(self.Row - 1, self.Column - 1)
+    local _BaseRow = self:GetRow(1)
+    for i = 2, self.Row do
+        local _Row = self:GetRow(i)
+
+        local _lcm = math.lcm(_BaseRow[1], _Row[1])
+
+        local _R1 = math.ArrayMulValue(_BaseRow, _lcm / _BaseRow[1])
+        local _R2 = math.ArrayMulValue(_Row, _lcm / _Row[1])
+        local _Result
+        if _BaseRow[1] * _Row[1] > 0 then
+            _Result = math.ArraySub(_R1, _R2)
+        else
+            _Result = math.ArrayAdd(_R1, _R2)
+        end
+
+        for j = 2, self.Column do
+            _NewMat:SetValue(i - 1, j - 1, _Result[j])
+        end
+    end
+
+    _NewMat:Elimination(OutResult)
+
+
+    local _RowIndex = 1
+    local _Result = 0
+    for i = self.Column, 2, -1 do
+        _Result = _Result +_BaseRow[i] * OutResult[_RowIndex]
+        _RowIndex = _RowIndex + 1
+    end
+
+    OutResult[self.Column] = _BaseRow[1] == 0 and 0 or (-1 * _Result / _BaseRow[1])
+
+end
+
 function Matrixs:ForeachValues(InFunc)
     for i = 1, self.Row do
         for j = 1, self.Column do
@@ -351,6 +397,11 @@ function Matrixs:FixValues()
     self:ForeachValues(function (InRow, InColumn, InV)
         if math.abs(InV) <= math.SMALL_NUMBER then
             self[InRow][InColumn] = 0
+        else
+            -- log('befor', self[InRow][InColumn] )
+            self[InRow][InColumn] = math.round2(self[InRow][InColumn], 10)
+            -- log('after', self[InRow][InColumn] )
+            -- log()
         end
     end)
 end
@@ -498,14 +549,35 @@ function Matrixs:Eigenvalues()
 
     local mat = self:Copy()
     local QMat = {}
-    for i = 1, math.max(self.Row, 50) do
+
+    local _V = Matrixs.new(self.Row, self.Column, 0)
+    for i = 1, self.Row do
+        _V[i][i] = 1    
+    end
+
+    local tol = 1e-6
+    for i = 1, math.max(self.Row, 250) do
         local R, Q = mat:HouseHolder()
         -- R:FixValues()
         -- Q:FixValues()
         mat = R * Q
         QMat[#QMat + 1] = Q
 
-        -- mat:FixValues()
+        _V = _V * Q
+        mat:FixValues()
+
+        -- 检查次对角元素是否收敛（简化版）
+        local converged = true
+        for r = 2, self.Row do
+            if math.abs(mat[r][r-1]) > tol then
+                converged = false
+                break
+            end
+        end
+
+        if converged then
+           break 
+        end
     end
 
     local QT = QMat[#QMat]:Transpose()
@@ -543,10 +615,15 @@ function Matrixs:EigenVectors()
 
     local _EigenValues, _ = self:EigenValues()
 
+    local _NewMat = Matrixs.new(self.Row, self.Column)
     for i = 1, #_EigenValues do
-        log('_EigenValue' .. tostring(i), _EigenValues[i])
-        self:EigenVectorFormValue(_EigenValues[i])
+        local VS = self:EigenVectorFormValue(_EigenValues[i])
+        for j = 1, self.Column do
+            _NewMat:SetValue(i, j, VS[j])
+        end
     end
+
+    return _NewMat
 end
 
 function Matrixs:EigenVectorFormValue(InValue)
@@ -557,34 +634,17 @@ function Matrixs:EigenVectorFormValue(InValue)
         _NewMat:SetValue(i, i, InValue)
     end
 
-    log()
-
-    -- _NewMat:Log('_NewMat11111')
-    -- self:Log('bbbbbbb')
     _NewMat = self - _NewMat
-    -- _NewMat:Log('_NewMat2222')
-    local _F = Formula.new()
-    for i = 1, self.Row do
-        local _FormulaOp = {}
-        for j = 1, self.Column do
-            _FormulaOp[j] = FormulaOperator.NewMul(_NewMat:GetValue(i, j), "Parame"..tostring(j))
-        end
+    
+    local _OutResult = {}
+    _NewMat:Elimination(_OutResult)
 
-        local _NewOp = nil
-        for N = 2, #_FormulaOp do
-            if _NewOp then
-                _NewOp = FormulaOperator.NewAdd(_NewOp, _FormulaOp[N])
-            else
-                _NewOp = FormulaOperator.NewAdd(_FormulaOp[1], _FormulaOp[2])
-            end
-        end
-
-         _errorAssert(_NewOp ~= nil)
-         --log('tttttttttt', _NewOp:ToString())
-        _F:AddOperator(_NewOp)
+    local reverse = {}
+    for i = #_OutResult, 1, -1 do
+        reverse[#reverse + 1] = _OutResult[i]
     end
 
-    _F:CalculateParameterByElimination();
+    return reverse
 end
 
 function Matrixs:GetUVMats()

@@ -957,6 +957,39 @@ math.GetTangentCone2D = function(InVector, InCircle, OutOCone2d)
     return OutOCone2d
 end
 
+--最大公约数
+math.gcd = function(a, b)
+    -- 处理负数
+    a = math.abs(a)
+    b = math.abs(b)
+    
+    -- 欧几里得算法
+    while b ~= 0 do
+        a, b = b, a % b
+    end
+    return a
+end
+
+--最小公倍数
+math.lcm = function(a, b)
+    -- 处理0的情况
+    if a == 0 or b == 0 then
+        return 0
+    end
+    
+    -- 公式计算
+    return math.abs(a * b) / math.gcd(a, b)
+end
+
+math.round2 = function(num, decimalPlaces)
+    local mult = 10^(decimalPlaces or 6)
+    if num >= 0 then
+        return math.floor(num * mult + 0.5) / mult
+    else
+        return math.ceil(num * mult - 0.5) / mult
+    end
+end
+
 math.defaulttransform =  love.math.newTransform( );
 math.MinNumber = 0.000001;
 math.MaxNumber = 999999.0;

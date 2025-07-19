@@ -1,4 +1,3 @@
-
 --https://www.imooc.com/wenda/detail/524261
 _G.luabit = require"bit"
 
@@ -21,13 +20,11 @@ dofile('script/application.lua')
 dofile('script/render/render.lua')
 dofile('script/render/canvas.lua')
 dofile('script/render/image.lua')
-dofile('script/render/HistogramRender.lua')
 
 dofile('script/common/color.lua')
 dofile('script/common/audio.lua')
 dofile('script/common/filepath.lua')
 dofile('script/common/earclip.lua')
-dofile('script/common/VelocityObstacles.lua')
 dofile('script/common/voronoi.lua')
 dofile('script/common/pbr.lua')
 dofile('script/common/radarfrustum.lua')
@@ -35,7 +32,6 @@ dofile('script/common/SpaceSplit.lua')
 dofile('script/common/psnr.lua')
 dofile('script/common/optional.lua')
 dofile('script/common/MehGenusGenerate.lua')
-dofile('script/common/Indicator.lua')
 
 dofile('script/file/file.lua')
 
@@ -57,11 +53,9 @@ dofile('script/polygon/line.lua')
 dofile('script/polygon/ray.lua')
 dofile('script/polygon/HermiteCurve.lua')
 dofile('script/polygon/BezierCurve.lua')
-dofile('script/polygon/BSplineCurve.lua')
 dofile('script/polygon/edge.lua')
 dofile('script/polygon/box.lua')
 dofile('script/polygon/mesh.lua')
-dofile('script/polygon/cone2d.lua')
 dofile('script/3d/mesh/mesh3d.lua')
 dofile('script/3d/mesh/aixs.lua')
 
@@ -86,8 +80,7 @@ dofile('script/math/matrix.lua')
 dofile('script/math/matrix2d.lua')
 dofile('script/math/matrixs.lua')
 dofile('script/math/RotationMatrix.lua')
-dofile('script/math/kmeans.lua')
-dofile('script/math/formula.lua')
+dofile 'script/math/kmeans.lua'
 dofile('script/3d/math/vector3.lua')
 dofile('script/3d/math/vector4.lua')
 dofile('script/3d/math/matrix3d.lua')
@@ -174,12 +167,6 @@ dofile('script/shader/ImageAnimaShader.lua')
 
 dofile('script/render/imageanima.lua')
 
-dofile('script/PathFinder/PathGridData.lua')
-dofile('script/PathFinder/PathFinderHelper.lua')
-dofile('script/PathFinder/AStartPathFinder.lua')
-
-dofile('script/DeepLearning/MarkovProcess.lua')
-
 dofile('script/raytrace/CPURaytraceUseDDA.lua')
 dofile 'script/ballgame/collision/collisionmanager.lua'
 dofile 'script/ballgame/collision/collisionbinder.lua'
@@ -208,8 +195,8 @@ if not _G.TEST then
 	end)
 
 else
-	dofile('script/test/test_circle.lua')--test_MeshVolume  test_BezierCurve.lua
-	-- dofile('script/demo/VelocityObstacles/demo_vo.lua')
+	dofile('script/test/test_Matrixs_EigenVectors.lua')--test_MeshVolume  test_BezierCurve.lua
+	-- dofile('script/demo/ball/demo_ball.lua') test_SpaceSplit.lua
 end
 --dofile()
 
