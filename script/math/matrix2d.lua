@@ -3,13 +3,15 @@ _G.Matrix2D = {}
 local metatable_Matrix2D = {}
 metatable_Matrix2D.__index = Matrix2D
 
--- metatable_Matrix2D.__mul = function(myvalue, value)
---     if value.renderid == Render.Vector2Id then
---         return myvalue:MulVector2(value)
---     else
---         _errorAssert(false, "metatable_Matrix2D.__mul")
---     end
--- end
+metatable_Matrix2D.__mul = function(myvalue, value)
+    if value.renderid == Render.Vector2Id then
+        return myvalue:MulVector2(value)
+    elseif value.renderid == Render.Matrix2DId then
+        local _NewMat = myvalue:Copy()
+        _NewMat:MulRight(value)
+        return _NewMat
+    end
+end
 
 function Matrix2D.new( )
 
@@ -40,6 +42,22 @@ end
 
 function Matrix2D:getData(i, j)
     return self[(i - 1) * 3 + j]
+end
+
+function Matrix2D:GetRow(i)
+    if i == 1 then
+        return {self[1], self[2], self[3]}
+    elseif i == 2 then
+        return {self[4], self[5], self[6]}
+    elseif i == 3 then
+        return {self[7], self[8], self[9]}
+    end
+    assert(false)
+end
+
+
+function Matrix2D:SetValue(i, j, InValue)
+     self[(i - 1) * 3 + j] = InValue
 end
 
 function Matrix2D:MulLeftVector2(v2)
@@ -418,6 +436,30 @@ function Matrix2D:Determinant( )
 	-- 	 - m[0][0] * m[1][2] * m[2][1] - m[0][1] * m[1][0] * m[2][2] - m[0][2] * m[1][1] * m[2][0];
 end
 
+function Matrix2D:Transpose()
+    local _NewMat = Matrix2D.new()
+     for i = 1, 3 do
+        for j = 1, 3 do
+            _NewMat:SetValue(j, i, self:getData(i, j))
+        end
+    end
+
+    return _NewMat
+end
+
+function Matrix2D:Set(InMat)
+    for i = 1, 9 do
+        self[i] = InMat[i]
+    end
+end
+
+function Matrix2D:Copy()
+    local _NewMat = Matrix2D.new()
+    
+    _NewMat:Set(self)
+
+   return _NewMat
+end
 
 function Matrix2D:use(obj)
     if not self.transform then

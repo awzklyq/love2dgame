@@ -26,6 +26,7 @@ mat:SetValue(3, 3, -7)
 
 local _NewMat = mat:EigenVectors()
 _NewMat:Log('yyyyyyy')
+
 -- local _Values,  _Vectors = mat:Eigenvalues()
 -- for i = 1, #_Values do
 --     log('rrrr', _Values[i])

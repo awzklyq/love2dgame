@@ -6,17 +6,30 @@ local metatable_point3d = {}
 metatable_point3d.__index = Point3D
 
 metatable_point3d.__add = function(myvalue, value)
-    return Point3D.new(myvalue.x + value.x, myvalue.y + value.y, myvalue.z + value.z)
+    if type(value) == "number" then
+        return Point3D.new(myvalue.x + value, myvalue.y + value, myvalue.z + value)
+    elseif  type(value) == "table" and value.renderid == Render.Point3Id then
+        return Point3D.new(myvalue.x + value.x, myvalue.y + value.y, myvalue.z + value.z)
+    else
+        _errorAssert(false, "metatable_point3d.__add~")
+    end
+    
 end
 
 metatable_point3d.__sub = function(myvalue, value)
-    return Point3D.new(myvalue.x - value.x, myvalue.y - value.y, myvalue.z - value.z)
+    if type(value) == "number" then
+        return Point3D.new(myvalue.x - value, myvalue.y - value, myvalue.z - value)
+    elseif  type(value) == "table" and (value.renderid == Render.Point3Id or value.renderid == Render.Vector3Id) then
+        return Point3D.new(myvalue.x - value.x, myvalue.y - value.y, myvalue.z - value.z)
+    else
+        _errorAssert(false, "metatable_point3d.__sub~")
+    end
 end
 
 metatable_point3d.__mul = function(myvalue, value)
     if type(value) == "number" then
         return Point3D.new(myvalue.x * value, myvalue.y * value, myvalue.z * value)
-    elseif  type(value) == "table" and value.renderid == Render.Point3Id then
+    elseif  type(value) == "table" and (value.renderid == Render.Point3Id or value.renderid == Render.Vector3Id) then
         return Point3D.new(myvalue.x * value.x, myvalue.y * value.y, myvalue.z * value.z)
     else
         _errorAssert(false, "metatable_point3d.__mul~")
@@ -30,7 +43,7 @@ end
 metatable_point3d.__div = function(myvalue, value)
     if type(value) == "number" then
         return Point3D.new(myvalue.x / value, myvalue.y / value, myvalue.z / value)
-    elseif  type(value) == "table" and value.renderid == Render.Point3Id then
+    elseif  type(value) == "table" and (value.renderid == Render.Point3Id or value.renderid == Render.Vector3Id) then
         return Point3D.new(myvalue.x / value.x, myvalue.y / value.y, myvalue.z / value.z)
     else
         _errorAssert(false, "metatable_point3d.__div~")
@@ -63,6 +76,19 @@ end
 
 function Point3D:CovertVector3()
     return Vector3.new(self.x, self.y, self.z)
+end
+
+
+function Point3D:BuildDrawBox()
+    self._DrawBox = BoundBox.BuildFromPointAndSize(self, 10):buildMeshLines()
+end
+
+function Point3D:draw()
+    if not self._DrawBox then
+        self:BuildDrawBox()
+    end
+
+    self._DrawBox:draw()
 end
 
 function Point3D:Log(sss)

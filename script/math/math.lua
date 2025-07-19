@@ -709,14 +709,26 @@ math.ArrayMulValue = function(a, b)
     return Result
 end
 
-math.ArrayNorm = function(a)
-    _errorAssert(#a > 0, "math.ArrayNorm")
+math.ArraySize = function(a)
+    _errorAssert(#a > 0, "math.ArraySize")
     local Result = 0
     for i = 1, #a do
         Result = Result + a[i] * a[i]
     end
 
     return math.sqrt(Result)
+end
+
+math.ArrayNormalize = function(a)
+    _errorAssert(#a > 0, "math.ArraySize")
+    local _Size = math.ArraySize(a)
+
+    local Result = {}
+    for i = 1, #a do
+        Result[i] = a[i] / _Size
+    end
+
+    return Result
 end
 
 math.ArrayConvertMatrixsRow = function(v)

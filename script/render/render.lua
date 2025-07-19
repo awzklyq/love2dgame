@@ -196,7 +196,7 @@ Render.getRenderIdName = function(id)
         return "Triangle2DId"
     elseif Render.Point3Id == id then
         return "Point3Id"
-    elseif Render.Matrix2D == id then
+    elseif Render.Matrix2DId == id then
         return "Matrix2DId"
     elseif Render.Vector2Id == id then
         return "Vector2Id"

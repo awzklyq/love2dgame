@@ -76,6 +76,7 @@ dofile('script/math/MathFunctionDisplay.lua')
 dofile('script/math/vector.lua')
 dofile('script/math/point2d.lua')
 dofile('script/math/complex.lua')
+dofile('script/math/CovarianceMatrix.lua')
 dofile('script/math/matrix.lua')
 dofile('script/math/matrix2d.lua')
 dofile('script/math/matrixs.lua')
@@ -195,7 +196,7 @@ if not _G.TEST then
 	end)
 
 else
-	dofile('script/test/test_Matrixs_EigenVectors.lua')--test_MeshVolume  test_BezierCurve.lua
+	dofile('script/test/test_CovarianceMatrix.lua')--test_MeshVolume  test_BezierCurve.lua
 	-- dofile('script/demo/ball/demo_ball.lua') test_SpaceSplit.lua
 end
 --dofile()

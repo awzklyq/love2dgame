@@ -498,12 +498,12 @@ function Matrixs:HouseHolder()
     end
 
     local v1 = self:GetColumn(1)
-    local d = math.ArrayNorm(v1)
+    local d = math.ArraySize(v1)
     local e1 = math.ArrayIdentity(v1)
 
     local e1d = math.ArrayMulValue(e1, d)
     local xv = math.ArraySub(v1, e1d)
-    local v = math.ArrayDiv(xv, math.ArrayNorm(xv))
+    local v = math.ArrayDiv(xv, math.ArraySize(xv))
 
     local I = Matrixs.new(self.Row, self.Column)
     I:Identity()
@@ -615,6 +615,9 @@ function Matrixs:EigenVectors()
 
     local _EigenValues, _ = self:EigenValues()
 
+    -- table.sort(_EigenValues, function(a, b)
+    --     return b > a
+    -- end)
     local _NewMat = Matrixs.new(self.Row, self.Column)
     for i = 1, #_EigenValues do
         local VS = self:EigenVectorFormValue(_EigenValues[i])
@@ -644,7 +647,7 @@ function Matrixs:EigenVectorFormValue(InValue)
         reverse[#reverse + 1] = _OutResult[i]
     end
 
-    return reverse
+    return math.ArrayNormalize(reverse)
 end
 
 function Matrixs:GetUVMats()
@@ -715,6 +718,20 @@ end
 function Matrixs:GetDrawGrayDatas()
     return self._DrawGrayDatas
 end
+
+function Matrixs:GetMatrix2D()
+    _errorAssert(self.Row == 3 and self.Column == 3)
+
+    local _m = Matrix2D.new()
+    for i = 1,  3 do
+        for j = 1, 3 do
+            _m:SetValue(i, j, self:GetValue(i, j))
+        end
+    end
+
+    return _m
+end
+
 
 function Matrixs:Log(info)
     local str = "Matrixs "

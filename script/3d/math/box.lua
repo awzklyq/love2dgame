@@ -87,12 +87,36 @@ BoundBox.buildFromMesh3D = function(mesh)
     return box
 end
 
+BoundBox.buildFromPoints = function(InPoints)
+    assert(#InPoints > 0)
+    local box = BoundBox.new()
+    box.min = Vector3.new(InPoints[1].x, InPoints[1].y, InPoints[1].z)
+    box.max = Vector3.new(InPoints[1].x, InPoints[1].y, InPoints[1].z)
+    for i = 2, #InPoints do
+        local P = InPoints[i]
+        box.min.x = math.min(P.x, box.min.x)
+        box.min.y = math.min(P.y, box.min.y)
+        box.min.z = math.min(P.z, box.min.z)
+
+        box.max.x = math.max(P.x, box.max.x)
+        box.max.y = math.max(P.y, box.max.y)
+        box.max.z = math.max(P.z, box.max.z)
+    end
+
+    box.center = Vector3.new((box.min.x + box.max.x) * 0.5, (box.min.y + box.max.y) * 0.5, (box.min.z + box.max.z) * 0.5)
+    return box
+end
 BoundBox.buildFromMinMax = function(min, max)
     local box = BoundBox.new()
     box.min = Vector3.copy(min)
     box.max = Vector3.copy(max)
     box.center = Vector3.new((box.min.x + box.max.x) * 0.5, (box.min.y + box.max.y) * 0.5, (box.min.z + box.max.z) * 0.5)
     return box
+end
+
+
+BoundBox.BuildFromPointAndSize = function(InPoint, InSize)
+    return BoundBox.buildFromMinMax(InPoint - (InSize * 0.5), InPoint + (InSize * 0.5))
 end
 
 function BoundBox:buildMeshLines(InFormMatrix)
@@ -411,51 +435,59 @@ function OrientedBox:getMax()
     return value
 end
 
+function OrientedBox.BuildFromCenter_Extents_Aixs(InCenter, InExtents, InAixsX, InAixsY, InAixsZ)
+    local obb = OrientedBox.new()
+    obb.vs[1] = InCenter + (InAixsX * InExtents.x + InAixsY * InExtents.y + InAixsZ * InExtents.z)
+    obb.vs[2] = InCenter + (InAixsX * InExtents.x + InAixsY * -InExtents.y + InAixsZ * InExtents.z)
+    obb.vs[3] = InCenter + (InAixsX * -InExtents.x + InAixsY * -InExtents.y + InAixsZ * InExtents.z)
+    obb.vs[4] = InCenter + (InAixsX * -InExtents.x + InAixsY * InExtents.y + InAixsZ * InExtents.z)
+
+    obb.vs[5] = InCenter + (InAixsX * InExtents.x + InAixsY * InExtents.y + InAixsZ * -InExtents.z)
+    obb.vs[6] = InCenter + (InAixsX * InExtents.x + InAixsY * -InExtents.y + InAixsZ * -InExtents.z)
+    obb.vs[7] = InCenter + (InAixsX * -InExtents.x + InAixsY * -InExtents.y + InAixsZ * -InExtents.z)
+    obb.vs[8] = InCenter + (InAixsX * -InExtents.x + InAixsY * InExtents.y + InAixsZ * -InExtents.z)
+
+    return obb
+end
 function OrientedBox:buildMeshLines()
-
-    local min = self:getMin()
-    local max = self:getMax()
-
-    local xsize = max.x - min.x
-    local ysize = max.y - min.y
-    local zsize = max.z - min.z
+    local _VS = self.vs
 
     local points = {}
-    points[#points + 1] = Vector3.new(min.x, min.y, min.z)
-    points[#points + 1] = Vector3.new(min.x + xsize, min.y, min.z)
+    points[#points + 1] = _VS[1]
+    points[#points + 1] = _VS[2]
 
-    points[#points + 1] = Vector3.new(min.x, min.y, min.z)
-    points[#points + 1] = Vector3.new(min.x, min.y + ysize, min.z)
+    points[#points + 1] = _VS[2]
+    points[#points + 1] = _VS[3]
 
-    points[#points + 1] = Vector3.new(min.x + xsize, min.y, min.z)
-    points[#points + 1] = Vector3.new(min.x + xsize, min.y + ysize, min.z)
+    points[#points + 1] = _VS[3]
+    points[#points + 1] = _VS[4]
 
-    points[#points + 1] = Vector3.new(min.x, min.y + ysize, min.z)
-    points[#points + 1] = Vector3.new(min.x+ xsize, min.y + ysize, min.z)
+    points[#points + 1] = _VS[4]
+    points[#points + 1] = _VS[1]
 
-    points[#points + 1] = Vector3.new(min.x, min.y, min.z)
-    points[#points + 1] = Vector3.new(min.x, min.y, min.z + zsize)
+    points[#points + 1] = _VS[5]
+    points[#points + 1] = _VS[6]
 
-    points[#points + 1] = Vector3.new(min.x + xsize, min.y, min.z)
-    points[#points + 1] = Vector3.new(min.x + xsize, min.y, min.z+ zsize)
+    points[#points + 1] = _VS[6]
+    points[#points + 1] = _VS[7]
 
-    points[#points + 1] = Vector3.new(min.x, min.y + ysize, min.z)
-    points[#points + 1] = Vector3.new(min.x, min.y + ysize, min.z+ zsize)
+    points[#points + 1] = _VS[7]
+    points[#points + 1] = _VS[8]
 
-    points[#points + 1] = Vector3.new(min.x+ xsize, min.y + ysize, min.z)
-    points[#points + 1] = Vector3.new(min.x+ xsize, min.y + ysize, min.z+ zsize)
+    points[#points + 1] = _VS[8]
+    points[#points + 1] = _VS[5]
 
-    points[#points + 1] = Vector3.new(min.x, min.y, min.z+ zsize)
-    points[#points + 1] = Vector3.new(min.x + xsize, min.y, min.z+ zsize)
+    points[#points + 1] = _VS[1]
+    points[#points + 1] = _VS[5]
 
-    points[#points + 1] = Vector3.new(min.x, min.y, min.z+ zsize)
-    points[#points + 1] = Vector3.new(min.x, min.y + ysize, min.z+ zsize)
+    points[#points + 1] = _VS[2]
+    points[#points + 1] = _VS[6]
 
-    points[#points + 1] = Vector3.new(min.x + xsize, min.y, min.z+ zsize)
-    points[#points + 1] = Vector3.new(min.x+ xsize, min.y + ysize, min.z+ zsize)
+    points[#points + 1] = _VS[3]
+    points[#points + 1] = _VS[7]
 
-    points[#points + 1] = Vector3.new(min.x, min.y + ysize, min.z+ zsize)
-    points[#points + 1] = Vector3.new(min.x+ xsize, min.y + ysize, min.z+ zsize)
+    points[#points + 1] = _VS[4]
+    points[#points + 1] = _VS[8]
 
     return MeshLines.new(points)
 end
