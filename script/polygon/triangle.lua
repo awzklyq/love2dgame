@@ -42,8 +42,27 @@ function Triangle2D.new(p1, p2, p3, IsNeedEdge, linewidth)-- Vector2 or Vector3.
 
     tri:GenerateOutCircle()
 
+    tri._IsDrawEdges = false
+
     return tri
 end
+
+--InMode-> fill or line
+function Triangle2D:SetRenderMode(InMode)
+    self.mode = InMode
+end
+
+function Triangle2D:SetDrawEdges(InValue)
+    self._IsDrawEdges = InValue
+end
+
+function Triangle2D:SetEdgesColor(...)
+    self.edge1:SetColor(...)
+    self.edge2:SetColor(...)
+    self.edge3:SetColor(...)
+end
+
+
 
 function Triangle2D:HasPoint(p)
     return self.P1 == p or self.P2 == p or self.P3 == p
@@ -223,6 +242,12 @@ function Triangle2D:draw()
     -- local r, g, b, a = love.graphics.getColor( );
     Render.RenderObject(self);
     -- love.graphics.setColor(r, g, b, a );
+
+    if self._IsDrawEdges then
+        self.edge1:draw()
+        self.edge2:draw()
+        self.edge3:draw()
+    end
 end
 
 function Triangle2D:CheckPointInOutCircle(Point)

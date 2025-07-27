@@ -13,3 +13,5 @@ end
 _G.IsString = function(n)
     return type(n) == 'string'
 end
+
+_G._NoneIndex = -1

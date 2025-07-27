@@ -40,11 +40,18 @@ function LColor:Log(info)
     log(info, self.r, self.g, self.b, self.a)
 end
 
-function LColor:Set(c)
-    self.r = c.r;
-    self.b = c.b;
-    self.g = c.g;
-    self.a = c.a;
+function LColor:Set(c, g, b, a)
+    if g == nil then
+        self.r = c.r;
+        self.b = c.b;
+        self.g = c.g;
+        self.a = c.a;
+    else
+        self.r = c;
+        self.b = g;
+        self.g = b;
+        self.a = a;
+    end
 end
 
 

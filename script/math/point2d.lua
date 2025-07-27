@@ -15,7 +15,7 @@ function Point2D.new(x, y, lw)-- lw :line width
     p.x = x or 0
     p.y = y or 0
 
-    p.lw = lw or 1;
+    p.lw = lw or 4;
     p.color = LColor.new(255,255,255,255)
 
     p.renderid = Render.Point2Id ;
@@ -23,15 +23,30 @@ function Point2D.new(x, y, lw)-- lw :line width
     return p;
 end
 
+function Point2D:GenerateDrawData()
+    if self._Rect == nil then
+        self._Rect = Rect.CreatFromCenter(self.x, self.y, self.lw, self.lw, 'fill')
+        self._Rect:SetColor(self.color)
+    end
+end
 function Point2D:SetColor(r, g, b, a)
-    self.color.r = r or 255
-    self.color.g = g or 255
-    self.color.b = b or 255
-    self.color.a = a or 255
+    if g == nil then
+        self.color:Set(r)
+    else
+        self.color.r = r or 255
+        self.color.g = g or 255
+        self.color.b = b or 255
+        self.color.a = a or 255
+    end
+    if self._Rect then
+        self._Rect:SetColor(r, g, b, a)
+    end
 end
 
 function Point2D:draw()
-    Render.RenderObject(self);
+    -- Render.RenderObject(self);
+    self:GenerateDrawData()
+    self._Rect:draw()
 end
 
 

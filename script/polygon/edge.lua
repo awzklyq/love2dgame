@@ -36,6 +36,18 @@ function Edge2D.Copy(edge)
     return Edge2D.new(Vector.Copy(edge.P1), Vector.Copy(edge.P2))
 end
 
+function Edge2D:SetColor(InR, InG, InB, InA)
+    if InG == nil then
+        self.Color:Set(InR)
+    else
+        self.Color.r = InR
+        self.Color.g = InG
+        self.Color.b = InB
+        self.Color.a = InA
+    end
+end
+
+
 function Edge2D:GetOtherPoint(p)
     if self.P1 == p then
         return self.P2

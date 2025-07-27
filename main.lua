@@ -32,7 +32,7 @@ dofile('script/common/SpaceSplit.lua')
 dofile('script/common/psnr.lua')
 dofile('script/common/optional.lua')
 dofile('script/common/MehGenusGenerate.lua')
-
+dofile('script/common/BSP_Face_2D.lua')
 dofile('script/file/file.lua')
 
 dofile('script/xml/xmlload.lua')
@@ -68,6 +68,7 @@ dofile('script/3d/terrain/tile.lua')
 dofile 'script/3d/terrain/tileshader.lua'
 
 dofile('script/polygon/polygon.lua')
+dofile('script/polygon/polygon2d.lua')
 
 dofile('script/uisystem/uisystem.lua')
 
@@ -196,7 +197,7 @@ if not _G.TEST then
 	end)
 
 else
-	dofile('script/test/test_obb.lua')--test_MeshVolume  test_BezierCurve.lua
+	dofile('script/test/test_bsp_face_2d.lua')--test_MeshVolume  test_BezierCurve.lua
 	-- dofile('script/demo/ball/demo_ball.lua') test_SpaceSplit.lua
 end
 --dofile()

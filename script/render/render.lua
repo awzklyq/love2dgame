@@ -132,6 +132,8 @@ Render.HistogramId = 65
 
 Render.PathGridId = 67
 
+Render.Polygon2DId = 68
+
 Render.getRenderIdName = function(id)
     if type(id) == "table" then
         id = id.renderid
@@ -236,6 +238,8 @@ Render.getRenderIdName = function(id)
         return "Histogram"
     elseif Render.PathGridId == id then
         return "PathGridData"
+    elseif Render.Polygon2DId == id then
+        return "Polygon2D"
     end
     
     return "Null"
@@ -428,7 +432,8 @@ Render.RenderObject = function(obj)
             love.graphics.setColor(obj.color._r, obj.color._g, obj.color._b);
             love.graphics.print(tostring(obj.text), obj.x, obj.y, obj.r, obj.sx, obj.sy, obj.ox, obj.oy, obj.kx, obj.ky)
         elseif obj.renderid == Render.Point2Id then
-            love.graphics.setColor(obj.color._r, obj.color._g, obj.color._b);
+            love.graphics.setLineWidth( obj.lw);
+            love.graphics.setColor(obj.color._r, obj.color._g, obj.color._b, 1);
             love.graphics.points(obj.x, obj.y)
         elseif obj.renderid == Render.Point2DCollectId then
             love.graphics.setColor(obj.color._r, obj.color._g, obj.color._b);
@@ -439,7 +444,7 @@ Render.RenderObject = function(obj)
             -- log('yyyyyyyyyyyyyy',  obj._w, obj._h )
         elseif obj.renderid == Render.Tile3DId then
             love.graphics.draw( obj.obj )
-        elseif obj.renderid == Render.Triangle2DId then
+        elseif obj.renderid == Render.Triangle2DId or obj.renderid == Render.Polygon2DId then
             if #obj.vertices > 0 then
                 love.graphics.setColor(obj.Color._r, obj.Color._g, obj.Color._b, obj.Color._a);
                 if obj.mode == 'line' then
