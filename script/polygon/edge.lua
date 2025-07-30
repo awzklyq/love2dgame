@@ -83,6 +83,13 @@ function Edge2D:ChangePoint(p, newp)
     end 
 end
 
+function Edge2D:CheckPointInLeftOfEdge(InPoint)
+    local _Center = (self.P1 + self.P2) * 0.5
+    local _v1 = InPoint - _Center
+    local _v2 = self.P1 - self.P2
+    return Vector.angleClockwise(_v1, _v2) >= math.pi
+end
+
 function Edge2D:Release()
     for i = 1, #self.P1.Edges do
         if self.P1.Edges[i] == self then

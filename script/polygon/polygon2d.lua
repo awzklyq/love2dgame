@@ -121,6 +121,71 @@ function Polygon2D:RemovePoint(InPoint)
     self:ReGenerateRenderData()
 end
 
+function Polygon2D:GetPoints()
+    return self._Points
+end
+
+function Polygon2D:GetLeftPointsOfEdge(InEdge)
+    local _Result = {}
+    for i = 1, #self._Points do
+        if InEdge:CheckPointInLeftOfEdge(self._Points[i]) then
+            _Result[#_Result + 1] = self._Points[i]
+        end
+    end
+
+    return _Result
+end
+
+function Polygon2D:GetRightPointsOfEdge(InEdge)
+    local _Result = {}
+    for i = 1, #self._Points do
+        if InEdge:CheckPointInLeftOfEdge(self._Points[i]) == false then
+            _Result[#_Result + 1] = self._Points[i]
+        end
+    end
+
+    return _Result
+end
+
+--目前只支持凸多边形
+function Polygon2D:CheckPointIn(InPoint)
+    local _IsLeft = -1
+    for i = 1, #self._Edges do
+        if self._Edges[i]:CheckPointInLeftOfEdge(InPoint) then
+            if _IsLeft == 0 then
+                return false
+            end
+            _IsLeft = 1 
+        else
+            if _IsLeft == 1 then
+                return false
+            end
+            _IsLeft = 0
+        end
+    end
+
+    return true
+end
+
+function Polygon2D:GetTriangles()
+    local _Result = {}
+    for i = 1, #self._Points do
+        local p = Vector.new(self._Points[i].x, self._Points[i].y)
+        p.Order = i
+
+        _Result[#_Result + 1] = p
+    end
+
+    _Result[#_Result].IsEnd = true
+    _Result[1].IsStart = true
+
+    for i = 1, #_Result - 1 do
+        Edge2D.new(_Result[i], _Result[i + 1])
+    end
+    
+    Edge2D.new(_Result[#_Result], _Result[1])
+    return EarClip.Process(_Result)
+end
 function Polygon2D:IsIntersectEdgesToEdge(InEdge)
     -- self._Edges = {}
 

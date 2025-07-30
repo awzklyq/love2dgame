@@ -20,7 +20,7 @@ EarClip.Process = function(points)
                 return nil
             end
     
-            if EarClip.FindEarPoint(p, points) then
+            if EarClip.FindEarPoint(p) then
                 table.remove(points, i)
                 NoPoint = false
             end
@@ -43,26 +43,26 @@ EarClip.Process = function(points)
     return Triangle2Ds
 end
 
-EarClip.FindEarPoint = function(p, points)
+EarClip.FindEarPoint = function(p)
     local p1 = p.Edges[1]:GetOtherPoint(p)
     local p2 = p.Edges[2]:GetOtherPoint(p)
 
-    if p1.Order > p2.Order then
-        local TempX = p2
-        p2 = p1
-        p1 = TempX
-    end
+    -- if p1.Order > p2.Order then
+    --     local TempX = p2
+    --     p2 = p1
+    --     p1 = TempX
+    -- end
 
-    if p1.IsStart and p2.IsEnd then
-        local TempX = p2
-        p2 = p1
-        p1 = TempX
-    end
+    -- if p1.IsStart and p2.IsEnd then
+    --     local TempX = p2
+    --     p2 = p1
+    --     p1 = TempX
+    -- end
 
     local v1 = (p1 - p):normalize()
     local v2 = (p2 - p):normalize()
 
-    if Vector.angleClockwise(v2, v1) > math.pi then
+    if math.abs(Vector.angleClockwise(v2, v1)) <= math.pi then
         return false
     end 
 

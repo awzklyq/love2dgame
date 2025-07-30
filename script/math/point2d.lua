@@ -9,6 +9,36 @@ Point2D.Meta.__eq = function(myvalue, value)
     return myvalue.x == value.x and myvalue.y == value.y
 end
 
+Point2D.Meta.__sub = function(myvalue, value)
+    if type(value) == "number" then
+        return Vector.new(myvalue.x - value, myvalue.y - value)
+    else
+        return Point2D.new(myvalue.x - value.x, myvalue.y - value.y)
+    end
+end
+
+Point2D.Meta.__add = function(myvalue, value)
+    if type(value) == "number" then
+        return Point2D.new(myvalue.x + value, myvalue.y + value)
+    else
+        return Point2D.new(myvalue.x + value.x, myvalue.y + value.y)
+    end
+end
+
+Point2D.Meta.__mul = function(myvalue, value)
+    if type(value) == 'table' then
+        if value.renderid == Render.Matrix2DId then
+            return value:MulLeftVector2(myvalue)
+        elseif value.renderid == Render.Vector2Id or value.renderid == Render.Point2Id then
+            return Point2D.new(myvalue.x * value.x, myvalue.y * value.y)
+        else
+            _errorAssert(false, 'function Point2D.__mul')
+        end
+    else
+        return Point2D.new(myvalue.x * value, myvalue.y * value)
+    end
+end
+
 function Point2D.new(x, y, lw)-- lw :line width
     local p = setmetatable({}, Point2D.Meta);
 
@@ -41,6 +71,10 @@ function Point2D:SetColor(r, g, b, a)
     if self._Rect then
         self._Rect:SetColor(r, g, b, a)
     end
+end
+
+function Point2D.Copy(this)
+    return Point2D.new(this.x, this.y)
 end
 
 function Point2D:draw()
