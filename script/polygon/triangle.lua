@@ -47,6 +47,11 @@ function Triangle2D.new(p1, p2, p3, IsNeedEdge, linewidth)-- Vector2 or Vector3.
     return tri
 end
 
+function Triangle2D:GetSurfaceArea()
+    local v1 = self.P2 - self.P1
+    local v2 = self.P3 - self.P1
+    return math.abs(Vector.cross(v1, v2) * 0.5)
+end
 --InMode-> fill or line
 function Triangle2D:SetRenderMode(InMode)
     self.mode = InMode
@@ -285,6 +290,10 @@ end
 
 function Triangle2D:CheckPointInXY(x, y)
     return self:CheckPointIn(Vector.new(x, y))
+end
+
+function Triangle2D:GetCenter()
+    return (self.P1 + self.P2 + self.P3) / 3
 end
 
 

@@ -166,8 +166,7 @@ function Polygon2D:CheckPointIn(InPoint)
 
     return true
 end
-
-function Polygon2D:GetTriangles()
+function Polygon2D:UseEarClipGenerateTriangles()
     local _Result = {}
     for i = 1, #self._Points do
         local p = Vector.new(self._Points[i].x, self._Points[i].y)
@@ -184,8 +183,57 @@ function Polygon2D:GetTriangles()
     end
     
     Edge2D.new(_Result[#_Result], _Result[1])
-    return EarClip.Process(_Result)
+    self._Triangles = EarClip.Process(_Result)
+
+    return self._Triangles
 end
+
+function Polygon2D:GetTriangles(InForce)
+    if not self._Triangles or InForce == true then
+        self:UseEarClipGenerateTriangles()
+    end
+
+    return self._Triangles
+end
+
+function Polygon2D:GetSurfaceArea(InForce)
+    if not self._Triangles or InForce == true then
+        self:GenerateTriangles(InForce)
+    end
+
+    local _Surface = 0
+    for i = 1, #self._Triangles do
+        _Surface = _Surface + self._Triangles[i]:GetSurfaceArea()
+    end
+
+    return _Surface
+end
+
+function Polygon2D:GenerateTriangles(InForce)
+    self._Triangles = self:GetTriangles(InForce)
+    
+    local _AllSurface = self:GetSurfaceArea()
+    local _Centroids = {}
+    for i = 1, #self._Triangles do
+        _Centroids[i] = self._Triangles[i]:GetCenter() * ( self._Triangles[i]:GetSurfaceArea() / _AllSurface )
+    end
+
+    self._Centroid = Point2D.new(0, 0)
+
+    for i = 1, #_Centroids do
+        self._Centroid = self._Centroid + _Centroids[i]
+    end
+end
+
+function Polygon2D:GetCenter(InForce)
+    if not self._Centroid or InForce == true then
+        self:GenerateTriangles(InForce)
+    end
+
+    return self._Centroid
+end
+
+
 function Polygon2D:IsIntersectEdgesToEdge(InEdge)
     -- self._Edges = {}
 
