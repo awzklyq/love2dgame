@@ -11,7 +11,9 @@ Include：
 	script/test/test_InverseMatrixs.lua （Inverse By Gauss Jordan）
 	script/test/test_MRP.lua （Markov reward Process(马尔可夫奖励过程)
 	script/test/test_obb.lua（Mesh 生成OBB）
+	script/test/test_polygon2d.lua
 	script/test/fxaa.lua
+	script/test_floatage.lua
 	script/test/line3d.lua
 	script/test/renderdepth.lua
 	script/test/shadowvolume.lua

@@ -93,7 +93,7 @@ dofile('script/polygon/collision2d.lua')
 dofile('script/groupmanager.lua')
 
 dofile('script/physics/world.lua')
-
+dofile('script/physics/floatage.lua')
 dofile('script/entity/entity.lua')
 dofile('script/entity/bullet.lua')
 dofile('script/entity/body.lua')
@@ -197,7 +197,7 @@ if not _G.TEST then
 	end)
 
 else
-	dofile('script/test/test_bsp_face_2d.lua')--test_MeshVolume  test_BezierCurve.lua
+	dofile('script/test/test_floatage.lua')--test_MeshVolume  test_BezierCurve.lua
 	-- dofile('script/demo/ball/demo_ball.lua') test_SpaceSplit.lua
 end
 --dofile()
