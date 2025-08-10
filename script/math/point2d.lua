@@ -11,10 +11,21 @@ end
 
 Point2D.Meta.__sub = function(myvalue, value)
     if type(value) == "number" then
-        return Vector.new(myvalue.x - value, myvalue.y - value)
+        return Point2D.new(myvalue.x - value, myvalue.y - value)
     else
         return Point2D.new(myvalue.x - value.x, myvalue.y - value.y)
     end
+end
+
+Point2D.Meta.__div = function(myvalue, value)
+    if type(value) == "number" then
+        return Point2D.new(myvalue.x / value, myvalue.y / value)
+    elseif  type(value) == "table" and (value.renderid == Render.Vector2Id or value.renderid == Render.Point2Id) then
+        return Point2D.new(myvalue.x / value.x, myvalue.y / value.y)
+    else
+        _errorAssert(false, "Point2D.Meta.__div~")
+    end  
+   
 end
 
 Point2D.Meta.__add = function(myvalue, value)
@@ -51,6 +62,13 @@ function Point2D.new(x, y, lw)-- lw :line width
     p.renderid = Render.Point2Id ;
 
     return p;
+end
+
+function Point2D:CheckInLeftOfLine(InLine)
+    local _Center = InLine:GetCenter()
+    local _v1 = self - _Center
+    local _v2 = self:GetEndPoint() - self:GetStartPoint()
+    return Vector.angleClockwise(_v1, _v2) >= math.pi
 end
 
 function Point2D:GenerateDrawData()

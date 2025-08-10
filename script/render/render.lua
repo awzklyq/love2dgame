@@ -251,7 +251,9 @@ Render.RenderObject = function(obj)
     if obj.transform and obj.transform.renderid == Render.MatrixId and obj.renderid ~= Render.EntityBodyId then
         obj.transform:use(obj);
     elseif obj.transform and obj.transform.renderid == Render.Matrix2DId then
-
+        obj.transform:use();
+    else
+        RenderSet.UseMatrix2D()
     end
 
     if obj.shader then

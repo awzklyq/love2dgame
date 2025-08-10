@@ -75,6 +75,13 @@ function Matrix2D:IsIdentity()
     self[4] == 0 and self[5] == 1 and self[6] == 0 and self[7] == 0 and self[8] == 0 and self[9] == 0
 end
 
+function Matrix2D.Identity()
+
+    return Matrix2D.CreatFromNumber(1, 0, 0,
+                                            0, 1, 0,
+                                            0, 0, 1)
+end
+
 
 function Matrix2D:Reset( )
         
@@ -461,18 +468,22 @@ function Matrix2D:Copy()
    return _NewMat
 end
 
-function Matrix2D:use(obj)
-    if not self.transform then
-        self.transform = love.math.newTransform()
+function Matrix2D:use()
+    if not self._love2d_transform then
+    self._love2d_transform = love.math.newTransform()
     end
 
-    self.transform:setMatrix(self[1], self[2], self[3],
-    self[4], self[5], self[6],
-    self[7], self[8], self[9])
+    self._love2d_transform:setMatrix(self[1], self[4], 0, self[7],
+    self[2], self[5], 0, self[8], 
+    self[3], self[6], 1, self[9],
+    0, 0, 0, 1)
 
-    love.graphics.applyTransform(self.transform);
+    love.graphics.applyTransform(self._love2d_transform);
 end
     
+function Matrix2D:unuse()
+    love.graphics.applyTransform(nil);
+end
     
     --     this.getRotation( )
         

@@ -30,6 +30,24 @@ function Polygon2D:Init(InPoints)
 
     self._IsRenderPoints = false
     self._IsRenderEdges = false
+
+    self.transform = Matrix2D.Identity()
+
+    self._RenderMode = "Polygon2D"
+    self._TriangleRenderMode = "fill"
+end
+
+function Polygon2D:SetRenderMode(InRenderMode)
+    self._RenderMode = InRenderMode or "Polygon2D"
+end
+
+function Polygon2D:SetTriangleRenderMode(InMode)
+    self:GenerateTriangles(true)
+
+    self._TriangleRenderMode = InMode
+    for i = 1, #self._Triangles do
+        self._Triangles[i] = InMode
+    end
 end
 
 function Polygon2D:SetPointsColor(...)
@@ -185,6 +203,9 @@ function Polygon2D:UseEarClipGenerateTriangles()
     Edge2D.new(_Result[#_Result], _Result[1])
     self._Triangles = EarClip.Process(_Result)
 
+    for i = 1, #self._Triangles do
+        self._Triangles[i]:SetRenderMode(self._TriangleRenderMode)
+    end
     return self._Triangles
 end
 
@@ -233,6 +254,26 @@ function Polygon2D:GetCenter(InForce)
     return self._Centroid
 end
 
+function Polygon2D:GetSurfaceArea(InForce)
+    if not self._Triangles or InForce == true then
+        self:GenerateTriangles(InForce)
+    end
+
+    local _Surface = 0
+    for i = 1, #self._Triangles do
+        _Surface = _Surface + self._Triangles[i]:GetSurfaceArea()
+    end
+
+    return _Surface
+end
+
+function Polygon2D:CutByLine(InLine)
+    if not self._Triangles then
+        self:GenerateTriangles()
+    end
+
+
+end
 
 function Polygon2D:IsIntersectEdgesToEdge(InEdge)
     -- self._Edges = {}
@@ -265,10 +306,6 @@ function Polygon2D:ReGenerateRenderData()
     end
 end
 
-function Polygon2D:SetRenderMode(InMode)
-    self.mode = InMode
-end
-
 function Polygon2D:SetRenderPoints(InValue)
     self._IsRenderPoints = InValue
 end
@@ -278,17 +315,32 @@ function Polygon2D:SetRenderEdges(InValue)
 end
 
 function Polygon2D:draw()
-    Render.RenderObject(self);
+    --  log('sssssssssss', self._RenderMode, self._RenderMode == "Polygon2D")
+    if self._RenderMode == "Polygon2D" then
+        Render.RenderObject(self);
 
-    if self._IsRenderPoints then
-        for i = 1, #self._Points do
-            self._Points[i]:draw()
+        RenderSet.PusMatrix2D(self.transform)
+        if self._IsRenderPoints then
+            for i = 1, #self._Points do
+                self._Points[i]:draw()
+            end
         end
-    end
 
-    if self._IsRenderEdges then
-        for i = 1, #self._Edges do
-            self._Edges[i]:draw()
+        if self._IsRenderEdges then
+            for i = 1, #self._Edges do
+                self._Edges[i]:draw()
+            end
         end
+        RenderSet.PopMatrix2D()
+    else
+        RenderSet.PusMatrix2D(self.transform)
+        if not self._Triangles then
+            self:GenerateTriangles(true)
+        end
+
+        for i = 1, #self._Triangles do
+            self._Triangles[i]:draw()
+        end
+        RenderSet.PopMatrix2D()
     end
 end

@@ -60,6 +60,20 @@ RenderSet.getCameraFrustumProjectMatrix = function()
     return Matrix3D.createPerspectiveFovLH( camera3d.fov, camera3d.aspectRatio, camera3d.nearClip, camera3d.farClip )
 end
 
+local _Matrix2Ds = {}
+RenderSet.PusMatrix2D = function(InMatrix2D)
+    _Matrix2Ds[#_Matrix2Ds + 1] = InMatrix2D
+end
+
+RenderSet.PopMatrix2D = function()
+    table.remove(_Matrix2Ds, #_Matrix2Ds)
+end
+
+RenderSet.UseMatrix2D = function()
+    if #_Matrix2Ds > 0 then
+        _Matrix2Ds[#_Matrix2Ds]:use()
+    end
+end
 
 local shadowMapSize = 1024
 RenderSet.setShadowMapSize = function(size)

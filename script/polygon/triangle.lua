@@ -131,6 +131,14 @@ function Triangle2D:GetVertices()
     self.vertices[#self.vertices + 1] = self.P3.y
 end
 
+function Triangle2D:CheckInLeftOfLine(InLine)
+    return self.P1:CheckInLeftOfLine(InLine) and self.P2:CheckInLeftOfLine(InLine) and self.P3:CheckInLeftOfLine(InLine)
+end
+
+function Triangle2D:CheckInRightOfLine(InLine)
+    return self.P1:CheckInLeftOfLine(InLine) == false and self.P2:CheckInLeftOfLine(InLine) == false and self.P3:CheckInLeftOfLine(InLine) == false
+end
+
 function Triangle2D:GetEdgeEqual(edge)
     if self.edge1 == edge then
         return self.edge1

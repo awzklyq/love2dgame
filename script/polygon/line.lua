@@ -110,6 +110,18 @@ function Line:GeneraOutCircle()
     self.OutCircle = Circle.new(r, center.x ,center.y, 50)
 end
 
+function Line:GetStartPoint()
+    return self._StartPoint
+end
+
+function Line:GetEndPoint()
+    return self._EndPoint
+end
+
+function Line:GetCenter()
+    return (self._StartPoint + self._EndPoint) * 0.5
+end
+
 function Line:SetVisible(InVisible)
     self._Visible = InVisible
 end
@@ -292,7 +304,7 @@ function NoiseLine.new(x1, y1, x2, y2, lw, segment, power, speed)-- random
 
     line.speed = speed or 10
 
-    line.segment = segment
+    line.segment = segment or 100
 
     line:resetData(x1, y1, x2, y2)
 
@@ -323,6 +335,7 @@ end
 
 function NoiseLine:setMode(mode)
     self.mode = mode
+    self:resetData(self.x1, self.y1, self.x2, self.y2)
 end
 
 function NoiseLine:setColor(r, g, b, a)
@@ -338,7 +351,7 @@ function NoiseLine:update(e)
             if self.mode == "x" then
                 self.renderdatas[i] = self.datas[i] + math.noise(self.datas[i], self.tick * self.speed) * self.power
             else
-                self.renderdatas[i + 1] = self.datas[i + 1] + math.noise(self.datas[i +1], self.tick * self.speed) * self.power
+                self.renderdatas[i + 1] = (self.datas[i + 1] ) + math.noise(i, self.tick * self.speed) * self.power
             end
             -- self.renderdatas[i + 1] = self.datas[i + 1] + math.noise(self.datas[i], self.tick * 10) * 100
         end
