@@ -12,6 +12,7 @@ Include：
 	script/test/test_MRP.lua （Markov reward Process(马尔可夫奖励过程)
 	script/test/test_obb.lua（Mesh 生成OBB）
 	script/test/test_polygon2d.lua
+	script/test/test_Polygon2D_CutByLine.lua
 	script/test/fxaa.lua
 	script/test_floatage.lua
 	script/test/line3d.lua

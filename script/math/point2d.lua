@@ -71,6 +71,24 @@ function Point2D:CheckInLeftOfLine(InLine)
     return Vector.angleClockwise(_v1, _v2) >= math.pi
 end
 
+function Point2D:CheckInLeftOfEdge(InEdge)
+    local _Center = InEdge:GetCenter()
+    local _v1 = self - _Center
+    local _v2 = InEdge:GetP2() - InEdge:GetP1()
+    return Vector.angleClockwise(_v1, _v2) >= math.pi
+end
+
+function Point2D:ToVector()
+    return Vector.new(self.x, self.y)
+end
+function Point2D:CheckInLeftOfLineOrEdge(InObj)
+    if InObj.renderid == Render.EdgeId then
+        return self:CheckInLeftOfEdge(InObj)
+    else
+        return self:CheckInLeftOfLine(InObj)
+    end
+end
+
 function Point2D:GenerateDrawData()
     if self._Rect == nil then
         self._Rect = Rect.CreatFromCenter(self.x, self.y, self.lw, self.lw, 'fill')

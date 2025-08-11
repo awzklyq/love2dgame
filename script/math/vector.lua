@@ -78,6 +78,11 @@ end
 function Vector:length()
     return math.sqrt(math.pow(self.x, 2) + math.pow(self.y, 2));
 end
+
+function Vector:ToPoint2D()
+    return Point2D.new(self.x, self.y)
+end
+
 function Vector:normalize()
     local w =  math.sqrt(math.pow(self.x, 2) + math.pow(self.y, 2));
     if not w or w == 0 then

@@ -38,8 +38,10 @@ _G.app.wheelmoved = setmetatable({},  metatab)
 _G.app.resizeWindow = setmetatable({},  metatab)
 
 function love.mousereleased(x, y, button, isTouch)
-  --  _G.UIHelper.mouseUp(x, y, button, isTouch)
-    _G.app.mousereleased(x, y, button, isTouch)
+  --  _G.UIHelper.mouseUp(x, y, button, isTouch)    
+    if UI.UISystem.mousereleased(button, x, y) == false then
+        _G.app.mousereleased(x, y, button, isTouch)
+    end
 end
 
 function love.keypressed(key, scancode, isrepeat)
@@ -161,7 +163,9 @@ function love.mousepressed(x, y, button, istouch)
     --    printy = y
     -- end
     --_G.UIHelper.mouseDown(x, y, button, isTouch)
-    _G.app.mousepressed(x, y, button, istouch);
+    if UI.UISystem.mouseDown(button, x, y) == false then
+        _G.app.mousepressed(x, y, button, istouch);
+    end
  end
 
  function love.mousemoved(x, y, dx, dy, istouch)
@@ -176,7 +180,9 @@ function love.mousepressed(x, y, button, istouch)
         _G.CameraManager.mousemoved(x, y, dx, dy, istouch);
         _G.LightManager.mousemoved(x, y, dx, dy, istouch)
 
-        _G.app.mousemoved(x, y, dx, dy, istouch);
+        if UI.UISystem.mousemoved(x, y) == false then
+            _G.app.mousemoved(x, y, dx, dy, istouch);
+        end
     end
  end
 

@@ -54,7 +54,6 @@ MeshGenusGenerateNode.Process = function(InMesh)
         InsertEdge(Edges, Triangles[i].Edge3)
     end
 
-    log('aaaaaaaaa', #Verts,  #Edges, #Triangles)
     local X = #Verts - #Edges + #Triangles
 
     local G = (2 - X) / 2

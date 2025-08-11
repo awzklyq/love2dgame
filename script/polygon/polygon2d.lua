@@ -10,6 +10,12 @@ function Polygon2D.new(InPoints)
     return p
 end
 
+function Polygon2D.CreateFromTriangles(InTriangles)
+    local _p = Polygon2D.new({})
+    _p:SetTriangles(InTriangles)
+    return _p
+end
+
 function Polygon2D:Init(InPoints)
     self._PointsColor = LColor.new(255, 0, 0,255)
     self._EdgesColor = LColor.new(0, 0, 255,255)
@@ -37,16 +43,29 @@ function Polygon2D:Init(InPoints)
     self._TriangleRenderMode = "fill"
 end
 
+function Polygon2D:SetTriangles(InTriangles)
+    self._Triangles = {}
+    for i = 1, #InTriangles do
+
+        self._Triangles[#self._Triangles + 1] = InTriangles[i]
+  
+    end
+
+    self._Points = {}
+    self._Edges = {}
+end
 function Polygon2D:SetRenderMode(InRenderMode)
     self._RenderMode = InRenderMode or "Polygon2D"
 end
 
 function Polygon2D:SetTriangleRenderMode(InMode)
-    self:GenerateTriangles(true)
+    if not self._Triangles then
+        self:GenerateTriangles(true)
+    end
 
     self._TriangleRenderMode = InMode
     for i = 1, #self._Triangles do
-        self._Triangles[i] = InMode
+        self._Triangles[i]:SetRenderMode(InMode)
     end
 end
 
@@ -165,6 +184,77 @@ function Polygon2D:GetRightPointsOfEdge(InEdge)
     return _Result
 end
 
+local DealTriangleIntersectByLineOrEdge = function(InPoints_Num1, InPoints_Num2, InObj)
+    local P1 = InPoints_Num1[1]
+    local P2 = InPoints_Num2[1]
+    local P3 = InPoints_Num2[2]
+
+    local P4, P5
+    if InObj.renderid == Render.EdgeId then
+        P4 = InObj:GetP1()
+        P5 = InObj:GetP2()
+    else
+        P4 = InObj:GetStartPoint()
+        P5 = InObj:GetEndPoint()
+    end
+
+    local OutP1 = Point2D.new()
+    local IsIntersect1 = math.IntersectLine( P1, P2, P4, P5, OutP1)
+
+    local OutP2 = Point2D.new()
+    local IsIntersect2 = math.IntersectLine( P1, P3, P4, P5, OutP2)
+
+    _errorAssert(IsIntersect1 and IsIntersect2)
+
+    local t1 = Triangle2D.new(P1, OutP2, OutP1)
+    local t2 = Triangle2D.new( OutP1, OutP2, P2)
+    local t3 = Triangle2D.new(P2, OutP2, P3)
+    local Result = {}
+    Result[1] = t1
+    Result[2] = t2
+    Result[3] = t3
+
+    return Result
+end
+
+function Polygon2D:CutByLineOrEdge(InObj)
+    if not self._Triangles then
+        self:GenerateTriangles()
+    end
+
+    _LeftTriangles = {}
+    _RightTriangles = {}
+
+    for i = 1, #self._Triangles do
+        local _tri = self._Triangles[i]
+        local _LeftPoints, _RightPoints = _tri:GetPointsOnEachSidesOfLineOrEdge(InObj)
+        if #_LeftPoints == 3 then 
+            _LeftTriangles[#_LeftTriangles + 1] = _tri
+        elseif #_RightPoints == 3 then 
+            _RightTriangles[#_RightTriangles + 1] = _tri
+        elseif #_LeftPoints == 1 and #_RightPoints == 2 then
+            local _Result = DealTriangleIntersectByLineOrEdge(_LeftPoints, _RightPoints, InObj)
+            _LeftTriangles[#_LeftTriangles + 1] = _Result[1]
+            _RightTriangles[#_RightTriangles + 1] = _Result[2]
+            _RightTriangles[#_RightTriangles + 1] = _Result[3]
+        elseif #_LeftPoints == 2 and #_RightPoints == 1 then
+            local _Result = DealTriangleIntersectByLineOrEdge(_RightPoints, _LeftPoints, InObj)
+            _RightTriangles[#_RightTriangles + 1] = _Result[1]
+            _LeftTriangles[#_LeftTriangles + 1] = _Result[2]
+            _LeftTriangles[#_LeftTriangles + 1] = _Result[3]
+        end
+    end
+
+    local _LeftP = Polygon2D.CreateFromTriangles(_LeftTriangles)
+
+    _LeftP:SetRenderMode("Triangle")
+    _LeftP:SetTriangleRenderMode(self._TriangleRenderMode)
+    local _RightP = Polygon2D.CreateFromTriangles(_RightTriangles)
+    _RightP:SetRenderMode("Triangle")
+    _RightP:SetTriangleRenderMode(self._TriangleRenderMode)
+    return _LeftP, _RightP
+end
+
 --目前只支持凸多边形
 function Polygon2D:CheckPointIn(InPoint)
     local _IsLeft = -1
@@ -265,14 +355,6 @@ function Polygon2D:GetSurfaceArea(InForce)
     end
 
     return _Surface
-end
-
-function Polygon2D:CutByLine(InLine)
-    if not self._Triangles then
-        self:GenerateTriangles()
-    end
-
-
 end
 
 function Polygon2D:IsIntersectEdgesToEdge(InEdge)

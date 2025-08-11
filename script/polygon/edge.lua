@@ -28,7 +28,7 @@ function Edge2D.new(p1, p2)
 
     edge.Color = LColor.new(255,255,255,255)
 
-    edge.renderid = Render.EdgeId ;
+    edge.renderid = Render.EdgeId;
     return edge
 end
 
@@ -104,6 +104,29 @@ function Edge2D:Release()
             break
         end
     end
+end
+
+function Edge2D:CheckIntersectLineOrEdge2D(InObj)
+    local IsIntersect = false
+    local OutPoint = Point2D.new()
+    if InObj.renderid == Render.EdgeId then
+        IsIntersect = math.IntersectLine( self.P1, self.P2, InObj:GetP1(), InObj:GetP2(), OutPoint)
+    elseif InObj.renderid == Render.LineId then
+        IsIntersect = math.IntersectLine( self.P1, self.P2, InObj:StartPoint(), InObj:EndPoint(), OutPoint)
+    end
+    return IsIntersect, OutPoint
+end
+
+function Edge2D:GetP1()
+    return self.P1
+end
+
+function Edge2D:GetP2()
+    return self.P2
+end
+
+function Edge2D:GetCenter()
+    return (self.P2 + self.P1) * 0.5
 end
 
 function Edge2D:draw()

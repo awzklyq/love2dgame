@@ -3,9 +3,9 @@ _G.Triangle2D = {}
 function Triangle2D.new(p1, p2, p3, IsNeedEdge, linewidth)-- Vector2 or Vector3...
     local tri = setmetatable({}, {__index = Triangle2D});
 
-    tri.P1 = p1
-    tri.P2 = p2
-    tri.P3 = p3
+    tri.P1 = p1.renderid == Render.Point2Id and p1 or p1:ToPoint2D()
+    tri.P2 = p2.renderid == Render.Point2Id and p2 or p2:ToPoint2D()
+    tri.P3 = p3.renderid == Render.Point2Id and p3 or p3:ToPoint2D()
 
     tri.Color = LColor.new(255,255,255,255)
 
@@ -131,12 +131,36 @@ function Triangle2D:GetVertices()
     self.vertices[#self.vertices + 1] = self.P3.y
 end
 
-function Triangle2D:CheckInLeftOfLine(InLine)
-    return self.P1:CheckInLeftOfLine(InLine) and self.P2:CheckInLeftOfLine(InLine) and self.P3:CheckInLeftOfLine(InLine)
+function Triangle2D:CheckInLeftOfLineOrEdge(InObj)
+    return self.P1:CheckInLeftOfLineOrEdge(InObj) and self.P2:CheckInLeftOfLineOrEdge(InObj) and self.P3:CheckInLeftOfLineOrEdge(InObj)
 end
 
-function Triangle2D:CheckInRightOfLine(InLine)
-    return self.P1:CheckInLeftOfLine(InLine) == false and self.P2:CheckInLeftOfLine(InLine) == false and self.P3:CheckInLeftOfLine(InLine) == false
+function Triangle2D:CheckInRightOfLineOrEdge(InObj)
+    return self.P1:CheckInLeftOfLineOrEdge(InObj) == false and self.P2:CheckInLeftOfLineOrEdge(InObj) == false and self.P3:CheckInLeftOfLineOrEdge(InObj) == false
+end
+
+function Triangle2D:GetPointsOnEachSidesOfLineOrEdge(InObj)
+    local LeftPoints = {}
+    local RightPoints = {}
+    if self.P1:CheckInLeftOfLineOrEdge(InObj) then
+        LeftPoints[#LeftPoints + 1] = self.P1
+    else
+        RightPoints[#RightPoints + 1] = self.P1
+    end
+
+    if self.P2:CheckInLeftOfLineOrEdge(InObj) then
+        LeftPoints[#LeftPoints + 1] = self.P2
+    else
+        RightPoints[#RightPoints + 1] = self.P2
+    end
+
+    if self.P3:CheckInLeftOfLineOrEdge(InObj) then
+        LeftPoints[#LeftPoints + 1] = self.P3
+    else
+        RightPoints[#RightPoints + 1] = self.P3
+    end
+
+    return LeftPoints, RightPoints
 end
 
 function Triangle2D:GetEdgeEqual(edge)
@@ -276,9 +300,9 @@ function Triangle2D:CheckTriangleEqual(tri)
 end
 
 function Triangle2D:CheckPointIn(Point)
-    local v1 = (self.P1 - Point):normalize()
-    local v2 = (self.P2 - Point):normalize()
-    local v3 = (self.P3 - Point):normalize()
+    local v1 = (self.P1 - Point):ToVector():normalize()
+    local v2 = (self.P2 - Point):ToVector():normalize()
+    local v3 = (self.P3 - Point):ToVector():normalize()
 
     local a1 = Vector.angle(v1, v2)
     local a2 = Vector.angle(v2, v3)
