@@ -221,5 +221,4 @@ end
 Vector.Copy = Vector.copy  
 
 
-
-    
+Vector.Up = Vector.new(0, 1)

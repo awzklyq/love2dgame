@@ -217,6 +217,14 @@ local DealTriangleIntersectByLineOrEdge = function(InPoints_Num1, InPoints_Num2,
     return Result
 end
 
+function Polygon2D:IsHasData()
+    if self._Triangles then
+        return #self._Triangles > 0
+    end
+
+    return #self._Points > 0 or #self._Edges > 0
+end
+
 function Polygon2D:CutByLineOrEdge(InObj)
     if not self._Triangles then
         self:GenerateTriangles()
@@ -226,7 +234,8 @@ function Polygon2D:CutByLineOrEdge(InObj)
     _RightTriangles = {}
 
     for i = 1, #self._Triangles do
-        local _tri = self._Triangles[i]
+        local _tri = self._Triangles[i]:Copy()
+        _tri:ApplyTransform(self.transform)
         local _LeftPoints, _RightPoints = _tri:GetPointsOnEachSidesOfLineOrEdge(InObj)
         if #_LeftPoints == 3 then 
             _LeftTriangles[#_LeftTriangles + 1] = _tri

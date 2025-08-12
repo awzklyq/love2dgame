@@ -34,10 +34,11 @@ app.mousepressed(function(x, y, button, istouch)
 end)
 
 
-local btn = UI.Button.new( 10, 10, 120, 50, 'Gnerate Triangles Data', 'btn' )
+local btn = UI.Button.new( 10, 10, 120, 50, 'Begin', 'btn' )
 
 btn.ClickEvent = function()
 
+    _p.transform:SetTranslation(0, 0)
     FloatageManager.AddPolygon2d(_p)
 end
 
@@ -58,4 +59,13 @@ checkc.ChangeEvent = function(Enable)
     -- for i = 1, #_Triangles do
     --     _Triangles[i]:SetRenderMode(IsDrawLine and 'line' or 'fill')
     -- end
+end
+
+local _Text = UI.Text.new( "Press Right Button Test", 200, 10, 200, 20 )
+_Text:SetNormalColor(0,0,255,255)
+
+local scrollbar = UI.ScrollBar.new( '_Brake Parame', 0, 140, 200, 40, 0.1, 10, 0.1)
+scrollbar.Value = FloatageManager._Brake
+scrollbar.ChangeEvent = function(v)
+    FloatageManager._Brake = v
 end

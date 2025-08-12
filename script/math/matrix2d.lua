@@ -5,7 +5,10 @@ metatable_Matrix2D.__index = Matrix2D
 
 metatable_Matrix2D.__mul = function(myvalue, value)
     if value.renderid == Render.Vector2Id then
-        return myvalue:MulVector2(value)
+        return myvalue:MulLeftVector2(value)
+    elseif value.renderid == Render.Point2Id then
+        local v =  myvalue:MulLeftVector2(value)
+        return v:ToPoint2D()
     elseif value.renderid == Render.Matrix2DId then
         local _NewMat = myvalue:Copy()
         _NewMat:MulRight(value)
@@ -66,6 +69,16 @@ function Matrix2D:MulLeftVector2(v2)
 	
 	rsult.x = xx * self:getData(1, 1) + yy * self:getData(2, 1) + self:getData(3, 1)
 	rsult.y = xx * self:getData(1, 2) + yy * self:getData(2, 2) + self:getData(3, 2)
+	return rsult
+end
+
+function Matrix2D:MulRightVector2(v2)
+    local xx, yy = v2.x, v2.y
+	local rsult = Vector.new()
+	
+	rsult.x = xx * self:getData(1, 1) + yy * self:getData(1, 2) + self:getData(1, 3) + self:getData(3, 1)
+	rsult.y = xx * self:getData(2, 1) + yy * self:getData(2, 2) + self:getData(2, 3) + self:getData(3, 2)
+    log('ttttttt', xx, yy, rsult.x , rsult.y, self:getData(3, 1), self:getData(3, 2))
 	return rsult
 end
 

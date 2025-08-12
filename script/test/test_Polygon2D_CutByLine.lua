@@ -60,7 +60,8 @@ app.mousepressed(function(x, y, button, istouch)
     elseif button == 2 then
         _p:AddPoint(Point2D.new(x, y))
     else
-        log('aaaaaaaaa', tostring(_p:CheckPointIn(Point2D.new(x, y))))
+       _p.transform:MulTranslationRight(50, 50)
+       _p.transform:MulRotationLeft(45)
     end
 end)
 
@@ -73,6 +74,8 @@ btn.ClickEvent = function()
     _Triangles = _p:GetTriangles()
     for i = 1, #_Triangles do
         _Triangles[i]:SetRenderMode('line' )
+        _Triangles[i]:ApplyTransform(_p.transform)
+
     end
 
     _CenterPoint = _p:GetCenter()

@@ -47,6 +47,18 @@ function Triangle2D.new(p1, p2, p3, IsNeedEdge, linewidth)-- Vector2 or Vector3.
     return tri
 end
 
+function Triangle2D:ApplyTransform(InTransform)
+    self.P1 = InTransform * self.P1
+    self.P2 = InTransform * self.P2
+    self.P3 = InTransform * self.P3
+
+    self:GetVertices()
+end
+
+function Triangle2D:Copy()
+    return Triangle2D.new(self.P1:Copy(), self.P2:Copy(), self.P3:Copy())
+end
+
 function Triangle2D:GetSurfaceArea()
     local v1 = self.P2 - self.P1
     local v2 = self.P3 - self.P1
@@ -121,6 +133,7 @@ function Triangle2D:SetColor(r, g, b, a)
 end
 
 function Triangle2D:GetVertices()
+    self.vertices = {}
     self.vertices[#self.vertices + 1] = self.P1.x
     self.vertices[#self.vertices + 1] = self.P1.y
 

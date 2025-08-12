@@ -67,7 +67,7 @@ end
 function Point2D:CheckInLeftOfLine(InLine)
     local _Center = InLine:GetCenter()
     local _v1 = self - _Center
-    local _v2 = self:GetEndPoint() - self:GetStartPoint()
+    local _v2 = InLine:GetEndPoint() - InLine:GetStartPoint()
     return Vector.angleClockwise(_v1, _v2) >= math.pi
 end
 
@@ -81,6 +81,11 @@ end
 function Point2D:ToVector()
     return Vector.new(self.x, self.y)
 end
+
+function Point2D:Copy()
+    return Point2D.new(self.x, self.y)
+end
+
 function Point2D:CheckInLeftOfLineOrEdge(InObj)
     if InObj.renderid == Render.EdgeId then
         return self:CheckInLeftOfEdge(InObj)

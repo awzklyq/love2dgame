@@ -14,7 +14,7 @@ Include：
 	script/test/test_polygon2d.lua
 	script/test/test_Polygon2D_CutByLine.lua
 	script/test/fxaa.lua
-	script/test_floatage.lua
+	script/test_floatage.lua（增加水上浮力示例）
 	script/test/line3d.lua
 	script/test/renderdepth.lua
 	script/test/shadowvolume.lua
