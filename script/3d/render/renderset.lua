@@ -75,6 +75,21 @@ RenderSet.UseMatrix2D = function()
     end
 end
 
+local _Matrix3Ds = {}
+RenderSet.PusMatrix2D = function(InMatrix3D)
+    _Matrix3Ds[#_Matrix3Ds + 1] = InMatrix3D
+end
+
+RenderSet.PopMatrix2D = function()
+    table.remove(_Matrix3Ds, #_Matrix3Ds)
+end
+
+RenderSet.UseMatrix2D = function()
+    if #_Matrix3Ds > 0 then
+        _Matrix3Ds[#_Matrix3Ds]:use()
+    end
+end
+
 local shadowMapSize = 1024
 RenderSet.setShadowMapSize = function(size)
     shadowMapSize = size

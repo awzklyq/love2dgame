@@ -175,6 +175,7 @@ dofile 'script/ballgame/collision/collisionbinder.lua'
 dofile 'script/ballgame/collision/collisiongroup.lua'
 dofile 'script/ballgame/collision/collisionphysics.lua'
 
+dofile('script/physics/JacoBian/JacoBianNode.lua')
 FileManager.addAllPath("assert")
 
 _G.mlib = require 'script/mlib' 
@@ -197,7 +198,7 @@ if not _G.TEST then
 	end)
 
 else
-	dofile('script/test/test_floatage.lua')--test_MeshVolume  test_BezierCurve.lua
+	dofile('script/test/test__JacoBianNode_IK.lua')--test_MeshVolume  test_BezierCurve.lua
 	-- dofile('script/demo/ball/demo_ball.lua') test_SpaceSplit.lua
 end
 --dofile()

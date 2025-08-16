@@ -826,20 +826,64 @@ function MeshLine:draw()
 end
 
 _G.MeshLines = {}
+MeshLines._Meta = {}
+MeshLines._Meta.__index = MeshLines
 function MeshLines.new(points)
-    local mesh = setmetatable({}, {__index = MeshLines});
+    local mesh = setmetatable({}, MeshLines._Meta);
     -- mesh.transform3d = Matrix3D.new();
     mesh.lines = {}
     for i = 1, #points, 2 do
         table.insert(mesh.lines, MeshLine.new(points[i], points[i + 1]))
     end
+
+    mesh.transform3d = Matrix3D.new();
     mesh.renderid = Render.MeshLinesId
+
+    mesh:setTransform(mesh.transform3d)
     return mesh;
 end
 
+function MeshLines.CreateFourSidedCone(InW, InH)
+    InW = InW or 1
+    InH = InH or 1
+    local P0 = Vector3.new(0, 0,  0.5 * InH)
+    local P1 = Vector3.new(0.5 * InW, 0.5 * InW, -0.5 * InH)
+    local P2 = Vector3.new(-0.5 * InW, 0.5 * InW, -0.5 * InH)
+    local P3 = Vector3.new(-0.5 * InW, -0.5 * InW, -0.5 * InH)
+    local P4 = Vector3.new(0.5 * InW, -0.5 * InW, -0.5 * InH)
+
+    local PS = {}
+    PS[#PS + 1] = P0
+    PS[#PS + 1] = P1
+
+    PS[#PS + 1] = P0
+    PS[#PS + 1] = P2
+
+    PS[#PS + 1] = P0
+    PS[#PS + 1] = P3
+
+    PS[#PS + 1] = P0
+    PS[#PS + 1] = P4
+
+    PS[#PS + 1] = P1
+    PS[#PS + 1] = P2
+
+    PS[#PS + 1] = P2
+    PS[#PS + 1] = P3
+    
+    PS[#PS + 1] = P3
+    PS[#PS + 1] = P4
+    
+    PS[#PS + 1] = P4
+    PS[#PS + 1] = P1
+
+    return MeshLines.new(PS)
+end
+
 function MeshLines:setTransform(transform)
+    self.transform3d = Matrix3D.copy(transform)
     for i = 1, #self.lines do
-        self.lines[i].transform3d = Matrix3D.copy(transform)
+        self.lines[i].transform3d = self.transform3d
     end
 end
 

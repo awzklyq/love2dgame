@@ -3,7 +3,7 @@ _G.FloatageManager = {}
 FloatageManager.G = Vector.new(0, 1000)
 FloatageManager.InvG = Vector.new(0, -1)
 
-FloatageManager.Density = 5
+FloatageManager.Density = 1.5
 
 FloatageManager.WaterHeight = 500
 

@@ -275,7 +275,11 @@ end
 			
 function Matrix3D:mulTranslationRight(x, y, z)
 	local mm = Matrix3D.new()
-	mm:SetTranslation(x, y, z)
+	if tonumber(y) then
+		mm:SetTranslation(x, y, z)
+	else
+		mm:SetTranslation(x.x, x.y, x.z)
+	end
 	self:mulLeft(Matrix3D.transpose(mm))
 end
 
@@ -744,6 +748,19 @@ Matrix3D.createOrthoOffCenterRH = function( left, right, bottom, top, znear, zfa
 		0.0,  ys1, 0.0, 0.0,
 		0.0, 0.0,   zf, 0.0,
 		 xs2,  ys2,   zn, 1.0 );
+end
+
+function Matrix3D:use()
+    if not self._love2d_transform then
+    self._love2d_transform = love.math.newTransform()
+    end
+
+    self._love2d_transform:setMatrix(self[1], self[5], self[9], self[13],
+    self[2], self[6], self[10], self[14], 
+    self[3], self[7], self[11], self[15],
+    self[4], self[8], self[12], self[16])
+
+    love.graphics.applyTransform(self._love2d_transform);
 end
 
 function Matrix3D:Log(sss)
