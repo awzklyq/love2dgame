@@ -134,6 +134,8 @@ Render.PathGridId = 67
 
 Render.Polygon2DId = 68
 
+Render.QuaternionID = 69
+
 Render.getRenderIdName = function(id)
     if type(id) == "table" then
         id = id.renderid
@@ -240,6 +242,8 @@ Render.getRenderIdName = function(id)
         return "PathGridData"
     elseif Render.Polygon2DId == id then
         return "Polygon2D"
+    elseif Render.QuaternionID == id then
+        return "Quaternion"
     end
     
     return "Null"

@@ -84,6 +84,7 @@ dofile('script/math/matrixs.lua')
 dofile('script/math/RotationMatrix.lua')
 dofile 'script/math/kmeans.lua'
 dofile('script/3d/math/vector3.lua')
+dofile('script/3d/math/quaternion.lua')
 dofile('script/3d/math/vector4.lua')
 dofile('script/3d/math/matrix3d.lua')
 dofile('script/3d/math/harmonics.lua')
