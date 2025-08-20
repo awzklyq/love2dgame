@@ -44,6 +44,8 @@ metatable_Matrix3D.__mul = function(myvalue, value)
 			return mat:mulTrangle(value)
 		elseif value.renderid == Render.BoundBoxId then
 			return mat:mulBoundBox(value)
+		elseif value.renderid == Render.QuaternionID then
+			return mat:MulQuaternionRight(value)
 		end
     else
         _errorAssert(false, "metatable_Matrix3D.__mul~")
@@ -97,6 +99,18 @@ end
 
 function Matrix3D:getMatrixXY(x,y)
     return self[x + (y-1)*4]
+end
+
+function Matrix3D:Identity()
+	for i = 1, 4 do
+		for j = 1, 4 do
+			if i == j then
+				self[i + (j-1)*4] = 1
+			else
+				self[i + (j-1)*4] = 0
+			end
+		end
+	end
 end
 
 function Matrix3D:GetRotationMatrix()
@@ -324,7 +338,15 @@ end
 			
 function Matrix3D:mulTranslationLeft(x, y, z)
 	local mm = Matrix3D.new()
-	mm[13] = x mm[14] = y mm[15] = z
+	if tonumber(y) then
+		mm[13] = x
+		mm[14] = y
+		mm[15] = z
+	else
+		mm[13] = x.x
+		mm[14] = x.y
+		mm[15] = x.z
+	end
 	self:mulRight(Matrix3D.transpose(mm))
 end
 
@@ -534,9 +556,13 @@ function Matrix3D:getData(i, j)
     return self[(i - 1) * 4 + j]
 end
 
+Matrix3D.GetData = Matrix3D.getData
+
 function Matrix3D:setData(i, j, v)
     self[(i - 1) * 4 + j] = v
 end
+
+Matrix3D.SetData = Matrix3D.setData
 
 function Matrix3D.determinant3x3( m00, m01, m02, m10, m11, m12, m20, m21, m22)
 	return m00 * m11 * m22 + m01 * m12 * m20 + m02 * m10 * m21 - m00 * m12 * m21- m01 * m10 * m22 - m02 * m11 * m20;
@@ -609,6 +635,18 @@ function Matrix3D:Scale(InX, InY, InZ)
 	self[10] = self[10] * InZ
 	self[11] = self[11] * InZ
 	return self
+end
+
+function Matrix3D:GetScaleX()
+	return math.sqrt(self[1] * self[1] + self[2] * self[2] + self[3] * self[3])
+end
+
+function Matrix3D:GetScaleY()
+	return math.sqrt(self[5] * self[5] + self[6] * self[6] + self[7] * self[7])
+end
+
+function Matrix3D:GetScaleZ()
+	return math.sqrt(self[9] * self[9] + self[10] * self[10] + self[11] * self[11])
 end
 
 function Matrix3D:Set(mat)
@@ -761,6 +799,72 @@ function Matrix3D:use()
     self[4], self[8], self[12], self[16])
 
     love.graphics.applyTransform(self._love2d_transform);
+end
+
+function Matrix3D:GetPosition(OutValue)
+	if OutValue then
+		OutValue.x = self[4]
+		OutValue.y = self[8]
+		OutValue.z = self[12]
+		return OutValue
+	end
+
+	local Temp = Vector3.new()
+
+	Temp.x = self[4]
+	Temp.y = self[8]
+	Temp.z = self[12]
+
+
+
+	return Temp
+end
+
+function Matrix3D:RotationQuaternion(InQuat)
+	local wx,wy,wz,xx,yy,yz,xy,xz,zz,x2,y2,z2
+
+	x2 = InQuat:GetX() + InQuat:GetX();
+	y2 = InQuat:GetY() + InQuat:GetY();
+	z2 = InQuat:GetZ() + InQuat:GetZ();
+	xx = InQuat:GetX() * x2;
+	xy = InQuat:GetX() * y2;
+	xz = InQuat:GetX() * z2;
+	yy = InQuat:GetY() * y2;
+	yz = InQuat:GetY() * z2;
+	zz = InQuat:GetZ() * z2;
+	wx = InQuat:GetW() * x2;
+	wy = InQuat:GetW() * y2;
+	wz = InQuat:GetW() * z2;
+
+	self:SetData( 1, 1, 1.0 - ( yy + zz ))
+	self:SetData( 1, 2, xy + wz)
+	self:SetData( 1, 3, xz - wy )
+
+	self:SetData( 2, 1, xy - wz )
+	self:SetData( 2, 2, 1.0 - ( xx + zz )) 
+	self:SetData( 3, 3, yz + wx )
+
+	self:SetData( 3, 1 ,xz + wy) 
+	self:SetData( 3, 2, yz - wx )
+	self:SetData( 3, 3, 1.0 - ( xx + yy ) )
+end
+
+function Matrix3D:GetQuaternion()
+	return Quaternion.CreateFromMatrix3(self)
+end
+
+function Matrix3D:MulQuaternionRight(InQuat)
+	local _QuatMat = InQuat:ToMatrix()
+	self:mulLeft(Matrix3D.transpose(_QuatMat))
+	-- self:mulLeft(_QuatMat)
+	return self
+end
+
+function Matrix3D:MulQuaternionLeft(InQuat)
+	local _QuatMat = InQuat:ToMatrix()
+	self:mulRight(Matrix3D.transpose(_QuatMat))
+	-- self:mulRight(_QuatMat)
+	return self
 end
 
 function Matrix3D:Log(sss)

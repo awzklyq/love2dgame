@@ -881,7 +881,7 @@ function MeshLines.CreateFourSidedCone(InW, InH)
 end
 
 function MeshLines:setTransform(transform)
-    self.transform3d = Matrix3D.copy(transform)
+    self.transform3d:Set(transform)
     for i = 1, #self.lines do
         self.lines[i].transform3d = self.transform3d
     end

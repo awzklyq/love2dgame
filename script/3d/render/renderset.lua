@@ -76,18 +76,21 @@ RenderSet.UseMatrix2D = function()
 end
 
 local _Matrix3Ds = {}
-RenderSet.PusMatrix2D = function(InMatrix3D)
+local _Matrix3D = Matrix3D.new()
+RenderSet.PusMatrix3D = function(InMatrix3D)
     _Matrix3Ds[#_Matrix3Ds + 1] = InMatrix3D
 end
 
-RenderSet.PopMatrix2D = function()
+RenderSet.PopMatrix3D = function()
     table.remove(_Matrix3Ds, #_Matrix3Ds)
 end
 
-RenderSet.UseMatrix2D = function()
-    if #_Matrix3Ds > 0 then
-        _Matrix3Ds[#_Matrix3Ds]:use()
+RenderSet.UseMatrix3D = function()
+    _Matrix3D:Identity()
+    for i = 1, #_Matrix3Ds do
+        _Matrix3D:mulRight(_Matrix3Ds[i])
     end
+    return _Matrix3D
 end
 
 local shadowMapSize = 1024

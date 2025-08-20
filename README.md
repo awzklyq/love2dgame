@@ -142,3 +142,4 @@ Include：
 	script/test/test_BinaryImage_Matrixs.lua
 	script/test/test_AStartPathFinder.lua
 	script/test/test_Line.lua
+	script/test/test_Quaternion.lua(四元数)
