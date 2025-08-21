@@ -82,7 +82,6 @@ function GenNewTri()
        end
        CP.VQ = VF / #CP.Faces
 
-       log('aaaaaaaaaaa', #CP.Faces)
        
        local VE = Vector.new(0, 0)
        for e = 1, #CP.Edges do
@@ -90,7 +89,6 @@ function GenNewTri()
        end
 
        CP.VR = VE / #CP.Edges
-       log('bbbbbbbbbbb', #CP.Edges)
        local newp = CP.VQ / 4  + CP.VR * (1 / 2)  + CP / 4
 
        NewTestPoints[#NewTestPoints + 1] = newp

@@ -345,7 +345,6 @@ UISystem.mouseDown = function( b, x, y )
 		end
 	end
 
-	log('aaaaaaaaaa',#SelectedUI , IsTrigger)
 	return #SelectedUI > 0 or IsTrigger;
 end
 

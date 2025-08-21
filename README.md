@@ -15,6 +15,7 @@ Include：
 	script/test/test_Polygon2D_CutByLine.lua
 	script/test/fxaa.lua
 	script/test_floatage.lua（增加水上浮力示例）
+	script/test/test_Matrix2D_Complex.lua(复数代替二维矩阵旋转运算，类似四元数)
 	script/test/line3d.lua
 	script/test/renderdepth.lua
 	script/test/shadowvolume.lua

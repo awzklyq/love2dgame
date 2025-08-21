@@ -136,6 +136,8 @@ Render.Polygon2DId = 68
 
 Render.QuaternionID = 69
 
+Render.ComplexID = 70
+
 Render.getRenderIdName = function(id)
     if type(id) == "table" then
         id = id.renderid
@@ -244,6 +246,8 @@ Render.getRenderIdName = function(id)
         return "Polygon2D"
     elseif Render.QuaternionID == id then
         return "Quaternion"
+    elseif Render.ComplexID == id then
+        return "Complex"
     end
     
     return "Null"

@@ -78,7 +78,6 @@ function Matrix2D:MulRightVector2(v2)
 	
 	rsult.x = xx * self:getData(1, 1) + yy * self:getData(1, 2) + self:getData(1, 3) + self:getData(3, 1)
 	rsult.y = xx * self:getData(2, 1) + yy * self:getData(2, 2) + self:getData(2, 3) + self:getData(3, 2)
-    log('ttttttt', xx, yy, rsult.x , rsult.y, self:getData(3, 1), self:getData(3, 2))
 	return rsult
 end
 
@@ -479,6 +478,23 @@ function Matrix2D:Copy()
     _NewMat:Set(self)
 
    return _NewMat
+end
+
+function Matrix2D:GetComplex()
+    local _NewComplex = Complex.new(self[1], self[4])
+    return _NewComplex
+end
+
+function Matrix2D:RotationComplex(InComplex)
+    _errorAssert(InComplex:IsNormalized())
+
+    self[1] = InComplex:GetReal()
+    self[2] = -InComplex:GetImag()
+
+    self[4] = InComplex:GetImag()
+    self[5] = InComplex:GetReal()
+
+    return self
 end
 
 function Matrix2D:use()
