@@ -30,6 +30,8 @@ Quaternion._Meta.__mul = function(myvalue, value)
     elseif value.renderid == Render.Matrix3DId then
         local _NewQuat = Quaternion.Copy(myvalue)
         return _NewQuat:MulMatrix3DRight(value)
+    elseif value.renderid == Render.Vector3Id then
+        return myvalue:RotateVector(value)
     end
     _errorAssert(false)
 end
@@ -227,6 +229,23 @@ function Quaternion.Copy(InOther)
     return Quaternion.new(InOther.x, InOther.y, InOther.z, InOther.w)
 end
 
+function Quaternion:RotateVector(InV)
+
+    -- http://people.csail.mit.edu/bkph/articles/Quaternions.pdf
+	-- V' = V + 2w(Q x V) + (2Q x (Q x V))
+	-- refactor:
+	-- V' = V + w(2(Q x V)) + (Q x (2(Q x V)))
+	-- T = 2(Q x V);
+	-- V' = V + w*(T) + (Q x T)
+
+    local Q = Vector3.new(self.x, self.y, self.z)
+    
+    local TT = Vector3.cross(Q, InV) * 2.0
+
+    local Result = InV + (TT * self.w) +  Vector3.crosst(Q, TT)
+    return Result
+
+end
 function Quaternion:SquaredLength()
     return self.x * self.x + self.y * self.y + self.z * self.z + self.w * self.w    
 end
