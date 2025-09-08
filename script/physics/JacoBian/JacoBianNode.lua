@@ -92,6 +92,11 @@ function JacoBianNode:GenerateRenderData(InPosition, InRenderW, InRenderH)
 end
 
 function JacoBianNode:ResetRenderTransform()
+
+    if not self._WorldTransform then
+        self:GetWorldMatrix()
+    end
+    self.transform3d:Set( self._WorldTransform)
     self._NodeRenderLines:setTransform(self.transform3d)
 end
 
@@ -116,77 +121,71 @@ function JacoBianNode:GetPosition()
         self._Position = Vector3.new()
     end
     
-    self.transform3d:GetPosition(self._Position)
+    self.transform3d:GetPositionTranpose(self._Position)
 
     return self._Position
 end
 
 function JacoBianNode:GetWorldPosition()
-    -- self:PushBackupTransfom()
-    self:ApplyParentTransform()
-
-    self:PushBackupTransfom()
-    local _M = RenderSet:UseMatrix3D()
-
-    self._BackupTransform:mulRight(_M)
-
     if not self._WorldPosition then
         self._WorldPosition = Vector3.new()
     end
     
-    self._BackupTransform:GetPosition(self._WorldPosition)
+    if not self._WorldTransform then
+        self:GetWorldMatrix()
+    end
 
-    self:ClearParentTransform()
-    -- self:PopBackupTransfom()
+    self._WorldTransform:GetPositionTranspose(self._WorldPosition)
 
     return self._WorldPosition
 end
 
-function JacoBianNode:SetTransform3D(InMat)
-    self.transform3d:Set( Matrix3D.transpose(InMat))
+function JacoBianNode:SetWorldTransform3D(InMat)
+    if not self._WorldTransform then
+        self._WorldTransform = Matrix3D.new()
+    end
+    -- self._WorldTransform:Set( Matrix3D.transpose(InMat))
+    self._WorldTransform:Set( Matrix3D.transpose(InMat))
     self:ResetRenderTransform()
 end
 
-function JacoBianNode:GetWorldMatrix()
+function JacoBianNode:GetWorldMatrix(InForce)
+    if self._WorldTransform and not InForce then
+        return self._WorldTransform
+    end
+    
+    self._WorldTransform = Matrix3D.new()
+
     self:ApplyParentTransform()
 
     self:PushBackupTransfom()
     local _M = RenderSet:UseMatrix3D()
 
     self._BackupTransform:mulRight(_M)
-
-    if not self._WorldTransform then
-        self._WorldTransform = Matrix3D.new()
-    end
     
     self._WorldTransform:Set(self._BackupTransform)
 
     self:ClearParentTransform()
-    -- self:PopBackupTransfom()
+    self:PopBackupTransfom()
 
     return self._WorldTransform
 end
 
 function JacoBianNode:draw()
-
-    self:PushBackupTransfom()
-    self:ApplyParentTransform()
-
-    local _M = RenderSet:UseMatrix3D()
-    self.transform3d:mulRight(_M)
+    if not  self._WorldTransform then
+        self:GetWorldMatrix()
+    end
 
     self:ResetRenderTransform()
 
     self._NodeRenderLines:draw()
 
-    self:ClearParentTransform()
-    self:PopBackupTransfom()
 end
 
 
 -----------------------------------------------------------------------------------------
-JacoBianManager.TargetThreshold = 1.0
-JacoBianManager.IterationCount = 100
+JacoBianManager.TargetThreshold = 10
+JacoBianManager.IterationCount = 1000
 
 local _JacoBianNodes = {}
 local _RootNode = nil
@@ -218,7 +217,7 @@ JacoBianManager.SeleteRootNode = function()
     end
 
     if _RootNode then
-        _RootWTM:Set(_RootNode.transform3d)--RootNode:GetWorldMatrix()
+        _RootWTM:Set(Matrix3D.transpose(_RootNode:GetWorldMatrix()))--RootNode:GetWorldMatrix()
         _RootWTMInverse:Set(_RootWTM)
     else
         _RootWTM:Identity()
@@ -263,8 +262,8 @@ JacoBianManager.InitMatrixs = function()
     _InverseMatrixs = {}
     _NodeMatrixs = {}
     for i = 1, #_SourceNodes do
-        _InverseMatrixs[i] = Matrix3D.inverse(_SourceNodes[i].transform3d)
-        _NodeMatrixs[i] = Matrix3D.Copy(_SourceNodes[i].transform3d)--_SourceNodes[i]:GetWorldMatrix()
+        _InverseMatrixs[i] = Matrix3D.inverse(Matrix3D.transpose(_SourceNodes[i]:GetWorldMatrix()))
+        _NodeMatrixs[i] = Matrix3D.Copy(Matrix3D.transpose(_SourceNodes[i]:GetWorldMatrix()))--_SourceNodes[i]:GetWorldMatrix()
 
         _JocaCurrentQuat[i] = Quaternion.CreateFromMatrix3(_NodeMatrixs[i])
         _JocaCurrentQuat[i]:Normalize()
@@ -297,7 +296,7 @@ JacoBianManager.StoreRelativeQuaternion = function(InQuat, InIndex)
     if InIndex == #_NodeMatrixs then
         matRelative = _RootWTMInverse * matRelative
     else
-        matRelative = _NodeMatrixs[InIndex + 1] * matRelative
+        matRelative = _InverseMatrixs[InIndex + 1] * matRelative
     end
 
     -- a_bConstrainRotation == true
@@ -330,7 +329,8 @@ JacoBianManager.RecalcMatrices = function(a_iStartIndex)
                 _NodeMatrixs[iNode] = _NodeMatrixs[iNode + 1];
             end
 
-            matTemp	= Matrix3D.CreateFromQuaternionAndTranslation(_JocaCurrentQuat[iNode], _SourceNodes[iNode]:GetPosition())
+            matTemp	= Matrix3D.CreateFromQuaternionAndTranslation(_JocaCurrentQuat[iNode], _SourceNodes[iNode]:GetWorldPosition())
+   
             _NodeMatrixs[iNode] = _NodeMatrixs[iNode] * matTemp;
             _InverseMatrixs[iNode] = Matrix3D.inverse(_NodeMatrixs[iNode])
         end
@@ -346,9 +346,13 @@ end
 --]]
 JacoBianManager.UpdateSourceNodes = function()
     for iNode = 1, #_SourceNodes - 1 do
-        -- _SourceNodes[iNode]:SetTransform3D(Matrix3D.CreateFromQuaternionAndTranslation(_JocaCurrentQuat[iNode], _SourceNodes[iNode]:GetPosition()))
-        -- _SourceNodes[iNode]:SetTransform3D(_NodeMatrixs[iNode])
-        _SourceNodes[iNode]:SetTransform3D(Matrix3D.CreateFromQuaternionAndTranslation(_NodeMatrixs[iNode]:GetQuaternion(), _NodeMatrixs[iNode]:GetPosition()))
+        -- _SourceNodes[iNode]:SetWorldTransform3D(Matrix3D.CreateFromQuaternionAndTranslation(_JocaCurrentQuat[iNode], _SourceNodes[iNode]:GetPosition()))
+        -- _SourceNodes[iNode]:SetWorldTransform3D(_NodeMatrixs[iNode])
+        -- _NodeMatrixs[iNode]:Log('aaaaaaaaaaaaaaaaaaaaa : '..tostring(iNode))
+        -- _SourceNodes[iNode]:GetWorldMatrix():Log('bbbbbbbbbbb: '..tostring(iNode))
+
+        local _NewMat = Matrix3D.CreateFromQuaternionAndTranslation(_NodeMatrixs[iNode]:GetQuaternion(), _NodeMatrixs[iNode]:GetPosition())
+        _SourceNodes[iNode]:SetWorldTransform3D(Matrix3D.CreateFromQuaternionAndTranslation(_NodeMatrixs[iNode]:GetQuaternion(), _NodeMatrixs[iNode]:GetPosition()))
     end
 	-- for( int iNode = 0; iNode < m_arrSourceNodes.size(); ++iNode )
 	-- 	m_arrSourceNodes[iNode]->SetRotation(m_arrCurrentQuat[iNode]);
@@ -387,13 +391,20 @@ JacoBianManager.CacleJocaBianMatrix = function()
             local v_target = _TargetPosition - WorldPosition
             local v_end = _MEndPosition - WorldPosition
 
+            -- log('ccccccccccc11111', v_target.x, v_target.y, v_target.z)
+            -- log('ccccccccccc22222', v_end.x, v_end.y, v_end.z)
             local axis = Vector3.cross(v_target, v_end)
             axis:normalize()
             
             local vec_entry = Vector3.cross(v_end, axis)
-
+            -- log('yyyyyyyyyyy0000', i, axis.x, axis.y, axis.z)
+            -- log('yyyyyyyyyyy1111', i, v_end.x, v_end.y, v_end.z, v_end.w)
+            -- log('dddddddd1111', axis.x, axis.y, axis.z)
+            -- log('dddddddd2222', vec_entry.x, vec_entry.y, vec_entry.z)
             _MArrAxis[i] = axis
             _MVecEntry[i] = vec_entry
+
+
         end
 
         local _FarrForce = {}
@@ -401,17 +412,22 @@ JacoBianManager.CacleJocaBianMatrix = function()
         _FarrForce[2] = _MVecDiff.y
         _FarrForce[3] = _MVecDiff.z
 
+        -- log()
+        -- log(_MEndPosition.x, _MEndPosition.y,_MEndPosition.z)
+        -- log(_TargetPosition.x, _TargetPosition.y,_TargetPosition.z)
+        -- log('fffffffff', _FarrForce[1], _FarrForce[2], _FarrForce[3])
+        -- log()
         _FarrForce[4] = 0
         _FarrForce[5] = 0
         _FarrForce[6] = 0
 
         -- log('yyyyyyyy', _FarrForce[1], _FarrForce[2], _FarrForce[3])
         local _MArrQDerivate = {}
-        for i = 1, #_MArrAxis do
+        for i = 1, iLevel do
             local axis = _MArrAxis[i]
             local vecentry = _MVecEntry[i]
-            _MArrQDerivate[i] = axis.x * _FarrForce[1] + axis.y * _FarrForce[2] + axis.z * _FarrForce[3]
-            _MArrQDerivate[i] = _MArrQDerivate[i] + vecentry.x * _FarrForce[4] + vecentry.y * _FarrForce[5] + vecentry.z * _FarrForce[6]
+            _MArrQDerivate[i] = axis.x * _FarrForce[3] + axis.y * _FarrForce[4] + axis.z * _FarrForce[5]
+            _MArrQDerivate[i] = _MArrQDerivate[i] + vecentry.x * _FarrForce[1] + vecentry.y * _FarrForce[2] + vecentry.z * _FarrForce[3]
         end
 
         for i = 1, iLevel do
@@ -421,9 +437,12 @@ JacoBianManager.CacleJocaBianMatrix = function()
             --  _MArrQDerivate[i] = math.rad(170)
 
             local _RotVec4 = Vector4.new(axis.x, axis.y, axis.z, _MArrQDerivate[i])
-            local quat = Quaternion.CreateFromAxisAndAngle(axis, math.rad(_MArrQDerivate[i]))
+            local quat = Quaternion.CreateFromAxisAndAngle(axis, math.rad(_MArrQDerivate[i] * 0.01))
             quat:Normalize()
-
+            --   log()
+            -- log('eeeeeeeeeee0000', i, axis.x, axis.y, axis.z, _MArrQDerivate[i])
+            -- log('eeeeeeeeeee1111', i, quat.x, quat.y, quat.z, quat.w)
+            --  log()
             JacoBianManager.StoreRelativeQuaternion(quat, iLinkIndex)
         end
 

@@ -25,7 +25,7 @@ JBN5:AddSubNode(JBN6)
 -- JacoBianManager.SeleteRootNode()
 -- JacoBianManager.SeleteEndNode()
 
-local _TargetPosition = Vector3.new(1,3,2):normalize()
+local _TargetPosition = Vector3.new(1,2,3):normalize()
 
 JacoBianManager.SetTargetPosition(_TargetPosition * 500)
 JacoBianManager.CacleJocaBianMatrix()

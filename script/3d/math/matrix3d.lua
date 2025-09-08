@@ -803,6 +803,23 @@ end
 
 function Matrix3D:GetPosition(OutValue)
 	if OutValue then
+		OutValue.x = self[13]
+		OutValue.y = self[14]
+		OutValue.z = self[15]
+		return OutValue
+	end
+
+	local Temp = Vector3.new()
+
+	Temp.x = self[13]
+	Temp.y = self[14]
+	Temp.z = self[15]
+
+	return Temp
+end
+
+function Matrix3D:GetPositionTranspose(OutValue)
+	if OutValue then
 		OutValue.x = self[4]
 		OutValue.y = self[8]
 		OutValue.z = self[12]
@@ -814,8 +831,6 @@ function Matrix3D:GetPosition(OutValue)
 	Temp.x = self[4]
 	Temp.y = self[8]
 	Temp.z = self[12]
-
-
 
 	return Temp
 end
