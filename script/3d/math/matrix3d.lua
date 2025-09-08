@@ -820,6 +820,14 @@ function Matrix3D:GetPosition(OutValue)
 	return Temp
 end
 
+function Matrix3D.CreateFromQuaternionAndTranslation(InQuat, InTranslation)
+	local _NewMat = Matrix3D.new()
+	_NewMat:RotationQuaternion(InQuat)
+	_NewMat:SetTranslation(InTranslation)
+
+	return _NewMat
+end
+
 function Matrix3D:RotationQuaternion(InQuat)
 	local wx,wy,wz,xx,yy,yz,xy,xz,zz,x2,y2,z2
 
@@ -847,6 +855,8 @@ function Matrix3D:RotationQuaternion(InQuat)
 	self:SetData( 3, 1 ,xz + wy) 
 	self:SetData( 3, 2, yz - wx )
 	self:SetData( 3, 3, 1.0 - ( xx + yy ) )
+
+	return self
 end
 
 function Matrix3D:GetQuaternion()
