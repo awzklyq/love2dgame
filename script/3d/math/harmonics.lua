@@ -121,7 +121,136 @@ function Harmonics.new()
 
     harmonics.m_Coefs = ThreeBandSHVectorRGB.new()
 
+	harmonics.m_Coefs5 = {}
+	harmonics.m_Coefs5_Num = 25
     return harmonics
+end
+
+function Harmonics:SHBasisFunction5(InVec)
+	local _pi = math.pi
+	local _inv_pi = 1 / _pi
+
+	local _V = Vector3.Copy(InVec):normalize()
+	local _x = _V.x
+	local _y = _V.y
+	local _z = _V.z
+
+	local _x2 = _x * _x
+	local _y2 = _y * _y
+	local _z2 = _z * _z
+
+	local _x4 = _x2 * _x2
+	local _y4 = _y2 * _y2
+	local _z4 = _z2 * _z2
+	local _sqrt = math.sqrt
+
+	local m_Coefs5 = {}
+	m_Coefs5[1] = 0.5 * _sqrt(_inv_pi)
+
+	-- l = 1
+	m_Coefs5[2] = _sqrt(3 / 4 * _inv_pi) * _y
+	m_Coefs5[3] = _sqrt(3 / 4 * _inv_pi) * _z
+	m_Coefs5[4] = _sqrt(3 / 4 * _inv_pi) * _x
+
+	-- l = 2
+	m_Coefs5[5] = 0.5 * _sqrt(15 * _inv_pi) * _x * _y
+	m_Coefs5[6] = 0.5 * _sqrt(15 * _inv_pi) * _y * _z
+	m_Coefs5[7] = 0.125 * _sqrt(5 * _inv_pi) * (3 * _z2 - 1)
+	m_Coefs5[8] = 0.5 * _sqrt(15 * _inv_pi) * _x * _z
+	m_Coefs5[9] = 0.25 * _sqrt(15 * _inv_pi) * (_x2 - _y2)
+
+	-- l = 3
+	m_Coefs5[10] = 0.25 * _sqrt(35 / 2 * _inv_pi) * (3 * _x2 - _y2) * _y
+	m_Coefs5[11] = 0.5 * _sqrt(105 * _inv_pi) * _x * _y * _z
+	m_Coefs5[12] = 0.25 * _sqrt(21 / 2 * _inv_pi) * _y * (4 * _z2 - _x2 - _y2)
+	m_Coefs5[13] = 0.25 * _sqrt(7 * _inv_pi) * _z * (2 * _z2 - 3 * _x2 - 3 * _y2)
+	m_Coefs5[14] = 0.25 * _sqrt(21 / 2 * _inv_pi) * _x * (4 * _z2 - _x2 - _y2)
+	m_Coefs5[15] = 0.25 * _sqrt(105 * _inv_pi) * _z * (_x2 - _y2)
+	m_Coefs5[16] = 0.25 * _sqrt(35 / 2 * _inv_pi) * _x *(_x2 - 3 * _y2)
+
+	-- l = 4
+	m_Coefs5[17] = 0.75 * _sqrt(35 * _inv_pi) * _x * _y * (_x2 - _y2)
+	m_Coefs5[18] = 0.75 * _sqrt(35 / 2 * _inv_pi) * _y * _z * (3 * _x2 - _y2)
+	m_Coefs5[19] = 0.75 * _sqrt(5 * _inv_pi) * _x * _y * (7 * _z2 - 1)
+	m_Coefs5[20] = 0.75 * _sqrt(5 / 2 * _inv_pi) * _y * _z * (7 * _z2 - 3)
+	m_Coefs5[21] = 3 / 16 * _sqrt(_inv_pi) * (35 * _z4 - 30 * _z2 + 3 )
+	m_Coefs5[22] = 0.75 * _sqrt(5 / 2 * _inv_pi) * _x *_z * (7 * _z2 - 3)
+	m_Coefs5[23] = 3 / 8 * _sqrt(5 * _inv_pi) * (_x2 - _y2) * (7 * _z2 - 1)
+	m_Coefs5[24] = 0.75 * _sqrt(35 / 2 * _inv_pi) * _x * _z * (_x2 - 3 * _y2)
+	m_Coefs5[25] = 3 / 16 * _sqrt(35 * _inv_pi) * (_x4 - 6 * _x *_x * _y *_y + _y4)
+
+	-- l = 5
+	m_Coefs5[26] = (3 / 16) * _sqrt(77 / 2 * _inv_pi) * _y * (5 * _x4 - 10 * _x *_x * _y2 + _y4)
+	m_Coefs5[27] = 0.75 * _sqrt(385 * _inv_pi) * _x * _y * ( _x2 - _y2) * _z
+	m_Coefs5[28] = (1 / 32) * _sqrt(385 * _inv_pi) * _y * (3 * _x2 - _y2) * (9 * _z2 - 1)
+	m_Coefs5[29] = 0.125 * _sqrt(1155 * _inv_pi) * _x * _y * (3 * _z2 - 1) * _z
+	m_Coefs5[30] = (1 / 16) * _sqrt(165 / 2 * _inv_pi) * _y * (14 * _z *_z - 21 *_z *_z2 *_z - 1 + 3 * _z *_z )
+	m_Coefs5[31] = (1 / 16) * _sqrt(11 * _inv_pi) * _z * (63 * _z *_z2 *_z - 70 * _z *_z + 15)
+	m_Coefs5[32] = (1 / 16) * _sqrt(165 / 2 * _inv_pi) * _x * (14 * _z *_z - 21 *_z *_z2 *_z - 1 + 3 * _z *_z )
+	m_Coefs5[33] = 0.125 * _sqrt(1155 * _inv_pi) * _z * (_x2 - _y2) * (3 * _z2 - 1)
+	m_Coefs5[34] = (1 / 32) * _sqrt(385 * _inv_pi) * _x * (_x2 - 3 * _y2) *  (9 * _z2 - 1)
+	m_Coefs5[35] = 0.75 * _sqrt(385 * _inv_pi) * _z * ( _x4 - 6 * _x2 * _y2  + _y4)
+	m_Coefs5[36] = (3 / 16) * _sqrt(77 / 2 * _inv_pi) * _x * (_x4 - 10 * _x2 * _y2 + 5 * _y4)
+	return m_Coefs5
+end
+
+function Harmonics:InItCoefs5()
+	self.m_Coefs5 = {}
+	for i = 1, self.m_Coefs5_Num do
+		self.m_Coefs5[i] = 0
+	end
+end
+
+function Harmonics:ProjectSH5(InCoefs5, InPower)
+	for i = 1, self.m_Coefs5_Num do
+		self.m_Coefs5[i] = self.m_Coefs5[i] + InCoefs5[i] * InPower
+	end
+end
+
+function Harmonics:GenerateMeshFlag(InPoss)
+	local _Box = BoundBox.new()--AddVector3
+	for i = 1, #InPoss do
+		_Box:AddVector3(InPoss[i])
+	end
+
+	local _Center = _Box:GetCenter()
+
+	local _Weight = 1 / #InPoss
+	self:InItCoefs5()
+	for i = 1, #InPoss do
+		local _v = InPoss[i]
+		local _p = _v - _Center
+
+		local _m_Coefs5 = self:SHBasisFunction5(_p)
+
+		self:ProjectSH5(_m_Coefs5, _p:Length() * _Weight)
+	end
+end
+
+function Harmonics:GetProjectSH5(InVec)
+	local _SH5 = self:SHBasisFunction5(InVec)
+
+	local _ProjectV = self:DotSH5(_SH5)
+	return InVec * _ProjectV
+end
+
+function Harmonics:DotSH5(InCoefs5)
+	local _Result = 0
+	for i = 1, self.m_Coefs5_Num do
+		_Result = _Result + self.m_Coefs5[i] * InCoefs5[i]
+	end
+	return _Result
+end
+
+function Harmonics:ReStrutMeshInfo(InNormals)
+	local _Normals = InNormals or self:GenerateSphereNormals(126 * 2 + 1, 126 * 2 + 1)
+	local _Pos = {}
+	for i = 1, #_Normals do
+		local _NewPos = self:GetProjectSH5(_Normals[i])
+		_Pos[#_Pos + 1] = _NewPos
+	end
+
+	return _Pos
 end
 
 function Harmonics:SHBasisFunction3(pos)
@@ -213,26 +342,12 @@ local UniformSampleSphere = function( E )
 	return Vector4.new( H.x, H.y, H.z, PDF );
 end
 
-function Harmonics:GenerateSphereNormals()
+function Harmonics:GenerateSphereNormals(InX, InY)
 	local Normals = {}
 
-	-- for a = 0, 360, 30 do
-	-- 	for b = 0, 180, 30 do
-	-- 		local x = SphereX(1, math.rad(a), math.rad(b))
-	-- 		local y = SphereY(1, math.rad(a), math.rad(b))
-	-- 		local z = SphereZ(1, math.rad(b))
-	-- 		local nor = Vector3.new(x, y, z)
-	-- 		Normals[#Normals + 1] = nor
-	-- 	end
-	-- end
-
-	local SampleSize = Vector.new(512, 512)
+	local SampleSize = Vector.new(InX or 512, InY or 512)
 	for x = 1, SampleSize.x - 1 do
 		for y = 1, SampleSize.y - 1 do
-			-- local angle = GetThetaPhi(x, y, SampleSize);
-			-- local xx = SphereX(1, angle.x, angle.y)
-			-- local yy = SphereY(1, angle.x, angle.y)
-			-- local zz = SphereZ(1, angle.y)
 
 			local result = UniformSampleSphere(Vector.new(x / SampleSize.x , y / SampleSize.y))
 

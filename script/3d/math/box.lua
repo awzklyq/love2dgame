@@ -35,6 +35,18 @@ function BoundBox.new()
     return box
 end
 
+function BoundBox:AddVector3(InVec)
+    self.min.x = math.min(self.min.x, InVec.x)
+    self.min.y = math.min(self.min.y, InVec.y)
+    self.min.z = math.min(self.min.z, InVec.z)
+
+    self.max.x = math.max(self.max.x, InVec.x)
+    self.max.y = math.max(self.max.y, InVec.y)
+    self.max.z = math.max(self.max.z, InVec.z)
+
+    self.center = Vector3.new((self.min.x + self.max.x) * 0.5, (self.min.y + self.max.y) * 0.5, (self.min.z + self.max.z) * 0.5)
+end
+
 function BoundBox:addSelf(bb)
     self.min.x = math.min(self.min.x, bb.min.x)
     self.min.y = math.min(self.min.y, bb.min.y)
@@ -45,6 +57,10 @@ function BoundBox:addSelf(bb)
     self.max.z = math.max(self.max.z, bb.max.z)
 
     self.center = Vector3.new((self.min.x + self.max.x) * 0.5, (self.min.y + self.max.y) * 0.5, (self.min.z + self.max.z) * 0.5)
+end
+
+function BoundBox:GetCenter()
+    return Vector3.Copy(self.center)
 end
 
 function BoundBox:GetSurfaceArea()

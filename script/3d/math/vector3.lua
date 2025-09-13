@@ -78,7 +78,13 @@ Vector3.Copy = Vector3.copy
 function Vector3:length()
     return math.sqrt(math.pow(self.x, 2) + math.pow(self.y, 2) + math.pow(self.z, 2));
 end
+
+Vector3.Length = Vector3.length
 function Vector3:normalize()
+    if self:IsNormalize() then
+        return self
+    end
+
     local w =  self:length()--math.sqrt(math.pow(self.x, 2) + math.pow(self.y, 2), math.pow(self.z, 2));
     if not w or w == 0 then
         return self;
@@ -88,6 +94,11 @@ function Vector3:normalize()
     self.y = self.y  / w;
     self.z = self.z  / w;
     return self
+end
+
+function Vector3:IsNormalize()
+    local w =  self:length()--math.sqrt(math.pow(self.x, 2) + math.pow(self.y, 2), math.pow(self.z, 2));
+    return math.abs(w - 1.0) <= math.MinNumber
 end
 
 Vector3.Normalize = Vector3.normalize

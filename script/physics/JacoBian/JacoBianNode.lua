@@ -185,7 +185,7 @@ end
 
 -----------------------------------------------------------------------------------------
 JacoBianManager.TargetThreshold = 10
-JacoBianManager.IterationCount = 1000
+JacoBianManager.IterationCount = 1
 
 local _JacoBianNodes = {}
 local _RootNode = nil
