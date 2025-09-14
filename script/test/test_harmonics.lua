@@ -6,22 +6,6 @@ FileManager.addAllPath("assert")
 
 math.randomseed(os.time()%10000)
 
-local UniformSampleSphere = function( E )
-
-    local Phi = 2 * math.pi * E.x;
-    local CosTheta = 1 - 2 * E.y;
-    local SinTheta = math.sqrt( 1 - CosTheta * CosTheta );
-
-    local H = Vector3.new();
-    H.x = SinTheta * math.cos( Phi );
-    H.y = SinTheta * math.sin( Phi );
-    H.z = CosTheta;
-
-    local PDF = 1.0 / (4 * math.pi);
-
-    return Vector4.new( H.x, H.y, H.z, PDF );
-end
-
 -- love.graphics.setWireframe( true )
 local aixs = Aixs.new(0,0,0, 150)
 local image = ImageEx.new("shtest.png")
@@ -39,7 +23,7 @@ local basecolor = Vector3.new(math.random(), math.random(), math.random())
 for x = 1, SampleSize.x - 1 do
     for y = 1, SampleSize.y - 1 do
         local r, g, b, a = ImgData:getPixel(x, y)
-        local result = UniformSampleSphere(Vector.new(x / SampleSize.x , y / SampleSize.y))
+        local result = math.UniformSampleSphere(Vector.new(x / SampleSize.x , y / SampleSize.y))
 
         local nor = Vector3.new(result.x, result.y, result.z)
 

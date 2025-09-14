@@ -1002,6 +1002,22 @@ math.round2 = function(num, decimalPlaces)
     end
 end
 
+math.UniformSampleSphere = function( E )
+
+	local Phi = 2 * math.pi * E.x;
+	local CosTheta = 1 - 2 * E.y;
+	local SinTheta = math.sqrt( 1 - CosTheta * CosTheta );
+
+	local H = Vector3.new();
+	H.x = SinTheta * math.cos( Phi );
+	H.y = SinTheta * math.sin( Phi );
+	H.z = CosTheta;
+
+	local PDF = 1.0 / (4 * math.pi);
+
+	return Vector4.new( H.x, H.y, H.z, PDF );
+end
+
 math.defaulttransform =  love.math.newTransform( );
 math.MinNumber = 0.000001;
 math.MaxNumber = 999999.0;

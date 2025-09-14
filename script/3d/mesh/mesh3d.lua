@@ -7,8 +7,8 @@ local vertexFormat = {
     {"ConstantColor", "byte", 4},
 }
 
-function Mesh3D.new(file)-- lw :line width
-    return Mesh3D.createFromPoints(Mesh3D.loadObjFile(_G.FileManager.findFile(file)))
+function Mesh3D.new(file, InNeedNormalize)-- lw :line width
+    return Mesh3D.createFromPoints(Mesh3D.loadObjFile(_G.FileManager.findFile(file)), InNeedNormalize)
 end
 
 function Mesh3D:setCanvas(canvas)
@@ -49,14 +49,43 @@ function Mesh3D:getRenderType()
     return self.rendertype
 end
 
+-- Fix ori box
+local NormalizeMeshDatas = function(InDatas)
+    local _Box = BoundBox.new()
+    local _vertpos = {}
+    for i = 1, #InDatas do
+        local v = Vector3.new(InDatas[i][1], InDatas[i][2], InDatas[i][3])
+        _Box:AddVector3(v)
+        _vertpos[i] = v
+    end
+
+    local _Center = _Box:GetCenter()
+
+    local _NewDatas = {}
+    for i = 1, #_vertpos do
+        local _NewV = _vertpos[i] - _Center
+        local _d = InDatas[i]
+
+        _NewDatas[#_NewDatas + 1] = {_NewV.x, _NewV.y, _NewV.z, _d[4], _d[5], _d[6], _d[7], _d[8]}
+    end
+
+    return _NewDatas
+end
+
 --{x,y,z,u,v,nx,ny,nz}
-function Mesh3D.createFromPoints(datas)
+function Mesh3D.createFromPoints(datas, InNeedNormalize)
     local mesh = setmetatable({}, Mesh3D);
     mesh.transform3d = Matrix3D.new();
 
     mesh.PreTransform = Matrix3D.new();
 
-    mesh.verts = datas
+    mesh._IsNormalize = not not InNeedNormalize
+    if InNeedNormalize then
+        mesh.verts = NormalizeMeshDatas(datas)
+    else
+        mesh.verts = datas
+    end
+    -- mesh.verts = datas
     mesh.shader = Shader.GetBase3DShader()
     mesh:makeNormals()
     mesh.obj = love.graphics.newMesh(vertexFormat, mesh.verts, "triangles")
@@ -74,6 +103,10 @@ function Mesh3D.createFromPoints(datas)
 
     mesh:setRenderType("normal")
     return mesh;
+end
+
+function Mesh3D:IsNormalize()
+    return self._IsNormalize
 end
 
 function Mesh3D.CreateCube()
@@ -137,6 +170,62 @@ function Mesh3D.CreateCube()
     end
 
     return Mesh3D.createFromPoints(Verts)
+end
+
+
+function Mesh3D.CreateSphereData(InX, InY, InLength)
+
+    local Poss = {}
+
+    local UVs = {}
+	local SampleSize = Vector.new(InX or 128, InY or 128)
+
+    InLength = InLength or 1
+
+	for x = 0, SampleSize.x do
+		for y = 0, SampleSize.y do
+            local v1 = Vector.new(x / SampleSize.x , y / SampleSize.y)
+            local v2 = Vector.new(( x + 1) / SampleSize.x , y / SampleSize.y)
+            local v3 = Vector.new(( x + 1) / SampleSize.x , (y + 1) / SampleSize.y)
+            local v4 = Vector.new(x / SampleSize.x , (y + 1) / SampleSize.y)
+
+            local _v1 = math.UniformSampleSphere(v1 ) * InLength
+            local _v2 = math.UniformSampleSphere(v2 ) * InLength
+            local _v3 = math.UniformSampleSphere(v3 ) * InLength
+            local _v4 = math.UniformSampleSphere(v4 ) * InLength
+
+			Poss[#Poss + 1] = _v1
+            Poss[#Poss + 1] = _v2
+            Poss[#Poss + 1] = _v3
+
+            Poss[#Poss + 1] = _v3
+            Poss[#Poss + 1] = _v4
+            Poss[#Poss + 1] = _v1
+
+            UVs[#UVs + 1] = v1
+            UVs[#UVs + 1] = v2
+            UVs[#UVs + 1] = v3
+
+            UVs[#UVs + 1] = v3
+            UVs[#UVs + 1] = v4
+            UVs[#UVs + 1] = v1
+		end
+	end
+
+    
+    local Verts = {}
+    for i = 1, #Poss do
+        local _pos = Poss[i]
+        local _dir = Vector3.Copy(_pos):normalize()
+
+        Verts[i] = {_pos.x, _pos.y, _pos.z, UVs[i].x, UVs[i].y, _dir.x, _dir.y, _dir.z}
+    end
+
+    return Verts
+end
+
+function Mesh3D.CreateSphere(InX, InY, InLength)
+    return Mesh3D.createFromPoints(Mesh3D.CreateSphereData(InX, InY, InLength))
 end
 
 function Mesh3D:GetWorldBox()
@@ -338,8 +427,8 @@ function Mesh3D:BuildBVHFormFacesInfosAgain()
             _box = _box + self.FacesInfosBVH[i].Box
             math.AppendArray( _IndexArray, self.FacesInfosBVH[i].IndexArray)
         
-        elseif i ==  _Len then
-            _errorAssert(_Len > 2, "BuildBVHFormFacesInfos self.FacesInfosBVH <= 2")
+        elseif i ==  _Len and _Len >= 2 then
+            _errorAssert(_Len >= 2, "BuildBVHFormFacesInfos self.FacesInfosBVH <= 2")
 
             if #_IndexArray > 1 then
                 TempFacesInfosBVH[#TempFacesInfosBVH + 1] = {Box = _box, IndexArray = _IndexArray}

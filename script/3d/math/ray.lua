@@ -102,6 +102,14 @@ function Ray:vectorOnRay( dist )
     return self.orig + self.dir * dist;
 end
 
+function Ray:GetPosition()
+	return self.orig
+end
+
+function Ray:GetDirection()
+	return self.dir
+end
+
 function Ray:GetMeshLine(dist, color)
 	local HelpLine =  MeshLine.new(self.orig, self:vectorOnRay(dist or 1000))
 
@@ -158,4 +166,46 @@ function Ray:IntersectTriangle(triangle, backcull )
 
 	dist = tdis;
 	return dist;
+end
+
+local CheckInCache = function(InCaches, InValue)
+	for i = 1, #InCaches do
+		local _c = InCaches[i]
+		if _c.orig == InValue.orig and _c.dir == InValue.dir then
+			return true
+		end
+	end
+
+	return false
+end
+function Ray.CreateSphereMeshRays(InReverse, InLenght)
+	local _SphereData = Mesh3D.CreateSphereData(64, 64)
+
+	InLenght = InLenght or 10000
+
+	local _Rays = {}
+	for i = 1, #_SphereData do
+		local _s = _SphereData[i]
+		local _nor = Vector3.new(_s[6], _s[7], _s[8])
+		_nor:normalize()
+
+		if InReverse then
+			local _pos = _nor * InLenght
+			_nor = -_nor
+
+			local _ray = Ray.new(_pos, _nor)
+
+			if CheckInCache(_Rays, _ray) == false then
+				_Rays[#_Rays + 1] = _ray
+			end
+		else
+			local _ray = Ray.new(Vector3.cOrigin, _nor)
+
+			if CheckInCache(_Rays, _ray) == false then
+				_Rays[#_Rays + 1] = _ray
+			end
+		end
+	end
+
+	return _Rays
 end

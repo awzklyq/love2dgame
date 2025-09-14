@@ -122,7 +122,7 @@ function Harmonics.new()
     harmonics.m_Coefs = ThreeBandSHVectorRGB.new()
 
 	harmonics.m_Coefs5 = {}
-	harmonics.m_Coefs5_Num = 25
+	harmonics.m_Coefs5_Num = 16
     return harmonics
 end
 
@@ -228,6 +228,7 @@ function Harmonics:GenerateMeshFlag(InPoss)
 end
 
 function Harmonics:GetProjectSH5(InVec)
+	InVec = Vector3.Copy(InVec):normalize()
 	local _SH5 = self:SHBasisFunction5(InVec)
 
 	local _ProjectV = self:DotSH5(_SH5)
@@ -243,6 +244,7 @@ function Harmonics:DotSH5(InCoefs5)
 end
 
 function Harmonics:ReStrutMeshInfo(InNormals)
+	log("Begin ReStrutMeshInfo!")
 	local _Normals = InNormals or self:GenerateSphereNormals(126 * 2 + 1, 126 * 2 + 1)
 	local _Pos = {}
 	for i = 1, #_Normals do
@@ -250,6 +252,7 @@ function Harmonics:ReStrutMeshInfo(InNormals)
 		_Pos[#_Pos + 1] = _NewPos
 	end
 
+	log("End ReStrutMeshInfo!")
 	return _Pos
 end
 
@@ -326,22 +329,6 @@ function Harmonics:DotSH3(A, B)
 	return Result;
 end
 
-local UniformSampleSphere = function( E )
-
-	local Phi = 2 * math.pi * E.x;
-	local CosTheta = 1 - 2 * E.y;
-	local SinTheta = math.sqrt( 1 - CosTheta * CosTheta );
-
-	local H = Vector3.new();
-	H.x = SinTheta * math.cos( Phi );
-	H.y = SinTheta * math.sin( Phi );
-	H.z = CosTheta;
-
-	local PDF = 1.0 / (4 * math.pi);
-
-	return Vector4.new( H.x, H.y, H.z, PDF );
-end
-
 function Harmonics:GenerateSphereNormals(InX, InY)
 	local Normals = {}
 
@@ -349,7 +336,7 @@ function Harmonics:GenerateSphereNormals(InX, InY)
 	for x = 1, SampleSize.x - 1 do
 		for y = 1, SampleSize.y - 1 do
 
-			local result = UniformSampleSphere(Vector.new(x / SampleSize.x , y / SampleSize.y))
+			local result = math.UniformSampleSphere(Vector.new(x / SampleSize.x , y / SampleSize.y))
 
 			local nor = Vector3.new(result.x, result.y, result.z)
 
@@ -358,6 +345,32 @@ function Harmonics:GenerateSphereNormals(InX, InY)
 	end
 
 	return Normals
+end
+
+function Harmonics:GenerateSH5FromMesh(InMesh)
+	log("Begin GenerateSH5FromMesh!")
+	local _Result = {}
+	local _Rays = Ray.CreateSphereMeshRays(true, 10000)
+	for i = 1, #_Rays do
+		log("GenerateSH5FromMesh : ", string.format("%.2f", ( i / #_Rays) * 100), i, #_Rays)
+		local _ray = _Rays[i]
+		local dis = InMesh:PickByRay(_ray, true)
+        if dis > 0 then
+			local _d1 = _ray:GetPosition():distanceself()
+
+			local _dir = _ray:GetDirection()
+			local _NewPos = (-_dir) * (_d1 - dis)
+			_Result[#_Result + 1] = _NewPos
+		end
+	end
+
+	log("Begin GenerateSH5FromMesh -> GenerateMeshFlag!")
+	self:GenerateMeshFlag(_Result)
+	-- return _Result
+
+	log("End GenerateSH5FromMesh -> GenerateMeshFlag!")
+
+	log("End GenerateSH5FromMesh!")
 end
 
 local TestNormal = Vector3.new()

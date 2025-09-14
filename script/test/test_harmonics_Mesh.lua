@@ -8,7 +8,8 @@ scene.bgColor = LColor.new(0,0,0,255)
 
 local cubenum = 1
 local i = 3
-local mesh3d = Mesh3D.new("suzanne.OBJ")
+local SphereData = Mesh3D.CreateSphereData(126, 126, 30)
+local mesh3d = Mesh3D.new("suzanne.OBJ", true)
 mesh3d.transform3d:mulTranslationRight(0, 0, 0)
 local scale = 3--math.random(0.5, 2)
 mesh3d.transform3d:mulScalingLeft(scale ,scale, scale)
@@ -26,56 +27,17 @@ local scene = Scene3D.new()
 local lightnode = scene:addLight(directionlight)
 lightnode.needshadow = true
 
-
-local _MeshDatas = Mesh3D.loadObjFile(_G.FileManager.findFile("suzanne.OBJ"))
-local _VertPos = {}
-local _Box = BoundBox.new()--AddVector3
-for i = 1, #_MeshDatas do
-    local _v = _MeshDatas[i]
-    local _pos = Vector3.new(_v[1] , _v[2], _v[3])
-    _VertPos[#_VertPos + 1] = _pos
-end
-
-local _Box = BoundBox.new()--AddVector3
-for i = 1, #_VertPos do
-    _Box:AddVector3(_VertPos[i])
-end
-
-local _Center = _Box:GetCenter()
-
-
-local _NewPoss = {}
-for i = 1, #_VertPos - 3, 3 do
-    local _v1 = _VertPos[i]
-    local _v2 = _VertPos[i + 1]
-    local _v3 = _VertPos[i + 2]
-
-    local _cv = (_v1 + _v2 + _v3) / 3
-
-    _NewPoss[#_NewPoss + 1] = _v1
-    _NewPoss[#_NewPoss + 1] = _v2
-    _NewPoss[#_NewPoss + 1] = _cv
-
-    _NewPoss[#_NewPoss + 1] = _v2
-    _NewPoss[#_NewPoss + 1] = _v3
-    _NewPoss[#_NewPoss + 1] = _cv
-
-    _NewPoss[#_NewPoss + 1] = _v3
-    _NewPoss[#_NewPoss + 1] = _v1
-    _NewPoss[#_NewPoss + 1] = _cv
-end
-
-
 local _OriNormals = {}
-for i = 1, #_NewPoss do
-    local _v = _NewPoss[i]
-    local _p = _v - _Center
 
-    _OriNormals[i] = _p
+local _SphereData = Mesh3D.CreateSphereData(128, 128)
+for i = 1, #_SphereData do
+    local _v = Vector3.new(_SphereData[i][1], _SphereData[i][2], _SphereData[i][3])
+    _OriNormals[i] = _v
 end
 
 local _H = Harmonics.new()
-_H:GenerateMeshFlag(_NewPoss)
+-- _H:GenerateMeshFlag(_NewPoss)
+_H:GenerateSH5FromMesh(mesh3d)
 
 local _NewPoss = _H:ReStrutMeshInfo(_OriNormals)
 
@@ -96,7 +58,7 @@ for i = 1, #_NewPoss do
     _Verts[i] = _v
 end
 
-log('ttttttttttttt', #_Verts, _Verts[10][1], _Verts[10][2], _Verts[10][3])
+-- log('ttttttttttttt', #_Verts, _Verts[10][1], _Verts[10][2], _Verts[10][3])
 local TempMesh = Mesh3D.createFromPoints(_Verts)
 TempMesh.transform3d:mulTranslationRight(0, 0, 0)
 -- local scale = 3--math.random(0.5, 2)

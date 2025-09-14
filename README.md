@@ -13,6 +13,7 @@ Include：
 	script/test/test_obb.lua（Mesh 生成OBB）
 	script/test/test_polygon2d.lua
 	script/test/test_Polygon2D_CutByLine.lua
+	script/test/test_harmonics_Mesh.lua（通过球谐基函数提取模型描述特征）
 	script/test/fxaa.lua
 	script/test_floatage.lua（增加水上浮力示例）
 	script/test/test_Matrix2D_Complex.lua(复数代替二维矩阵旋转运算，类似四元数)
