@@ -12,6 +12,7 @@ local _Pixels = _OriImg:GetPixels()
 local _W = #_Pixels
 local _H = #_Pixels[1]
 
+local _M = _Pixels[math.ceil(_W * 0.5)][math.ceil(_H * 0.5)]:GetLogLuminance()
 local TestImage
 local _ScaleL = 1.0
 function ReGenerate()
@@ -19,7 +20,7 @@ function ReGenerate()
 
     for ix = 1, _W do
         for iy = 1, _H do
-            local _l = _Grid3:SampleFromPixel(ix, iy, _Pixels[ix][iy])
+            local _l = _Grid3:SampleFromPixel(ix, iy, _Pixels[ix][iy], _M)
 
             local _C = LColor.Copy(_Pixels[ix][iy]):MulLuminance(_l * _ScaleL)
             TestImageData:SetPixel(ix - 1, iy - 1, _C)
