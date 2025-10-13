@@ -20,9 +20,9 @@ function ReGenerate()
 
     for ix = 1, _W do
         for iy = 1, _H do
-            local _l = _Grid3:SampleFromPixel(ix, iy, _Pixels[ix][iy], _M)
+            local _l = _Grid3:SampleFromPixel(ix, iy, _Pixels[ix][iy], _M, _ScaleL)
 
-            local _C = LColor.Copy(_Pixels[ix][iy]):MulLuminance(_l * _ScaleL)
+            local _C = LColor.Copy(_Pixels[ix][iy]):MulLuminance(_l)
             TestImageData:SetPixel(ix - 1, iy - 1, _C)
         end
     end

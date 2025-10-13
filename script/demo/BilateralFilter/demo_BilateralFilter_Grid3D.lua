@@ -191,7 +191,7 @@ end
 
 --https://zhuanlan.zhihu.com/p/573894977
 --Return Value
-function BilateralFilter_Grid3D:SampleFromPixel(InX, InY, InColor, InM)
+function BilateralFilter_Grid3D:SampleFromPixel(InX, InY, InColor, InM, InC)
     local _IndexX = math.ceil(InX / self._OffsetX)
     local _IndexY = math.ceil(InY / self._OffsetY)
 
@@ -213,7 +213,7 @@ function BilateralFilter_Grid3D:SampleFromPixel(InX, InY, InColor, InM)
     -- local a = 0.9
     -- _NewL_B = _NewL_B * a + (_OLd_L - _NewL_B)
 
-    local c = 0.99
+    local c = InC
     local d = _OLd_L - _NewL_B
     _NewL_B = c * (_NewL_B - InM) + d * (InColor:GetLogLuminance() - _NewL_B) + InM
     return math.exp(_NewL_B )/ iz--math.clamp(_NewL / iz, 0.5, 1.5)
