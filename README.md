@@ -145,3 +145,6 @@ Include：
 	script/test/test_AStartPathFinder.lua
 	script/test/test_Line.lua
 	script/test/test_Quaternion.lua(四元数)
+	
+Demo：
+	script/demo/BilateralFilter/demo_bilateral_filter.lua

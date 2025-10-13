@@ -199,8 +199,8 @@ if not _G.TEST then
 	end)
 
 else
-	dofile('script/test/test_harmonics_Mesh.lua')--test_MeshVolume  test_BezierCurve.lua
-	-- dofile('script/demo/ball/demo_ball.lua') test_SpaceSplit.lua
+	-- dofile('script/test/test_harmonics_Mesh.lua')--test_MeshVolume  test_BezierCurve.lua
+	dofile('script/demo/BilateralFilter/demo_bilateral_filter.lua') 
 end
 --dofile()
 

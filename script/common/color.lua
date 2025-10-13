@@ -10,6 +10,10 @@ function LColor.new(r, g, b, a)
     return color;
 end
 
+function LColor.Copy(InColor)
+    return LColor.new(InColor.r, InColor.g, InColor.b, InColor.a)
+end
+
 function LColor:GetShaderValue()
     return {self._r, self._g, self._b, self._a}
 end
@@ -31,6 +35,11 @@ end
 function LColor:GetLuminance()
     return 0.299* self._r +  0.587 * self._g + 0.114 * self._b
 end
+
+function LColor:GetLogLuminance()
+    return math.log(self:GetLuminance())
+end
+
 
 function LColor:Log(info)
     if not info then
@@ -111,6 +120,14 @@ end
 
 function LColor:GetGray()
     return self:GetLuminance()
+end
+
+function LColor:MulLuminance(InLum)
+    self.r = math.clamp(InLum * self.r , 0, 255)
+    self.g = math.clamp(InLum * self.g , 0, 255)
+    self.b = math.clamp(InLum * self.b , 0, 255)
+
+    return self
 end
 
 LColor.Red = LColor.new(255, 0, 0, 255)
