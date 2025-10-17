@@ -203,6 +203,10 @@ function Vector3:IsZero()
     return self.x == 0 and self.y == 0 and self.z == 0 
 end
 
+function Vector3:AsColor( )
+    return LColor.new(self.x, self.y, self.z)
+end
+
 -- Vector3& Vector3::Cartesian2Cylindrical( )
 -- {
 -- 	_float xx = Math::Atan( y / x );

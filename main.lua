@@ -33,6 +33,9 @@ dofile('script/common/psnr.lua')
 dofile('script/common/optional.lua')
 dofile('script/common/MehGenusGenerate.lua')
 dofile('script/common/BSP_Face_2D.lua')
+
+dofile('script/common/HaarWavalet2D.lua')
+
 dofile('script/file/file.lua')
 
 dofile('script/xml/xmlload.lua')
@@ -199,8 +202,8 @@ if not _G.TEST then
 	end)
 
 else
-	-- dofile('script/test/test_harmonics_Mesh.lua')--test_MeshVolume  test_BezierCurve.lua
-	dofile('script/demo/BilateralFilter/demo_bilateral_filter.lua') 
+	dofile('script/test/test_HaarWavalet2D.lua')--test_MeshVolume  test_BezierCurve.lua
+	-- dofile('script/demo/BilateralFilter/demo_bilateral_filter.lua') 
 end
 --dofile()
 

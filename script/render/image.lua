@@ -241,6 +241,8 @@ function ImageEx:Release()
     self.ImageData = nil
 end
 
+-----------------------------------------------
+
 _G.ImageDataEx = {}
 
 function ImageDataEx.new(w, h, format, rawdata)
@@ -275,6 +277,15 @@ function ImageDataEx:SetPixelsFromDatas(InDatas)
         for j = 1, #InDatas[i] do
             local d = InDatas[i][j]
             self:SetPixel(d.x - 1, d.y - 1, d.C)
+        end
+    end
+end
+
+function ImageDataEx:SetPixels(InPixels)
+    for i = 1, #InPixels do
+        for j = 1, #InPixels[i] do
+            local C = InPixels[i][j]
+            self:SetPixel(i - 1, j - 1, C)
         end
     end
 end

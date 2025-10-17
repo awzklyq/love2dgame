@@ -45,6 +45,8 @@ _G._errorAssert = function(a, b)
     assert(a, "Error : ".. tostring(b))
 end
 
+_G.check = _G._errorAssert
+
 _G.logbit = function(v, num)
     assert(type(v) == 'number')
     v = math.modf(v)

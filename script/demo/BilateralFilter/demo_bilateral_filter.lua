@@ -43,7 +43,6 @@ app.render(function(dt)
     -- love.graphics.print( "Press Key A.  RenderSet.AlphaTestMode: "..tostring(RenderSet.AlphaTestMode), 10, 10)
 end)
 
-
 local checkb = UI.CheckBox.new( 10, 10, 20, 20, "IsDrawOriImg" )
 checkb.IsSelect = IsDrawOriImg
 checkb.ChangeEvent = function(Enable)

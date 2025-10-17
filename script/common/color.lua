@@ -130,6 +130,10 @@ function LColor:MulLuminance(InLum)
     return self
 end
 
+function LColor:AsVector()
+    return Vector3.new(self.r, self.g, self.b)
+end
+
 LColor.Red = LColor.new(255, 0, 0, 255)
 LColor.Green = LColor.new(0, 255, 0, 255)
 LColor.Blue = LColor.new(0, 0, 255, 255)
