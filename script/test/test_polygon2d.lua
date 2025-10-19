@@ -46,7 +46,7 @@ btn.ClickEvent = function()
         _Triangles[i]:SetRenderMode('line' )
     end
 
-    _CenterPoint = _p:GetCenter()
+    _CenterPoint = _p:GetCentroid()
     _CenterPoint:SetColor(255, 0, 0, 255)
 end
 

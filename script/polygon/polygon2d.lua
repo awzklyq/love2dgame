@@ -16,6 +16,28 @@ function Polygon2D.CreateFromTriangles(InTriangles)
     return _p
 end
 
+function Polygon2D.GenerateCircleData(InPointNumber, InRange, InX, InY)
+    InPointNumber = tonumber(InPointNumber) or 4
+    InPointNumber = math.max(InPointNumber, 4)
+
+    local _OriPosition = Point2D.new(InX, InY)
+
+    local _First = Complex.new(InRange, 0)
+
+    local _Angle = 360 / InPointNumber
+    local _RotationComplex = Complex.CreateFromAngle(_Angle)
+
+    local _Points = {}
+    _Points[1] = _First:AsPoint() + _OriPosition
+    for i = 2, InPointNumber do
+        _First = _First * _RotationComplex
+        _Points[i] = _First:AsPoint() + _OriPosition
+    end
+
+    return Polygon2D.new(_Points)
+end
+
+
 function Polygon2D:Init(InPoints)
     self._PointsColor = LColor.new(255, 0, 0,255)
     self._EdgesColor = LColor.new(0, 0, 255,255)
@@ -345,12 +367,28 @@ function Polygon2D:GenerateTriangles(InForce)
     end
 end
 
-function Polygon2D:GetCenter(InForce)
+--Old GetCenter function
+function Polygon2D:GetCentroid(InForce)
     if not self._Centroid or InForce == true then
         self:GenerateTriangles(InForce)
     end
 
     return self._Centroid
+end
+
+function Polygon2D:GetCenter(InForce)
+    if not self._Center then
+        local c = Point2D.new(0, 0)
+        for i = 1, #self._Points do
+            c = c + self._Points[i]
+        end
+
+        c = c / #self._Points
+
+        self._Center = c
+    end
+
+    return self._Center
 end
 
 function Polygon2D:GetSurfaceArea(InForce)
@@ -368,21 +406,26 @@ end
 
 function Polygon2D:IsIntersectEdgesToEdge(InEdge)
     -- self._Edges = {}
+    local _Result = self:IntersectEdgesToEdge(InEdge)
+    return #_Result > 0
+end
 
+function Polygon2D:IntersectEdgesToEdge(InEdge)
+    -- self._Edges = {}
     if #self._Edges == 0 then
-        return false
+       self:ReGenerateEdges()
     end
 
     local Results = {}
     for i = 1, #self._Edges  do
         local edge = self._Edges[i]
-        local OutIntersect_p = nil
+        local OutIntersect_p = Point2D.new()
         if math.IntersectLine(InEdge.P1, InEdge.P2, edge.P1, edge.P2, OutIntersect_p) then
             Results[#Results + 1] = {Edge = edge, Position = OutIntersect_p}
         end
     end
 
-    return #Results > 0
+    return Results
 end
 
 function Polygon2D:SetLineWidth(InValue)

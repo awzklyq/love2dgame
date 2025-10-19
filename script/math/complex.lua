@@ -100,3 +100,11 @@ function Complex:ToMatrix2D()
     _NewMat:RotationComplex(self)
     return _NewMat
 end
+
+function Complex:AsVector()
+    return Vector.new(self.real, self.imag)
+end
+
+function Complex:AsPoint()
+    return Point2D.new(self.real, self.imag)
+end

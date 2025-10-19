@@ -124,6 +124,10 @@ function Point2D:draw()
     self._Rect:draw()
 end
 
+function Point2D:AsVector()
+    return Vector.new(self.x, self.y)
+end
+
 
 _G.Point2DCollect = {}
 
@@ -166,3 +170,5 @@ function Point2DCollect:draw()
     Render.RenderObject(self);
 end
 
+
+Point2D.Origin = Point2D.new(0, 0)

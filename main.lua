@@ -98,6 +98,7 @@ dofile('script/groupmanager.lua')
 
 dofile('script/physics/world.lua')
 dofile('script/physics/floatage.lua')
+dofile('script/physics/XenoCollide2D.lua')
 dofile('script/entity/entity.lua')
 dofile('script/entity/bullet.lua')
 dofile('script/entity/body.lua')
@@ -202,7 +203,7 @@ if not _G.TEST then
 	end)
 
 else
-	dofile('script/test/test_HaarWavalet2D.lua')--test_MeshVolume  test_BezierCurve.lua
+	dofile('script/test/test_MPR_XenoCollide.lua')--test_MeshVolume  test_BezierCurve.lua
 	-- dofile('script/demo/BilateralFilter/demo_bilateral_filter.lua') 
 end
 --dofile()

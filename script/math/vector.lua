@@ -83,6 +83,12 @@ function Vector:ToPoint2D()
     return Point2D.new(self.x, self.y)
 end
 
+Vector.AsPoint = Vector.ToPoint2D
+
+function Vector:AsComplex()
+    return Complex.new(self.x, self.y)
+end
+
 function Vector:normalize()
     local w =  math.sqrt(math.pow(self.x, 2) + math.pow(self.y, 2));
     if not w or w == 0 then
@@ -222,3 +228,4 @@ Vector.Copy = Vector.copy
 
 
 Vector.Up = Vector.new(0, 1)
+Vector.Origin = Vector.new(0, 0)
