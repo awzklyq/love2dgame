@@ -90,6 +90,10 @@ function Edge2D:CheckPointInLeftOfEdge(InPoint)
     return Vector.angleClockwise(_v1, _v2) >= math.pi
 end
 
+function Edge2D:CheckPointInRightOfEdge(InPoint)
+    return self:CheckPointInLeftOfEdge(InPoint) == false
+end
+
 function Edge2D:Release()
     for i = 1, #self.P1.Edges do
         if self.P1.Edges[i] == self then

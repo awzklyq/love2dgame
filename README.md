@@ -146,6 +146,7 @@ Include：
 	script/test/test_Line.lua
 	script/test/test_Quaternion.lua(四元数)
 	script/test/test_HaarWavalet2D.lua(Haar小波变换和逆变换，可以压缩和降噪，JPGE压缩)
+	script/test/test_MPR_XenoCollide.lua(使用闵可夫斯基差异求多边形碰撞，GJK算法)
 	
 Demo：
 	script/demo/BilateralFilter/demo_bilateral_filter.lua
