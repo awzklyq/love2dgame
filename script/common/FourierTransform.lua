@@ -175,9 +175,9 @@ function FourierTransform:InverseFourierTransformLine(InLine)
             _TempDatas[i][3] = _TempDatas[i][3] + self:CacleIntegrateValue(_Data[3], i, j, _W)           
         end  
         
-        _TempDatas[i][1] = _TempDatas[i][1] / _H
-        _TempDatas[i][2] = _TempDatas[i][2] / _H
-        _TempDatas[i][3] = _TempDatas[i][3] / _H
+        _TempDatas[i][1] = _TempDatas[i][1] / _W
+        _TempDatas[i][2] = _TempDatas[i][2] / _W
+        _TempDatas[i][3] = _TempDatas[i][3] / _W
     end
 
     --Write data back...
