@@ -214,3 +214,126 @@ function FourierTransform:UseInverseDatasGenerateImage()
 
     return self._GenerateImage
 end
+
+function FourierTransform:BindDatas(InDatas)
+    check(#InDatas > 0 and #InDatas[1] > 0)
+
+    self._OriDatasVectors = {}
+    local _BH = #InDatas
+    local _BW = #InDatas[1]
+
+    for i = 1, _BH do
+        self._OriDatasVectors[i] = {}
+        for j = 1, _BW do
+            local _Data = InDatas[i][j]
+            self._OriDatasVectors[i][j] = Vector3.new(_Data, _Data, _Data) 
+        end
+    end
+end
+function FourierTransform:GetOriW()
+    return #self._OriDatasVectors[1]
+end
+
+function FourierTransform:GetOriH()
+    return #self._OriDatasVectors
+end
+
+function FourierTransform:BindDatasAlign(InDatas, InW, InH)
+    check(#InDatas > 0 and #InDatas[1] > 0)
+
+    self._OriDatasVectors = {}
+    local _BH = #InDatas
+    local _BW = #InDatas[1]
+
+    check(InW > _BW and InH > _BH)
+
+    local _CenterW = math.ceil(InW / 2)
+    local _CenterH = math.ceil(InH / 2)
+    local _TempDatas = {}
+    for i = 1, InH do
+        _TempDatas[i] = {}
+        for j = 1, InW do
+            _TempDatas[i][j] = Complex.new(0, 0) 
+        end
+    end
+
+    local _StartW = _CenterW - math.ceil(_BW / 2)
+    local _StartH = _CenterH - math.ceil(_BH / 2)
+    -- log('bbbbbbb', _StartW, _StartH)
+    for i = _StartH, _StartH + _BH - 1 do
+        for j = _StartW, _StartW + _BW - 1 do
+            -- log('aaaaaa', i, j, i - _StartH + 1, j - _StartW + 1)
+            _TempDatas[i][j] = Complex.new( InDatas[i - _StartH + 1][j - _StartW + 1], 0)
+        end
+    end
+
+    self:BindDatas(_TempDatas)
+end
+
+function FourierTransform:GetFourierDataScroll(InI, InJ)
+    check(#self._FourierDatasVectors > 0 and #self._FourierDatasVectors[1] > 0)
+    local _Datas
+    local _LEN1 = #self._FourierDatasVectors
+    if InI <= _LEN1 then
+        _Datas = self._FourierDatasVectors[InI]
+    else
+        if InI % _LEN1 == 0 then
+            _Datas = self._FourierDatasVectors[_LEN1]
+        else
+            _Datas = self._FourierDatasVectors[InI % _LEN1]
+        end
+    end
+
+    local _Data
+    local _LEN2 = #_Datas
+    if InJ <= _LEN2 then
+        _Data = _Datas[InJ]
+    else
+        if InJ % _LEN2 == 0 then
+            _Data = _Datas[_LEN2]
+        else
+            _Data = _Datas[InJ % _LEN2]
+        end
+    end
+
+    return _Data
+end
+
+function FourierTransform:BlurFromFT(InFT)
+    check(#self._FourierDatasVectors > 0 and #self._FourierDatasVectors[1] > 0)
+
+    log("FourierTransform Begin FourierTransform")
+
+    -- log('BlurData _Result', _Result:GetReal(), _Result:GetImag())         
+    local _H = #self._FourierDatasVectors
+    local _W = #self._FourierDatasVectors[1]
+    for i = 1, _H do
+        for j = 1, _W do
+            local _BlurData = InFT:GetFourierDataScroll(i, j)
+            self._FourierDatasVectors[i][j][1] = self._FourierDatasVectors[i][j][1] *  _BlurData[1]
+            self._FourierDatasVectors[i][j][2] = self._FourierDatasVectors[i][j][2] *  _BlurData[2]
+            self._FourierDatasVectors[i][j][3] = self._FourierDatasVectors[i][j][3] *  _BlurData[3]
+        end
+    end
+
+    log("FourierTransform FourierTransform Done")
+end
+
+function FourierTransform:Log( )
+     local _H = #self._FourierDatasVectors
+    local _W = #self._FourierDatasVectors[1]
+    for i = 1, _H do
+        local Str1 = ""
+        local Str2 = ""
+        local Str3 = ""
+        for j = 1, _W do
+            Str1 = Str1 .. " " .. self._FourierDatasVectors[i][j][1]:GetReal()
+            Str2 = Str2 .. " " .. self._FourierDatasVectors[i][j][2]:GetReal()
+            Str3 = Str3 .. " " .. self._FourierDatasVectors[i][j][3]:GetReal()
+        end
+        log("FourierTransform Line1", i, Str1)
+        log("FourierTransform Line1", i, Str2)
+        log("FourierTransform Line1", i, Str3)
+        log()
+    end
+end

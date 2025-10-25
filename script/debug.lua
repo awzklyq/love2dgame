@@ -2,7 +2,7 @@
 local dbg = require('emmy_core')
 
 -- Start the TCP debug server
-dbg.tcpListen('localhost', 9966)
+-- dbg.tcpListen('localhost', 9966)
 
 -- Wait for IDE connection
 -- dbg.waitIDE()
