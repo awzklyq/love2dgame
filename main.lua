@@ -138,6 +138,7 @@ dofile 'script/render/font.lua'
 dofile 'script/common/timer.lua'
 
 dofile 'script/common/RamerDouglasPeucker.lua'
+dofile 'script/common/FourierTransform.lua'
 
 dofile 'script/postprocess/tonemapping.lua'
 dofile 'script/postprocess/bloom.lua'
@@ -203,7 +204,7 @@ if not _G.TEST then
 	end)
 
 else
-	dofile('script/test/test_MPR_XenoCollide.lua')--test_MeshVolume  test_BezierCurve.lua
+	dofile('script/test/test_FourierTransform_Image.lua')--test_MeshVolume  test_BezierCurve.lua
 	-- dofile('script/demo/BilateralFilter/demo_bilateral_filter.lua') 
 end
 --dofile()

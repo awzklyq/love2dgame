@@ -121,6 +121,20 @@ function ImageEx:GetPixels()
     return ImageColors
 end
 
+function ImageEx:GetPixelsAsVector()
+    local imgd = self:GetImageData()
+    local index = 0
+    local ImageColorsVector = {}
+    for i = 0, self.w - 1 do
+        ImageColorsVector[#ImageColorsVector + 1] = {}
+        for j = 0, self.h - 1 do
+            local r, g, b, a = imgd:getPixel(i, j)
+            ImageColorsVector[#ImageColorsVector][j + 1] = LColor.new(r * 255, g * 255, b * 255, a * 255):AsVector()
+        end
+    end
+    return ImageColorsVector
+end
+
 function ImageEx:Histogram()
     local ImageColors = self:GetPixels()
     local Num = 255

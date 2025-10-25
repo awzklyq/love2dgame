@@ -33,7 +33,9 @@ end
 -- end
 
 metatable_complex.__div = function(myvalue, value)
-    if value.renderid == Render.ComplexID then
+    if type(value) == "number" then
+        return Complex.new(myvalue.real / value, myvalue.imag / value)
+    elseif value.renderid == Render.ComplexID then
         return Complex.new((myvalue.real * value.real + myvalue.imag * value.imag) / (math.pow(value.real, 2) + math.pow(value.imag, 2)),
         (myvalue.imag * value.real - myvalue.real * value.imag) / (math.pow(value.real, 2) + math.pow(value.imag, 2)))
     end
@@ -60,6 +62,8 @@ end
 function Complex.exp(value)
     return Complex.new(math.exp(value.real) * math.cos(value.imag), math.exp(value.real) * math.sin(value.imag))
 end
+
+Complex.Exp = Complex.exp
 
 
 function Complex:SquaredLength()
@@ -107,4 +111,9 @@ end
 
 function Complex:AsPoint()
     return Point2D.new(self.real, self.imag)
+end
+
+function Complex:Log(InV)
+    InV = InV or ""
+    log(tostring(InV) .. ' Complex:', self.real, self.imag)
 end
