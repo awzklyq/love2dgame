@@ -92,6 +92,8 @@ dofile('script/3d/math/vector4.lua')
 dofile('script/3d/math/matrix3d.lua')
 dofile('script/3d/math/harmonics.lua')
 
+dofile('script/common/FastBrownColorToneConversion.lua')
+
 dofile('script/polygon/collision2d.lua')
 
 dofile('script/groupmanager.lua')
@@ -204,7 +206,7 @@ if not _G.TEST then
 	end)
 
 else
-	dofile('script/test/test_FourierTransform_BlurImage.lua')--test_MeshVolume  test_BezierCurve.lua
+	dofile('script/test/test_FastBrownColorToneConversion.lua')--test_MeshVolume  test_BezierCurve.lua
 	-- dofile('script/demo/BilateralFilter/demo_bilateral_filter.lua') 
 end
 --dofile()

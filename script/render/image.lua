@@ -41,6 +41,12 @@ function ImageEx.CreateFromImage(obj, x, y, w, h, ...)
     return image;
 end
 
+function ImageEx.CreateFromPixels(InW, InH, InPixels)
+    local TestImageData = ImageDataEx.new(InW, InH, 'rgba8')
+    TestImageData:SetPixels(InPixels)
+    return TestImageData:GetImage()
+end
+
 function ImageEx:InitData()
     self.transform = Matrix.new()
 

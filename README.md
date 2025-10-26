@@ -149,6 +149,7 @@ Include：
 	script/test/test_MPR_XenoCollide.lua(使用闵可夫斯基差异求多边形碰撞，GJK算法)
 	script/test/test_FourierTransform_Image.lua(傅里叶变换和逆变换处理图像)
 	script/test/test_FourierTransform_BlurImage.lua(用傅里叶变换进行模糊)
+	script/test/test_FastBrownColorToneConversion.lua(快速的棕色褐色色调转换)
 	
 Demo：
 	script/demo/BilateralFilter/demo_bilateral_filter.lua
