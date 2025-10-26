@@ -245,6 +245,9 @@ function FourierTransform:BindDatasAlign(InDatas, InW, InH)
     local _BH = #InDatas
     local _BW = #InDatas[1]
 
+    -- InW = math.ceil(InW *0.5)
+    -- InH = math.ceil(InH *0.5)
+
     check(InW > _BW and InH > _BH)
 
     local _CenterW = math.ceil(InW / 2)
@@ -257,11 +260,11 @@ function FourierTransform:BindDatasAlign(InDatas, InW, InH)
         end
     end
 
-    local _StartW = _CenterW - math.ceil(_BW / 2)
-    local _StartH = _CenterH - math.ceil(_BH / 2)
+    local _StartW = 1--_CenterW - math.ceil(_BW / 2)
+    local _StartH = 1--_CenterH - math.ceil(_BH / 2)
     -- log('bbbbbbb', _StartW, _StartH)
-    for i = _StartH, _StartH + _BH - 1 do
-        for j = _StartW, _StartW + _BW - 1 do
+    for i = _StartH , _StartH + _BH - 1 do
+        for j = _StartW , _StartW + _BW - 1 do
             -- log('aaaaaa', i, j, i - _StartH + 1, j - _StartW + 1)
             _TempDatas[i][j] = Complex.new( InDatas[i - _StartH + 1][j - _StartW + 1], 0)
         end
@@ -310,9 +313,10 @@ function FourierTransform:BlurFromFT(InFT)
     for i = 1, _H do
         for j = 1, _W do
             local _BlurData = InFT:GetFourierDataScroll(i, j)
-            self._FourierDatasVectors[i][j][1] = self._FourierDatasVectors[i][j][1] *  _BlurData[1]
-            self._FourierDatasVectors[i][j][2] = self._FourierDatasVectors[i][j][2] *  _BlurData[2]
-            self._FourierDatasVectors[i][j][3] = self._FourierDatasVectors[i][j][3] *  _BlurData[3]
+            -- local _BlurData = InFT._FourierDatasVectors[i][j]
+            self._FourierDatasVectors[i][j][1] = self._FourierDatasVectors[i][j][1] *  _BlurData[1]:GetReal()
+            self._FourierDatasVectors[i][j][2] = self._FourierDatasVectors[i][j][2] *  _BlurData[2]:GetReal()
+            self._FourierDatasVectors[i][j][3] = self._FourierDatasVectors[i][j][3] *  _BlurData[3]:GetReal()
         end
     end
 
