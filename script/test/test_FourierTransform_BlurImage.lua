@@ -49,9 +49,7 @@ for i = 1, 5 do
         _BlurDatas[i][j] = _BlurDatas[i][j] / _All * 1.01
     end
 end
--- FourierTransform:BindDatasAlign
-_BlurFT:BindDatasAlign(_BlurDatas, _FT:GetOriW(), _FT:GetOriH())
--- _BlurFT:BindDatas(_BlurDatas)
+_BlurFT:BindDatasAlign_2D(_BlurDatas, _FT:GetOriW(), _FT:GetOriH())
 _BlurFT:ProcessTransformImage()
 
 _FT:BlurFromFT(_BlurFT)
