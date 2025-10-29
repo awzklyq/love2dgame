@@ -206,7 +206,7 @@ if not _G.TEST then
 	end)
 
 else
-	dofile('script/test/test_FastBrownColorToneConversion.lua')--test_MeshVolume  test_BezierCurve.lua
+	dofile('script/test/test_FourierTransform_Datas_1D.lua.lua')
 	-- dofile('script/demo/BilateralFilter/demo_bilateral_filter.lua') 
 end
 --dofile()

@@ -60,7 +60,11 @@ end
 
 
 function Complex.exp(value)
-    return Complex.new(math.exp(value.real) * math.cos(value.imag), math.exp(value.real) * math.sin(value.imag))
+    if type(value) == "number" then
+        return Complex.CreateFromAngle(math.deg(value))
+    else
+        return Complex.new(math.exp(value.real) * math.cos(value.imag), math.exp(value.real) * math.sin(value.imag))
+    end
 end
 
 Complex.Exp = Complex.exp
