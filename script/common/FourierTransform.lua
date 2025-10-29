@@ -383,7 +383,7 @@ function FourierTransform:InverseFourierTransform_1D()
     end
 end
 
-function FourierTransform.Dot_1D(InFT1, InFT2 )
+function FourierTransform.Convolution_1D(InFT1, InFT2 )
     local _NewFT = FourierTransform.new()
     _NewFT._OriDatas_1D = {}
 
@@ -396,7 +396,7 @@ function FourierTransform.Dot_1D(InFT1, InFT2 )
     local _FourierDatas_From_InFT2 = InFT2._FourierDatas_1D
 
     _NewFT._FourierDatas_1D = {}
-    for i = 1, #_OriDatas_1D_From_InFT1 do
+    for i =  #_OriDatas_1D_From_InFT1, 1, -1 do
         _NewFT._FourierDatas_1D[i] = _FourierDatas_From_InFT1[i] * _FourierDatas_From_InFT2[i]
     end
 

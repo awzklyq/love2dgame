@@ -19,6 +19,6 @@ local _FT2 = FourierTransform.new()
 _FT2:BindDatas_1D(TestDatas2, #TestDatas1, true)
 _FT2:ProcessTransformDatas_1D()
 
-local _NewFT = FourierTransform.Dot_1D(_FT1, _FT2)
+local _NewFT = FourierTransform.Convolution_1D(_FT1, _FT2)
 _NewFT:InverseFourierTransform_1D()
 _NewFT:Log()
