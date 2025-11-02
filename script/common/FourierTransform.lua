@@ -100,6 +100,11 @@ function FourierTransform:CacleIntegrateValue(InValue, InW, InK, InN)
     end
 end
 
+function FourierTransform:Cacle_W(InK, InN)
+    local _p = (math.c2pi * InK) / InN
+    return Complex.exp(_p)
+end
+
 function FourierTransform:InverseProcessTransformImage()
     check(#self._FourierDatasVectors > 0 and #self._FourierDatasVectors[1] > 0)
 
@@ -372,6 +377,7 @@ function FourierTransform:InverseFourierTransform_1D()
     check(self._FourierDatas_1D and #self._FourierDatas_1D > 0 and #self._OriDatas_1D > 0)
 
     self._InverseDatas_1D = {}
+    
     local _LEN1 = #self._OriDatas_1D
     local _LEN2 = #self._FourierDatas_1D
     for i = 1, _LEN1 do
@@ -380,6 +386,62 @@ function FourierTransform:InverseFourierTransform_1D()
             _Result = _Result  + self:CacleIntegrateValue(self._FourierDatas_1D[j], j, i - 1, _LEN2)           
         end
         self._InverseDatas_1D[_LEN1 - i + 1] = _Result /_LEN2
+    end
+end
+
+function FourierTransform:FFT_Base2_1D()
+    check( #self._OriDatas_1D > 0 and #self._OriDatas_1D % 2 == 0)
+
+    -- local InNum = #self._OriDatas_1D / 2 - 1
+    local _N_2 =  #self._OriDatas_1D / 2
+    local _N =  #self._OriDatas_1D
+    self._FourierDatas_1D = {}
+    for i = 1, _N_2  do
+        local _Result_1 = Complex.new(0, 0)
+        local _Result_2 = Complex.new(0, 0)
+        for j = 1, _N_2  do
+            local _Index_2r = j * 2
+            _Result_1 = _Result_1 + self:Cacle_W( -j * i * 2 , _N) *  self._OriDatas_1D[_Index_2r]
+            _Result_2 = _Result_2 + self:Cacle_W( -j * i * 2, _N) *  self._OriDatas_1D[_Index_2r - 1]
+        end
+
+        self._FourierDatas_1D[i] =_Result_2 + self:Cacle_W(- i, _N) * _Result_1
+        self._FourierDatas_1D[i + _N_2] = _Result_2 - self:Cacle_W(- i, _N) * _Result_1
+    end
+
+    -- log('aaaaaaaa', self._FourierDatas_1D[1]:GetReal(), self._FourierDatas_1D[1]:SquaredLength(), self._FourierDatas_1D[2]:GetReal(), self._FourierDatas_1D[2]:SquaredLength(), self._FourierDatas_1D[4]:GetReal(), self._FourierDatas_1D[4]:SquaredLength(),  self._FourierDatas_1D[5]:GetReal(), self._FourierDatas_1D[5]:SquaredLength())
+
+    -- for i = 1, _N do
+    --     local _Result_1 = Complex.new(0, 0)
+    --     for j = 1, _N do
+    --         _Result_1 = _Result_1 + self:Cacle_W(-j * i, _N) *  self._OriDatas_1D[j]
+    --     end
+
+    --     self._FourierDatas_1D[i] = _Result_1
+    -- end
+
+    -- log('bbbbbbbbbb', self._FourierDatas_1D[1]:GetReal(), self._FourierDatas_1D[1]:SquaredLength(), self._FourierDatas_1D[2]:GetReal(), self._FourierDatas_1D[2]:SquaredLength(), self._FourierDatas_1D[4]:GetReal(), self._FourierDatas_1D[4]:SquaredLength(),  self._FourierDatas_1D[5]:GetReal(), self._FourierDatas_1D[5]:SquaredLength())
+end
+function FourierTransform:IFFT_1D()
+    check(self._FourierDatas_1D and #self._FourierDatas_1D > 0 and #self._OriDatas_1D > 0)
+
+    self._InverseDatas_1D = {}
+    local _N_2 =  #self._FourierDatas_1D / 2
+    local _N =  #self._FourierDatas_1D
+    for i = 1, _N_2 do
+        local _Result_1 = Complex.new(0, 0) 
+        local _Result_2 = Complex.new(0, 0) 
+        for j = 1, _N_2 do
+            local _Index_2r = j * 2
+            _Result_1 = _Result_1 + self:Cacle_W(j * i * 2, _N) *  self._FourierDatas_1D[_Index_2r]
+            _Result_2 = _Result_2 + self:Cacle_W(j * i * 2, _N) *  self._FourierDatas_1D[_Index_2r - 1]    
+        end
+
+        local _Index1 = i - 1
+        local _Index2 = i + _N_2 - 1
+        self._InverseDatas_1D[_Index1 == 0 and _N or _Index1] =(_Result_2 + self:Cacle_W(i , _N) * _Result_1) / _N
+        self._InverseDatas_1D[_Index2] = (_Result_2 - self:Cacle_W( i , _N) * _Result_1) / _N
+
     end
 end
 

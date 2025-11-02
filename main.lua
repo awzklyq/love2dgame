@@ -206,7 +206,7 @@ if not _G.TEST then
 	end)
 
 else
-	dofile('script/test/test_FourierTransform_Sort_Dot_Datas.lua')
+	dofile('script/test/test_FFT.lua')
 	-- dofile('script/demo/BilateralFilter/demo_bilateral_filter.lua') 
 end
 --dofile()
