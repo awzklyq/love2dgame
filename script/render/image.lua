@@ -266,7 +266,7 @@ end
 _G.ImageDataEx = {}
 
 function ImageDataEx.new(w, h, format, rawdata)
-local imageData = setmetatable({}, {__index = ImageDataEx});
+    local imageData = setmetatable({}, {__index = ImageDataEx});
     imageData.obj = love.image.newImageData( w, h, format, rawdata )
 
     imageData.renderid = Render.ImageDataId;
@@ -275,6 +275,23 @@ local imageData = setmetatable({}, {__index = ImageDataEx});
     imageData._h = h
 
     return imageData
+end
+
+function ImageDataEx.CreateFromFile(InFile)
+    local imageData = setmetatable({}, {__index = ImageDataEx});
+    imageData.filename = InFile;
+    imageData.obj = love.image.newImageData( _G.FileManager.findFile(InFile) )
+
+    imageData.renderid = Render.ImageDataId;
+
+    imageData._w = imageData.obj:getWidth()
+    imageData._h = imageData.obj:getHeight()
+
+    return imageData
+end
+
+function ImageDataEx:GetDataAsString()
+    return self.obj:getString( 0, self.obj:getSize())
 end
 
 function ImageDataEx:GetPixel(x, y)

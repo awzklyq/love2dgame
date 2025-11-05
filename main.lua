@@ -8,6 +8,8 @@ _G.TEST = false
 
 --file
 _G.log = require "script/log"
+dofile('script/Data/dkjson.lua')
+
 dofile('script/class.lua')
 dofile('script/debug.lua')
 dofile('script/GlobalFunction.lua')
@@ -184,6 +186,10 @@ dofile 'script/ballgame/collision/collisiongroup.lua'
 dofile 'script/ballgame/collision/collisionphysics.lua'
 
 dofile('script/physics/JacoBian/JacoBianNode.lua')
+dofile('script/Network/HttpRequset.lua')
+
+dofile('script/Data/DataEncode.lua')
+
 FileManager.addAllPath("assert")
 
 _G.mlib = require 'script/mlib' 
@@ -206,7 +212,7 @@ if not _G.TEST then
 	end)
 
 else
-	dofile('script/test/test_FFT.lua')
+	dofile('script/test/test_HttpRequest.lua')
 	-- dofile('script/demo/BilateralFilter/demo_bilateral_filter.lua') 
 end
 --dofile()

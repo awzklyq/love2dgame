@@ -153,6 +153,7 @@ Include：
 	script/test/test_FourierTransform_Datas_1D.lua(傅里叶变换一维数据卷积)
 	script/test/test_FourierTransform_Sort_Dot_Datas.lua(傅里叶变换一维数据点积简化原数据点积权重排序)
 	script/test/test_FFT.lua(快速傅里叶变换)
+	script/test/test_HttpRequest.lua(增加HttpRequest)
 	
 Demo：
 	script/demo/BilateralFilter/demo_bilateral_filter.lua
