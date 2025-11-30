@@ -54,6 +54,10 @@ function MeshWater:func_P_h(vec_k)
 	return result;
 end
 
+function MeshWater:InitPhillipsSpectrum()
+    
+end
+
 function MeshWater:func_h_twiddle_0(v)--vec_k
 	local xi_r = math.random(-10000 , 10000) * 0.0001
 	local xi_i =  math.random(-10000 , 10000) * 0.0001

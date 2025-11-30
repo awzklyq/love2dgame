@@ -109,6 +109,44 @@ function Mesh3D:IsNormalize()
     return self._IsNormalize
 end
 
+function Mesh3D.CreatePlane(InX, InY, InSize, InH)
+    local X = InX * InSize
+    local Y = InY * InSize
+    local HalfX = X * 0.5
+    local HalfY = Y * 0.5
+
+    local H = InH or 0
+
+    local Datas = {}
+    for _x = -HalfX, HalfX, InSize do
+        local I = #Datas + 1
+        Datas[I] = {}
+        for _y = -HalfY, HalfY, InSize do
+            local _Pos = Vector3.new(_x, _y, H) 
+            local _Nor = Vector3.new(0, 0, 1)
+            local _UV = Vector.new((_x + HalfX) / X, (_y + HalfY) / Y)
+            Datas[I][#Datas[I] + 1] = {_Pos.x, _Pos.y, _Pos.z, _UV.x, _UV.y, _Nor.x, _Nor.y, _Nor.z}
+        end
+    end
+
+    local Verts = {}
+    for i = 1, #Datas - 1 do
+        for j = 1, #Datas[1] - 1 do
+            Verts[#Verts + 1] = Datas[i][j]
+             Verts[#Verts + 1] = Datas[i + 1][j + 1] 
+            Verts[#Verts + 1] = Datas[i + 1][j]
+
+            Verts[#Verts + 1] = Datas[i][j]
+            Verts[#Verts + 1] = Datas[i][j + 1] 
+            Verts[#Verts + 1] = Datas[i + 1][j + 1]
+            
+        end
+    end
+
+    -- log('sssssssssssss', #Verts)
+    return Mesh3D.createFromPoints(Verts)
+end
+
 function Mesh3D.CreateCube()
     local Datas = {}
     Datas[1] = {-0.5, -0.5, -0.5, 0.0, 0.0}

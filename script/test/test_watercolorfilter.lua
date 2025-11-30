@@ -1,4 +1,4 @@
-local image = ImageEx.new("itgongzuo.jpg")
+local image = ImageEx.new("builds.jpg") --itgongzuo.jpg
 
 image.renderWidth = RenderSet.screenwidth
 image.renderHeight = RenderSet.screenheight

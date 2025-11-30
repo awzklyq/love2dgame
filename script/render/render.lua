@@ -138,6 +138,8 @@ Render.QuaternionID = 69
 
 Render.ComplexID = 70
 
+Render.MeshWaterFFTId = 71
+
 Render.getRenderIdName = function(id)
     if type(id) == "table" then
         id = id.renderid
@@ -248,6 +250,8 @@ Render.getRenderIdName = function(id)
         return "Quaternion"
     elseif Render.ComplexID == id then
         return "Complex"
+    elseif Render.MeshWaterFFTId == id then
+        return "MeshWaterFFT"
     end
     
     return "Null"
@@ -407,7 +411,7 @@ Render.RenderObject = function(obj)
             love.graphics.rectangle("line", x1 - 3, y1 - 3, x2 - x1 + 6, y2 - y1 + 6)
         elseif obj.renderid == Render.MeshId then
             love.graphics.draw( obj.obj )
-        elseif obj.renderid == Render.MeshWaterId then
+        elseif obj.renderid == Render.MeshWaterId or obj.renderid == Render.MeshWaterFFTId then
             if obj.obj then
                 love.graphics.draw( obj.obj )
             end

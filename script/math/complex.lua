@@ -117,6 +117,10 @@ function Complex:AsPoint()
     return Point2D.new(self.real, self.imag)
 end
 
+function Complex:Conjugate()
+    return Complex.new(self.real, -self.imag)
+end
+
 function Complex:Log(InV)
     InV = InV or ""
     log(tostring(InV) .. ' Complex:', self.real, self.imag)

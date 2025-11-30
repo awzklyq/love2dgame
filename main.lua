@@ -135,6 +135,9 @@ dofile 'script/3d/math/fbm.lua'
 dofile 'script/3d/water/MeshWater.lua'
 dofile 'script/3d/water/watershader.lua'
 
+dofile 'script/3d/water/MeshWaterFFT.lua'
+dofile 'script/3d/water/WaterShaderFFT.lua'
+
 dofile 'script/text/lovescreentext.lua'
 
 dofile 'script/render/font.lua'
@@ -212,7 +215,7 @@ if not _G.TEST then
 	end)
 
 else
-	dofile('script/test/test_HttpRequest.lua')
+	dofile('script/test/test_MeshWaterFFT.lua')
 	-- dofile('script/demo/BilateralFilter/demo_bilateral_filter.lua') 
 end
 --dofile()
