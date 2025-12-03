@@ -154,6 +154,7 @@ Include：
 	script/test/test_FourierTransform_Sort_Dot_Datas.lua(傅里叶变换一维数据点积简化原数据点积权重排序)
 	script/test/test_FFT.lua(快速傅里叶变换)
 	script/test/test_HttpRequest.lua(增加HttpRequest)
+	script/test/test_MeshWaterFFT.lua(基于Phillips 谱函数值 的 傅里叶逆变换水波)
 	
 Demo：
 	script/demo/BilateralFilter/demo_bilateral_filter.lua

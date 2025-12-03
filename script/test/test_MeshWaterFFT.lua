@@ -7,7 +7,7 @@ local aixs = Aixs.new(0,0,0, 500)
 local directionlight = DirectionLight.new((currentCamera3D.eye - currentCamera3D.look):normalize(), LColor.new(255,255,255,255))
 _G.useLight(directionlight)
 
-local _Water = MeshWaterFFT.new(20, 20, 40)
+local _Water = MeshWaterFFT.new(40, 40, 50,Vector.new(1, 1),20, 1000)
 
 _Water:SetWaterMap('water.jpg')
 app.render(function(dt)
@@ -27,6 +27,11 @@ end)
 currentCamera3D.eye = Vector3.new( 195.88320929841 ,281.50478660121 ,206.73155244685)
 currentCamera3D.look = Vector3.new(0, 0 ,0)
 
+local scrollbar = UI.ScrollBar.new( 'Water Speed', 10, 10, 200, 40, 1, 20, 0.1)
+scrollbar:SetValue(_Water:GetSpeed())
+scrollbar.ChangeEvent = function(v)
+    _Water:SetSpeed(v)
+end
 
 --Test
 -- local TestC = Complex.new(math.random(-1000, 1000), math.random(-1000, 1000))

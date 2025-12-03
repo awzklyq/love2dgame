@@ -26,16 +26,43 @@ function MeshWaterFFT.new(InX, InY, InSize, InWinDirection, InWindSpeed, InL)
         _mw._WindDirection:Normalize()
     end
 
-    _mw._WindSpeed = InWindSpeed or 1.0
+    _mw._WindSpeed = InWindSpeed or 10.0
 
-    _mw.A = 1e-5
+    _mw.A = 1.0--1e-5
     _mw.renderid = Render.MeshWaterFFTId
 
     _mw._Mesh = _mw:CreatWaterPlaneDatas(InX, InY, InSize, 0)
 
     _mw._Tick = 0
+    _mw._Speed = 1.0
     _mw:InitializeFrequencyDomain()    
     return _mw
+end
+
+function MeshWaterFFT:PhillipsSpectrum2(InKX, InKY)--kx, ky, wind_dir, wind_speed, fetch
+    local kx = InKX
+    local ky = InKY
+    local k2 = kx * kx + ky * ky
+    if k2 < 1e-8 then return 0 end
+
+    local L =  (self._WindSpeed * self._WindSpeed)  / 9.81  -- 特征波长
+    local k = math.sqrt(k2)
+
+    -- 投影到风向上（增强顺风波）
+    local k_dot_w = (kx * self._WindDirection.x + ky * self._WindDirection.y) / k
+    local l2 = k_dot_w * k_dot_w  -- cos²θ
+
+    -- 避免垂直风向产生过大波（抑制 cross-wind）
+    if l2 < 1e-4 then l2 = 1e-4 end
+
+    local ph = l2 * math.exp(-1 / (k2 * L * L)) / (k2 * k2)
+
+    -- 小尺度抑制（短风区）
+    if k * self._L < 1 then
+        ph = ph * k * self._L
+    end
+
+    return ph 
 end
 
 function MeshWaterFFT:PhillipsSpectrum(InKX, InKY)
@@ -61,7 +88,10 @@ function MeshWaterFFT:PhillipsSpectrum(InKX, InKY)
     -- 方向因子	(k·ŵ)²	风向相关性	顺风向的波能量最大
     --公式分解（标准Phillips谱）
     --P(k) = A · [exp(-1/(k²L²)) / k⁴] · (k·ŵ)² · Φ(k)
-    local Spectrum = self.A * math.exp(-1.0 / (k2 * L * L)) / k4 * math.pow(kDotW, 2)
+    local Test1 = k2 * L * L
+    local Test2 = -1.0 / Test1
+    local Test3 = math.exp(Test2)
+    local Spectrum =  self.A * math.exp(-1.0 / (k2 * L * L)) / k4 * math.pow(kDotW, 2) --self.A *
 
     -- 抑制与风向相反的波
     if kDotW < 0 then
@@ -110,16 +140,18 @@ function MeshWaterFFT:InitializeFrequencyDomain()
             local P = self:PhillipsSpectrum(kx, ky)
             local r1, r2 = GaussianRandom()
 
+            -- r1 = r1 * 1000
+            -- r2 = r2 * 1000
+            -- P = math.random() * 1000000
             self._H0[i][j] = Complex.new(r1 * math.sqrt(P * 0.5) , r2 * math.sqrt(P * 0.5))
 
+            -- log('ffffffff', P, kx, ky)
             --将坐标(i,j)映射到其频率反转的位置
             local j_conj = ((self._Y - j + 1) % self._Y) + 1
             self._H0Conjugate[i_conj][j_conj] = self._H0[i][j]:Conjugate()
 
         end
     end
-
-    self:GenerateHeightField(self._Tick + 0.5)
 
     self:GenerateRenderObj()
 end
@@ -155,8 +187,6 @@ function MeshWaterFFT:CalculateHeight(InI, InJ, InT)
 
     local term2  = h0_conj * Complex.exp(-phase)
     
-    local TT  =term1 + term2
-    log('aaaaaaaa', term1:GetReal(), term2:GetReal(), TT:GetReal())
     return term1 + term2
 end
 
@@ -281,12 +311,20 @@ function MeshWaterFFT:SetWaterMap(InFileName)
     self._WaterMap = ImageEx.new(InFileName)
 end
 
+function MeshWaterFFT:SetSpeed(InValue)
+    self._Speed = InValue or 1.0
+end
+
+function MeshWaterFFT:GetSpeed()
+    return self._Speed
+end
+
 function MeshWaterFFT:update(InT)
-    self._Tick = self._Tick + InT
+    self._Tick = self._Tick + (InT * self._Speed)
 
-    -- self:GenerateHeightField(self._Tick)
+    self:GenerateHeightField(self._Tick)
 
-    -- self:GenerateRenderObj()
+    self:GenerateRenderObj()
 end
 
 function MeshWaterFFT:draw()
