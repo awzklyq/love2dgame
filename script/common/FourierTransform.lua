@@ -32,6 +32,24 @@ function FourierTransform:ProcessTransformImage()
 
 end
 
+--InDatas[i][j] = Complex.new()
+function FourierTransform:SetFourierDatasVectors(InDatas)
+    local _H = #InDatas
+    local _W = #InDatas[1]
+    
+    self._FourierDatasVectors = {}
+    --TODO
+    for i = 1, _H do
+        self._FourierDatasVectors[i] = {}
+        for j = 1, _W do
+            self._FourierDatasVectors[i][j] = {}
+            self._FourierDatasVectors[i][j][1] = InDatas[i][j]
+            self._FourierDatasVectors[i][j][2] = InDatas[i][j]
+            self._FourierDatasVectors[i][j][3] = InDatas[i][j]
+        end
+    end
+end
+
 function FourierTransform:CacleFourierTransformLine(InLine)
     local _H = #self._OriDatasVectors
     local _W = #self._OriDatasVectors[1]
@@ -105,6 +123,13 @@ function FourierTransform:Cacle_W(InK, InN)
     return Complex.exp(_p)
 end
 
+function FourierTransform:GetInverseDataFromIndex(InI, InJ)
+    check(#self._InverseDatasVectors > 0 and #self._InverseDatasVectors[1] > 0)
+    check(#self._InverseDatasVectors >= InI and #self._InverseDatasVectors[1] >= InJ)
+    return self._InverseDatasVectors[InI][InJ]
+
+end
+
 function FourierTransform:InverseProcessTransformImage()
     check(#self._FourierDatasVectors > 0 and #self._FourierDatasVectors[1] > 0)
 
@@ -115,13 +140,13 @@ function FourierTransform:InverseProcessTransformImage()
 
     for row = 1, _W do
         self:InverseFourierTransformRow(row)
-        log("Beging InverseProcessTransformImage Row: ", row, _W)
+        -- log("Beging InverseProcessTransformImage Row: ", row, _W)
     end
     
-    log("Beging InverseProcessTransformImage")
+    -- log("Beging InverseProcessTransformImage")
     for line = 1, _H do
         self:InverseFourierTransformLine(line)
-        log("Beging InverseProcessTransformImage Line: ", line, _H)
+        -- log("Beging InverseProcessTransformImage Line: ", line, _H)
     end
 end
 

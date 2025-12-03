@@ -21,6 +21,7 @@ app.render(function(dt)
 end)
 
 app.update(function(dt)
+    _Water:update(dt)
 end)
 
 currentCamera3D.eye = Vector3.new( 195.88320929841 ,281.50478660121 ,206.73155244685)
