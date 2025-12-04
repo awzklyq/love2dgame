@@ -4,10 +4,10 @@ FileManager.addAllPath("assert")
 math.randomseed(os.time()%10000)
 -- love.graphics.setWireframe( true )
 local aixs = Aixs.new(0,0,0, 500)
-local directionlight = DirectionLight.new((currentCamera3D.eye - currentCamera3D.look):normalize(), LColor.new(255,255,255,255))
+local directionlight = DirectionLight.new(Vector3.new(1.0, 0.5, -2.0):normalize(), LColor.new(255,255,255,255))
 _G.useLight(directionlight)
 
-local _Water = MeshWaterFFT.new(40, 40, 50,Vector.new(1, 1),20, 1000)
+local _Water = MeshWaterFFT.new(30, 30, 50,Vector.new(1, 1),15, 2000)
 
 _Water:SetWaterMap('water.jpg')
 app.render(function(dt)

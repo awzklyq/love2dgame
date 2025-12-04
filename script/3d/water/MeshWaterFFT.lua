@@ -224,7 +224,36 @@ function MeshWaterFFT:GenerateHeightField(InT)
     end
     
     -- -- 计算法线和切线
-    -- self:calculateNormals()
+    self:CalculateNormals()
+end
+
+function MeshWaterFFT:CalculateNormals()
+    -- local _Tangents = {}
+    -- local _Bitangents = {}
+    for i = 1, self._X do
+        for j = 1, self._Y do
+            local left = self._Datas[i > 1 and i-1 or self._X][j][3] or 0
+            local right = self._Datas[i < self._X and i+1 or 1][j][3] or 0
+            local top = self._Datas[i][j > 1 and j-1 or self._Y][3] or 0
+            local bottom = self._Datas[i][j < self._Y and j+1 or 1][3] or 0
+
+            local dx = (right - left) / (2.0 * self._L / self._X)
+            local dy = (bottom - top) / (2.0 * self._L / self._Y)
+
+            local Tangent = Vector3.new(1.0, 0.0, dx)
+            local Bitangent = Vector3.new(0.0, 1.0, dy)
+
+            Tangent:Normalize()
+            Bitangent:Normalize()
+            local _n = Vector3.cross(Tangent, Bitangent)
+            -- local _n = Vector3.new(-dx, -dy, 1.0)
+            _n:Normalize()
+
+            self._Datas[i][j][6] = _n.x
+            self._Datas[i][j][7] = _n.y
+            self._Datas[i][j][8] = _n.z
+        end
+    end
 end
 
 function MeshWaterFFT:CreatWaterPlaneDatas(InX, InY, InSize)

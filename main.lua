@@ -215,7 +215,7 @@ if not _G.TEST then
 	end)
 
 else
-	dofile('script/test/test_HttpRequest.lua')
+	dofile('script/test/test_MeshWaterFFT.lua')
 	-- dofile('script/demo/BilateralFilter/demo_bilateral_filter.lua') 
 end
 --dofile()

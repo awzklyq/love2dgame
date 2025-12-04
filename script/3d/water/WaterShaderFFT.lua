@@ -107,26 +107,20 @@ function Shader.GetWaterFFTPSShaderCode()
                 
             --     ]]
         if #directionlights > 0 then
-            pixelcode = pixelcode .. " float dotn = 0; \n";
             pixelcode = pixelcode .. " vec3 lightDir;\n ";
+            pixelcode = pixelcode .. " vec3 lightcolor;\n "
+            pixelcode = pixelcode .. " float dotn = 0.0;\n "
         end
         for i = 1, #directionlights do
             local light = directionlights[i]
             pixelcode = pixelcode .. " lightDir = directionlight"..i..".xyz;\n ";
+            pixelcode = pixelcode .. " lightcolor = directionlightcolor"..i..".xyz;\n ";
             pixelcode = pixelcode ..[[
-                dotn = clamp(dot(normalize(lightDir + viewdir.xyz), normal.xyz), 0.1, 1);
-                vec3 reflectDir = normalize(reflect(-lightDir.xyz, normal.xyz)); 
+                dotn = clamp(dot(-lightDir, normal.xyz), 0.1, 2.0);
+                vec3 specular = lightcolor * pow(clamp(dot(normalize(lightDir + viewdir.xyz), normal.xyz), 0.1, 5.0), 0.8);
                 ]]
 
-            -- pixelcode = pixelcode .. " texcolor.xyz = texcolor.xyz * directionlightcolor"..i..".xyz * dotn; ";
-            if RenderSet.GetPBR() then
-
-                pixelcode = pixelcode .. " vec3 pbr = ".._G.ShaderFunction.PBRFunctionName.."(1, 1, texcolor.xyz, viewdir.xyz, normalize(directionlight"..i..".xyz), normal.xyz);\n";
-            else
-                pixelcode = pixelcode .. " vec3 pbr = vec3(1);\n";
-            end
-            
-            pixelcode = pixelcode .. " texcolor.xyz = texcolor.xyz + pbr * directionlightcolor"..i..".xyz *  pow(max(dot(reflectDir.xyz, viewdir.xyz), 0),Gloss);\n ";
+            pixelcode = pixelcode .. " texcolor.xyz = texcolor.xyz * lightcolor * dotn + specular;\n ";
         end    
 
     pixelcode = pixelcode ..[[
@@ -134,6 +128,7 @@ function Shader.GetWaterFFTPSShaderCode()
         }
     ]];
 
+    -- log(pixelcode)
     return pixelcode
 end
 
