@@ -39,3 +39,14 @@ function HttpRequest:SendRequest(InTableData)
     --     log('bbbbbbbbb', i, v)
     -- end
 end
+
+function HttpRequest:GetResponseAsString()
+    local _ResultStr = ""
+
+    for i, v in pairs(self._Response_Body) do
+        _ResultStr = _ResultStr .. tostring(self._Response_Body[i])
+        -- log('aaaa', i, self._Response_Body[i])
+    end
+
+    return _ResultStr
+end
