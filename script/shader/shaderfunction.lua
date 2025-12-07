@@ -88,3 +88,26 @@ vec3 LightSpecularColorPhong(vec3 LightColor, vec3 LightDir, vec3 WorldNormal, v
     return SpecularColor;
 } 
 ]]
+
+_G.ShaderFunction.Common = [[
+    uniform mat4 Inverse_ProjectviewMatrix;
+
+    vec2 ViewportUVToScreenPos(vec2 ViewportUV)
+    {
+        return vec2(2 * ViewportUV.x - 1, 1 - 2 * ViewportUV.y);
+    }
+
+    vec2 ScreenPosToViewportUV(vec2 ScreenPos)
+    {
+        return vec2(0.5 + 0.5 * ScreenPos.x, 0.5 - 0.5 * ScreenPos.y);
+    }
+
+    vec4 CacleWorldPosition(vec2 IntextureCoords, float InDepth)
+    {
+        vec2 uv = ViewportUVToScreenPos(IntextureCoords);
+        vec4 vpos = vec4(uv.x, uv.y, InDepth, 1.0);
+
+        vec4 spos = Inverse_ProjectviewMatrix * vpos;
+        return spos;
+    }
+]]

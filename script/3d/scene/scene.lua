@@ -217,15 +217,14 @@ end
 function Scene3D:draw(isdrawCanvaColor)
     self:drawDepth()
 
-    -- for i = 1, #self.lights do
-    --     local light = self.lights[i]
-    --     if light.directionLight then            
-    --         _G.useLight(light.directionLight)
-    --     end
-    -- end
-
     MotionVectorNode:BeforeExecute()
 
+    for i = 1, #self.lights do
+        local light = self.lights[i]
+        if light.directionLight then            
+            _G.useLight(light.directionLight)
+        end
+    end
     local AlphaTestNodes = {}
     love.graphics.setMeshCullMode("back")
     love.graphics.setDepthMode("less", true)
@@ -277,9 +276,9 @@ function Scene3D:draw(isdrawCanvaColor)
         self:DrawAlphaTest2(AlphaTestNodes)
     end
 
-    -- for i = 1, #self.lights do
-    --     _G.popLight()
-    -- end
+    for i = 1, #self.lights do
+        _G.popLight()
+    end
 
     self:drawNormalmap()
 

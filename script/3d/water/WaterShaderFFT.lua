@@ -6,16 +6,19 @@ function Shader.GetWaterFFTVSShaderCode()
         uniform mat4 projectionMatrix;
         uniform mat4 modelMatrix;
         uniform mat4 viewMatrix; 
+        uniform vec3 camerapos;
         ]];
     
     local normalmap = RenderSet.getNormalMap()
     if not normalmap and Shader.neednormal > 0 then
         vertexcode = vertexcode .. "varying vec4 vnormal;\n"
     end
-    vertexcode = vertexcode .. "varying vec4 modelpos; \n"
-    vertexcode = vertexcode .. "varying vec2 vTexCoord2; \n"
-    vertexcode = vertexcode .. "varying float waterheight; \n"
 
+    vertexcode = vertexcode..[[
+        varying vec3 vViewdir;
+        varying vec2 vTexCoord2;
+        varying float waterheight;
+    ]]
     vertexcode = vertexcode .. _G.ShaderFunction.GetNoise
 
     vertexcode = vertexcode .. _G.ShaderFunction.GetTTF
@@ -28,18 +31,14 @@ function Shader.GetWaterFFTVSShaderCode()
     if not normalmap and Shader.neednormal > 0 then
         vertexcode = vertexcode.."   vnormal = VertexColor;\n "
     end
-
-    vertexcode = vertexcode.." vec4 vpos = VertexPosition; \n"
-    --vertexcode = vertexcode.." vec2 twiddlev = twiddle(VertexColor.x, VertexColor.y, ConstantColor.xy, ConstantColor.zw, tvalue, 0.98); \n"
-    --vertexcode = vertexcode.." vpos.z = 2 * pow(clamp((sin((VertexColor.x + VertexColor.y) * invWaveLength + tvalue) + 1) * 0.5, 0, 1), kvalue) * amplitude; \n"
-   -- vertexcode = vertexcode.." vpos.z = twiddlev.x; \n"
-    vertexcode = vertexcode.." waterheight = vpos.z; \n"
-    vertexcode = vertexcode.." vec4 wpos = projectionMatrix * viewMatrix * modelMatrix * vpos; \n"
-    vertexcode = vertexcode.." modelpos =  modelMatrix * vpos; \n"
-    vertexcode = vertexcode.." vTexCoord2 =  VertexTexCoord.xy; \n"
   
     vertexcode = vertexcode..[[
-        
+        vec4 vpos = VertexPosition;
+        waterheight = vpos.z;
+        vec4 wpos = projectionMatrix * viewMatrix * modelMatrix * vpos;
+        vec4 modelpos =  modelMatrix * vpos;
+        vViewdir = normalize(camerapos.xyz);
+        vTexCoord2 =  VertexTexCoord.xy; 
         return wpos;
     }
 
@@ -51,7 +50,6 @@ end
 
 function Shader.GetWaterFFTPSShaderCode()
     local pixelcode = "uniform vec4 bcolor;\n"
-    pixelcode = pixelcode .. " uniform vec3 camerapos;  \n";
 
     --collect direction lights
     local directionlights = Lights.getDirectionLights()
@@ -75,7 +73,7 @@ function Shader.GetWaterFFTPSShaderCode()
     -- pixelcode = pixelcode .. "uniform sampler2D waternoisemap;\n";
     -- pixelcode = pixelcode .. "uniform float amplitude;\n"
     -- pixelcode = pixelcode .. " uniform float tvalue;\n"
-    pixelcode = pixelcode .. "varying  vec4 modelpos; \n"
+    pixelcode = pixelcode .. "varying  vec3 vViewdir; \n"
     pixelcode = pixelcode .. "varying vec2 vTexCoord2; \n"
     pixelcode = pixelcode .. "varying float waterheight; \n"
     
@@ -88,7 +86,7 @@ function Shader.GetWaterFFTPSShaderCode()
         {
             float Gloss = 1;
             vec4 texcolor = Texel(watermap, vTexCoord2) * bcolor;
-            vec3 viewdir = normalize( camerapos.xyz - modelpos.xyz);
+            vec3 viewdir =  vViewdir.xyz;
             ]];
 
             if normalmap then
@@ -117,7 +115,7 @@ function Shader.GetWaterFFTPSShaderCode()
             pixelcode = pixelcode .. " lightcolor = directionlightcolor"..i..".xyz;\n ";
             pixelcode = pixelcode ..[[
                 dotn = clamp(dot(-lightDir, normal.xyz), 0.1, 2.0);
-                vec3 specular = lightcolor * pow(clamp(dot(normalize(lightDir + viewdir.xyz), normal.xyz), 0.1, 5.0), 0.8);
+                vec3 specular = lightcolor * pow(clamp(dot(normalize(lightDir + viewdir.xyz), normal.xyz), 0.1, 5.0), 0.7);
                 ]]
 
             pixelcode = pixelcode .. " texcolor.xyz = texcolor.xyz * lightcolor * dotn + specular;\n ";

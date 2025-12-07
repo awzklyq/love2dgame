@@ -365,7 +365,7 @@ function MeshWaterFFT:draw()
 
     -- RenderSet.setNormalMap(self.normalmap)
     self:UseLights()
-    self.shader:setCameraAndMatrix3D(self.transform3d, RenderSet.getUseProjectMatrix(), RenderSet.getUseViewMatrix(), camera3d.eye)
+    self.shader:setCameraAndMatrix3D(self.transform3d, RenderSet.getUseProjectMatrix(), RenderSet.getUseViewMatrix(), camera3d.eye - camera3d.look)
 
     self.shader:setWaterValue(self._WaterMap and self._WaterMap.obj or nil)
 
