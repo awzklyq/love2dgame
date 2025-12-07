@@ -178,7 +178,7 @@ function Shader.GetBase3DPSShaderCode(AlphaTest, PBR)
         vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
         {
             vec4 texcolor = Texel(tex, texture_coords) * bcolor;
-            vec3 viewdir = normalize( camerapos.xyz);
+            vec3 viewdir = normalize( camerapos.xyz - modelpos.xyz);
             ]];
 
             if AlphaTest then
@@ -211,7 +211,7 @@ function Shader.GetBase3DPSShaderCode(AlphaTest, PBR)
             pixelcode = pixelcode .. " dotn = clamp(dot(lightdir, normal.xyz), 0.2, 10);\n ";
             -- pixelcode = pixelcode .. " texcolor.xyz = texcolor.xyz * directionlightcolor"..i..".xyz * dotn; ";
             if PBRData.IsUsePBR(PBR) then
-                pixelcode = pixelcode .. " texcolor.xyz = texcolor.xyz + ".._G.ShaderFunction.PBRFunctionName.."(Roughness, Metallic, F0, texcolor.xyz, viewdir.xyz, lightdir, normal.xyz);\n";
+                pixelcode = pixelcode .. " texcolor.xyz = texcolor.xyz +".._G.ShaderFunction.PBRFunctionName.."(Roughness, Metallic, F0, texcolor.xyz, viewdir.xyz, lightdir, normal.xyz);\n";
             else
                 pixelcode = pixelcode .. [[
                 vec3 _Specluar = lightcolor;//vec3(1,1,1);

@@ -548,7 +548,7 @@ function Mesh3D:draw()
     RenderSet.setNormalMap(self.normalmap)
     self:useLights()
 
-    self.shader:setCameraAndMatrix3D(self.transform3d, RenderSet.getUseProjectMatrix(), RenderSet.getUseViewMatrix(), camera3d.eye - camera3d.look, self)
+    self.shader:setCameraAndMatrix3D(self.transform3d, RenderSet.getUseProjectMatrix(), RenderSet.getUseViewMatrix(), camera3d.eye, self)
     
     -- if self.shader:hasUniform( "bcolor") and self.bcolor then
         self.shader:sendValue('bcolor',{self.bcolor._r, self.bcolor._g, self.bcolor._b, self.bcolor._a})
