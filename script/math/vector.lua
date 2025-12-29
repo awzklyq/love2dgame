@@ -118,7 +118,7 @@ function Vector:draw()
 end
 
 function Vector:IsZero()
-    return self.x == 0 and self.y == 0
+    return math.abs(self.x) == 0 and math.abs(self.y) == 0
 end
 
 function Vector:GetMortonCode2()

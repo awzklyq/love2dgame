@@ -37,6 +37,30 @@ function Polygon2D.GenerateCircleData(InPointNumber, InRange, InX, InY)
     return Polygon2D.new(_Points)
 end
 
+function Polygon2D.GeneratePolygonsFromeCircleDatasRandomRange(InPointNumber, InMaxRange, InX, InY)
+    InPointNumber = tonumber(InPointNumber) or 4
+    InPointNumber = math.max(InPointNumber, 4)
+
+    local _OriPosition = Point2D.new(InX, InY)
+
+    local _First = Complex.new(1, 0)
+
+    local _Angle = 360 / InPointNumber
+    local _RotationComplex = Complex.CreateFromAngle(_Angle)
+
+    local _Points = {}
+    _Points[1] = (_First * math.random(-InMaxRange, InMaxRange)):AsPoint() + _OriPosition
+    _Points[1]._Angle = 0
+    for i = 2, InPointNumber do
+        _First = _First * _RotationComplex
+        _Points[i] = (_First * math.random(-InMaxRange, InMaxRange)):AsPoint() + _OriPosition
+        _Points[i]._Angle = _Points[i - 1]._Angle + _Angle
+    end
+
+    return Polygon2D.new(_Points)
+end
+
+
 
 function Polygon2D:Init(InPoints)
     self._PointsColor = LColor.new(255, 0, 0,255)

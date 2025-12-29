@@ -215,7 +215,7 @@ if not _G.TEST then
 	end)
 
 else
-	dofile('script/test/test_pbr.lua')
+	dofile('script/test/test_FourierSeries.lua') --test_FourierSeries.lua
 	-- dofile('script/demo/BilateralFilter/demo_bilateral_filter.lua') 
 end
 --dofile()

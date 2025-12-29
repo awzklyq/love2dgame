@@ -47,7 +47,6 @@ function Complex.new(real ,imag)
     local v = setmetatable({}, metatable_complex);
     v.real = real or 0;
     v.imag = imag or 0;
-
     v.renderid = Render.ComplexID
     return v;
 end
@@ -75,7 +74,7 @@ function Complex:SquaredLength()
 end
 
 function Complex:Normalize()
-    local _Len = self:SqrtLength()
+    local _Len = self:SquaredLength()
     if _Len >=_Tolerance then
         self.real = self.real / _Len
         self.imag = self.imag / _Len
@@ -124,4 +123,14 @@ end
 function Complex:Log(InV)
     InV = InV or ""
     log(tostring(InV) .. ' Complex:', self.real, self.imag)
+end
+
+function Complex:GetAngle()
+    local _Len = self:SquaredLength()
+    return math.deg(math.atan2(self.imag / _Len, self.real / _Len))
+end
+
+function Complex:GetAngle_Rad()
+    local _Len = self:SquaredLength()
+    return math.atan2(self.imag / _Len, self.real / _Len)
 end

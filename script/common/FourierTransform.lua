@@ -70,9 +70,9 @@ function FourierTransform:CacleFourierTransformLine(InLine)
         _FourierDatasVectors_i[2] = Complex.new(0, 0)
         _FourierDatasVectors_i[3] = Complex.new(0, 0)
         for j = 1, _W do
-            _FourierDatasVectors_i[1] = _FourierDatasVectors_i[1] + self:CacleIntegrateValue(_Datas[j].x, i, j, _W)
-            _FourierDatasVectors_i[2] = _FourierDatasVectors_i[2] + self:CacleIntegrateValue(_Datas[j].y, i, j, _W)
-            _FourierDatasVectors_i[3] = _FourierDatasVectors_i[3] + self:CacleIntegrateValue(_Datas[j].z, i, j, _W)
+            _FourierDatasVectors_i[1] = _FourierDatasVectors_i[1] + FourierTransform.CacleIntegrateValue(_Datas[j].x, i, j, _W)
+            _FourierDatasVectors_i[2] = _FourierDatasVectors_i[2] + FourierTransform.CacleIntegrateValue(_Datas[j].y, i, j, _W)
+            _FourierDatasVectors_i[3] = _FourierDatasVectors_i[3] + FourierTransform.CacleIntegrateValue(_Datas[j].z, i, j, _W)
         end
     end
 end
@@ -92,9 +92,9 @@ function FourierTransform:CacleFourierTransformRow(InRow)
         _FourierTransformRow[i][3] = Complex.new(0, 0)
         for j = 1, _H do
             local _Data = self._FourierDatasVectors[j][InRow]
-            _FourierTransformRow[i][1] = _FourierTransformRow[i][1] + self:CacleIntegrateValue(_Data[1], i, j, _H)
-            _FourierTransformRow[i][2] = _FourierTransformRow[i][2] + self:CacleIntegrateValue(_Data[2], i, j, _H)
-            _FourierTransformRow[i][3] = _FourierTransformRow[i][3] + self:CacleIntegrateValue(_Data[3], i, j, _H)
+            _FourierTransformRow[i][1] = _FourierTransformRow[i][1] + FourierTransform.CacleIntegrateValue(_Data[1], i, j, _H)
+            _FourierTransformRow[i][2] = _FourierTransformRow[i][2] + FourierTransform.CacleIntegrateValue(_Data[2], i, j, _H)
+            _FourierTransformRow[i][3] = _FourierTransformRow[i][3] + FourierTransform.CacleIntegrateValue(_Data[3], i, j, _H)
         end
     end
 
@@ -108,9 +108,19 @@ function FourierTransform:CacleFourierTransformRow(InRow)
 end
 
 
-function FourierTransform:CacleIntegrateValue(InValue, InW, InK, InN)
+function FourierTransform.CacleIntegrateValue(InValue, InW, InK, InN)
     local _p = math.c2pi / InN
+    -- log('gggggggggggg', InW, InK, InW *  InK * _p)
     local c = Complex.CreateFromAngle(math.deg(InW *  InK * _p) )
+    if tonumber(InValue) then
+        return c * InValue
+    else
+        return InValue * c
+    end
+end
+
+function FourierTransform.CacleIntegrateValue2(InValue, InRadian)
+    local c = Complex.CreateFromAngle((math.deg(InRadian)))
     if tonumber(InValue) then
         return c * InValue
     else
@@ -174,9 +184,9 @@ function FourierTransform:InverseFourierTransformRow(InRow)
         _InverseDatasVectors[3] = Complex.new(0, 0)
         for j = 1, _H do
             local _Data = self._FourierDatasVectors[j][InRow]
-            _InverseDatasVectors[1] = _InverseDatasVectors[1] + self:CacleIntegrateValue(_Data[1], i, j, _H)
-            _InverseDatasVectors[2] = _InverseDatasVectors[2] + self:CacleIntegrateValue(_Data[2], i, j, _H)
-            _InverseDatasVectors[3] = _InverseDatasVectors[3] + self:CacleIntegrateValue(_Data[3], i, j, _H)           
+            _InverseDatasVectors[1] = _InverseDatasVectors[1] + FourierTransform.CacleIntegrateValue(_Data[1], i, j, _H)
+            _InverseDatasVectors[2] = _InverseDatasVectors[2] + FourierTransform.CacleIntegrateValue(_Data[2], i, j, _H)
+            _InverseDatasVectors[3] = _InverseDatasVectors[3] + FourierTransform.CacleIntegrateValue(_Data[3], i, j, _H)           
         end  
         
         _InverseDatasVectors[1] = _InverseDatasVectors[1] / _H
@@ -200,9 +210,9 @@ function FourierTransform:InverseFourierTransformLine(InLine)
         _TempDatas[i][3] = Complex.new(0, 0)
         for j = 1, _W do
             local _Data = _InverseDatasVectors[j]
-            _TempDatas[i][1] = _TempDatas[i][1] + self:CacleIntegrateValue(_Data[1], i, j, _W)
-            _TempDatas[i][2] = _TempDatas[i][2] + self:CacleIntegrateValue(_Data[2], i, j, _W)
-            _TempDatas[i][3] = _TempDatas[i][3] + self:CacleIntegrateValue(_Data[3], i, j, _W)           
+            _TempDatas[i][1] = _TempDatas[i][1] + FourierTransform.CacleIntegrateValue(_Data[1], i, j, _W)
+            _TempDatas[i][2] = _TempDatas[i][2] + FourierTransform.CacleIntegrateValue(_Data[2], i, j, _W)
+            _TempDatas[i][3] = _TempDatas[i][3] + FourierTransform.CacleIntegrateValue(_Data[3], i, j, _W)           
         end  
         
         _TempDatas[i][1] = _TempDatas[i][1] / _W
@@ -391,7 +401,7 @@ function FourierTransform:ProcessTransformDatas_1D(InNum)
     for i = 1, InNum do
         local _Result = Complex.new(0, 0)
         for j = 1, _LEN do
-            _Result = _Result + self:CacleIntegrateValue(self._OriDatas_1D[j], i, j, _LEN)
+            _Result = _Result + FourierTransform.CacleIntegrateValue(self._OriDatas_1D[j], i, j, _LEN)
         end
 
         self._FourierDatas_1D[i] =_Result
@@ -408,7 +418,7 @@ function FourierTransform:InverseFourierTransform_1D()
     for i = 1, _LEN1 do
         local _Result = Complex.new(0, 0) 
         for j = 1, _LEN2 do
-            _Result = _Result  + self:CacleIntegrateValue(self._FourierDatas_1D[j], j, i - 1, _LEN2)           
+            _Result = _Result  + FourierTransform.CacleIntegrateValue(self._FourierDatas_1D[j], j, i - 1, _LEN2)           
         end
         self._InverseDatas_1D[_LEN1 - i + 1] = _Result /_LEN2
     end
@@ -547,4 +557,105 @@ function FourierTransform:Log( )
         log(Str3)
         log()
     end
+end
+
+local TempAngles = {}
+TempAngles[1] = 0
+TempAngles[2] = 1.5707963267949
+TempAngles[3] = 3.1415926535898
+TempAngles[4] = 1.5707963267949
+--Data: x, y form circle
+function FourierTransform.Static_ProcessTransform_Circle(InDatas)
+    local N = #InDatas
+    local _FourierDatas = {}
+
+    -- for i = 1, N do
+    --     log('aaaaaaaaaaaaaaaaaaa',  InDatas[i]:length())
+    -- end
+    for i = 1, N do
+        local _Result = Complex.new(0, 0)
+        check(InDatas[i]._Radian)
+        for j = 1, N do
+            local _data = InDatas[j]
+            local Length = _data:length()
+            local _Radian = InDatas[j]._Radian
+            _Radian = _Radian * i
+            _Result = _Result + FourierTransform.CacleIntegrateValue2(Length, _Radian)--FourierTransform.CacleIntegrateValue(Length, i, j, N)
+            
+        end
+
+        _FourierDatas[i] =_Result
+        _FourierDatas[i]._Radian =  InDatas[i]._Radian
+    end
+
+    -- log()
+    -- for i = 1, N do
+    --     log('ccccccccc',  _FourierDatas[i]:GetReal(),   _FourierDatas[i]:GetImag(),   _FourierDatas[i]:SquaredLength())
+    -- end
+    -- log()
+    return _FourierDatas
+end
+
+function FourierTransform.Static_InverseTransform_Circle(InDatas)
+    local N = #InDatas
+
+    local _Mid = 0
+    --Filter Test
+    for i = 1, #InDatas do
+        _Mid = _Mid + InDatas[i]:SquaredLength()
+    end
+    _Mid = _Mid / #InDatas
+
+    local _OriDatas = {}
+     for i = 1, N do
+        check(InDatas[i]._Radian)
+        local _LenI = InDatas[i]:SquaredLength()
+        local _Result = Complex.new(0, 0)
+        if _LenI >= _Mid * 0.5 then
+            for j = 1, N do
+                local _LenJ = InDatas[j]:SquaredLength()
+                if _LenJ >= _Mid then
+                    local _data = InDatas[j]
+                    local _Radian = InDatas[j]._Radian
+                    if i > 1 then
+                        _Radian = _Radian * (i - 1)
+                    elseif  i == 1 then
+                        _Radian = _Radian * N
+                    end
+                    _Result = _Result + FourierTransform.CacleIntegrateValue2(_data, _Radian)--FourierTransform.CacleIntegrateValue2(_data, Angle_Rad, i -1)
+                end
+            end
+        end
+       
+        local _Index = N - i + 1
+        _OriDatas[_Index] =_Result / N
+        _OriDatas[_Index]._Radian = InDatas[i]._Radian
+    end
+
+    
+    -- for i = 1, N do
+    --     local _data = _OriDatas[i]
+    --     local Angle_Rad = _data:GetAngle_Rad()
+    --     local Lenght = _data:SquaredLength()
+    --     log('bbbbbbbbb', _data:GetReal(), _data:GetImag(), Angle_Rad, Lenght)
+    -- end
+
+    local _ResultDatas = {}
+    for i = 1, N do
+        local _data = _OriDatas[i]
+        local Lenght = _data:GetReal()
+        local _Com = Complex.CreateFromAngle(math.deg(-_data._Radian))
+
+
+        _Com = _Com * Lenght
+        
+        local V = _Com:AsVector()
+        if not V:IsZero() then
+            _ResultDatas[#_ResultDatas + 1] = _Com:AsVector()
+            _ResultDatas[#_ResultDatas]._Radian = _data._Radian
+            log('rrrrrrrrrrrr',  #_ResultDatas, _ResultDatas[#_ResultDatas].x, _ResultDatas[#_ResultDatas].y)
+        end
+    end
+    
+    return _ResultDatas
 end
