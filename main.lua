@@ -88,6 +88,8 @@ dofile('script/math/matrix2d.lua')
 dofile('script/math/matrixs.lua')
 dofile('script/math/RotationMatrix.lua')
 dofile 'script/math/kmeans.lua'
+
+dofile 'script/math/Zernike.lua'
 dofile('script/3d/math/vector3.lua')
 dofile('script/3d/math/quaternion.lua')
 dofile('script/3d/math/vector4.lua')
@@ -215,7 +217,7 @@ if not _G.TEST then
 	end)
 
 else
-	dofile('script/test/test_FourierSeries.lua') --test_FourierSeries.lua
+	dofile('script/test/test_Zernike_BasicFunction.lua') --test_FourierSeries.lua
 	-- dofile('script/demo/BilateralFilter/demo_bilateral_filter.lua') 
 end
 --dofile()

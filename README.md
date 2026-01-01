@@ -6,6 +6,8 @@ The entry point for running the algorithm is the main.lua file, which changes th
 
 Include：
 
+	script/test/test_Zernike_BasicFunction.lua（通过Zernike多项式模拟2d球谐函数）
+	script/test/test_FourierSeries.lua(FFT 傅里叶级数降低采样频率)
 	script/test/test_CovarianceMatrix.lua（协方差矩阵 生成OBB）
 	script/test/test_MDP.lua （Markov reward Process(马尔可夫決策过程)
 	script/test/test_InverseMatrixs.lua （Inverse By Gauss Jordan）
