@@ -132,6 +132,7 @@ dofile 'script/3d/math/box.lua'
 dofile 'script/3d/math/ray.lua'
 dofile 'script/3d/math/perlinnoise1.lua'
 dofile 'script/3d/math/perlinnoise2.lua'
+dofile 'script/3d/math/PerlinNoiseSimple.lua' 
 dofile 'script/3d/math/fbm.lua'
 
 dofile 'script/3d/water/MeshWater.lua'
@@ -217,7 +218,7 @@ if not _G.TEST then
 	end)
 
 else
-	dofile('script/test/test_Zernike_BasicFunction.lua') --test_FourierSeries.lua
+	dofile('script/test/test_PerlinNoiseSimple.lua') --test_FourierSeries.lua
 	-- dofile('script/demo/BilateralFilter/demo_bilateral_filter.lua') 
 end
 --dofile()
