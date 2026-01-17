@@ -51,6 +51,15 @@ end
 metatable_vector.__eq = function(myvalue, value)
     return myvalue.x == value.x and myvalue.y == value.y
 end
+metatable_vector.__mod = function(myvalue, value)
+    if type(value) == "number" then
+        return Vector.new(myvalue.x % value, myvalue.y % value)
+    elseif type(value) == "table" and value.renderid == Render.Vector2Id then
+        return Vector.new(myvalue.x % value.x, myvalue.y % value.y)
+    else
+        _errorAssert(false, "metatable_vector2.__mod~")
+    end
+end
 
 metatable_vector.__call = function(mytable, x, y)
     _errorAssert(type(x) == 'number' and type(y) == 'number',  'metatable_vector.__call x, y')

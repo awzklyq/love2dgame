@@ -28,6 +28,15 @@ math.noise = function(...)
     return value--2 * value - 1
 end
 
+math.NoiseVector3 = function(InV)
+    return math.noise(InV.x, InV.y, InV.z )
+end
+
+math.NoiseVector2 = function(InV)
+    return math.noise(InV.x, InV.y )
+end
+
+
 local GetCross = function(p1, p2, p)
 	return (p2.x - p1.x) * (p.y - p1.y) - (p.x - p1.x) * (p2.y - p1.y);
 end
