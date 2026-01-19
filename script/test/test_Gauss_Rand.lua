@@ -1,13 +1,13 @@
 math.randomseed(os.time()%10000)
 
 local _GetGaussRand = function()
-    local _Num = 1 + math.ceil(math.random() * 2)
+    local _Num = 3 + math.ceil(math.random() * 2)
     local _Sum = 0
     for i = 1, _Num do
         _Sum = _Sum + math.random()
     end
 
-    return math.abs((_Sum / _Num) - 0.5)
+    return math.abs((_Sum / _Num) - 0.5) * 2
 end
 
 local _Number = 100
@@ -50,3 +50,10 @@ app.render(function(dt)
     _OriCircle:draw()
     _OriRect:draw()
 end)
+
+-- local _III = 0
+-- for i = 1, 10000 do
+--     _III = _III +  math.random() 
+-- end
+
+-- log('aaaaaaaa', _III / 10000)
