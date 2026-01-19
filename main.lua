@@ -219,7 +219,7 @@ if not _G.TEST then
 	end)
 
 else
-	dofile('script/test/test_CurlNoise.lua') --test_FourierSeries.lua
+	dofile('script/test/test_Gauss_Rand.lua') --test_FourierSeries.lua
 	-- dofile('script/demo/BilateralFilter/demo_bilateral_filter.lua') 
 end
 --dofile()

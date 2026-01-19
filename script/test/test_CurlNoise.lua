@@ -12,9 +12,9 @@ for i = 1, X_Numer do
         local _Start = _StartPos + _Offset * Vector.new(i, j)
         -- local _End = _Start + Vector.new(2, 2)
         local _rect = Rect.new(_Start.x, _Start.y, 4, 4, "fill")
-        local _ColorValueR = math.random(1, 255)
-        local _ColorValueG = math.random(1, 255)
-        local _ColorValueB = math.random(1, 255)
+        local _ColorValueR = (i / X_Numer) *255--  math.random(1, 255)
+        local _ColorValueG =  255 - (i / X_Numer) *255--math.random(1, 255)
+        local _ColorValueB = 255--math.random(1, 255)
         _rect:SetColor(_ColorValueR, _ColorValueG, _ColorValueB, 255)
         _Rects[#_Rects + 1] = _rect
     end
