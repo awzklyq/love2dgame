@@ -477,7 +477,7 @@ function Polygon2D:draw()
     if self._RenderMode == "Polygon2D" then
         Render.RenderObject(self);
 
-        RenderSet.PusMatrix2D(self.transform)
+        RenderSet.PushMatrix2D(self.transform)
         if self._IsRenderPoints then
             for i = 1, #self._Points do
                 self._Points[i]:draw()
@@ -491,7 +491,7 @@ function Polygon2D:draw()
         end
         RenderSet.PopMatrix2D()
     else
-        RenderSet.PusMatrix2D(self.transform)
+        RenderSet.PushMatrix2D(self.transform)
         if not self._Triangles then
             self:GenerateTriangles(true)
         end

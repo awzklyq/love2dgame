@@ -61,7 +61,7 @@ RenderSet.getCameraFrustumProjectMatrix = function()
 end
 
 local _Matrix2Ds = {}
-RenderSet.PusMatrix2D = function(InMatrix2D)
+RenderSet.PushMatrix2D = function(InMatrix2D)
     _Matrix2Ds[#_Matrix2Ds + 1] = InMatrix2D
 end
 

@@ -260,12 +260,11 @@ end
 Render.RenderObject = function(obj)
     if not _G.lovedebug.renderobject then return end
     love.graphics.push();
+    RenderSet.UseMatrix2D()
     if obj.transform and obj.transform.renderid == Render.MatrixId and obj.renderid ~= Render.EntityBodyId then
         obj.transform:use(obj);
     elseif obj.transform and obj.transform.renderid == Render.Matrix2DId then
         obj.transform:use();
-    else
-        RenderSet.UseMatrix2D()
     end
 
     if obj.shader then
