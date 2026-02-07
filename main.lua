@@ -219,7 +219,7 @@ if not _G.TEST then
 	end)
 
 else
-	dofile('script/test/test_Complex_DOF.lua') --test_FourierSeries.lua
+	dofile('script/test/test_GammaFunction1.lua') --test_FourierSeries.lua
 	-- dofile('script/demo/BilateralFilter/demo_bilateral_filter.lua') 
 end
 --dofile()

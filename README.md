@@ -160,6 +160,7 @@ Include：
 	script/test/test_PerlinNoiseSimple.lua(自定义柏林噪声)
 	script/test/test_Gauss_Rand.lua(高斯随机)
 	script/test/test_Complex_DOF.lua(原自：GDC:Circular Separable Convolution Depth of Field “Circular Dof”Kleber Garcia Rendering Engineer – Frostbite Engine Electronic Arts Inc.)
+	script/test/test_GammaFunction1.lua (Stirling's formula近似 Gamma Function)
 	
 Demo：
 	script/demo/BilateralFilter/demo_bilateral_filter.lua
