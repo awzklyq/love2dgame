@@ -11,7 +11,7 @@ local vertexFormat = {
 function Mesh.new(vertices, mode, usage)
     local mesh = setmetatable({}, Mesh);
     -- mesh.obj = love.graphics.newMesh(vertices, mode, usage)
-    mesh.obj = love.graphics.newMesh(vertexFormat, vertices, "fan")
+    mesh.obj = love.graphics.newMesh(vertexFormat, vertices, mode or "fan")
 
     mesh.transform = Matrix.new()
     mesh.renderid = Render.MeshId ;
@@ -159,3 +159,95 @@ _G.MeshQuadBlur.new = function(w, h, color)
 end
 
 
+_G.MeshGrids = {}
+
+_G.MeshGrids.new = function(w, h, wn, hn, color, img)
+    -- local vertices = {-w * 0.5, -h * 0.5, 
+    -- w * 0.5, -h * 0.5,
+    -- w * 0.5, h * 0.5,
+    -- -w * 0.5, h * 0.5};
+
+    local _OffsetX = w / wn
+    local _OffsetY = h / hn
+
+    local _StartX = 0
+    local _StartY = 0
+    local _AllVertices = {}
+    local _AllUVs = {}
+    for i = 1, wn - 1 do
+        for j = 1, hn - 1 do
+            local vertices = {0 , 0 , 
+            0 , h ,
+            w , h ,
+            w , 0 };
+
+            local sx = _StartX + (i - 1) * _OffsetX
+            local sy = _StartY + (j - 1) * _OffsetY
+
+            local v1 = {sx, sy}
+            local v2 = {sx, sy + _OffsetY}
+            local v3 = {sx + _OffsetX, sy + _OffsetY}
+
+            local v4 = {sx, sy}
+            local v5 = {sx + _OffsetX, sy + _OffsetY}
+            local v6 = {sx + _OffsetX, sy}
+
+            _AllVertices[#_AllVertices + 1] = v1
+            _AllVertices[#_AllVertices + 1] = v2
+            _AllVertices[#_AllVertices + 1] = v3
+
+            _AllVertices[#_AllVertices + 1] = v4
+            _AllVertices[#_AllVertices + 1] = v5
+            _AllVertices[#_AllVertices + 1] = v6
+
+
+            local uv1 = {(v1[1] - _StartX) / w, (v1[2] - _StartY) / h }
+            local uv2 = {(v2[1] - _StartX) / w, (v2[2] - _StartY) / h }
+            local uv3 = {(v3[1] - _StartX) / w, (v3[2] - _StartY) / h }
+            local uv4 = {(v4[1] - _StartX) / w, (v4[2] - _StartY) / h }
+            local uv5 = {(v5[1] - _StartX) / w, (v5[2] - _StartY) / h }
+            local uv6 = {(v6[1] - _StartX) / w, (v6[2] - _StartY) / h }
+
+            _AllUVs[#_AllUVs + 1] = uv1
+            _AllUVs[#_AllUVs + 1] = uv2
+            _AllUVs[#_AllUVs + 1] = uv3
+
+            _AllUVs[#_AllUVs + 1] = uv4
+            _AllUVs[#_AllUVs + 1] = uv5
+            _AllUVs[#_AllUVs + 1] = uv6
+
+        end
+    end
+    
+    
+    local _Datas = {}
+    for i = 1, #_AllVertices do
+        local _Data = {}
+        _Data[#_Data + 1] = _AllVertices[i][1]
+        _Data[#_Data + 1] = _AllVertices[i][2]
+
+        _Data[#_Data + 1] = _AllUVs[i][1]
+        _Data[#_Data + 1] = _AllUVs[i][2]
+
+        _Data[#_Data + 1] = color._r
+        _Data[#_Data + 1] = color._g
+        _Data[#_Data + 1] = color._b
+        _Data[#_Data + 1] = color._a
+
+        _Datas[#_Datas + 1] = _Data
+    end
+
+    local mesh = Mesh.new(_Datas, "triangles");
+    if img then
+        if img.obj then
+            mesh:setTexture(img.obj)
+        else
+            mesh:setTexture(img)
+        end
+        
+    end
+
+    mesh.shader = Shader.GetBaseShader()
+
+    return mesh;
+end
