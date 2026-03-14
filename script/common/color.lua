@@ -1,4 +1,5 @@
 _G.LColor = {}
+
 function LColor.new(r, g, b, a)
     local color = setmetatable({}, LColor);
 
@@ -63,6 +64,45 @@ function LColor:Set(c, g, b, a)
     end
 end
 
+function LColor:getBrightness()
+    return 0.2126 * self._r + 0.7152 * self._g + 0.0722 *self._b
+end
+
+function LColor:AdjustGray(InNewGray)
+    local gray = self:GetGray()
+
+    local scale = InNewGray / gray
+    -- log('aaaaaaaa', scale, 'tttttt',  InNewGray, 'yyyyyy', gray)
+    self.r = math.min(255, math.max(0, self.r * scale))
+    self.g = math.min(255, math.max(0, self.g * scale))
+    self.b = math.min(255, math.max(0, self.b * scale))
+
+end
+
+function LColor:GetGray()
+    return self:GetLuminance()
+end
+
+function LColor:MulLuminance(InLum)
+    self.r = math.clamp(InLum * self.r , 0, 255)
+    self.g = math.clamp(InLum * self.g , 0, 255)
+    self.b = math.clamp(InLum * self.b , 0, 255)
+
+    return self
+end
+
+function LColor:AsVector()
+    return Vector3.new(self.r, self.g, self.b)
+end
+
+function LColor.Lerp(InColor1, InColor2, InValue)
+    local v1 = InColor1:AsVector()
+    local V2 = InColor2:AsVector()
+    local v3 = Vector3.lerp (v1, V2, InValue)
+    return v3:AsColor()
+end
+
+
 
 
 LColor.__index = function(tab, key)
@@ -103,35 +143,12 @@ LColor.__eq = function(myvalue, value)
     return myvalue._r == value._r and  myvalue._g == value._g and  myvalue._b == value._b
 end
 
-function LColor:getBrightness()
-    return 0.2126 * self._r + 0.7152 * self._g + 0.0722 *self._b
-end
-
-function LColor:AdjustGray(InNewGray)
-    local gray = self:GetGray()
-
-    local scale = InNewGray / gray
-    -- log('aaaaaaaa', scale, 'tttttt',  InNewGray, 'yyyyyy', gray)
-    self.r = math.min(255, math.max(0, self.r * scale))
-    self.g = math.min(255, math.max(0, self.g * scale))
-    self.b = math.min(255, math.max(0, self.b * scale))
-
-end
-
-function LColor:GetGray()
-    return self:GetLuminance()
-end
-
-function LColor:MulLuminance(InLum)
-    self.r = math.clamp(InLum * self.r , 0, 255)
-    self.g = math.clamp(InLum * self.g , 0, 255)
-    self.b = math.clamp(InLum * self.b , 0, 255)
-
-    return self
-end
-
-function LColor:AsVector()
-    return Vector3.new(self.r, self.g, self.b)
+LColor.__mul = function(myvalue, value)
+    if type(value) == 'number' then
+        return LColor.new(myvalue.r * value, myvalue.g * value, myvalue.b * value, myvalue.a) -- TODO
+    else
+        check(false, 'function LColor.__mul')
+    end
 end
 
 LColor.Red = LColor.new(255, 0, 0, 255)

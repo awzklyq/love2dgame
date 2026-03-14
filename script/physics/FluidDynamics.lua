@@ -16,8 +16,12 @@ function NSGrids.new(InStartX, InStartY, InW, InH, InWN, InHN)
     grid._WN = InWN
     grid._HN = InHN
 
+    grid._Diff = 0.005
+
     grid._OffsetX = InW / InWN
     grid._OffsetY = InH / InHN
+
+    grid._SourceColor = LColor.Blue
 
     grid._Datas = {}
     grid._Mesh = _G.MeshGrids.new(InStartX, InStartY, InW, InH, InWN, InHN, LColor.White, nil, 
@@ -30,7 +34,7 @@ function NSGrids.new(InStartX, InStartY, InW, InH, InWN, InHN)
 
         local AddIndex = 1
         if not grid._Datas[InI][InJ] then
-            grid._Datas[InI][InJ] = {}
+            grid._Datas[InI][InJ] = {_Density0 = 0.0, _Density1 = 0.0, _VaildDensity = false}
         else
             AddIndex = #grid._Datas[InI][InJ] + 1
         end
@@ -42,6 +46,55 @@ function NSGrids.new(InStartX, InStartY, InW, InH, InWN, InHN)
     return grid
 end
 
+function NSGrids:SetVaildDensity()
+    for i = 1, #self._Datas do
+        for j = 1, #self._Datas[i] do
+            local _Data = self._Datas[i][j]
+            check(_Data)
+
+            if _Data._Density0 ~= _Data._Density1 then
+                self:UpdateGridColor(i, j, LColor.Lerp(LColor.White, self._SourceColor, _Data._Density1))
+            end
+            _Data._Density0 = _Data._Density1
+            _Data._VaildDensity = false
+        end
+    end
+end
+
+function NSGrids:GetDiffValue(dt)
+    return self._Diff * self._WN * self._HN * dt
+end
+function NSGrids:GetGridVaild_Density(InI, InJ)
+    if not self:CheckIndexVaild(InI, InJ) then
+        return 0
+    end
+
+    local _Data = self._Datas[InI][InJ]
+    return _Data._VaildDensity and _Data._Density1 or _Data._Density0
+end
+
+function NSGrids:Diffusion_Density(InDiff)
+    for i = 1, #self._Datas do
+        for j = 1, #self._Datas[i] do
+            local _Data = self._Datas[i][j]
+            local ds = InDiff * (self:GetGridVaild_Density(i - 1, j) +  self:GetGridVaild_Density(i + 1, j) + self:GetGridVaild_Density(i, j - 1) + self:GetGridVaild_Density(i , j + 1) )
+            ds = _Data._Density0 + ds
+            ds = ds / (1 + 4 * InDiff)
+
+            _Data._Density1 = ds
+            _Data._VaildDensity = true
+        end
+    end
+
+    self:SetVaildDensity()
+end
+
+function NSGrids:Update_Density(dt)
+    local diff = self:GetDiffValue(dt)
+
+    
+    self:Diffusion_Density(diff)
+end
 function NSGrids:CheckPositionIn(InX, InY)
     return InX >= self._StartX and InX < self._StartX + self._W and InY >= self._StartY and InY <= self._StartY + self._H
 end
@@ -92,6 +145,7 @@ function NSGrids:GetGridDataFormPosition(InX, InY)
     return _Datas
 end
 
+
 function NSGrids:SetPositionColor(InX, InY, InColor)
     local _Datas = self:GetGridDataFormPosition(InX, InY)
     if not _Datas then
@@ -110,6 +164,24 @@ function NSGrids:SetPositionColor(InX, InY, InColor)
     self:UpdateGridColor(_Datas[_Index].i, _Datas[_Index].j, InColor)
 end
 
+function NSGrids:SetPositionDensity(InX, InY, InDensity)
+     local _Datas = self:GetGridDataFormPosition(InX, InY)
+    if not _Datas then
+        return
+    end
+
+    local _MinDistance = _Datas[1].distance
+    local _Index = 1
+    for i = 2, #_Datas do
+        if _MinDistance >  _Datas[i].distance then
+            _Index = i
+            _MinDistance = _Datas[i].distance
+        end
+    end
+
+    -- log('aaaaa', InDensity)
+    self:Set_Density(_Datas[_Index].i, _Datas[_Index].j, InDensity)
+end
 function NSGrids:UpdateGridColor(InI, InJ, InColor)
     local _Data = self._Datas[InI][InJ]
     check(_Data)
@@ -124,6 +196,17 @@ function NSGrids:UpdateGridColor(InI, InJ, InColor)
         self._Mesh:SetVertex(d._Index,  d._Data)
     end
 
+end
+
+function NSGrids:Set_Density(InI, InJ, InDensity)
+    local _Data = self._Datas[InI][InJ]
+    check(_Data)
+    _Data._Density0 = InDensity
+
+end
+
+function NSGrids:update(dt)
+    self:Update_Density(dt)
 end
 
 function NSGrids:draw()
@@ -144,7 +227,16 @@ function NavierStokesEquations:SetPositionColor(InX, InY, InColor)
     self._Grids:SetPositionColor(InX, InY, InColor)
 end
 
+function NavierStokesEquations:SetPositionDensity(InX, InY, InDensity)
+    self._Grids:SetPositionDensity(InX, InY, InDensity)
+end
+
+
 function NavierStokesEquations:draw()
     self._Grids:draw()
+end
+
+function NavierStokesEquations:update(dt)
+    self._Grids:update(dt)
 end
 

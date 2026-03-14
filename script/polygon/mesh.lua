@@ -58,7 +58,7 @@ end
 function Mesh:SetVertex(InIndex, InData)
     self:setVertex( InIndex, InData[1], InData[2], InData[3], InData[4], InData[5], InData[6], InData[7], InData[8])
 
-    self:Flush()
+    -- self:Flush()
 end
 
 function Mesh:setBaseTexture(canvas)
