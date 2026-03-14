@@ -105,6 +105,8 @@ dofile('script/groupmanager.lua')
 dofile('script/physics/world.lua')
 dofile('script/physics/floatage.lua')
 dofile('script/physics/XenoCollide2D.lua')
+dofile('script/physics/FluidDynamics.lua')
+
 dofile('script/entity/entity.lua')
 dofile('script/entity/bullet.lua')
 dofile('script/entity/body.lua')
@@ -219,7 +221,7 @@ if not _G.TEST then
 	end)
 
 else
-	dofile('script/test/test_TaylorTheorem.lua') --test_FourierSeries.lua
+	dofile('script/test/test_NS_Slover.lua') --test_FourierSeries.lua
 	-- dofile('script/demo/BilateralFilter/demo_bilateral_filter.lua') 
 end
 --dofile()

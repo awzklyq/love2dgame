@@ -49,6 +49,18 @@ function Mesh:setCanvas(canvas)
     self:setTexture(canvas.obj)
 end
 
+function Mesh:Flush()
+    self:flush()
+end
+
+-- Mesh:setVertex( index, x, y, u, v, r, g, b, a )
+
+function Mesh:SetVertex(InIndex, InData)
+    self:setVertex( InIndex, InData[1], InData[2], InData[3], InData[4], InData[5], InData[6], InData[7], InData[8])
+
+    self:Flush()
+end
+
 function Mesh:setBaseTexture(canvas)
     if not canvas then
         self.shader = Shader.GetBaseShader()
@@ -161,7 +173,7 @@ end
 
 _G.MeshGrids = {}
 
-_G.MeshGrids.new = function(w, h, wn, hn, color, img)
+_G.MeshGrids.new = function(InStartX, InStartY, w, h, wn, hn, color, img, InFunc)
     -- local vertices = {-w * 0.5, -h * 0.5, 
     -- w * 0.5, -h * 0.5,
     -- w * 0.5, h * 0.5,
@@ -170,12 +182,13 @@ _G.MeshGrids.new = function(w, h, wn, hn, color, img)
     local _OffsetX = w / wn
     local _OffsetY = h / hn
 
-    local _StartX = 0
-    local _StartY = 0
+    local _StartX = InStartX
+    local _StartY = InStartY
     local _AllVertices = {}
     local _AllUVs = {}
-    for i = 1, wn - 1 do
-        for j = 1, hn - 1 do
+    local Indexs = {}
+    for i = 1, wn do
+        for j = 1, hn do
             local vertices = {0 , 0 , 
             0 , h ,
             w , h ,
@@ -200,6 +213,21 @@ _G.MeshGrids.new = function(w, h, wn, hn, color, img)
             _AllVertices[#_AllVertices + 1] = v5
             _AllVertices[#_AllVertices + 1] = v6
 
+            local index1 = {i, j}
+            local index2 = {i, j + 1}
+            local index3 = {i + 1, j + 1}
+
+            local index4 = {i, j}
+            local index5 = {i + 1, j + 1}
+            local index6 = {i + 1, j}
+
+            Indexs[#Indexs + 1] = index1
+            Indexs[#Indexs + 1] = index2
+            Indexs[#Indexs + 1] = index3
+
+            Indexs[#Indexs + 1] = index4
+            Indexs[#Indexs + 1] = index5
+            Indexs[#Indexs + 1] = index6
 
             local uv1 = {(v1[1] - _StartX) / w, (v1[2] - _StartY) / h }
             local uv2 = {(v2[1] - _StartX) / w, (v2[2] - _StartY) / h }
@@ -234,6 +262,9 @@ _G.MeshGrids.new = function(w, h, wn, hn, color, img)
         _Data[#_Data + 1] = color._b
         _Data[#_Data + 1] = color._a
 
+        if InFunc then
+            InFunc(#_Datas + 1, Indexs[i][1], Indexs[i][2], _Data)
+        end
         _Datas[#_Datas + 1] = _Data
     end
 

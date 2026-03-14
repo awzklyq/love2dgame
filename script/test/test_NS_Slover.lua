@@ -2,8 +2,19 @@
 
 math.randomseed(os.time()%10000)
 
-local _MeshGrid = _G.MeshGrids.new(500, 500, 10, 10, LColor.White)
+local NSE = NavierStokesEquations.new(50, 50, 500, 500, 10, 10)
 
 app.render(function(dt)
-    _MeshGrid:draw()
+    NSE:draw()
 end)
+
+
+app.mousepressed(function(x, y, button, istouch)
+    log(x, y)
+    NSE:SetPositionColor(x, y, LColor.Blue)
+end)
+
+local checkb = UI.CheckBox.new( 10, 10, 20, 20, "Wireframe" )
+checkb.ChangeEvent = function(Enable)
+    RenderSet.SetWireframe(Enable)
+end

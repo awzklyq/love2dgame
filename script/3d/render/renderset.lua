@@ -198,12 +198,17 @@ RenderSet.ClearCanvasColorAndDepth = function ()
     love.graphics.setMeshCullMode("none")
 end
 
+RenderSet.SetWireframe = function(...)
+    love.graphics.setWireframe(...)    
+end
+
 app.resizeWindow(function(w, h)
     if NeedResizeCanva then
         CanvasColor = Canvas.new(w, h, {format = "rgba8", readable = true, msaa = 0, mipmaps="none"})
         DepthBuff = Canvas.new(w, h, {format = "depth24stencil8", readable = true, msaa = 0, mipmaps="none"})
     end
 end)
+
 
 RenderSet.screenwidth = love.graphics.getPixelWidth()
 RenderSet.screenheight = love.graphics.getPixelHeight()
