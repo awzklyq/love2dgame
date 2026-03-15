@@ -263,7 +263,7 @@ _G.MeshGrids.new = function(InStartX, InStartY, w, h, wn, hn, color, img, InFunc
         _Data[#_Data + 1] = color._a
 
         if InFunc then
-            InFunc(#_Datas + 1, Indexs[i][1], Indexs[i][2], _Data)
+            InFunc(#_Datas + 1, Indexs[i][1], Indexs[i][2], _Data, _AllVertices[i][1], _AllVertices[i][2])
         end
         _Datas[#_Datas + 1] = _Data
     end

@@ -238,3 +238,4 @@ Vector.Copy = Vector.copy
 
 Vector.Up = Vector.new(0, 1)
 Vector.Origin = Vector.new(0, 0)
+Vector.Zero = Vector.new(0, 0)
