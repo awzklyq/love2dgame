@@ -22,7 +22,7 @@ function NSGrids.new(InStartX, InStartY, InW, InH, InWN, InHN)
     grid._OffsetX = InW / InWN
     grid._OffsetY = InH / InHN
 
-    grid._SourceColor = LColor.Blue
+    grid._SourceColor = LColor.Black
 
     grid._Datas = {}
     grid._Mesh = _G.MeshGrids.new(InStartX, InStartY, InW, InH, InWN, InHN, LColor.White, nil, 
@@ -35,7 +35,7 @@ function NSGrids.new(InStartX, InStartY, InW, InH, InWN, InHN)
 
         local AddIndex = 1
         if not grid._Datas[InI][InJ] then
-            grid._Datas[InI][InJ] = {_Density0 = 0.0, _Density1 = 0.0, _VaildDensity = false, _VelocityU0 = 0, _VelocityU1 = 0, _VaildVelocityU = false, _VelocityV0 = 0, _VelocityV1 = 0, _VaildVelocityV = false, _X = InX, _Y = InY}
+            grid._Datas[InI][InJ] = {_Density0 = 0.0, _Density1 = 0.0, _VaildDensity = false, _VelocityU0 = 0, _VelocityU1 = 0, _VaildVelocityU = false, _VelocityV0 = 0, _VelocityV1 = 0, _VaildVelocityV = false, _X = InX, _Y = InY, _P = 0, _Div = 0}
         else
             AddIndex = #grid._Datas[InI][InJ] + 1
         end
@@ -110,6 +110,15 @@ function NSGrids:GetGridVaild_VelocityV(InI, InJ)
 
     local _Data = self._Datas[InI][InJ]
     return _Data._VaildVelocityV and _Data._VelocityV1 or _Data._VelocityV0
+end
+
+function NSGrids:GetGrid_P(InI, InJ)
+    if not self:CheckIndexVaild(InI, InJ) then
+        return 0
+    end
+
+    local _Data = self._Datas[InI][InJ]
+    return _Data._P
 end
 
 function NSGrids:Diffusion_Density(InDiff)
@@ -225,6 +234,39 @@ function NSGrids:Advection_Velocity(dt)
     end
 end
 
+function NSGrids:Project_Velocity()
+    local h = (self._OffsetX + self._OffsetY) * 0.5
+    for i = 1, #self._Datas do
+        for j = 1, #self._Datas[i] do
+            local _Data = self._Datas[i][j]
+            _Data._P = 0
+
+            _Data._Div = 0.5 * h * (self:GetGridVaild_VelocityU(i, j + 1) - self:GetGridVaild_VelocityU(i, j - 1) + self:GetGridVaild_VelocityV(i + 1, j) - self:GetGridVaild_VelocityV(i - 1, j))
+        end
+    end
+
+    for k = 0, 2 do
+        for i = 1, #self._Datas do
+            for j = 1, #self._Datas[i] do
+                local _Data = self._Datas[i][j]
+                _Data._P = (_Data._Div + self:GetGrid_P(i + 1, j) + self:GetGrid_P(i - 1, j) + self:GetGrid_P(i, j + 1) + self:GetGrid_P(i , j - 1)) / 4
+            end
+        end    
+    end
+    
+    for i = 1, #self._Datas do
+        for j = 1, #self._Datas[i] do
+            local _Data = self._Datas[i][j]
+            _Data._VelocityU1 = _Data._VelocityU1 - 0.5 * (self:GetGrid_P(i, j + 1) + self:GetGrid_P(i , j - 1)) / h 
+            _Data._VelocityU0 = _Data._VelocityU1
+
+            _Data._VelocityV1 = _Data._VelocityV1 - 0.5 * (self:GetGrid_P(i + 1, j) + self:GetGrid_P(i - 1, j)) / h 
+            _Data._VelocityV0 = _Data._VelocityV1
+
+            -- log( _Data._VelocityU0, _Data._VelocityV0)
+        end
+    end
+end
 function NSGrids:Update_Density(dt)
     local diff = self:GetDiffValue(dt)
     
@@ -239,8 +281,10 @@ function NSGrids:Update_Velocity(dt)
     local Viscosity = self:GetViscosityValue(dt)
     
     self:Diffusion_Velocity(Viscosity)
+    self:Project_Velocity()
 
     self:Advection_Velocity(dt)
+    self:Project_Velocity()
 
     self:SetVaildVelocity()
 end
@@ -382,6 +426,23 @@ function NSGrids:Set_Velocity(InI, InJ, InVelocityV, InVelocityU)
     _Data._VelocityU0 = InVelocityU
     _Data._VelocityV0 = InVelocityV
 
+    _Data._VaildVelocityU = false
+    _Data._VaildVelocityV = false
+
+end
+
+function NSGrids:ResetVelocity()
+    for i = 1, #self._Datas do
+        for j = 1, #self._Datas[i] do
+            local _Data = self._Datas[i][j]
+            _Data._VelocityU0 = 0
+            _Data._VelocityV0 = 0
+
+            _Data._VaildVelocityU = false
+            _Data._VaildVelocityV = false
+
+        end
+    end  
 end
 
 function NSGrids:update(dt)
@@ -391,6 +452,15 @@ end
 
 function NSGrids:draw()
     self._Mesh:draw()    
+end
+
+function NSGrids:LogVelocity()
+    for i = 1, #self._Datas do
+        for j = 1, #self._Datas[i] do
+            local _Data = self._Datas[i][j]
+            log("Velocity", i, j, _Data._VelocityU0, _Data._VelocityV0)
+        end
+    end  
 end
 
 _G.NavierStokesEquations = {}
@@ -415,11 +485,19 @@ function NavierStokesEquations:SetPositionVelocity(InX, InY, InVelocityV, InVelo
     self._Grids:SetPositionVelocity(InX, InY, InVelocityV, InVelocityU)
 end
 
+
+function NavierStokesEquations:ResetVelocity()
+    self._Grids:ResetVelocity()
+end
 function NavierStokesEquations:draw()
     self._Grids:draw()
 end
 
 function NavierStokesEquations:update(dt)
     self._Grids:update(dt)
+end
+
+function NavierStokesEquations:LogVelocity()
+    self._Grids:LogVelocity()
 end
 

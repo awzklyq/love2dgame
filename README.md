@@ -162,5 +162,6 @@ Include：
 	script/test/test_Complex_DOF.lua(原自：GDC:Circular Separable Convolution Depth of Field “Circular Dof”Kleber Garcia Rendering Engineer – Frostbite Engine Electronic Arts Inc.)
 	script/test/test_GammaFunction1.lua (Stirling's formula近似 Gamma Function)
 	script/test/test_TaylorTheorem.lua(学习Taylor Theorem，N介余项会缩小近似误差)
+	script/test/test_NS_Slover.lua(学习Navier-Stokes Equations)
 Demo：
 	script/demo/BilateralFilter/demo_bilateral_filter.lua

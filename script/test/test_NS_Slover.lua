@@ -6,7 +6,7 @@ local _StartX = 50
 local _StartY = 50
 local _W = 400
 local _H = 400
-local NSE = NavierStokesEquations.new(_StartX, _StartY, _W, _H, 80, 80)
+local NSE = NavierStokesEquations.new(_StartX, _StartY, _W, _H, 100, 100)
 
 app.render(function(dt)
     NSE:draw()
@@ -19,14 +19,28 @@ end)
 app.mousepressed(function(x, y, button, istouch)
     log(x, y)
     -- NSE:SetPositionColor(x, y, LColor.Blue)
-    NSE:SetPositionDensity(x, y, 300)
+    NSE:SetPositionDensity(x, y, 150)
+    NSE:ResetVelocity()
+
+    local SpeedX = math.random(0, 100) 
+    local SpeedY = math.random(0, 100) 
+    -- log("Speed", SpeedX, SpeedY)
+     NSE:SetPositionVelocity(x, y, SpeedX, SpeedY)
     for i = 1, 20 do
-        local SpeedX = math.random(-100, 100) * 0.001, math.random(-100, 100) * 0.001
-        local SpeedY = math.random(-100, 100) * 0.001, math.random(-100, 100) * 0.001
-        log("Speed", SpeedX, SpeedY)
+        local SpeedX = math.random(-100, 100) 
+        local SpeedY = math.random(-100, 100)
         --log(math.random(_StartX, _StartX + _W), math.random(_StartY, _StartY + _H), math.random(0, 100) * -1)
         NSE:SetPositionVelocity(math.random(_StartX, _StartX + _W), math.random(_StartY, _StartY + _H), SpeedX, SpeedY)
     end
+    
+end)
+
+
+app.keypressed(function(key, scancode, isrepeat)
+    if key == "space" then
+        NSE:LogVelocity()
+    end
+
 end)
 
 local checkb = UI.CheckBox.new( 10, 10, 20, 20, "Wireframe" )
